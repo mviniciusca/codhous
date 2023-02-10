@@ -1,10 +1,10 @@
 <?php
 
-namespace App\View\Components\dashboard\layout\navbar;
+namespace App\View\Components\dashboard\layout;
 
 use Illuminate\View\Component;
 
-class app extends Component
+class sidebar extends Component
 {
     /**
      * Create a new component instance.
@@ -23,6 +23,6 @@ class app extends Component
      */
     public function render()
     {
-        return view('components.dashboard.layout.navbar.app');
+        return view('components.dashboard.layout.sidebar');
     }
 }
