@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,13 +22,22 @@ Route::prefix('dashboard')->group(function () {
     })->middleware(['auth', 'verified'])->name('dashboard');
 
     Route::middleware('auth')->group(function () {
+
+        /** Profile Routes */
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+        /** Customers Routes */
         Route::controller(CustomerController::class)->group(function () {
             Route::get('/customers', 'create')->name('customers.index');
         });
+
+        /** Tasks Routes */
+        Route::controller(TaskController::class)->group(function () {
+             Route::get('/tasks','create')->name('tasks.index');
+        });
+
     });
 });
 

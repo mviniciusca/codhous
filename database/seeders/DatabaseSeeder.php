@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\Task;
 use App\Models\Customer;
 use Illuminate\Database\Seeder;
 
@@ -17,5 +18,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         Customer::factory(10)->create();
+        Task::factory(10)->create();
     }
 }
