@@ -21,12 +21,12 @@
 
 </head>
 
-<body class="h-screen font-inter text-sm text-gray-500 antialiased">
+<body class="h-screen w-screen bg-gray-50 font-inter text-sm text-gray-700 antialiased">
     <div class="flex h-screen">
-        <div class="w-52 bg-gray-100">
+        <nav class="w-60 bg-white p-8">
             @include('layouts.navigation')
-        </div>
-        <main class="w-screen bg-gray-50 p-8">
+        </nav>
+        <main class="w-full p-8">
             {{ $slot }}
         </main>
     </div>
