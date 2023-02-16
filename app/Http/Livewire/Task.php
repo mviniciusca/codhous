@@ -9,15 +9,20 @@ class Task extends Component
 {
     public ModelTask $task;
 
+    protected $listeners = [
+        'task::destroyed' => '$refresh',
+    ];
+
     public function mount(ModelTask $task)
     {
         $this->task = $task;
     }
+
     public function render()
     {
         return view('livewire.task', [
-            'total' => ModelTask::all()->count(),
-            'items' => ModelTask::all()->sortByDesc('id'),
+            'total' => $this->task->all()->count(),
+            'tasks' => $this->task->all()->sortByDesc('id'),
         ]);
     }
 }
