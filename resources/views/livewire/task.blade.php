@@ -1,38 +1,42 @@
-    <div class="grid w-full rounded-2xl bg-white p-8">
-        <div class="flex items-center justify-between gap-3 text-sm font-bold">
+        <div class="grid w-full rounded-2xl bg-white p-8">
 
-            <div class="flex items-center gap-3 text-base">
-                {{-- Icon and Title --}}
-                <ion-icon class="text-lg" name="bookmarks-outline"></ion-icon>
-                <div id="title">Latest Tasks</div>
-                {{-- Badge --}}
-                <span class="flex items-center rounded-lg bg-gray-800 p-1 text-xs font-bold text-gray-100">
-                    {{ $total }}
-                </span>
-            </div>
-            {{-- Navigation --}}
-            <div class="flex gap-3">
+            <div class="flex items-center justify-between gap-3 text-sm font-bold">
 
-                <button>
-                    <ion-icon class="text-lg" name="chevron-back-outline"></ion-icon>
-                </button>
+                <div class="flex items-center gap-3 text-base">
+                    {{-- Icon and Title --}}
 
-                <button>
-                    <ion-icon class="text-lg" name="chevron-forward-outline"></ion-icon>
-                </button>
-
-            </div>
-        </div>
-        {{-- Listing Content  --}}
-        <div class="mt-8">
-            @foreach ($tasks as $task)
-                <div class="mb-5 flex items-center justify-between gap-14">
-                    <label for="{{ $task->id }}">
-                        <input name="status" id="{{ $task->id }}" type="checkbox">
-                        {{ $task->title }}
-                    </label>
-                    {{--  Delete Component --}}
-                    <livewire:task.destroy :task="$task" :key="$task->id" />
+                    <div class="text-gray-500" id="title">Latest Tasks</div>
+                    {{-- Badge --}}
+                    @if ($total > 0)
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-gray-600 p-3 text-xs text-gray-100">
+                            {{ $total }}
+                        </span>
+                    @endif
                 </div>
-            @endforeach
+                {{-- Navigation --}}
+                <div class="flex gap-3">
+                    {{ $tasks->links() }}
+                </div>
+            </div>
+
+            {{-- Listing Content  --}}
+            <div class="mt-8">
+                @foreach ($tasks as $task)
+                    <div class="mb-4 flex w-full items-center justify-between gap-5">
+                        {{-- Listing Items --}}
+                        <livewire:task.listing :task="$task" :key="$task->id . '-updated'" />
+                        {{--  Delete Component --}}
+                        <livewire:task.destroy :task="$task" :key="$task->id . '-delete ?>'" />
+                    </div>
+                @endforeach
+
+                {{-- Empty / Clear Results --}}
+                @if ($total == 0)
+                    <x-clear />
+                @endif
+                {{-- Empty / Clear Results --}}
+
+            </div>
+
         </div>

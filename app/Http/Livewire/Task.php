@@ -4,13 +4,16 @@ namespace App\Http\Livewire;
 
 use App\Models\Task as ModelTask;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Task extends Component
 {
+    use WithPagination;
     public ModelTask $task;
 
     protected $listeners = [
         'task::destroyed' => '$refresh',
+        'task::updated' => '$refresh'
     ];
 
     public function mount(ModelTask $task)
@@ -22,7 +25,12 @@ class Task extends Component
     {
         return view('livewire.task', [
             'total' => $this->task->all()->count(),
-            'tasks' => $this->task->all()->sortByDesc('id'),
+            'tasks' => ModelTask::simplePaginate(10),
         ]);
+    }
+
+    public function updated()
+    {
+        $this->task->save();
     }
 }
