@@ -48,6 +48,7 @@ class HeroSection extends PageBlock
                                     ->required()
                                     ->placeholder('Button Link')
                                     ->label('Button Link')
+                                    ->prefixIcon('heroicon-o-link')
                                     ->maxLength(50),
                                 TextInput::make('btn_full_text')
                                     ->required()
@@ -57,6 +58,7 @@ class HeroSection extends PageBlock
                                 TextInput::make('btn_full_url')
                                     ->required()
                                     ->placeholder('Button Link')
+                                    ->prefixIcon('heroicon-o-link')
                                     ->label('Button Link')
                                     ->maxLength(50),
                             ])
