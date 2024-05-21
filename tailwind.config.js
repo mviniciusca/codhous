@@ -14,6 +14,8 @@ export default {
             primary: colors.zinc,
             secondary: colors.indigo,
             tertiary: colors.rose,
+            red: colors.red,
+            green: colors.green,
         },
         extend: {},
   },
