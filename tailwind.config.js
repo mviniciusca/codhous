@@ -1,12 +1,21 @@
 /** @type {import('tailwindcss').Config} */
+const colors = require('tailwindcss/colors')
 export default {
     content: [
     "./resources/**/*.blade.php",
     "./resources/**/*.js",
     "./resources/**/*.vue",
   ],
-  theme: {
-    extend: {},
+    theme: {
+        fontFamily: {
+            sans: ['"Inter", sans-serif']
+        },
+        colors: {
+            primary: colors.zinc,
+            secondary: colors.indigo,
+            tertiary: colors.rose,
+        },
+        extend: {},
   },
   plugins: [],
 }

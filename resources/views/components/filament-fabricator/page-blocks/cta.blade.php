@@ -8,12 +8,12 @@
                 class="mx-auto max-w-screen-xl items-center gap-8 px-4 py-8 sm:py-16 md:grid md:grid-cols-2 lg:px-6 xl:gap-16">
                 <img class="w-full" src="{{ asset('storage/' . $image) }}" alt="image">
                 <div class="mt-4 md:mt-0">
-                    <h2 class="mb-4 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                    <h2 class="dark:text-white mb-4 text-4xl font-extrabold tracking-tight text-primary-700">
                         {{ $title }}
                     </h2>
-                    <p class="mb-6 font-light text-gray-500 md:text-lg dark:text-gray-400">{{ $subtitle }}</p>
+                    <p class="text-gray-500 dark:text-gray-400 mb-6 font-light md:text-lg">{{ $subtitle }}</p>
                     <a href="{{ $btn_url }}"
-                        class="bg-primary-700 hover:bg-primary-200 focus:ring-primary-300 dark:focus:ring-primary-900 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4">
+                        class="text-white inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium hover:bg-primary-200 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900">
                         {{ $btn_text }}
                         <svg class="-mr-1 ml-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg">
