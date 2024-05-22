@@ -17,9 +17,12 @@ class FeatureList extends PageBlock
             ->schema([
                 Section::make('Feature List Cards')
                     ->description('Create a list of cards with icon + title + short description')
+                    ->collapsed()
                     ->icon('heroicon-o-pencil-square')
                     ->schema([
                         Repeater::make('cards')
+                            ->collapsed()
+                            ->cloneable()
                             ->columns(3)
                             ->schema([
                                 TextInput::make('icon')
