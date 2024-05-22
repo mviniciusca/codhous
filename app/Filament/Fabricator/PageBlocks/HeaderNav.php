@@ -20,7 +20,7 @@ class HeaderNav extends PageBlock
                 Section::make('Header Menu')
                     ->description('Settings of the Menu')
                     ->icon('heroicon-o-cube')
-                    ->collapsible()
+                    ->collapsed()
                     ->columns(2)
                     ->schema([
                         Group::make()->schema([
@@ -36,25 +36,25 @@ class HeaderNav extends PageBlock
                                 ->prefixIcon('heroicon-o-link')
                                 ->label('Button Link')
                         ]),
-                    ]),
-                Section::make('Navigation Menu')
-                    ->description('Navigation itens control')
-                    ->icon('heroicon-o-link')
-                    ->collapsible()
-                    ->schema([
-                        Group::make()
+                        Section::make('Navigation Menu')
+                            ->description('Navigation itens control')
+                            ->icon('heroicon-o-link')
+                            ->collapsed()
                             ->schema([
-                                Repeater::make('navigations')
+                                Group::make()
                                     ->schema([
-                                        TextInput::make('navlink_text')
-                                            ->label('Menu Text'),
-                                        TextInput::make('navlink_url')
-                                            ->label('Link URL')
-                                            ->url()
-                                            ->prefixIcon('heroicon-o-link'),
-                                    ])->columns(2),
-                            ])
-                            ->columnSpanFull(),
+                                        Repeater::make('navigations')
+                                            ->schema([
+                                                TextInput::make('navlink_text')
+                                                    ->label('Menu Text'),
+                                                TextInput::make('navlink_url')
+                                                    ->label('Link URL')
+                                                    ->url()
+                                                    ->prefixIcon('heroicon-o-link'),
+                                            ])->columns(2),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
                     ]),
             ]);
     }

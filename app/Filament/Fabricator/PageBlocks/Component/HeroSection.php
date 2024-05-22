@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Fabricator\PageBlocks;
+namespace App\Filament\Fabricator\PageBlocks\Component;
 
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
@@ -13,7 +13,7 @@ class HeroSection extends PageBlock
 {
     public static function getBlockSchema(): Block
     {
-        return Block::make('hero-section')
+        return Block::make('component.hero-section')
             ->schema([
                 Section::make('Hero Section')
                     ->description('Hero Section Settings')

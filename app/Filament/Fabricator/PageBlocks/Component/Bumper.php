@@ -19,12 +19,12 @@ class Bumper extends PageBlock
                 Section::make('Bumper Component')
                     ->icon('heroicon-o-tag')
                     ->description('Place an information with a bumper card')
-                    ->collapsible()
+                    ->collapsed()
                     ->columns(6)
                     ->schema([
                         Toggle::make('status')
                             ->label('Active')
-                            ->inline(true)
+                            ->inline(false)
                             ->default(true),
                         TextInput::make('info')
                             ->label('Tag Info')
@@ -52,7 +52,7 @@ class Bumper extends PageBlock
                                         'left' => 'Left',
                                         'right' => 'Right',
                                     ])
-                                    ->default('center')
+                                    ->default('centers')
                                     ->selectablePlaceholder(false)
                             ])
                     ])

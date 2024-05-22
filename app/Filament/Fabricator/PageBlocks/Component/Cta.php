@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Fabricator\PageBlocks;
+namespace App\Filament\Fabricator\PageBlocks\Component;
 
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
@@ -14,7 +14,7 @@ class Cta extends PageBlock
 {
     public static function getBlockSchema(): Block
     {
-        return Block::make('cta')
+        return Block::make('component.cta')
             ->schema([
                 Section::make('CTA')
                     ->description('CTA is a group with a image + text and subtitle + action button')

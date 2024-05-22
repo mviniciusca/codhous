@@ -1,5 +1,5 @@
 @aware(['page'])
-@props(['title' => null, 'image' => null, 'subtitle' => null, 'btn_text' => null, 'btn_url' => null])
+@props(['title', 'image', 'subtitle', 'btn_text', 'btn_url'])
 
 <div class="px-4 py-4 md:py-8">
     <div class="mx-auto max-w-7xl">
@@ -8,12 +8,12 @@
                 class="mx-auto max-w-screen-xl items-center gap-8 px-4 py-8 sm:py-16 md:grid md:grid-cols-2 lg:px-6 xl:gap-16">
                 <img class="w-full" src="{{ asset('storage/' . $image) }}" alt="image">
                 <div class="mt-4 md:mt-0">
-                    <h2 class="dark:text-white mb-4 text-4xl font-extrabold tracking-tight text-primary-700">
+                    <h2 class="mb-4 text-4xl font-extrabold tracking-tight">
                         {{ $title }}
                     </h2>
-                    <p class="text-gray-500 dark:text-gray-400 mb-6 font-light md:text-lg">{{ $subtitle }}</p>
+                    <p class="text-gray-500 mb-6 font-light md:text-lg">{{ $subtitle }}</p>
                     <a href="{{ $btn_url }}"
-                        class="text-white inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium hover:bg-primary-200 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900">
+                        class="inline-flex items-center rounded-lg bg-secondary-600 px-5 py-2.5 text-center text-sm font-medium text-primary-50 hover:bg-secondary-500 focus:ring-4 focus:ring-secondary-400 dark:focus:ring-secondary-900">
                         {{ $btn_text }}
                         <svg class="-mr-1 ml-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg">

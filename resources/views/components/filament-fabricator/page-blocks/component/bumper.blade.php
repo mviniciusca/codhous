@@ -1,11 +1,11 @@
 @aware(['page'])
-@props(['title' => null, 'info' => null, 'link'=> null, 'status' => true])
+@props(['title', 'info', 'link', 'status', 'bumper_position' ])
 
 @if($status)
-<div class="px-4 py-4 md:py-8">
+<div class="text-center">
     <div class="mx-auto max-w-7xl">
-        <a href="#"
-            class="text-gray-700 dark:bg-purple-100 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 mb-7 inline-flex items-center justify-between rounded-full bg-primary-200 px-1 py-1 pr-4 text-sm"
+        <a href="{{ $link }}"
+            class="mb-2 inline-flex items-center justify-between rounded-full bg-primary-200 px-1 py-1 pr-4 text-sm hover:opacity-80 dark:bg-primary-950"
             role="alert">
             <span class="mr-3 rounded-full bg-secondary-600 px-4 py-1.5 text-xs text-primary-50">{{ $info }}</span>
             <span class="text-sm font-medium">{{ $title }}</span>
