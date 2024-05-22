@@ -19,7 +19,7 @@ class ButtonGroup extends PageBlock
                 Section::make('Group Buttons')
                     ->description('A group with a pair of buttons')
                     ->icon('heroicon-o-paint-brush')
-                    ->collapsible()
+                    ->collapsed()
                     ->schema([
                         Group::make()
                             ->schema([
