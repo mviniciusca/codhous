@@ -45,8 +45,16 @@ class HeaderInfo extends PageBlock
                         Section::make('Layout')
                             ->description('Layout Settings')
                             ->icon('heroicon-o-cog-6-tooth')
+                            ->columns(2)
                             ->collapsed()
                             ->schema([
+                                Select::make('title_font_size')
+                                    ->options([
+                                        'small' => 'Small',
+                                        'normal' => 'Normal',
+                                        'large' => 'Large'
+                                    ])
+                                    ->default('normal'),
                                 Select::make('position')
                                     ->options([
                                         'center' => 'Center',
