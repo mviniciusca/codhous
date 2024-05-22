@@ -2,7 +2,7 @@
 @props(['title', 'image', 'subtitle', 'btn_text', 'btn_url'])
 
 
-<section class="bg-white dark:bg-gray-900">
+<section>
     <div class="mx-auto max-w-screen-xl items-center gap-8 px-4 py-8 sm:py-16 md:grid md:grid-cols-2 lg:px-6 xl:gap-16">
         <img class="w-full" src="{{ asset('storage/' . $image) }}" alt="image">
         <div class="mt-4 md:mt-0">
