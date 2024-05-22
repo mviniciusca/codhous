@@ -3,6 +3,7 @@ const colors = require('tailwindcss/colors')
 export default {
     content: [
     "./resources/**/*.blade.php",
+    "./resources/views/components/filament-fabricator/**/*.blade.php",
     "./resources/**/*.js",
     "./resources/**/*.vue",
   ],
