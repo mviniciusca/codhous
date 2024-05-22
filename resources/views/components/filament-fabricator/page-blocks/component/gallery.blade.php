@@ -1,114 +1,25 @@
 @aware(['page'])
-<section class="text-gray-600 body-font">
+@props(['images'])
+
+<section>
     <div class="container mx-auto px-5 py-24">
-        <div class="mb-20 flex w-full flex-col text-center">
-            <h1 class="title-font text-gray-900 mb-4 text-2xl font-medium sm:text-3xl">Master Cleanse Reliac
-                Heirloom
-            </h1>
-            <p class="mx-auto text-base leading-relaxed lg:w-2/3">Whatever cardigan tote bag tumblr hexagon
-                brooklyn
-                asymmetrical gentrify, subway tile poke farm-to-table. Franzen you probably haven't heard of
-                them
-                man
-                bun deep jianbing selfies heirloom.</p>
-        </div>
         <div class="-m-4 flex flex-wrap">
+            @foreach ($images as $image )
             <div class="p-4 sm:w-1/2 lg:w-1/3">
                 <div class="relative flex">
-                    <img alt="gallery" class="absolute inset-0 h-full w-full object-cover object-center"
-                        src="https://dummyimage.com/600x360">
+                    <img alt="image" class="absolute inset-0 h-full w-full object-cover object-center"
+                        src="{{ asset('storage/' . $image['image']) }}">
                     <div
-                        class="border-gray-200 bg-white relative z-10 w-full border-4 px-8 py-10 opacity-0 hover:opacity-100">
-                        <h2 class="title-font text-indigo-500 mb-1 text-sm font-medium tracking-widest">THE
-                            SUBTITLE
+                        class="relative z-10 w-full border-4 border-primary-200 bg-primary-50 px-8 py-10 opacity-0 hover:opacity-100 dark:border-primary-700 dark:bg-primary-800">
+                        <h2 class="mb-3 text-sm font-bold uppercase tracking-widest text-secondary-400">
+                            {{ $image['subtitle'] }}
                         </h2>
-                        <h1 class="title-font text-gray-900 mb-3 text-lg font-medium">Shooting Stars</h1>
-                        <p class="leading-relaxed">Photo booth fam kinfolk cold-pressed sriracha leggings
-                            jianbing
-                            microdosing tousled waistcoat.</p>
+                        <h1 class="mb-3 text-lg font-bold">{{ $image['title'] }}</h1>
+                        <p class="leading-relaxed">{{ $image['info'] }}</p>
                     </div>
                 </div>
             </div>
-            <div class="p-4 sm:w-1/2 lg:w-1/3">
-                <div class="relative flex">
-                    <img alt="gallery" class="absolute inset-0 h-full w-full object-cover object-center"
-                        src="https://dummyimage.com/601x361">
-                    <div
-                        class="border-gray-200 bg-white relative z-10 w-full border-4 px-8 py-10 opacity-0 hover:opacity-100">
-                        <h2 class="title-font text-indigo-500 mb-1 text-sm font-medium tracking-widest">THE
-                            SUBTITLE
-                        </h2>
-                        <h1 class="title-font text-gray-900 mb-3 text-lg font-medium">The Catalyzer</h1>
-                        <p class="leading-relaxed">Photo booth fam kinfolk cold-pressed sriracha leggings
-                            jianbing
-                            microdosing tousled waistcoat.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 sm:w-1/2 lg:w-1/3">
-                <div class="relative flex">
-                    <img alt="gallery" class="absolute inset-0 h-full w-full object-cover object-center"
-                        src="https://dummyimage.com/603x363">
-                    <div
-                        class="border-gray-200 bg-white relative z-10 w-full border-4 px-8 py-10 opacity-0 hover:opacity-100">
-                        <h2 class="title-font text-indigo-500 mb-1 text-sm font-medium tracking-widest">THE
-                            SUBTITLE
-                        </h2>
-                        <h1 class="title-font text-gray-900 mb-3 text-lg font-medium">The 400 Blows</h1>
-                        <p class="leading-relaxed">Photo booth fam kinfolk cold-pressed sriracha leggings
-                            jianbing
-                            microdosing tousled waistcoat.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 sm:w-1/2 lg:w-1/3">
-                <div class="relative flex">
-                    <img alt="gallery" class="absolute inset-0 h-full w-full object-cover object-center"
-                        src="https://dummyimage.com/602x362">
-                    <div
-                        class="border-gray-200 bg-white relative z-10 w-full border-4 px-8 py-10 opacity-0 hover:opacity-100">
-                        <h2 class="title-font text-indigo-500 mb-1 text-sm font-medium tracking-widest">THE
-                            SUBTITLE
-                        </h2>
-                        <h1 class="title-font text-gray-900 mb-3 text-lg font-medium">Neptune</h1>
-                        <p class="leading-relaxed">Photo booth fam kinfolk cold-pressed sriracha leggings
-                            jianbing
-                            microdosing tousled waistcoat.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 sm:w-1/2 lg:w-1/3">
-                <div class="relative flex">
-                    <img alt="gallery" class="absolute inset-0 h-full w-full object-cover object-center"
-                        src="https://dummyimage.com/605x365">
-                    <div
-                        class="border-gray-200 bg-white relative z-10 w-full border-4 px-8 py-10 opacity-0 hover:opacity-100">
-                        <h2 class="title-font text-indigo-500 mb-1 text-sm font-medium tracking-widest">THE
-                            SUBTITLE
-                        </h2>
-                        <h1 class="title-font text-gray-900 mb-3 text-lg font-medium">Holden Caulfield</h1>
-                        <p class="leading-relaxed">Photo booth fam kinfolk cold-pressed sriracha leggings
-                            jianbing
-                            microdosing tousled waistcoat.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 sm:w-1/2 lg:w-1/3">
-                <div class="relative flex">
-                    <img alt="gallery" class="absolute inset-0 h-full w-full object-cover object-center"
-                        src="https://dummyimage.com/606x366">
-                    <div
-                        class="border-gray-200 bg-white relative z-10 w-full border-4 px-8 py-10 opacity-0 hover:opacity-100">
-                        <h2 class="title-font text-indigo-500 mb-1 text-sm font-medium tracking-widest">THE
-                            SUBTITLE
-                        </h2>
-                        <h1 class="title-font text-gray-900 mb-3 text-lg font-medium">Alper Kamu</h1>
-                        <p class="leading-relaxed">Photo booth fam kinfolk cold-pressed sriracha leggings
-                            jianbing
-                            microdosing tousled waistcoat.</p>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
