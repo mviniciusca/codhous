@@ -8,14 +8,14 @@
         </a>
         <nav class="flex flex-wrap items-center justify-center text-base md:ml-auto md:mr-auto">
             @foreach ( $navigations as $item )
-            <a href="{{ $item['navlink_url'] }}" class="hover:text-gray-900 mr-5">{{ $item['navlink_text'] }}</a>
+            <a href="{{ $item['navlink_url'] }}" class="mr-5 hover:text-secondary-500">{{ $item['navlink_text'] }}</a>
             @endforeach
         </nav>
 
         @if($menu_btn && $menu_btn_link)
         <a href="{{ $menu_btn_link }}">
             <button
-                class="bg-gray-100 hover:bg-gray-200 mt-4 inline-flex items-center rounded border-0 px-3 py-1 text-base focus:outline-none md:mt-0">{{ $menu_btn }}
+                class="mt-4 inline-flex items-center rounded border-0 bg-secondary-500 px-3 py-1 text-base hover:bg-secondary-600 focus:outline-none md:mt-0">{{ $menu_btn }}
                 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     class="ml-1 h-4 w-4" viewBox="0 0 24 24">
                     <path d="M5 12h14M12 5l7 7-7 7"></path>
