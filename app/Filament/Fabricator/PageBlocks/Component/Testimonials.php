@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Fabricator\PageBlocks;
+namespace App\Filament\Fabricator\PageBlocks\Component;
 
 use Filament\Forms\Components\Builder\Block;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
@@ -9,7 +9,7 @@ class Testimonials extends PageBlock
 {
     public static function getBlockSchema(): Block
     {
-        return Block::make('testimonials')
+        return Block::make('component.testimonials')
             ->schema([
                 //
             ]);

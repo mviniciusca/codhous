@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Fabricator\PageBlocks;
+namespace App\Filament\Fabricator\PageBlocks\Component;
 
 use Faker\Core\File;
 use Filament\Forms\Components\Group;
@@ -15,7 +15,7 @@ class HeaderNav extends PageBlock
 {
     public static function getBlockSchema(): Block
     {
-        return Block::make('header-nav')
+        return Block::make('component.header-nav')
             ->schema([
                 Section::make('Header Menu')
                     ->description('Settings of the Menu')
