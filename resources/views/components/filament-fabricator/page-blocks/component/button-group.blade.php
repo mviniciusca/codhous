@@ -1,7 +1,7 @@
 @aware(['page'])
-@props(['btn_full_text' => null, 'btn_full_icon' => null, 'btn_full_link' => null, 'btn_full_status' => null, 'btn_text'
-=> null, 'btn_icon' => null,
-'btn_link' => null, 'btn_status' => null])
+@props(['btn_full_text' => null, 'btn_full_icon' => null, 'btn_full_link' => null,
+'btn_full_status' => null,'btn_text'=> null, 'btn_icon' => null, 'btn_link' => null,
+'btn_status' => null])
 
 @if($btn_full_status)
 <div class="mb-8 flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-4 sm:space-y-0 lg:mb-16">
@@ -11,7 +11,6 @@
         <x-ionicon :icon="$btn_full_icon" />
     </a>
     @endif
-
 
     @if($btn_status)
     <a href="{{ $btn_link }}"
