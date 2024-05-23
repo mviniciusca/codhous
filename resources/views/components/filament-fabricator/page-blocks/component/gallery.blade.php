@@ -1,6 +1,7 @@
 @aware(['page'])
 @props(['images', 'only_images', 'only_title', 'only_subtitle', 'only_info', 'col_size', 'link'])
 
+@if(count($images) != null)
 <div
     class="grid grid-cols-2 gap-4 {{ ($col_size == 2 ? 'md:grid-cols-2' : ($col_size == 3 ? 'md:grid-cols-3' : ($col_size == 4 ? 'md:grid-cols-4' : ($col_size == 5 ? 'md:grid-cols-5' : 'md:grid-cols-6' )))) }}">
 
@@ -28,3 +29,11 @@
     </a>
     @endforeach
 </div>
+@endif
+
+@auth
+{{-- Empty Section --}}
+@if(count($images) == null)
+<x-section.empty-section />
+@endif
+@endauth
