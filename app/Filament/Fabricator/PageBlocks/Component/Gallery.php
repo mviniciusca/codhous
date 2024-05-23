@@ -8,6 +8,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
 class Gallery extends PageBlock
@@ -16,6 +17,15 @@ class Gallery extends PageBlock
     {
         return Block::make('component.gallery')
             ->schema([
+                Section::make('Gallery Settings')
+                    ->description('Gallery Settings')
+                    ->icon('heroicon-o-cog')
+                    ->collapsible()
+                    ->schema([
+                        Toggle::make('only_images')
+                            ->inline(false)
+                            ->label('Display only Images')
+                    ]),
                 Section::make('Image Gallery')
                     ->description('Add a new Image Gallery. Use same size images')
                     ->icon('heroicon-o-photo')
