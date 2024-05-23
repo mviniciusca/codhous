@@ -4,6 +4,7 @@ namespace App\Filament\Fabricator\PageBlocks\Component;
 
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -22,9 +23,23 @@ class Gallery extends PageBlock
                     ->icon('heroicon-o-cog')
                     ->collapsible()
                     ->schema([
-                        Toggle::make('only_images')
-                            ->inline(false)
-                            ->label('Display only Images')
+                        Group::make()
+                            ->columns(4)
+                            ->schema([
+                                Toggle::make('only_images')
+                                    ->inline(false)
+                                    ->label('Display only Images'),
+                                Toggle::make('only_title')
+                                    ->inline(false)
+                                    ->label('Display only title'),
+                                Toggle::make('only_subtitle')
+                                    ->inline(false)
+                                    ->label('Display only subtitle'),
+                                Toggle::make('only_info')
+                                    ->inline(false)
+                                    ->label('Display only info')
+                            ]),
+
                     ]),
                 Section::make('Image Gallery')
                     ->description('Add a new Image Gallery. Use same size images')
@@ -32,12 +47,12 @@ class Gallery extends PageBlock
                     ->collapsed()
                     ->schema([
                         Repeater::make('images')
-                            ->columns(2)
+                            ->columns(6)
                             ->cloneable()
                             ->collapsed()
                             ->schema([
                                 FileUpload::make('image')
-                                    ->columnSpanFull()
+                                    ->columnSpan(2)
                                     ->label('Image Upload')
                                     ->directory('gallery')
                                     ->helperText('Image should be 16:9 aspect ratio')
@@ -49,17 +64,23 @@ class Gallery extends PageBlock
                                         '1:1',
                                     ])
                                     ->imageEditor(),
-                                TextInput::make('title')
-                                    ->label('Title')
-                                    ->maxLength(30),
-                                TextInput::make('subtitle')
-                                    ->label('Subtitle')
-                                    ->maxLength(30),
-                                Textarea::make('info')
-                                    ->label('Info')
-                                    ->rows(2)
-                                    ->maxLength(100)
-                                    ->columnSpanFull()
+                                Group::make()
+                                    ->columnSpan(4)
+                                    ->schema([
+                                        Group::make()
+                                            ->schema([
+                                                TextInput::make('title')
+                                                    ->label('Title')
+                                                    ->maxLength(30),
+                                                TextInput::make('subtitle')
+                                                    ->label('Subtitle')
+                                                    ->maxLength(30),
+                                                Textarea::make('info')
+                                                    ->label('Info')
+                                                    ->rows(2)
+                                                    ->maxLength(100)
+                                            ])
+                                    ]),
                             ])
                     ])
             ]);
