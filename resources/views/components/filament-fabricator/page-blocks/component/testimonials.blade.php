@@ -1,5 +1,7 @@
 @aware(['page'])
-<section class="bg-white dark:bg-gray-900">
+@props(['avatar', 'name', 'job_position', 'opinion'])
+
+<section>
     <div class="mx-auto max-w-screen-xl px-4 py-8 text-center lg:px-6 lg:py-16">
         <figure class="mx-auto max-w-screen-md">
             <svg class="text-gray-400 dark:text-gray-600 mx-auto mb-3 h-12" viewBox="0 0 24 27" fill="none"
@@ -9,19 +11,13 @@
                     fill="currentColor" />
             </svg>
             <blockquote>
-                <p class="text-gray-900 dark:text-white text-2xl font-medium">"Flowbite is just awesome. It
-                    contains
-                    tons of predesigned components and pages starting from login screen to complex dashboard.
-                    Perfect
-                    choice for your next SaaS application."</p>
+                <p class="text-gray-900 dark:text-white text-2xl font-medium">"{!! $opinion !!}"</p>
             </blockquote>
             <figcaption class="mt-6 flex items-center justify-center space-x-3">
-                <img class="h-6 w-6 rounded-full"
-                    src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gouch.png"
-                    alt="profile picture">
+                <img class="h-6 w-6 rounded-full" src="{{ asset('storage/' . $avatar) }}" alt="profile picture">
                 <div class="divide-gray-500 dark:divide-gray-700 flex items-center divide-x-2">
-                    <div class="text-gray-900 dark:text-white pr-3 font-medium">Micheal Gough</div>
-                    <div class="text-gray-500 dark:text-gray-400 pl-3 text-sm font-light">CEO at Google</div>
+                    <div class="text-gray-900 dark:text-white pr-3 font-medium">{{ $name }}</div>
+                    <div class="text-gray-500 dark:text-gray-400 pl-3 text-sm font-light">{{ $job_position }}</div>
                 </div>
             </figcaption>
         </figure>
