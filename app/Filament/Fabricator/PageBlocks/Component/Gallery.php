@@ -3,10 +3,12 @@
 namespace App\Filament\Fabricator\PageBlocks\Component;
 
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -20,24 +22,48 @@ class Gallery extends PageBlock
             ->schema([
                 Section::make('Gallery Settings')
                     ->description('Gallery Settings')
-                    ->icon('heroicon-o-cog')
+                    ->icon('heroicon-o-cog-6-tooth')
                     ->collapsible()
                     ->schema([
                         Group::make()
-                            ->columns(4)
                             ->schema([
-                                Toggle::make('only_images')
-                                    ->inline(false)
-                                    ->label('Display only Images'),
-                                Toggle::make('only_title')
-                                    ->inline(false)
-                                    ->label('Display only title'),
-                                Toggle::make('only_subtitle')
-                                    ->inline(false)
-                                    ->label('Display only subtitle'),
-                                Toggle::make('only_info')
-                                    ->inline(false)
-                                    ->label('Display only info')
+                                Fieldset::make('Display on this Gallery')
+                                    ->columns(4)
+                                    ->schema([
+                                        Toggle::make('only_images')
+                                            ->inline(false)
+                                            ->default(false)
+                                            ->label('Only Images'),
+                                        Toggle::make('only_title')
+                                            ->inline(false)
+                                            ->default(true)
+                                            ->label('Title'),
+                                        Toggle::make('only_subtitle')
+                                            ->inline(false)
+                                            ->default(true)
+                                            ->label('Subtitle'),
+                                        Toggle::make('only_info')
+                                            ->inline(false)
+                                            ->default(true)
+                                            ->label('Info')
+                                    ]),
+                                Fieldset::make('Gallery Grid')
+                                    ->schema([
+                                        Group::make()
+                                            ->schema([
+                                                Select::make('col_size')
+                                                    ->label('Items per View')
+                                                    ->helperText('Show how many items you want to see in the gallery\'s row')
+                                                    ->options([
+                                                        '2' => '2',
+                                                        '3' => '3',
+                                                        '4' => '4',
+                                                        '5' => '5',
+                                                        '6' => '6',
+                                                    ])
+                                                    ->default('4')
+                                            ]),
+                                    ])
                             ]),
 
                     ]),
@@ -78,7 +104,10 @@ class Gallery extends PageBlock
                                                 Textarea::make('info')
                                                     ->label('Info')
                                                     ->rows(2)
-                                                    ->maxLength(100)
+                                                    ->maxLength(100),
+                                                TextInput::make('link')
+                                                    ->prefixIcon('heroicon-o-link')
+                                                    ->label('Link')
                                             ])
                                     ]),
                             ])
