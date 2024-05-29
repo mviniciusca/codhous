@@ -14,6 +14,8 @@ return new class extends Migration {
         Schema::create('contacts', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Setting::class)->constrained();
+            $table->string('address_name')
+                ->default('main');
             $table->text('map');
             $table->string('address');
             $table->timestamps();

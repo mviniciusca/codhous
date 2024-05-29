@@ -18,7 +18,7 @@ class ContactFactory extends Factory
     {
         return [
             'map' => 'map',
-            'address' => 'rio de janeiro'
+            'address' => 'rio de janeiro',
         ];
     }
 }
