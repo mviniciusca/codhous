@@ -4,20 +4,16 @@ namespace App\Models;
 
 use App\Models\Contact;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Setting extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
-    /**
-     *  TODO: Doc this
-     * Summary of contacts
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function contact(): BelongsTo
+    public function contact(): HasOne
     {
-        return $this->belongsTo(Contact::class);
+        return $this->hasOne(Contact::class);
     }
 }
