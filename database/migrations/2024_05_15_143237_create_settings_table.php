@@ -21,8 +21,6 @@ return new class extends Migration {
 
             $table->string('meta_title');
             $table->string('meta_author');
-            $table->string('meta_favicon')
-                ->nullable();
             $table->string('meta_keywords');
             $table->string('meta_description');
 
