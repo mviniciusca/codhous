@@ -14,6 +14,7 @@
     <div class="main-base">
         <div class="px-4 py-4">
             <div class="mx-auto max-w-7xl">
+                <x-core.header />
                 <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
             </div>
             <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
