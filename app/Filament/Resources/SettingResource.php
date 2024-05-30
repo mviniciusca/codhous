@@ -3,6 +3,8 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables;
 use App\Models\Setting;
 use Filament\Forms\Form;
@@ -32,7 +34,29 @@ class SettingResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Section::make(__('App Settings'))
+                    ->description(__('Define the Application Global Settings'))
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->collapsible()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('app_name')
+                            ->label(__('Application Name'))
+                            ->helperText(__('Define here the Application or Website Name.'))
+                            ->maxLength(140)
+                            ->required(),
+                        TextInput::make('email')
+                            ->label(__('Public E-mail'))
+                            ->helperText(__('Define here the e-mail address for you or your Company. This is a public information.'))
+                            ->maxLength(140)
+                            ->required(),
+                        TextInput::make('office_hour')
+                            ->label(__('Office Hour'))
+                            ->helperText(__('Define here the office hour of your Company.'))
+                            ->maxLength(140)
+                            ->columnSpanFull()
+                            ->required(),
+                    ])
             ]);
     }
 
