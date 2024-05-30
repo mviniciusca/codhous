@@ -56,7 +56,33 @@ class SettingResource extends Resource
                             ->maxLength(140)
                             ->columnSpanFull()
                             ->required(),
-                    ])
+                    ]),
+                Section::make('SEO & Meta')
+                    ->description(__('Define here the search engine optimization with meta tags'))
+                    ->icon('heroicon-o-magnifying-glass')
+                    ->collapsible()
+                    ->columns(2)
+                    ->schema([]),
+                Section::make('Security and Management')
+                    ->description(__('Control the visibility of application'))
+                    ->icon('heroicon-o-shield-exclamation')
+                    ->collapsible()
+                    ->columns(2)
+                    ->schema([]),
+                Section::make('Modules Control')
+                    ->description(__('Control the global module visibility'))
+                    ->icon('heroicon-o-eye')
+                    ->collapsible()
+                    ->columns(2)
+                    ->schema([]),
+                Section::make('Add-ons & External Complements')
+                    ->description(__('Boost the website with complements or scripts from external source'))
+                    ->icon('heroicon-o-puzzle-piece')
+                    ->collapsible()
+                    ->columns(2)
+                    ->schema([]),
+
+
             ]);
     }
 
