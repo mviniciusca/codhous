@@ -3,8 +3,9 @@
 namespace App\View\Components\Core;
 
 use Closure;
-use Illuminate\Contracts\View\View;
+use App\Models\Contact as ContactModel;
 use Illuminate\View\Component;
+use Illuminate\Contracts\View\View;
 
 class Contact extends Component
 {
@@ -21,6 +22,9 @@ class Contact extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.core.contact');
+        return view(
+            'components.core.contact',
+            ['contact' => ContactModel::first()]
+        );
     }
 }
