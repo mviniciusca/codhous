@@ -25,6 +25,7 @@ class SettingResource extends Resource
     {
         return $page->generateNavigationItems([
             Pages\EditContact::class,
+            Pages\EditLayout::class,
         ]);
     }
     public static function form(Form $form): Form
@@ -69,7 +70,8 @@ class SettingResource extends Resource
             'index' => Pages\ListSettings::route('/'),
             'create' => Pages\CreateSetting::route('/create'),
             'edit' => Pages\EditSetting::route('/{record}/edit'),
-            'edit_contact' => Pages\EditContact::route('/{record}/edit-contact')
+            'edit_layout' => Pages\EditLayout::route('/{record}/edit-layout'),
+            'edit_contact' => Pages\EditContact::route('/{record}/edit-contact'),
         ];
     }
 }

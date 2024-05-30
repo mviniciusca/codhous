@@ -27,7 +27,7 @@ class EditContact extends EditRecord
     {
         return $form
             ->schema([
-                Section::make(__('Visibilty Control'))
+                Section::make(__('Visibility Control'))
                     ->icon('heroicon-o-eye')
                     ->relationship('contact')
                     ->description(__('Control the public visibility of this section.'))
@@ -63,7 +63,7 @@ class EditContact extends EditRecord
                                     ->required()
                                     ->placeholder('<iframe src=" ... ')
                                     ->label(__('Google Maps Code'))
-                                    ->helperText(__('Paste here only https code inside after src. Exemple: <iframe src=""></iframe> from your Google Maps localization'))
+                                    ->helperText(__('Paste here only https code inside after src. Example: <iframe src=""></iframe> from your Google Maps localization'))
                                     ->rows(5),
                             ])
                     ]),
