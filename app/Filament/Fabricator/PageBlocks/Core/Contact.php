@@ -3,6 +3,7 @@
 namespace App\Filament\Fabricator\PageBlocks\Core;
 
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
@@ -12,12 +13,15 @@ class Contact extends PageBlock
     {
         return Block::make('core.contact')
             ->icon('heroicon-o-cpu-chip')
-            ->label(__('Contact Section'))
+            ->label('Contact Section')
             ->schema([
-                Section::make(__('Contact Section'))
-                    ->description(__('Core Feature for a Contact Section. This can be edited on Settings > Contact & Locale'))
+                Section::make(__('Core Feature: App Header'))
+                    ->description(__('Place a header in your application. Edit on Settings > Menu Navigation'))
                     ->icon('heroicon-o-cpu-chip')
                     ->collapsed()
+                    ->schema([
+                        Hidden::make('id')
+                    ])
             ]);
     }
 

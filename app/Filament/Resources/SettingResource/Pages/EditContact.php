@@ -21,8 +21,6 @@ class EditContact extends EditRecord
     {
         return __('Contact & Locale');
     }
-
-
     public function form(Form $form): Form
     {
         return $form
