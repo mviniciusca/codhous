@@ -1,4 +1,4 @@
-<header class="body-font text-gray-600 mb-8">
+<header>
     <div class="container mx-auto flex flex-col flex-wrap items-center p-5 md:flex-row">
 
         {{-- Application Logo --}}

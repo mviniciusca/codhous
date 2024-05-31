@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->foreignIdFor(Setting::class)->constrained();
             $table->boolean('status')->default(true);
             $table->json('navigation');
+            $table->json('nav_button');
             $table->timestamps();
         });
     }

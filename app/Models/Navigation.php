@@ -20,6 +20,7 @@ class Navigation extends Model
     {
         return [
             'navigation' => 'array',
+            'nav_button' => 'array',
         ];
     }
 

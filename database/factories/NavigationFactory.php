@@ -17,7 +17,8 @@ class NavigationFactory extends Factory
     public function definition(): array
     {
         return [
-            'navigation' => ''
+            'navigation' => '',
+            'nav_button' => '',
         ];
     }
 }
