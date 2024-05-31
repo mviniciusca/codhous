@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Contact;
 use App\Models\Layout;
+use App\Models\Navigation;
 use App\Models\Setting;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -24,6 +25,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Layout::factory()->create([
+            'setting_id' => $setting->id,
+        ]);
+
+        Navigation::factory()->create([
             'setting_id' => $setting->id,
         ]);
 
