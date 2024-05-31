@@ -23,7 +23,8 @@ class Navigation extends Component
     public function render(): View|Closure|string
     {
         return view('components.core.header.navigation', [
-            'navigation' => NavigationModel::all(),
+            'navigation' =>
+                NavigationModel::all()
         ]);
     }
 }

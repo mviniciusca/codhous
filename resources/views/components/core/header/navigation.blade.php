@@ -1,4 +1,3 @@
-@dd($navigation)
 <div class="flex items-center lg:order-2">
     <button data-collapse-toggle="mobile-menu-2" type="button"
         class="text-gray-500 hover:bg-gray-100 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 ml-1 inline-flex items-center rounded-lg p-2 text-sm focus:outline-none focus:ring-2 lg:hidden"
@@ -18,9 +17,15 @@
 </div>
 <div class="hidden w-full items-center justify-between lg:order-1 lg:flex lg:w-auto" id="mobile-menu-2">
     <ul class="mt-4 flex flex-col font-medium lg:mt-0 lg:flex-row lg:space-x-8">
+        @foreach ($navigation as $index => $key)
+        @foreach ($key['navigation'] as $menu )
         <li>
-            <a href="#"
-                class="text-gray-700 border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700 block border-b py-2 pl-3 pr-4 lg:border-0 lg:p-0 lg:hover:text-primary-700">Company</a>
+            <a target="{{ $menu['target'] }}" href="{{ $menu['menu_url'] }}"
+                class="text-gray-700 border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700 block border-b py-2 pl-3 pr-4 lg:border-0 lg:p-0 lg:hover:text-primary-700">
+                {{ $menu['menu_title'] }}
+            </a>
         </li>
+        @endforeach
+        @endforeach
     </ul>
 </div>
