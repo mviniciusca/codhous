@@ -15,10 +15,12 @@ class Bumper extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.bumper')
+            ->icon('heroicon-o-cube')
+            ->label(__('Bumper'))
             ->schema([
                 Section::make('Bumper Component')
-                    ->icon('heroicon-o-tag')
-                    ->description('Place an information with a bumper card')
+                    ->icon('heroicon-o-bell-alert')
+                    ->description(__('Place an information with a bumper card anywhere in your applications'))
                     ->collapsed()
                     ->columns(6)
                     ->schema([
