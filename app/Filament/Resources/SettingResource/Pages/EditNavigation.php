@@ -26,6 +26,7 @@ class EditNavigation extends EditRecord
                 Section::make(__('Navigation Menu'))
                     ->description(__('Define the navigation menu of the application'))
                     ->icon('heroicon-o-bars-3-bottom-left')
+                    ->relationship('navigation')
                     ->collapsible()
                     ->schema([
                         Repeater::make('navigation')

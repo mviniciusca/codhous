@@ -3,8 +3,9 @@
 namespace App\View\Components\Core\Header;
 
 use Closure;
-use Illuminate\Contracts\View\View;
+use App\Models\Navigation as NavigationModel;
 use Illuminate\View\Component;
+use Illuminate\Contracts\View\View;
 
 class Navigation extends Component
 {
@@ -21,6 +22,8 @@ class Navigation extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.core.header.navigation');
+        return view('components.core.header.navigation', [
+            'navigation' => NavigationModel::all(),
+        ]);
     }
 }
