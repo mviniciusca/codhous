@@ -16,10 +16,12 @@ class HeaderNav extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.header-nav')
+            ->icon('heroicon-o-cube')
+            ->label(__('Navigation Menu'))
             ->schema([
-                Section::make('Header Menu')
+                Section::make('Navigation Menu')
                     ->description('Settings of the Menu')
-                    ->icon('heroicon-o-cube')
+                    ->icon('heroicon-o-bars-3-center-left')
                     ->collapsed()
                     ->columns(2)
                     ->schema([

@@ -14,11 +14,13 @@ class FeatureList extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.feature-list')
+            ->icon('heroicon-o-cube')
+            ->label(__('Feature List'))
             ->schema([
-                Section::make('Feature List Cards')
-                    ->description('Create a list of cards with icon + title + short description')
+                Section::make(__('Feature List Cards'))
+                    ->description(__('Create a list of cards with icon + title + short description'))
                     ->collapsed()
-                    ->icon('heroicon-o-pencil-square')
+                    ->icon('heroicon-o-squares-2x2')
                     ->schema([
                         Repeater::make('cards')
                             ->collapsed()

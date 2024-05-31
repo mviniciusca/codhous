@@ -15,10 +15,12 @@ class ButtonGroup extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.button-group')
+            ->icon('heroicon-o-cube')
+            ->label(__('Button Group'))
             ->schema([
                 Section::make('Group Buttons')
                     ->description('A group with a pair of buttons')
-                    ->icon('heroicon-o-paint-brush')
+                    ->icon('heroicon-o-square-3-stack-3d')
                     ->collapsed()
                     ->schema([
                         Group::make()

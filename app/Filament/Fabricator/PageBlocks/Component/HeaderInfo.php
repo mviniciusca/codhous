@@ -16,49 +16,54 @@ class HeaderInfo extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.header-info')
+            ->icon('heroicon-o-cube')
+            ->label(__('Section Title + Subtitle'))
             ->schema([
-
-                Section::make('Header Info')
-                    ->description('Header and subtitle box info')
-                    ->icon('heroicon-o-cube')
+                Section::make(__('Section Title + Subtitle'))
+                    ->description(__('Header and subtitle box info'))
+                    ->icon('heroicon-o-pencil')
                     ->columns(6)
                     ->collapsed()
                     ->schema([
                         Toggle::make('status')
                             ->inline(false)
-                            ->label('Active')
+                            ->label(__('Active'))
                             ->columnSpan(1)
                             ->default(true),
                         TextInput::make('title')
                             ->columnSpan(5)
-                            ->label('Title')
+                            ->label(__('Title'))
+                            ->helperText(__('Add a title for the section'))
+                            ->maxLength(255)
                             ->required(),
                         Group::make()
                             ->columnSpanFull()
                             ->schema([
                                 Textarea::make('subtitle')
-                                    ->label('Sub-title')
+                                    ->label(__('Subtitle'))
+                                    ->helperText(__('Add a subtitle for the section'))
+                                    ->maxLength(255)
                                     ->columnSpanFull()
-                                    ->rows(4)
+                                    ->rows(3)
                                     ->required(),
                             ]),
                         Section::make('Layout')
-                            ->description('Layout Settings')
+                            ->description(__('Layout Settings'))
                             ->icon('heroicon-o-cog-6-tooth')
                             ->columns(2)
                             ->collapsed()
                             ->schema([
                                 Select::make('title_font_size')
                                     ->options([
-                                        'small' => 'Small',
-                                        'normal' => 'Normal',
-                                        'large' => 'Large'
+                                        'small' => __('Small'),
+                                        'normal' => __('Normal'),
+                                        'large' => __('Large')
                                     ])
                                     ->default('normal'),
                                 Select::make('position')
                                     ->options([
-                                        'center' => 'Center',
-                                        'left' => 'Left',
+                                        'center' => __('Center'),
+                                        'left' => __('Left'),
                                     ])
                                     ->default('center')
                                     ->selectablePlaceholder(true)

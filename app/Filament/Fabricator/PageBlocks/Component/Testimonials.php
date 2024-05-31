@@ -15,10 +15,12 @@ class Testimonials extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.testimonials')
+            ->icon('heroicon-o-cube')
+            ->label(__('Testimonials'))
             ->schema([
                 Section::make('Testimonials')
                     ->icon('heroicon-o-user')
-                    ->description('Add a Testimonial')
+                    ->description('Add a Testimonial to your application')
                     ->collapsible()
                     ->columns(6)
                     ->schema([

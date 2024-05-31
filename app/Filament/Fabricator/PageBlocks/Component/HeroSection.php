@@ -14,10 +14,12 @@ class HeroSection extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.hero-section')
+            ->icon('heroicon-o-cube')
+            ->label(__('Hero Section'))
             ->schema([
                 Section::make('Hero Section')
                     ->description('Hero Section Settings')
-                    ->icon('heroicon-o-cube')
+                    ->icon('heroicon-o-bolt')
                     ->collapsed()
                     ->schema([
                         Group::make()

@@ -15,10 +15,12 @@ class Cta extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.cta')
+            ->icon('heroicon-o-cube')
+            ->label(__('CTA'))
             ->schema([
                 Section::make('CTA')
                     ->description('CTA is a group with a image + text and subtitle + action button')
-                    ->icon('heroicon-o-cube')
+                    ->icon('heroicon-o-stop')
                     ->collapsed()
                     ->schema([
                         Group::make([

@@ -16,7 +16,7 @@ class Header extends PageBlock
             ->label(__('Header Section'))
             ->schema([
                 Section::make(__('Core Feature: App Header'))
-                    ->description(__('Place a header in your application. Edit on Settings > Menu Navigation'))
+                    ->description(__('Place a header in your application. Edit on Settings'))
                     ->icon('heroicon-o-cpu-chip')
                     ->collapsed()
                     ->schema([

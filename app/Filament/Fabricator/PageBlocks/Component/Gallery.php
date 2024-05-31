@@ -19,6 +19,8 @@ class Gallery extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.gallery')
+            ->icon('heroicon-o-cube')
+            ->label(__('Image Gallery'))
             ->schema([
                 Section::make('Gallery Settings')
                     ->description('Gallery Settings')
