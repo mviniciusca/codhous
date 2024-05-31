@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Core\Header;
 
+use App\Models\Navigation;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -21,6 +22,10 @@ class Content extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.core.header.content');
+        return view('components.core.header.content', [
+            'buttons' => Navigation::query()
+                ->select(['nav_button'])
+                ->first()
+        ]);
     }
 }

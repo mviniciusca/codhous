@@ -1,11 +1,10 @@
-<div>
-    <a href="">
-        <button
-            class="mt-4 inline-flex items-center rounded border-0 bg-secondary-500 px-3 py-1 text-base hover:bg-secondary-600 focus:outline-none md:mt-0">
-            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                class="ml-1 h-4 w-4" viewBox="0 0 24 24">
-                <path d="M5 12h14M12 5l7 7-7 7"></path>
-            </svg>
-        </button>
-    </a>
-</div>
+@foreach ($buttons['nav_button'] as $button )
+<a href="{{ $button['button_link'] }}">
+    <button
+        class="mx-1 mt-4 inline-flex items-center rounded px-3 py-2 text-sm focus:outline-none md:mt-0 active:opacity-80
+    {{ $button['button_style'] === 'filled' ? 'bg-secondary-500 hover:bg-secondary-700 border-none font-bold' : 'bg-none border border-primary-700 hover:border-primary-700' }}">
+        {!! $button['button_title'] !!}
+        <x-ionicon :icon="$button['button_icon']" />
+    </button>
+</a>
+@endforeach
