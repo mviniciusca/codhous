@@ -4,7 +4,7 @@
 @if($status)
 <x-layout.section :$section_filled>
     <x-layout.content>
-        <div class="space-y-8 md:grid md:grid-cols-2 md:gap-12 md:space-y-0
+        <div class="py-8 space-y-8 md:grid md:grid-cols-2 md:gap-12 md:space-y-0
         {{ $grid_view === 'default' ? 'lg:grid-cols-3' : 'lg:grid-cols-4' }}">
             @foreach ($cards as $card)
             <a href="{{ $card['link'] }}">
