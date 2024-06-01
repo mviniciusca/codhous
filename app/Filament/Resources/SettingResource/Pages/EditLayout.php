@@ -48,7 +48,6 @@ class EditLayout extends EditRecord
                             ->image()
                             ->columnSpan(3)
                             ->imageEditor()
-                            ->directory('layout')
                             ->helperText(__('Upload the application background image')),
                     ])
             ]);
