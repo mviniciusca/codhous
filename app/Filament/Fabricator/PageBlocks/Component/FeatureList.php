@@ -3,6 +3,7 @@
 namespace App\Filament\Fabricator\PageBlocks\Component;
 
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -24,9 +25,17 @@ class FeatureList extends PageBlock
                     ->collapsed()
                     ->icon('heroicon-o-squares-2x2')
                     ->schema([
-                        Toggle::make('status')
-                            ->label(__('Active Module'))
-                            ->default(true),
+                        Fieldset::make('Module Settings')
+                            ->schema([
+                                Toggle::make('status')
+                                    ->label(__('Active Module'))
+                                    ->helperText(__('Active or disable this section.'))
+                                    ->default(true),
+                                Toggle::make('section_filled')
+                                    ->label(__('Section Filled'))
+                                    ->helperText(__('Applies a color contrast as background for the section'))
+                                    ->default(true),
+                            ]),
                         Section::make(__('Settings'))
                             ->description(__('Settings and configuration of this card\'s section'))
                             ->icon('heroicon-o-cog-6-tooth')
