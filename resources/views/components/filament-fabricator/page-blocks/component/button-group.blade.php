@@ -6,7 +6,7 @@
 @if($btn_full_status)
 <div class="mb-8 flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-4 sm:space-y-0 lg:mb-16">
     <a href="{{ $btn_full_link }}"
-        class="inline-flex items-center justify-center rounded-lg bg-secondary-700 px-5 py-3 text-center text-base font-medium hover:bg-secondary-800 focus:ring-4 focus:ring-secondary-300 dark:focus:ring-secondary-900">
+        class="inline-flex items-center justify-center rounded-lg bg-secondary-700 px-5 py-3 text-center text-base font-medium text-primary-50 hover:bg-secondary-800 focus:ring-4 focus:ring-secondary-300 dark:focus:ring-secondary-900">
         {{ $btn_full_text }}
         <x-ionicon :icon="$btn_full_icon" />
     </a>

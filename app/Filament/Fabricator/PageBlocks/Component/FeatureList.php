@@ -24,10 +24,13 @@ class FeatureList extends PageBlock
                     ->collapsed()
                     ->icon('heroicon-o-squares-2x2')
                     ->schema([
+                        Toggle::make('status')
+                            ->label(__('Active Module'))
+                            ->default(true),
                         Section::make(__('Settings'))
                             ->description(__('Settings and configuration of this card\'s section'))
                             ->icon('heroicon-o-cog-6-tooth')
-                            ->collapsible()
+                            ->collapsed()
                             ->columns(3)
                             ->schema([
                                 Toggle::make('centered')

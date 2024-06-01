@@ -44,8 +44,7 @@ class HeaderInfo extends PageBlock
                                     ->helperText(__('Add a subtitle for the section'))
                                     ->maxLength(255)
                                     ->columnSpanFull()
-                                    ->rows(3)
-                                    ->required(),
+                                    ->rows(3),
                             ]),
                         Section::make('Layout')
                             ->description(__('Layout Settings'))
