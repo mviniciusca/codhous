@@ -2,6 +2,7 @@
 
 namespace App\Filament\Fabricator\PageBlocks\Component;
 
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -19,17 +20,25 @@ class HeaderInfo extends PageBlock
             ->icon('heroicon-o-cube')
             ->label(__('Section Title + Subtitle'))
             ->schema([
+                Fieldset::make('module_settings')
+                    ->columns(2)
+                    ->label(__('Module Settings'))
+                    ->schema([
+                        Toggle::make('status')
+                            ->default(true)
+                            ->label(__('Active Module'))
+                            ->helperText(__('Active or disable this section')),
+                        Toggle::make('section_filled')
+                            ->default(true)
+                            ->label(__('Fill Section'))
+                            ->helperText(__('Fill this section with a contrast color')),
+                    ]),
                 Section::make(__('Section Title + Subtitle'))
                     ->description(__('Header and subtitle box info'))
                     ->icon('heroicon-o-pencil')
                     ->columns(6)
                     ->collapsed()
                     ->schema([
-                        Toggle::make('status')
-                            ->inline(false)
-                            ->label(__('Active'))
-                            ->columnSpan(1)
-                            ->default(true),
                         TextInput::make('title')
                             ->columnSpan(5)
                             ->label(__('Title'))
@@ -49,7 +58,7 @@ class HeaderInfo extends PageBlock
                         Section::make('Layout')
                             ->description(__('Layout Settings'))
                             ->icon('heroicon-o-cog-6-tooth')
-                            ->columns(2)
+                            ->columns(3)
                             ->collapsed()
                             ->schema([
                                 Select::make('title_font_size')
@@ -65,7 +74,11 @@ class HeaderInfo extends PageBlock
                                         'left' => __('Left'),
                                     ])
                                     ->default('center')
-                                    ->selectablePlaceholder(true)
+                                    ->selectablePlaceholder(true),
+                                Toggle::make('padding')
+                                    ->label(__('Vertical Padding'))
+                                    ->helperText(__('Applies a vertical space in the title'))
+                                    ->default(false)
                             ]),
                     ]),
             ]);
