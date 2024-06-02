@@ -10,6 +10,12 @@ class Layout extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    protected function casts(): array
+    {
+        return [
+            'content' => 'array',
+        ];
+    }
     public function setting()
     {
         return $this->belongsTo(Setting::class);

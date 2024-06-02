@@ -83,7 +83,7 @@ class EditNavigation extends EditRecord
                                     ->columnSpan(2)
                                     ->prefix('ionicon')
                                     ->helperText(__('Choose a Ionicon name for a icon')),
-                                Select::make('button_style')
+                                Select::make('button_target')
                                     ->options([
                                         'self' => __('Self'),
                                         'blank' => __('Blank')

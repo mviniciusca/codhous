@@ -28,8 +28,8 @@ class SettingResource extends Resource
     public static function getRecordSubNavigation(Page $page): array
     {
         return $page->generateNavigationItems([
-            Pages\EditLayout::class,
             Pages\EditNavigation::class,
+            Pages\EditLayout::class,
             Pages\EditContact::class,
         ]);
     }
