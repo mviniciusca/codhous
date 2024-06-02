@@ -22,10 +22,28 @@ class Background extends Component
      */
     public function render(): View|Closure|string
     {
+        $content = $this->getContent();
+        $background = $this->getBackground();
+
         return view('components.layout.background', [
-            'bg' => Layout::query()->
-                select(['background_image'])
-                ->first()
+            'background' => $background['background_image'],
+            'content' => $content['content'],
         ]);
+    }
+
+    public function getContent()
+    {
+        $data = Layout::query()
+            ->select(['content'])
+            ->first();
+        return $data;
+    }
+
+    public function getBackground()
+    {
+        $data = Layout::query()
+            ->select(['background_image'])
+            ->first();
+        return $data;
     }
 }

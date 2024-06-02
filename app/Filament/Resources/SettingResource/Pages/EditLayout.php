@@ -8,6 +8,7 @@ use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
@@ -89,6 +90,22 @@ class EditLayout extends EditRecord
                                         'fixed' => __('Fixed'),
                                     ])
                                     ->default('scroll'),
+                                Select::make('content.bg_size')
+                                    ->label(__('Background Size'))
+                                    ->helperText(__('Set the background size. Default value is "cover"'))
+                                    ->options([
+                                        'cover' => __('Cover'),
+                                        'auto' => __('Auto'),
+                                        'contain' => __('Contain'),
+                                    ])
+                                    ->default('scroll'),
+                                TextInput::make('content.bg_height')
+                                    ->label(__('Background Hight'))
+                                    ->helperText(__('Height in pixels (px). Default value is 680'))
+                                    ->numeric()
+                                    ->default(680)
+                                    ->maxLength(10)
+                                    ->suffix('px')
                             ]),
                         FileUpload::make('background_image')
                             ->label(__('Background Image'))
