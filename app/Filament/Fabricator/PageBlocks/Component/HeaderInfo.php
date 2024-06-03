@@ -36,7 +36,7 @@ class HeaderInfo extends PageBlock
                 Section::make(__('Section Title + Subtitle'))
                     ->description(__('Header and subtitle box info'))
                     ->icon('heroicon-o-pencil')
-                    ->columns(6)
+                    ->columns(5)
                     ->collapsed()
                     ->schema([
                         TextInput::make('title')
@@ -58,7 +58,7 @@ class HeaderInfo extends PageBlock
                         Section::make('Layout')
                             ->description(__('Layout Settings'))
                             ->icon('heroicon-o-cog-6-tooth')
-                            ->columns(3)
+                            ->columns(4)
                             ->collapsed()
                             ->schema([
                                 Select::make('title_font_size')
@@ -77,8 +77,17 @@ class HeaderInfo extends PageBlock
                                     ->selectablePlaceholder(true),
                                 Toggle::make('padding')
                                     ->label(__('Vertical Padding'))
+                                    ->inline(false)
                                     ->helperText(__('Applies a vertical space in the title'))
-                                    ->default(false)
+                                    ->default(false),
+                                Select::make('color')
+                                    ->label(__('Text Color'))
+                                    ->helperText(__('Set the color of the text. This affects the title and subtitle'))
+                                    ->options([
+                                        'dark' => __('Dark'),
+                                        'light' => __('Light'),
+                                        'default' => __('Default'),
+                                    ])->default('default'),
                             ]),
                     ]),
             ]);

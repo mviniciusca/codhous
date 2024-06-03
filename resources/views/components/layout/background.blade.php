@@ -8,8 +8,7 @@
 ])
 
 @if($status)
-<div id="app-backrgound" class="absolute -z-10 w-full
-{{ $bg_repeat . ' '. $bg_position . ' '. $bg_attachment . ' ' . $bg_size . ' ' }}"
-    style="background-image: url('{{asset('storage/' . $background)}}'); height:{{ $bg_height }}px">
+<div class="absolute -z-10 w-full overflow-hidden" style="height:{{ $bg_height . 'px' }};">
+    <img class="object-fit object-center" src="{{ asset('storage/' . $background) }}" />
 </div>
 @endif
