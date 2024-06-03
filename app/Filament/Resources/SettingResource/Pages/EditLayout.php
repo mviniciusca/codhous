@@ -65,45 +65,51 @@ class EditLayout extends EditRecord
                             ->schema([
                                 Select::make('content.bg_position')
                                     ->label(__('Background Position'))
-                                    ->helperText(__('Set the background position. Default value is "center"'))
+                                    ->helperText(__('Set the background position. Default value is "top"'))
+                                    ->required()
                                     ->options([
-                                        'center' => __('Center'),
-                                        'left' => __('Left'),
-                                        'right' => __('Right'),
+                                        'bg-top' => __('Top'),
+                                        'bg-center' => __('Center'),
+                                        'bg-left' => __('Left'),
+                                        'bg-right' => __('Right'),
                                     ])
-                                    ->default('center'),
+                                    ->default('bg-top'),
                                 Select::make('content.bg_repeat')
                                     ->label(__('Background Repeat'))
                                     ->helperText(__('Repeat the background image. Default value is "no repeat"'))
+                                    ->required()
                                     ->options([
-                                        'no-repeat' => __('No Repeat'),
-                                        'repeat' => __('Repeat'),
-                                        'repeat-x' => __('Repeat X'),
-                                        'repeat-y' => __('Repeat Y'),
+                                        'bg-no-repeat' => __('No Repeat'),
+                                        'bg-repeat' => __('Repeat'),
+                                        'bg-repeat-x' => __('Repeat X'),
+                                        'bg-repeat-y' => __('Repeat Y'),
                                     ])
-                                    ->default('no-repeat'),
+                                    ->default('bg-no-repeat'),
                                 Select::make('content.bg_attachment')
+                                    ->required()
                                     ->label(__('Background Attachment'))
                                     ->helperText(__('Set the background attachment. Default value is "scroll"'))
                                     ->options([
-                                        'scroll' => __('Scroll'),
-                                        'fixed' => __('Fixed'),
+                                        'bg-scroll' => __('Scroll'),
+                                        'bg-fixed' => __('Fixed'),
                                     ])
-                                    ->default('scroll'),
+                                    ->default('bg-scroll'),
                                 Select::make('content.bg_size')
                                     ->label(__('Background Size'))
                                     ->helperText(__('Set the background size. Default value is "cover"'))
+                                    ->required()
                                     ->options([
-                                        'cover' => __('Cover'),
-                                        'auto' => __('Auto'),
-                                        'contain' => __('Contain'),
+                                        'bg-cover' => __('Cover'),
+                                        'bg-auto' => __('Auto'),
+                                        'bg-contain' => __('Contain'),
                                     ])
-                                    ->default('scroll'),
+                                    ->default('bg-cover'),
                                 TextInput::make('content.bg_height')
                                     ->label(__('Background Hight'))
                                     ->helperText(__('Height in pixels (px). Default value is 680'))
                                     ->numeric()
                                     ->default(680)
+                                    ->required()
                                     ->maxLength(10)
                                     ->suffix('px')
                             ]),
@@ -113,6 +119,7 @@ class EditLayout extends EditRecord
                             ->imageEditor()
                             ->directory('background')
                             ->columnSpan(3)
+                            ->required()
                             ->helperText(__('Upload the application background image')),
                     ]),
             ]);

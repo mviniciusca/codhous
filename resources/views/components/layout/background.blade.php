@@ -7,7 +7,8 @@
 'bg_height' => $content['bg_height']
 ])
 
-{{ $bg_repeat }}
-<div class="absolute -z-10 h-[680px] w-full bg-auto bg-scroll bg-center bg-no-repeat"
-    style="background-image: url('{{asset('storage/' . $background)}}')">
+@if($status)
+<div class="absolute -z-10 w-full {{ $bg_repeat . ' '. $bg_position . ' '. $bg_attachment . ' ' . $bg_size . ' ' }}"
+    style="background-image: url('{{asset('storage/' . $background)}}'); height:{{ $bg_height }}px">
 </div>
+@endif
