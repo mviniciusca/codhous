@@ -9,7 +9,7 @@
 
 @if($status)
 <div class="absolute -z-10 w-full overflow-hidden" style="height:{{ $bg_height . 'px' }};">
-    <div class="h-full w-full bg-secondary-400 {{ $bg_size . ' ' . $bg_repeat . ' ' . $bg_position . ' ' . $bg_attachment . ' ' }}"
+    <div class="h-full w-full {{$bg_size . ' ' . $bg_repeat . ' ' . $bg_position . ' ' . $bg_attachment}}"
         style="background-image: url('{{ asset('storage/' . $background) }}')">
     </div>
 </div>

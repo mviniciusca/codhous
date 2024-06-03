@@ -6,7 +6,10 @@ export default {
     "./resources/views/components/filament-fabricator/**/*.blade.php",
     "./resources/**/*.js",
     "./resources/**/*.vue",
-  ],
+    ],
+    safelist: [
+       'bg-contain' ,'bg-cover', 'bg-auto', 'bg-scroll', 'bg-fixed', 'bg-center', 'bg-top', 'bg-left', 'bg-right', 'bg-repeat-x', 'bg-repeat-y', 'bg-repeat', 'bg-no-repeat'
+],
     theme: {
         fontFamily: {
             sans: ['"Inter", sans-serif']
