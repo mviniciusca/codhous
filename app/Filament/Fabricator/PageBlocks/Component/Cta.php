@@ -78,20 +78,28 @@ class Cta extends PageBlock
                                         ->prefixIcon('heroicon-o-link')
                                         ->maxLength(250),
                                     Toggle::make('target')
-                                        ->label(__('External'))
+                                        ->label(__('Ext. Link'))
                                         ->helperText(__('Open this link in a new window'))
                                         ->columnSpan(1)
+                                        ->inline(false)
                                         ->default(false),
                                     Toggle::make('iconLeft')
                                         ->label(__('Icon Position'))
                                         ->helperText(__('Place the icon before or after the text. Active is on the left.'))
-                                        ->columnSpan(2)
+                                        ->columnSpan(1)
+                                        ->inline(false)
                                         ->default(true),
                                     TextInput::make('icon')
                                         ->label(__('Ionicon name'))
                                         ->helperText(__('Use a icon name from Ionicon. Ex.: bulb-outline'))
                                         ->columnSpan(3)
                                         ->prefix('ionicon'),
+                                    Toggle::make('filled')
+                                        ->label(__('Filled Style'))
+                                        ->helperText(__('Filled or clean button style'))
+                                        ->columnSpan(1)
+                                        ->default(true)
+                                        ->inline(false),
                                 ])->columns(6)
                         ])->columns(6)
                     ])
