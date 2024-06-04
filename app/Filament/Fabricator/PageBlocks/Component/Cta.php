@@ -42,28 +42,37 @@ class Cta extends PageBlock
                         Group::make([
                             TextInput::make('title')
                                 ->required()
-                                ->label('Title')
-                                ->maxLength(50),
+                                ->label(__('Title'))
+                                ->columnSpanFull()
+                                ->maxLength(140),
                             Textarea::make('subtitle')
                                 ->required()
-                                ->label('Sub-title')
-                                ->maxLength(180),
+                                ->columnSpanFull()
+                                ->label(__('Subtitle'))
+                                ->maxLength(240),
                             TextInput::make('btn_text')
                                 ->required()
-                                ->label('Button Text')
-                                ->maxLength(50),
+                                ->label(__('Button Text'))
+                                ->maxLength(140),
                             TextInput::make('btn_url')
-                                ->required()
-                                ->label('Button URL')
+                                ->label(__('Button URL (Optional)'))
                                 ->prefixIcon('heroicon-o-link')
-                                ->maxLength(50),
+                                ->maxLength(250),
+                            Toggle::make('target')
+                                ->label(__('External Link'))
+                                ->helperText(__('Open this link in a new window'))
+                                ->default(false),
                             FileUpload::make('image')
+                                ->label(__('Upload Image'))
                                 ->image()
+                                ->directory('cta')
                                 ->required()
                                 ->imageEditor()
+                                ->imageCropAspectRatio('16:9')
+                                ->helperText(__('This will automatically crop into a 16:9 ratio format'))
                                 ->columnSpanFull(),
                         ])
-                            ->columns(2)
+                            ->columns(3)
                     ])
             ]);
     }
