@@ -44,22 +44,28 @@ class Cta extends PageBlock
                                 ->required()
                                 ->label(__('Title'))
                                 ->columnSpanFull()
+                                ->helperText(__('Title for Content. Max 140 characters'))
                                 ->maxLength(140),
                             Textarea::make('subtitle')
                                 ->required()
+                                ->rows(3)
                                 ->columnSpanFull()
                                 ->label(__('Subtitle'))
+                                ->helperText(__('Short description about the content. Max 240 characters'))
                                 ->maxLength(240),
                             TextInput::make('btn_text')
-                                ->required()
-                                ->label(__('Button Text'))
+                                ->label(__('Button Text (Optional)'))
+                                ->columnSpan(2)
+                                ->helperText(__('This show the button on page. Max 140 characters'))
                                 ->maxLength(140),
                             TextInput::make('btn_url')
                                 ->label(__('Button URL (Optional)'))
+                                ->columnSpan(3)
+                                ->helperText(__('Link for the button. Max 255 characters'))
                                 ->prefixIcon('heroicon-o-link')
                                 ->maxLength(250),
                             Toggle::make('target')
-                                ->label(__('External Link'))
+                                ->label(__('External'))
                                 ->helperText(__('Open this link in a new window'))
                                 ->default(false),
                             FileUpload::make('image')
@@ -72,7 +78,7 @@ class Cta extends PageBlock
                                 ->helperText(__('This will automatically crop into a 16:9 ratio format'))
                                 ->columnSpanFull(),
                         ])
-                            ->columns(3)
+                            ->columns(6)
                     ])
             ]);
     }
