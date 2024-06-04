@@ -1,5 +1,6 @@
 @aware(['page'])
-@props(['title', 'image', 'subtitle', 'btn_text', 'btn_url', 'status', 'axis', 'target', 'icon', 'iconLeft'])
+@props(['title', 'image', 'subtitle', 'btn_text', 'btn_url',
+'status', 'axis', 'target', 'icon', 'iconLeft'])
 
 @if($status)
 <section>
