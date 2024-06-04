@@ -40,34 +40,6 @@ class Cta extends PageBlock
                                     ->inline(false),
                             ]),
                         Group::make([
-                            TextInput::make('title')
-                                ->required()
-                                ->label(__('Title'))
-                                ->columnSpanFull()
-                                ->helperText(__('Title for Content. Max 140 characters'))
-                                ->maxLength(140),
-                            Textarea::make('subtitle')
-                                ->required()
-                                ->rows(3)
-                                ->columnSpanFull()
-                                ->label(__('Subtitle'))
-                                ->helperText(__('Short description about the content. Max 240 characters'))
-                                ->maxLength(240),
-                            TextInput::make('btn_text')
-                                ->label(__('Button Text (Optional)'))
-                                ->columnSpan(2)
-                                ->helperText(__('This show the button on page. Max 140 characters'))
-                                ->maxLength(140),
-                            TextInput::make('btn_url')
-                                ->label(__('Button URL (Optional)'))
-                                ->columnSpan(3)
-                                ->helperText(__('Link for the button. Max 255 characters'))
-                                ->prefixIcon('heroicon-o-link')
-                                ->maxLength(250),
-                            Toggle::make('target')
-                                ->label(__('External'))
-                                ->helperText(__('Open this link in a new window'))
-                                ->default(false),
                             FileUpload::make('image')
                                 ->label(__('Upload Image'))
                                 ->image()
@@ -76,10 +48,54 @@ class Cta extends PageBlock
                                 ->imageEditor()
                                 ->imageCropAspectRatio('16:9')
                                 ->helperText(__('This will automatically crop into a 16:9 ratio format'))
-                                ->columnSpanFull(),
-                        ])
-                            ->columns(6)
+                                ->columnSpan(2),
+                            Group::make()->schema([
+                                TextInput::make('title')
+                                    ->required()
+                                    ->label(__('Title'))
+                                    ->columnSpan(4)
+                                    ->helperText(__('Title for Content. Max 140 characters'))
+                                    ->maxLength(140),
+                                Textarea::make('subtitle')
+                                    ->required()
+                                    ->rows(3)
+                                    ->columnSpan(4)
+                                    ->label(__('Subtitle'))
+                                    ->helperText(__('Short description about the content. Max 240 characters'))
+                                    ->maxLength(240),
+                            ])->columnSpan(4),
+                            FieldSet::make('Button Settings')
+                                ->schema([
+                                    TextInput::make('btn_text')
+                                        ->label(__('Button Text (Optional)'))
+                                        ->columnSpan(3)
+                                        ->helperText(__('This show the button on page. Max 140 characters'))
+                                        ->maxLength(140),
+                                    TextInput::make('btn_url')
+                                        ->label(__('Button URL (Optional)'))
+                                        ->columnSpan(3)
+                                        ->helperText(__('Link for the button. Max 255 characters'))
+                                        ->prefixIcon('heroicon-o-link')
+                                        ->maxLength(250),
+                                    Toggle::make('target')
+                                        ->label(__('External'))
+                                        ->helperText(__('Open this link in a new window'))
+                                        ->columnSpan(1)
+                                        ->default(false),
+                                    Toggle::make('iconLeft')
+                                        ->label(__('Icon Position'))
+                                        ->helperText(__('Place the icon before or after the text. Active is on the left.'))
+                                        ->columnSpan(2)
+                                        ->default(true),
+                                    TextInput::make('icon')
+                                        ->label(__('Ionicon name'))
+                                        ->helperText(__('Use a icon name from Ionicon. Ex.: bulb-outline'))
+                                        ->columnSpan(3)
+                                        ->prefix('ionicon'),
+                                ])->columns(6)
+                        ])->columns(6)
                     ])
+
             ]);
     }
 
