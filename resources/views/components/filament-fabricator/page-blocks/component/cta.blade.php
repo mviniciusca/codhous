@@ -1,6 +1,6 @@
 @aware(['page'])
 @props(['title', 'image', 'subtitle', 'btn_text', 'btn_url',
-'status', 'axis', 'target', 'icon', 'iconLeft'])
+'status', 'axis', 'target', 'icon', 'iconLeft', 'filled'])
 
 @if($status)
 <section>
@@ -11,7 +11,7 @@
                 {!! $title !!}
             </h2>
             <p class="text-gray-500 mb-6 font-light md:text-lg">{!! $subtitle !!}</p>
-            <x-ui.button :$icon :$iconLeft>{{ $btn_text }}</x-ui.button>
+            <x-ui.button :$icon :$iconLeft :$filled>{{ $btn_text }}</x-ui.button>
         </div>
     </div>
 </section>
