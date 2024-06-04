@@ -57,7 +57,6 @@ class Cta extends PageBlock
                                     ->helperText(__('Title for Content. Max 140 characters'))
                                     ->maxLength(140),
                                 Textarea::make('subtitle')
-                                    ->required()
                                     ->rows(3)
                                     ->columnSpan(4)
                                     ->label(__('Subtitle'))
