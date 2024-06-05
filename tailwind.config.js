@@ -22,6 +22,8 @@ export default {
             tertiary: colors.rose,
             red: colors.red,
             green: colors.green,
+            gray: colors.gray,
+            indigo: colors.indigo,
         },
         extend: {},
   },
