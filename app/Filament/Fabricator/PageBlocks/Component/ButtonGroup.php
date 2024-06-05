@@ -5,6 +5,7 @@ namespace App\Filament\Fabricator\PageBlocks\Component;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -23,54 +24,36 @@ class ButtonGroup extends PageBlock
                     ->icon('heroicon-o-square-3-stack-3d')
                     ->collapsed()
                     ->schema([
-                        Group::make()
+                        Repeater::make('buttons')
+                            ->columns(2)
                             ->schema([
-                                Fieldset::make('Background Filled Button')
-                                    ->columns(6)
-                                    ->schema([
-                                        Toggle::make('btn_full_status')
-                                            ->inline(false)
-                                            ->default(true)
-                                            ->label('Active'),
-                                        TextInput::make('btn_full_text')
-                                            ->columnSpan(3)
-                                            ->label('Button Filled Text')
-                                            ->maxLength(50),
-                                        TextInput::make('btn_full_icon')
-                                            ->columnSpan(2)
-                                            ->prefixIcon('heroicon-o-light-bulb')
-                                            ->label('Ionicon Name')
-                                            ->helperText('Ionicon icon name'),
-                                        TextInput::make('btn_full_url')
-                                            ->columnSpanFull()
-                                            ->label('Button URL')
-                                            ->prefixIcon('heroicon-o-link')
-                                    ]),
+                                TextInput::make('title')
+                                    ->label(__('Button Title'))
+                                    ->helperText(__('Button Title. Max 80 characters'))
+                                    ->maxLength(80),
+                                TextInput::make('link')
+                                    ->label(__('URL Link'))
+                                    ->helperText(__('Button Link. Max 255 characters'))
+                                    ->maxLength(255),
+                                Toggle::make('target')
+                                    ->default(false)
+                                    ->label(__('External Link'))
+                                    ->helperText(__('When active, opens the link in the new window')),
+                                Toggle::make('filled')
+                                    ->default(true)
+                                    ->label(__('Filled Button Style'))
+                                    ->helperText(__('When active, activate the "filled" style.')),
+                                TextInput::make('icon')
+                                    ->label(__('Button Icon'))
+                                    ->prefix('ionicon')
+                                    ->helperText(__('Button Icon. Max 255 characters'))
+                                    ->maxLength(255),
+                                Toggle::make('iconLeft')
+                                    ->default(true)
+                                    ->label(__('Icon Position'))
+                                    ->helperText(__('When active, the icon appears before the text')),
                             ]),
-                        Group::make()->schema([
-                            Fieldset::make('Simply Button')
-                                ->columns(6)
-                                ->schema([
-                                    Toggle::make('btn_status')
-                                        ->inline(false)
-                                        ->default(true)
-                                        ->label('Active'),
-                                    TextInput::make('btn_text')
-                                        ->columnSpan(3)
-                                        ->label('Button Text')
-                                        ->maxLength(50),
-                                    TextInput::make('btn_icon')
-                                        ->columnSpan(2)
-                                        ->prefixIcon('heroicon-o-light-bulb')
-                                        ->label('Ionicon Name')
-                                        ->helperText('Ionicon icon name'),
-                                    TextInput::make('btn_url')
-                                        ->columnSpanFull()
-                                        ->label('Button URL')
-                                        ->prefixIcon('heroicon-o-link')
-                                ]),
-                        ]),
-                    ]),
+                    ])
             ]);
     }
 
