@@ -36,6 +36,11 @@
                         class="bg-white w-full rounded border border-gray-300 px-3 py-1 text-base leading-8 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
                 </div>
                 <div class="relative mb-4">
+                    <label for="email" class="text-sm leading-7">Phone</label>
+                    <input type="email" id="phone" name="phone"
+                        class="bg-white w-full rounded border border-gray-300 px-3 py-1 text-base leading-8 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
+                </div>
+                <div class="relative mb-4">
                     <label for="message" class="text-sm leading-7">Message</label>
                     <textarea id="message" name="message"
                         class="bg-white h-32 w-full resize-none rounded border border-gray-300 px-3 py-1 text-base leading-6 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"></textarea>
