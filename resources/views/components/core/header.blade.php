@@ -1,4 +1,5 @@
-<header>
+<header
+    class="fixed z-50 mx-auto w-full bg-primary-50 bg-blend-multiply shadow-2xl dark:bg-primary-950 dark:bg-opacity-70">
     <div class="container mx-auto flex flex-col flex-wrap items-center p-3 md:flex-row">
 
         {{-- Application Logo --}}
