@@ -1,5 +1,5 @@
 <header>
-    <div class="container mx-auto flex flex-col flex-wrap items-center p-5 md:flex-row">
+    <div class="container mx-auto flex flex-col flex-wrap items-center p-3 md:flex-row">
 
         {{-- Application Logo --}}
         <a class="title-font text-gray-900 mb-4 flex items-center font-medium md:mb-0">
@@ -13,7 +13,6 @@
 
         {{-- Header Side Content // Button --}}
         <x-core.header.content />
-
 
     </div>
 </header>

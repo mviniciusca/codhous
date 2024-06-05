@@ -69,38 +69,38 @@ class EditNavigation extends EditRecord
                                     ->label(__('Visible'))
                                     ->inline(false)
                                     ->default(true),
-                                TextInput::make('button_title')
+                                TextInput::make('title')
                                     ->label(__('Button Title'))
                                     ->columnSpan(2)
                                     ->helperText(__('Define the title of the button')),
-                                TextInput::make('button_link')
+                                TextInput::make('link')
                                     ->label(__('Button URL'))
                                     ->prefixIcon('heroicon-o-link')
                                     ->columnSpan(3)
                                     ->helperText(__('Define the link of the button')),
-                                TextInput::make('button_icon')
+                                TextInput::make('icon')
                                     ->label(__('Button Icon'))
-                                    ->columnSpan(2)
+                                    ->columnSpan(3)
                                     ->prefix('ionicon')
                                     ->helperText(__('Choose a Ionicon name for a icon')),
-                                Select::make('button_target')
-                                    ->options([
-                                        'self' => __('Self'),
-                                        'blank' => __('Blank')
-                                    ])
-                                    ->columnSpan(2)
-                                    ->default('self')
-                                    ->label(__('Button Link Target'))
-                                    ->helperText(__('Define if the link is internal or external')),
-                                Select::make('button_style')
-                                    ->label(__('Button Style'))
-                                    ->helperText(__('Define if the style of the button'))
-                                    ->columnSpan(2)
-                                    ->options([
-                                        'filled' => __('Filled'),
-                                        'clean' => __('Clean'),
-                                    ])
-                                    ->default('filled'),
+                                Toggle::make('target')
+                                    ->label(__('External'))
+                                    ->helperText(__('When active, opens the link in a new window'))
+                                    ->columnSpan(1)
+                                    ->inline(false)
+                                    ->default(false),
+                                Toggle::make('filled')
+                                    ->label(__('Filled'))
+                                    ->helperText(__('When active, fill the button\'s background'))
+                                    ->columnSpan(1)
+                                    ->inline(false)
+                                    ->default(true),
+                                Toggle::make('iconLeft')
+                                    ->label(__('Icon Left'))
+                                    ->helperText(__('When active, places the icon before the text'))
+                                    ->columnSpan(1)
+                                    ->inline(false)
+                                    ->default(true),
                             ])
                     ])
             ]);
