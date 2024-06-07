@@ -1,4 +1,4 @@
-@props(['content'])
+@props(['content', 'background'])
 
 @if($content)
 @if($content['status'])
