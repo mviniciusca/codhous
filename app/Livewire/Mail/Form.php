@@ -27,11 +27,16 @@ class Form extends Component implements HasForms
             ->schema([
                 TextInput::make('name')
                     ->label(__('Full Name'))
+                    ->maxLength(140)
                     ->required(),
                 TextInput::make('email')
                     ->label(__('Email'))
+                    ->email()
+                    ->maxLength(200)
                     ->required(),
                 TextInput::make('phone')
+                    ->tel()
+                    ->maxLength(200)
                     ->label(__('Phone'))
                     ->required(),
                 Select::make('subject')
@@ -44,6 +49,8 @@ class Form extends Component implements HasForms
                     ->default('business')
                     ->label(__('Subject')),
                 Textarea::make('message')
+                    ->required()
+                    ->maxLength(600)
                     ->label(__('Message'))
                     ->rows(3)
             ])
@@ -55,10 +62,9 @@ class Form extends Component implements HasForms
         // Reinitialize the form to clear its data.
         $this->form->fill();
         Notification::make()
-            ->title('Saved successfully')
+            ->title(__('Message Sent'))
             ->success()
             ->send();
-        ;
     }
     public function render()
     {

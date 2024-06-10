@@ -3,3 +3,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+textarea, select, input[type="text"], input[type="password"] {
+    @apply dark:bg-primary-800
+}
+form button {
+    @apply mt-5
+}
+}
