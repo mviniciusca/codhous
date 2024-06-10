@@ -12,7 +12,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 
-
 class Form extends Component implements HasForms
 {
     use InteractsWithForms;
@@ -27,15 +26,18 @@ class Form extends Component implements HasForms
             ->schema([
                 TextInput::make('name')
                     ->label(__('Full Name'))
+                    ->minLength(6)
                     ->maxLength(140)
                     ->required(),
                 TextInput::make('email')
                     ->label(__('Email'))
                     ->email()
+                    ->minLength(5)
                     ->maxLength(200)
                     ->required(),
                 TextInput::make('phone')
                     ->tel()
+                    ->minLength(8)
                     ->maxLength(200)
                     ->label(__('Phone'))
                     ->required(),
@@ -50,6 +52,7 @@ class Form extends Component implements HasForms
                     ->label(__('Subject')),
                 Textarea::make('message')
                     ->required()
+                    ->minLength(20)
                     ->maxLength(600)
                     ->label(__('Message'))
                     ->rows(3)
