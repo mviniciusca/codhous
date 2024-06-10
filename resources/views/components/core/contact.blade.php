@@ -23,33 +23,9 @@
             <div class="mt-4 flex w-full flex-col md:ml-auto md:mt-0 md:w-1/2 md:py-2 lg:w-1/3">
                 <h2 class="title-font mb-1 text-2xl font-medium leading-tight tracking-tighter">{{ __('Contact') }}
                 </h2>
-                <p class="mb-5 leading-relaxed">{{ __('Send us a message and our team will able to get you back.') }}
-                </p>
-                <div class="relative mb-4">
-                    <label for="name" class="text-sm leading-7">Name</label>
-                    <input type="text" id="name" name="name"
-                        class="bg-white w-full rounded border border-gray-300 px-3 py-1 text-base leading-8 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
-                </div>
-                <div class="relative mb-4">
-                    <label for="email" class="text-sm leading-7">Email</label>
-                    <input type="email" id="email" name="email"
-                        class="bg-white w-full rounded border border-gray-300 px-3 py-1 text-base leading-8 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
-                </div>
-                <div class="relative mb-4">
-                    <label for="email" class="text-sm leading-7">Phone</label>
-                    <input type="email" id="phone" name="phone"
-                        class="bg-white w-full rounded border border-gray-300 px-3 py-1 text-base leading-8 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
-                </div>
-                <div class="relative mb-4">
-                    <label for="message" class="text-sm leading-7">Message</label>
-                    <textarea id="message" name="message"
-                        class="bg-white h-32 w-full resize-none rounded border border-gray-300 px-3 py-1 text-base leading-6 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"></textarea>
-                </div>
-                <x-ui.button :filled='true'>Send Message</x-ui.button>
-                <p class="mt-3 text-xs">Chicharrones blog helvetica normcore iceland tousled brook viral
-                    artisan.
-                </p>
+                <livewire:mail.form />
             </div>
+        </div>
         </div>
     </x-layout.content>
 </x-layout.section>
