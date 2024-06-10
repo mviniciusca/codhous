@@ -10,6 +10,8 @@ use Livewire\Component;
 use Filament\Forms\Form as FilamentForm;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Notifications\Notification;
+
 
 class Form extends Component implements HasForms
 {
@@ -52,6 +54,11 @@ class Form extends Component implements HasForms
         Mail::create($this->form->getState());
         // Reinitialize the form to clear its data.
         $this->form->fill();
+        Notification::make()
+            ->title('Saved successfully')
+            ->success()
+            ->send();
+        ;
     }
     public function render()
     {

@@ -17,4 +17,3 @@
 @if($meta->google_tag)
 {{ $meta->google_tag }}
 @endif
-@vite('resources/css/app.css')

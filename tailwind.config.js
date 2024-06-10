@@ -2,7 +2,10 @@
 const colors = require('tailwindcss/colors')
 export default {
     content: [
-    "./resources/**/*.blade.php",
+    './app/Filament/**/*.php',
+    './resources/views/filament/**/*.blade.php',
+    './vendor/filament/**/*.blade.php',
+    './resources/**/*.blade.php',
     "./resources/views/components/filament-fabricator/**/*.blade.php",
     "./resources/**/*.js",
     "./resources/**/*.vue",
@@ -20,13 +23,14 @@ export default {
             primary: colors.zinc,
             secondary: colors.indigo,
             tertiary: colors.rose,
-            red: colors.red,
-            green: colors.green,
             gray: colors.gray,
-            indigo: colors.indigo,
+            white: colors.white,
         },
         extend: {},
   },
-  plugins: [],
+    plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+  ],
 }
 
