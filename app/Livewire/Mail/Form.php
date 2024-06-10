@@ -59,7 +59,6 @@ class Form extends Component implements HasForms
     public function create(): void
     {
         Mail::create($this->form->getState());
-        // Reinitialize the form to clear its data.
         $this->form->fill();
         Notification::make()
             ->title(__('Message Sent'))
