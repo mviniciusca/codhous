@@ -25,6 +25,7 @@ class ButtonGroup extends PageBlock
                     ->collapsed()
                     ->schema([
                         Repeater::make('buttons')
+                            ->cloneable()
                             ->columns(2)
                             ->schema([
                                 TextInput::make('title')
