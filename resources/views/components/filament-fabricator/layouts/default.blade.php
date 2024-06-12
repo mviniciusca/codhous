@@ -17,6 +17,7 @@
 <body class="bg-primary-50 text-primary-600 dark:bg-primary-900 dark:text-primary-300">
     @livewire('notifications')
     <div class="main-base">
+        @livewire('darkmode')
         <x-core.header />
         <x-layout.background />
         <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
