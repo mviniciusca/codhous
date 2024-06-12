@@ -15,8 +15,8 @@ class Contact extends PageBlock
             ->icon('heroicon-o-cpu-chip')
             ->label('Contact Section')
             ->schema([
-                Section::make(__('Core Feature: App Header'))
-                    ->description(__('Place a header in your application. Edit on Settings > Menu Navigation'))
+                Section::make(__('Core Feature: Contact Section'))
+                    ->description(__('Add a Contact Section in your application'))
                     ->icon('heroicon-o-cpu-chip')
                     ->collapsed()
                     ->schema([
