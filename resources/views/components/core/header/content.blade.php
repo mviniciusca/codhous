@@ -12,4 +12,6 @@
     @endif
     @endforeach
     @endif
+    {{-- Darkmode Switch --}}
+    @livewire('darkmode')
 </div>

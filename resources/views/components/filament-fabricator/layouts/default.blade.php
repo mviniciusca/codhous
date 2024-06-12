@@ -14,7 +14,6 @@
 </head>
 
 <body class="bg-primary-50 text-primary-600 dark:bg-primary-900 dark:text-primary-300">
-    @livewire('darkmode')
     @livewire('notifications')
     <div class="main-base">
         <x-core.header />
