@@ -20,7 +20,9 @@
             @endif
 
             @if($item['subtitle'])
-            <p class="mb-6 font-light text-gray-500 md:text-lg">{!! $item['subtitle'] !!}</p>
+            <p class="mb-6 font-light text-gray-500 md:text-lg">
+                {!! $item['subtitle'] !!}
+            </p>
             @endif
 
             @if($item['btn_text'] || $item['icon'])
