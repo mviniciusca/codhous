@@ -30,6 +30,11 @@ class Darkmode extends Component
     }
     public function render()
     {
-        return view('livewire.darkmode', ['darkMode' => $this->toggleDarkMode()]);
+        return view(
+            'livewire.darkmode',
+            [
+                'darkMode' => $this->toggleDarkMode()
+            ]
+        );
     }
 }
