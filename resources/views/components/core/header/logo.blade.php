@@ -1,3 +1,3 @@
 <a href="/">
-    <img src="{{ asset('storage/' . $header->logo) }}" alt="app-logo">
+    <img src="{{ $header->logo ? asset('storage/' . $header->logo) : asset('img/app-logo.png') }}" alt="app-logo">
 </a>
