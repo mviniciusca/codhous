@@ -25,30 +25,29 @@ class Cta extends PageBlock
                     ->icon('heroicon-o-stop')
                     ->collapsed()
                     ->schema([
-                        Fieldset::make(__('CTA Module Settings'))
-                            ->columns(2)
-                            ->schema([
-                                Toggle::make('status')
-                                    ->default(true)
-                                    ->label(__('Show Module'))
-                                    ->helperText(__('Control the public visibility of this module'))
-                                    ->inline(false),
-                                Toggle::make('axis')
-                                    ->default(true)
-                                    ->label(__('Invert Position'))
-                                    ->helperText(__('Invert the position of the CTA components'))
-                                    ->inline(false),
-                            ]),
                         Group::make([
-                            FileUpload::make('image')
-                                ->label(__('Upload Image'))
-                                ->image()
-                                ->directory('cta')
-                                ->required()
-                                ->imageEditor()
-                                ->imageCropAspectRatio('16:9')
-                                ->helperText(__('This will automatically crop into a 16:9 ratio format'))
-                                ->columnSpan(2),
+                            Group::make()->schema([
+                                Group::make()->schema([
+                                    Toggle::make('status')
+                                        ->default(true)
+                                        ->label(__('Show'))
+                                        ->helperText(__('Show this CTA'))
+                                        ->inline(true),
+                                    Toggle::make('axis')
+                                        ->default(true)
+                                        ->label(__('Invert'))
+                                        ->helperText(__('Invert the position of the CTA components'))
+                                        ->inline(true),
+                                ])->columns(2),
+                                FileUpload::make('image')
+                                    ->label(__('Upload Image'))
+                                    ->image()
+                                    ->directory('cta')
+                                    ->required()
+                                    ->imageEditor()
+                                    ->imageCropAspectRatio('16:9')
+                                    ->helperText(__('This will automatically crop into a 16:9 ratio format')),
+                            ])->columnSpan(2),
                             Group::make()->schema([
                                 TextInput::make('title')
                                     ->required()
@@ -57,7 +56,7 @@ class Cta extends PageBlock
                                     ->helperText(__('Title for Content. Max 140 characters'))
                                     ->maxLength(140),
                                 Textarea::make('subtitle')
-                                    ->rows(3)
+                                    ->rows(6)
                                     ->columnSpan(4)
                                     ->label(__('Subtitle'))
                                     ->helperText(__('Short description about the content. Max 240 characters'))
