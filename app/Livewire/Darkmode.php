@@ -6,9 +6,8 @@ use Livewire\Component;
 
 class Darkmode extends Component
 {
-    public $active;
-    public $theme;
-
+    public string $active;
+    public string $theme;
     public function mount()
     {
         $this->active = isset($_COOKIE['theme']) && $_COOKIE['theme'] === 'dark';
@@ -31,6 +30,6 @@ class Darkmode extends Component
     }
     public function render()
     {
-        return view('livewire.darkmode');
+        return view('livewire.darkmode', ['darkMode' => $this->toggleDarkMode()]);
     }
 }

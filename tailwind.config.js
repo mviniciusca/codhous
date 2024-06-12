@@ -14,7 +14,8 @@ export default {
         'bg-contain', 'bg-cover', 'bg-auto', 'bg-scroll', 'bg-fixed', 'bg-center', 'bg-top',
         'bg-left', 'bg-right', 'bg-repeat-x', 'bg-repeat-y',
         'bg-repeat', 'bg-no-repeat', 'order-1', 'order-2', 'order-3'
-],
+    ],
+    darkMode: 'class',
     theme: {
         fontFamily: {
             sans: ['"Inter", sans-serif']

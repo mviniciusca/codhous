@@ -1,6 +1,6 @@
 @props(['page'])
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ session('theme') == 'dark' ? 'dark' : '' }}">
 
 <head>
     <x-layout.meta />
@@ -15,9 +15,9 @@
 
 
 <body class="bg-primary-50 text-primary-600 dark:bg-primary-900 dark:text-primary-300">
+    @livewire('darkmode')
     @livewire('notifications')
     <div class="main-base">
-        @livewire('darkmode')
         <x-core.header />
         <x-layout.background />
         <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
