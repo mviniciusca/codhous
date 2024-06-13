@@ -3,20 +3,22 @@
     <x-layout.content>
         <div class="container mx-auto flex flex-wrap px-5 py-24 sm:flex-nowrap">
             <div
-                class="relative flex items-end justify-start overflow-hidden rounded-lg bg-primary-300 p-10 sm:mr-10 md:w-1/2 lg:w-2/3 dark:bg-primary-950">
+                class="relative flex items-end justify-start overflow-hidden rounded-lg bg-primary-300 p-10 dark:bg-primary-950 sm:mr-10 md:w-1/2 lg:w-2/3">
                 <iframe width="100%" height="100%" class="absolute inset-0" frameborder="0" title="map" marginheight="0"
                     marginwidth="0" scrolling="no" src="{{ $contact->map }}"
                     style="filter: grayscale(1) contrast(1) opacity(0.7);"></iframe>
-                <div class="relative flex flex-wrap rounded bg-primary-500 py-6 shadow-md">
+                <div
+                    class="relative flex flex-wrap rounded bg-primary-50 py-6 text-primary-700 shadow-md dark:bg-primary-900 dark:text-primary-300">
                     <div class="px-6 lg:w-1/2">
-                        <h2 class="title-font text-xs font-semibold tracking-widest">ADDRESS</h2>
-                        <p class="mt-1">Photo booth tattooed prism, portland taiyaki hoodie neutra typewriter</p>
+                        <h2 class="title-font text-xs font-semibold uppercase tracking-widest">{{ __('Address') }}</h2>
+                        <p class="mt-1">{{ $contact->address }}</p>
                     </div>
                     <div class="mt-4 px-6 lg:mt-0 lg:w-1/2">
-                        <h2 class="title-font text-xs font-semibold tracking-widest">EMAIL</h2>
-                        <a class="leading-relaxed">example@email.com</a>
-                        <h2 class="title-font mt-4 text-xs font-semibold tracking-widest">PHONE</h2>
-                        <p class="leading-relaxed">123-456-7890</p>
+                        <h2 class="title-font text-xs font-semibold uppercase tracking-widest">{{ __('Email') }}</h2>
+                        <a class="leading-relaxed">{{ $contact->setting->email }}</a>
+                        <h2 class="title-font mt-4 text-xs font-semibold uppercase tracking-widest">{{ __('Phone') }}
+                        </h2>
+                        <p class="leading-relaxed">{{ $contact->setting->phone }}</p>
                     </div>
                 </div>
             </div>

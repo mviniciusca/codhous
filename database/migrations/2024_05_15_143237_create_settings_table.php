@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('app_name');
             $table->string('email');
             $table->string('office_hour');
+            $table->string('phone');
 
             $table->string('meta_title');
             $table->string('meta_author');

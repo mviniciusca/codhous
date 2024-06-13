@@ -24,6 +24,7 @@ class SettingFactory extends Factory
             'app_name' => 'Codhous',
             'email' => 'test@test.dev',
             'office_hour' => 'Monday - Friday, 8AM - 5PM',
+            'phone' => '2155554444',
 
             'meta_title' => 'Codhous - Software Management for Websites',
             'meta_author' => 'Codhous Software',

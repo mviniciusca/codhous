@@ -53,6 +53,12 @@ class SettingResource extends Resource
                             ->helperText(__('Define here the e-mail address for you or your Company. This is a public information.'))
                             ->maxLength(140)
                             ->required(),
+                        TextInput::make('phone')
+                            ->label(__('Public Phone'))
+                            ->helperText(__('Define here the phone number for you or your Company. This is a public information.'))
+                            ->maxLength(140)
+                            ->tel()
+                            ->required(),
                         TextInput::make('office_hour')
                             ->label(__('Office Hour'))
                             ->helperText(__('Define here the office hour of your Company.'))
