@@ -63,7 +63,6 @@ class SettingResource extends Resource
                             ->label(__('Office Hour'))
                             ->helperText(__('Define here the office hour of your Company.'))
                             ->maxLength(140)
-                            ->columnSpanFull()
                             ->required(),
                     ]),
                 Section::make(__('Security & Management'))
