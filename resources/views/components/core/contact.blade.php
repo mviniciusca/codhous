@@ -9,7 +9,7 @@
                     marginwidth="0" scrolling="no" src="{{ $contact->map }}"
                     style="filter: grayscale(1) contrast(1) opacity(0.7);"></iframe>
                 @else
-                <img class="absolute inset-0 object-cover" src="{{ asset('img/paper-map.svg') }}">
+                <img class="absolute inset-0 object-cover" src="{{ asset('img/paper-map.svg') }}" alt="map-image">
                 @endif
                 <div
                     class="relative flex flex-wrap rounded bg-primary-50 py-6 text-primary-700 shadow-md dark:bg-primary-900 dark:text-primary-300">
