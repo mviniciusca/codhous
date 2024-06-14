@@ -5,15 +5,15 @@
             wire:submit="create">
 
             <h1 class="text-4xl font-bold leading-tight tracking-tighter">
-                {{ $title .  __('Subscribe our Newsletter') }}
+                {{ $title ??  __('Subscribe our Newsletter') }}
             </h1>
-            <p class="mb-6 text-sm">{{ __('Join our newsletter and stay ready with Zordie') }}</p>
+            <p class="mb-6 text-sm">{{ $subtitle ?? __('Join our newsletter and stay ready with Zordie') }}</p>
 
             <div class="mx-auto max-w-xl">
                 {{ $this->form }}
                 <x-ui.button :icon="'none'" :filled="'true'">
                     <span class="inline-flex gap-2">
-                        <p>Subscribe</p>
+                        <p>{{ $btn_text ?? __('Subscribe') }}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"

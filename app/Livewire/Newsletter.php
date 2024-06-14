@@ -16,9 +16,10 @@ class Newsletter extends Component implements HasForms
 
     public ?array $data = [];
 
-    public string $title;
-    public string $subtitle;
-    public string $info;
+    public ?string $title;
+    public ?string $subtitle;
+    public ?string $info;
+    public ?string $btn_text;
     public function mount(): void
     {
         $this->form->fill();
