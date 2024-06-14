@@ -27,12 +27,13 @@ class Newsletter extends Component implements HasForms
             ->schema([
                 TextInput::make('email')
                     ->email()
-                    ->unique()
+                    ->unique(table: NewsletterModel::class)
                     ->required()
                     ->maxLength(150)
                     ->minLength(10)
-                    ->label(__('Email'))
-                    ->helperText(__('Enter with your email address'))
+                    ->hiddenLabel()
+                    ->placeholder(__('Email'))
+                    ->helperText(__('Use your e-mail to subscribe our newsletter. We hate spam ;)'))
             ])
             ->statePath('data');
     }
