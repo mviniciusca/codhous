@@ -1,5 +1,5 @@
 @aware(['page'])
-@props(['status' => null, 'title' => null, 'subtitle' => null, 'info' => null])
+@props(['status' => null, 'title' => null, 'subtitle' => null, 'info' => null, 'btn_text' => null])
 
 @if($status)
 @livewire('newsletter', [
