@@ -15,7 +15,6 @@ class Newsletter extends Component implements HasForms
     use InteractsWithForms;
 
     public ?array $data = [];
-
     public ?string $title;
     public ?string $subtitle;
     public ?string $info;
