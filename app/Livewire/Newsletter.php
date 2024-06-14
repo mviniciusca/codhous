@@ -37,7 +37,6 @@ class Newsletter extends Component implements HasForms
                     ->minLength(10)
                     ->hiddenLabel()
                     ->placeholder(__('Email'))
-                    ->helperText(__('Use your e-mail to subscribe our newsletter. We hate spam ;)'))
             ])
             ->statePath('data');
     }

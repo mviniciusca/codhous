@@ -11,6 +11,8 @@
 
             <div class="mx-auto max-w-xl">
                 {{ $this->form }}
+                <p class="py-1 text-sm">{{ $info ?? 'Use your e-mail to subscribe our newsletter. We hate spam ;)' }}
+                </p>
                 <x-ui.button :icon="'none'" :filled="'true'">
                     <span class="inline-flex gap-2">
                         <p>{{ $btn_text ?? __('Subscribe') }}</p>

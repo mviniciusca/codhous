@@ -3,7 +3,9 @@
 namespace App\Filament\Fabricator\PageBlocks\Core;
 
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
@@ -21,7 +23,27 @@ class Newsletter extends PageBlock
                         Toggle::make('status')
                             ->inline(true)
                             ->label(__('Show this Module'))
-                            ->default(true)
+                            ->default(true),
+                        Group::make()
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label(__('(Optional)'))
+                                    ->helperText(__('. Max.: 100 characters'))
+                                    ->maxLength(100),
+                                TextInput::make('subtitle')
+                                    ->label(__('(Optional)'))
+                                    ->helperText(__('. Max.: 100 characters'))
+                                    ->maxLength(100),
+                                TextInput::make('info')
+                                    ->label(__('(Optional)'))
+                                    ->helperText(__('. Max.: 100 characters'))
+                                    ->maxLength(100),
+                                TextInput::make('btn_text')
+                                    ->label(__('(Optional)'))
+                                    ->helperText(__('. Max.: 100 characters'))
+                                    ->maxLength(100),
+                            ]),
                     ]),
             ]);
     }

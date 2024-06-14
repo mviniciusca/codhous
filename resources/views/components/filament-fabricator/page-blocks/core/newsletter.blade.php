@@ -3,9 +3,9 @@
 
 @if($status)
 @livewire('newsletter', [
+'info' => $info,
 'title' => $title,
 'subtitle' => $subtitle,
-'info' => $info,
 'btn_text' => $btn_text,
 ])
 @endif
