@@ -1,0 +1,2 @@
+@aware(['page'])
+@livewire('newsletter')
