@@ -7,6 +7,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Livewire\Component;
 
 class Newsletter extends Component implements HasForms
@@ -26,6 +27,7 @@ class Newsletter extends Component implements HasForms
             ->schema([
                 TextInput::make('email')
                     ->email()
+                    ->unique()
                     ->required()
                     ->maxLength(150)
                     ->minLength(10)
@@ -38,6 +40,11 @@ class Newsletter extends Component implements HasForms
     public function create(): void
     {
         NewsletterModel::create($this->form->getState());
+        $this->form->fill();
+        Notification::make()
+            ->title(__('Thanks for subscribe!'))
+            ->success()
+            ->send();
     }
     public function render()
     {
