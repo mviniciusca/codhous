@@ -1,2 +1,8 @@
 @aware(['page'])
-@livewire('newsletter')
+@props(['status' => null])
+
+@if($status)
+@livewire('newsletter', [
+'title' => $status
+])
+@endif

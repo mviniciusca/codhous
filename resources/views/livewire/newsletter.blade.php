@@ -4,7 +4,8 @@
             class="mx-auto max-w-4xl rounded-md border border-primary-100 bg-white p-12 text-center dark:border-primary-800 dark:bg-primary-950"
             wire:submit="create">
 
-            <h1 class="text-4xl font-bold leading-tight tracking-tighter"> {{ __('Subscribe our Newsletter') }}
+            <h1 class="text-4xl font-bold leading-tight tracking-tighter">
+                {{ $title .  __('Subscribe our Newsletter') }}
             </h1>
             <p class="mb-6 text-sm">{{ __('Join our newsletter and stay ready with Zordie') }}</p>
 
