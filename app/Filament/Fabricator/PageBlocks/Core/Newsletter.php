@@ -28,20 +28,20 @@ class Newsletter extends PageBlock
                             ->columns(2)
                             ->schema([
                                 TextInput::make('title')
-                                    ->label(__('(Optional)'))
-                                    ->helperText(__('. Max.: 100 characters'))
+                                    ->label(__('Title (Optional)'))
+                                    ->helperText(__('Title of header content. Max.: 100 characters'))
                                     ->maxLength(100),
                                 TextInput::make('subtitle')
-                                    ->label(__('(Optional)'))
-                                    ->helperText(__('. Max.: 100 characters'))
+                                    ->label(__('Subtitle (Optional)'))
+                                    ->helperText(__('of header content. Max.: 100 characters'))
                                     ->maxLength(100),
                                 TextInput::make('info')
-                                    ->label(__('(Optional)'))
-                                    ->helperText(__('. Max.: 100 characters'))
+                                    ->label(__('Info (Optional)'))
+                                    ->helperText(__('Info of header content. Max.: 100 characters'))
                                     ->maxLength(100),
                                 TextInput::make('btn_text')
-                                    ->label(__('(Optional)'))
-                                    ->helperText(__('. Max.: 100 characters'))
+                                    ->label(__('Button Text (Optional)'))
+                                    ->helperText(__('Button Text. Max.: 100 characters'))
                                     ->maxLength(100),
                             ]),
                     ]),
