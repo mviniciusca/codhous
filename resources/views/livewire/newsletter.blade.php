@@ -13,7 +13,7 @@
                 <p class="mb-6 text-sm">{{ $subtitle ?? __('Join our newsletter and stay ready with Zordie') }}</p>
 
                 <div class="mx-auto max-w-xl">
-                    {{ $this->form }}
+                    <x-core.newsletter-form :form="$this->form" />
                     <p class="pt-4 text-sm">
                         {{ $info ?? 'Use your e-mail to subscribe our newsletter. We hate spam ;)' }}
                     </p>
