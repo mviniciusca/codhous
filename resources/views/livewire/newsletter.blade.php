@@ -1,7 +1,7 @@
 <x-layout.section>
     <x-layout.content>
         <form
-            class="mx-auto grid max-w-5xl items-center justify-around rounded-lg border border-primary-100 bg-white p-2 text-center dark:border-primary-800 dark:bg-primary-950 md:flex"
+            class="mx-auto grid max-w-5xl items-center justify-around rounded-lg border border-primary-100 bg-white p-4 text-center dark:border-primary-800 dark:bg-primary-950 md:flex"
             wire:submit="create">
 
             <div class="w-full md:w-1/3">
@@ -10,7 +10,7 @@
             </div>
 
             <div class="w-full md:w-1/2">
-                <h1 class="text-2xl font-bold leading-tight tracking-tighter md:text-4xl">
+                <h1 class="text-2xl font-bold leading-tight tracking-tighter md:text-3xl lg:text-4xl">
                     {{ $title ??  __('Subscribe our Newsletter') }}
                 </h1>
                 <p class="mb-6 text-sm">{{ $subtitle ?? __('Join our newsletter and stay ready with Zordie') }}</p>
