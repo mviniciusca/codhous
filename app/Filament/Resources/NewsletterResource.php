@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\NewsletterResource\Pages;
@@ -23,6 +24,11 @@ class NewsletterResource extends Resource
     protected static ?string $model = Newsletter::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Subscribers');
+    }
 
     public static function form(Form $form): Form
     {

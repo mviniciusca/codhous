@@ -2,15 +2,19 @@
 
 namespace App\Filament\Resources\NewsletterResource\Pages;
 
-use App\Filament\Resources\NewsletterResource;
-use App\Filament\Resources\NewsletterResource\Widgets\NewsletterOverwview;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Contracts\Support\Htmlable;
+use App\Filament\Resources\NewsletterResource;
+use App\Filament\Resources\NewsletterResource\Widgets\NewsletterOverwview;
 
 class ListNewsletters extends ListRecords
 {
     protected static string $resource = NewsletterResource::class;
-
+    public function getTitle(): string|Htmlable
+    {
+        return __('Subscribers');
+    }
     protected function getHeaderWidgets(): array
     {
         return [

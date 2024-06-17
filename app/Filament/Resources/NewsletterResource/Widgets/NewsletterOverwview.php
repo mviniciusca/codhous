@@ -22,6 +22,7 @@ class NewsletterOverwview extends ChartWidget
             )
             ->perMonth()
             ->count();
+
         return [
             'datasets' => [
                 [
