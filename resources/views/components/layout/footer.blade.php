@@ -18,9 +18,11 @@
                 <hr class="my-6 border-gray-200 dark:border-primary-800 sm:mx-auto lg:my-8" />
                 <span class="block text-sm sm:text-center">
                     © {{ date('Y') }}
+                    @if($app['app_name'] || ENV('APP_NAME'))
                     <a href="/" class="hover:underline">
-                        {{ ENV('APP_NAME') }}
+                        {{ $app['app_name'] ? $app['app_name'] : ENV('APP_NAME') }}
                     </a> -
+                    @endif
                     {{ __('All Rights Reserved.') }}
                 </span>
             </div>
