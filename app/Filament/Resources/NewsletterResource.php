@@ -22,9 +22,15 @@ use Filament\View\LegacyComponents\Widget;
 class NewsletterResource extends Resource
 {
     protected static ?string $model = Newsletter::class;
+    protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    public static function getNavigationBadge(): ?string
+    {
+        if (static::getModel()::count() != 0) {
+            return static::getModel()::count();
+        }
+        return null;
+    }
     public static function getNavigationLabel(): string
     {
         return __('Subscribers');
