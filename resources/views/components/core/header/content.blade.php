@@ -1,6 +1,6 @@
 @props(['buttons'])
 
-<div class="inline-flex gap-2 py-2">
+<div class="inline-flex items-center gap-2 py-2">
     @if($buttons['nav_button'])
     @foreach ($buttons['nav_button'] as $button)
     @if($button['status'])
