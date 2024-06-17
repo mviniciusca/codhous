@@ -1,7 +1,7 @@
 <x-layout.section>
     <x-layout.content>
         <form
-            class="mx-auto grid max-w-5xl items-center justify-around rounded-lg border border-primary-100 bg-white p-4 text-center dark:border-primary-800 dark:bg-primary-950 md:flex"
+            class="mx-auto grid max-w-5xl items-center justify-around rounded-lg border border-primary-100 bg-white p-2 text-center dark:border-primary-800 dark:bg-primary-950 md:flex"
             wire:submit="create">
 
             <div class="w-full md:w-1/3">
