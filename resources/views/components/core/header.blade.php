@@ -2,11 +2,11 @@
     <x-layout.content>
         <div class="mx-auto flex flex-col flex-wrap items-center md:flex-row">
             {{-- Application Logo --}}
-            <a class="title-font mb-4 flex items-center font-medium text-gray-900 md:mb-0">
+            <a class="title-font flex items-center font-medium text-gray-900 md:mb-0">
                 <x-core.header.logo />
             </a>
             {{-- Menu Navigation //  --}}
-            <nav class="flex flex-wrap items-center justify-center text-base md:ml-auto md:mr-auto">
+            <nav class="flex flex-wrap items-center md:ml-auto md:mr-auto">
                 <x-core.header.navigation />
             </nav>
             {{-- Header Side Content // Button --}}
