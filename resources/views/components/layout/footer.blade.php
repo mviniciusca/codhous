@@ -5,18 +5,14 @@
                 <div class="sm:flex sm:items-center sm:justify-between">
                     <x-core.header.logo />
                     <ul class="mb-6 flex flex-wrap items-center text-sm font-medium text-gray-500 sm:mb-0">
+                        @if($navigation['navigation'])
+                        @foreach ($navigation['navigation'] as $item )
                         <li>
-                            <a href="#" class="me-4 hover:underline md:me-6">About</a>
+                            <a target="{{ $item['target'] }}" href="{{ $item['menu_url'] }}"
+                                class="me-4 hover:underline md:me-6">{{ $item['menu_title'] }}</a>
                         </li>
-                        <li>
-                            <a href="#" class="me-4 hover:underline md:me-6">Privacy Policy</a>
-                        </li>
-                        <li>
-                            <a href="#" class="me-4 hover:underline md:me-6">Licensing</a>
-                        </li>
-                        <li>
-                            <a href="#" class="hover:underline">Contact</a>
-                        </li>
+                        @endforeach
+                        @endif
                     </ul>
                 </div>
                 <hr class="my-6 border-gray-200 dark:border-primary-800 sm:mx-auto lg:my-8" />
