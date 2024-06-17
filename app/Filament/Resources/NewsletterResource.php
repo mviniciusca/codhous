@@ -34,8 +34,12 @@ class NewsletterResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('email'),
-                IconColumn::make('active')->boolean()->alignCenter()
+                TextColumn::make('email')
+                    ->label(__('Email')),
+                IconColumn::make('active')
+                    ->label(__('Status'))
+                    ->boolean()
+                    ->alignCenter()
             ])
             ->filters([
                 //
