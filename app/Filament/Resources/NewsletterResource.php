@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\NewsletterResource\Widgets\NewsletterOverwview;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\NewsletterResource\Pages;
 use App\Filament\Resources\NewsletterResource\RelationManagers;
+use Filament\View\LegacyComponents\Widget;
 
 class NewsletterResource extends Resource
 {
@@ -60,6 +62,13 @@ class NewsletterResource extends Resource
     {
         return [
             //
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            NewsletterOverwview::class
         ];
     }
 
