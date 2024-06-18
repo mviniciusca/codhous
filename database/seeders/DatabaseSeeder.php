@@ -3,10 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Contact;
 use App\Models\Layout;
-use App\Models\Navigation;
+use App\Models\Contact;
 use App\Models\Setting;
+use App\Models\Navigation;
+use App\Models\Newsletter;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -36,5 +37,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        Newsletter::factory(2500)->create();
     }
 }

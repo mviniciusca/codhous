@@ -18,7 +18,7 @@ class NewsletterOverwview extends ChartWidget
         $data = Trend::model(Newsletter::class)
             ->between(
                 start: now()->startOfYear(),
-                end: now()->endOfYear()
+                end: now()->endOfMonth(),
             )
             ->perMonth()
             ->count();

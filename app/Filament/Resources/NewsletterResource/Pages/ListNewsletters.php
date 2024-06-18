@@ -24,7 +24,7 @@ class ListNewsletters extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-
+            //
         ];
     }
 }
