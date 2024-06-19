@@ -23,7 +23,6 @@ class NewsletterResource extends Resource
 {
     protected static ?string $model = Newsletter::class;
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
-
     public static function getNavigationBadge(): ?string
     {
         if (static::getModel()::count() != 0) {

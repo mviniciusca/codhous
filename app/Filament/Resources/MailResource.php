@@ -17,8 +17,20 @@ class MailResource extends Resource
 {
     protected static ?string $model = Mail::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-envelope-open';
 
+    public static function getNavigationBadge(): ?string
+    {
+        if (static::getModel()::count() != 0) {
+            return static::getModel()::count();
+        }
+        return null;
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Inbox');
+    }
     public static function form(Form $form): Form
     {
         return $form
