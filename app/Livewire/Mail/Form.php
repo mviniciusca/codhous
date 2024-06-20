@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Mail;
 
+use App\Mail\Contact;
 use App\Models\Mail as MailModel;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Filament\Forms\Form as FilamentForm;
 use Filament\Forms\Contracts\HasForms;
@@ -62,6 +64,8 @@ class Form extends Component implements HasForms
     public function create(): void
     {
         MailModel::create($this->form->getState());
+        Mail::to('mviniciusca@gmail.com')
+            ->send(new Contact);
         $this->form->fill();
         Notification::make()
             ->title(__('Message Sent'))
