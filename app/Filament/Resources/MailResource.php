@@ -49,7 +49,7 @@ class MailResource extends Resource
                 TextColumn::make('email'),
                 TextColumn::make('subject'),
             ])
-            ->defaultSort('desc')
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
