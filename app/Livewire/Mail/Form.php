@@ -22,7 +22,7 @@ class Form extends Component implements HasForms
     {
         $this->form->fill();
     }
-    public function form(FilamentForm $form): FilamentForm
+    protected function form(FilamentForm $form): FilamentForm
     {
         return $form
             ->schema([
@@ -69,6 +69,7 @@ class Form extends Component implements HasForms
             ->title(__('Message Sent'))
             ->success()
             ->send();
+        $this->form->fill();
     }
     public function render()
     {

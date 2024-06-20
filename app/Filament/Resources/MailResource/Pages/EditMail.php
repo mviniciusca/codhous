@@ -9,7 +9,6 @@ use Filament\Resources\Pages\EditRecord;
 class EditMail extends EditRecord
 {
     protected static string $resource = MailResource::class;
-
     protected function getHeaderActions(): array
     {
         return [
