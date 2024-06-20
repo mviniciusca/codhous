@@ -64,9 +64,6 @@ class Form extends Component implements HasForms
     public function create(): void
     {
         MailModel::create($this->form->getState());
-        Mail::to('mviniciusca@gmail.com')
-            ->send(new Contact);
-        $this->form->fill();
         Notification::make()
             ->title(__('Message Sent'))
             ->success()
