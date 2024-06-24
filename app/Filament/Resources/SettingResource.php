@@ -30,6 +30,11 @@ class SettingResource extends Resource
         return __('App Settings');
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function getRecordSubNavigation(Page $page): array
     {
         return $page->generateNavigationItems([
