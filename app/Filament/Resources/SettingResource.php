@@ -25,6 +25,11 @@ class SettingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('App Settings');
+    }
+
     public static function getRecordSubNavigation(Page $page): array
     {
         return $page->generateNavigationItems([

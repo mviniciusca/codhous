@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\SettingResource;
+use App\Filament\Resources\SettingResource\Pages\EditSetting;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
@@ -16,6 +18,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Z3d0X\FilamentFabricator\FilamentFabricatorPlugin;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
@@ -28,6 +31,14 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->id('admin')
             ->path('admin')
+            ->navigationItems([
+                NavigationItem::make('setting')
+                    ->label(fn(): string => __('App Settings'))
+                    ->url(fn(): string => EditSetting::getUrl([1]))
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->group(__('Setting'))
+                    ->sort(6),
+            ])
             ->plugins([
                 FilamentFabricatorPlugin::make(),
             ])
