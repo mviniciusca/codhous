@@ -32,7 +32,6 @@ class MailResource extends Resource
         }
         return null;
     }
-
     public static function getNavigationLabel(): string
     {
         return __('Inbox');
