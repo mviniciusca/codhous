@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\MailResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\MailResource\RelationManagers;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -40,7 +41,8 @@ class MailResource extends Resource
     {
         return $form
             ->schema([
-                //
+                TextInput::make('email')
+                    ->disabled(),
             ]);
     }
 
@@ -129,7 +131,8 @@ class MailResource extends Resource
         return [
             'index' => Pages\ListMails::route('/'),
             'create' => Pages\CreateMail::route('/create'),
-            'edit' => Pages\EditMail::route('/{record}/edit'),
+            // 'edit' => Pages\EditMail::route('/{record}/edit'),
+            'view' => Pages\ViewMail::route('/{record}/view'),
         ];
     }
 }
