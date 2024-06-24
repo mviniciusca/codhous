@@ -17,6 +17,10 @@ return new class extends Migration {
             $table->string('phone');
             $table->string('subject');
             $table->text('message');
+            $table->boolean('is_sent')->default(false);
+            $table->boolean('is_read')->default(false);
+            $table->boolean('is_favorite')->default(false);
+            $table->boolean('is_spam')->default(false);
             $table->timestamps();
         });
     }
