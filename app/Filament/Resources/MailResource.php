@@ -71,10 +71,13 @@ class MailResource extends Resource
                     ->falseIcon('heroicon-o-arrow-down-right')
                     ->falseColor('secondary'),
                 TextColumn::make('name')
+                    ->limit(25)
                     ->label(__('Name')),
                 TextColumn::make('email')
+                    ->limit(30)
                     ->label(__('Email')),
                 TextColumn::make('subject')
+                    ->limit(50)
                     ->label(__('Subject')),
             ])
             ->searchable()
