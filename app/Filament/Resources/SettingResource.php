@@ -23,7 +23,7 @@ class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     public static function getRecordSubNavigation(Page $page): array
     {
