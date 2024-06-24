@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\MailResource\Pages;
 
-use Filament\Actions;
 use App\Filament\Resources\MailResource;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditMail extends EditRecord
@@ -15,6 +15,4 @@ class EditMail extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-
-
 }
