@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MailResource\Pages;
 
 use App\Filament\Resources\MailResource;
 use Filament\Actions;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
@@ -38,6 +39,8 @@ class ViewMail extends ViewRecord
                 TextEntry::make('subject')
                     ->label(__('Subject:'))
                     ->columnSpanFull(),
+                IconEntry::make('is_favorite')->boolean(),
+                IconEntry::make('is_read')->boolean(),
                 TextEntry::make('message')
                     ->label(__('Message:'))
                     ->columnSpanFull()
