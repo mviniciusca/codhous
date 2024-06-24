@@ -22,6 +22,10 @@ class MailFactory extends Factory
             'phone' => $this->faker->phoneNumber,
             'message' => $this->faker->paragraph,
             'subject' => $this->faker->sentence,
+            'is_read' => $this->faker->boolean(),
+            'is_favorite' => $this->faker->boolean(),
+            'is_spam' => $this->faker->boolean(),
+            'is_sent' => $this->faker->boolean(),
         ];
     }
 }
