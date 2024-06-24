@@ -45,9 +45,12 @@ class MailResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
-                TextColumn::make('subject'),
+                TextColumn::make('name')
+                    ->label(__('Name')),
+                TextColumn::make('email')
+                    ->label(__('Email')),
+                TextColumn::make('subject')
+                    ->label(__('Subject')),
             ])
             ->searchable()
             ->defaultSort('created_at', 'desc')
