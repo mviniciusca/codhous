@@ -47,12 +47,29 @@ class MailResource extends Resource
         return $table
             ->columns([
                 IconColumn::make('is_favorite')
+                    ->wrap()
                     ->label(__(''))
                     ->boolean()
                     ->trueIcon('heroicon-s-star')
-                    ->trueColor('warning')
+                    ->trueColor('primary')
                     ->falseIcon('heroicon-o-star')
                     ->falseColor('gray'),
+                IconColumn::make('is_read')
+                    ->wrap()
+                    ->label(__(''))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-envelope-open')
+                    ->trueColor('gray')
+                    ->falseIcon('heroicon-s-envelope')
+                    ->falseColor('primary'),
+                IconColumn::make('is_sent')
+                    ->wrap()
+                    ->label(__(''))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-arrow-up-left')
+                    ->trueColor('primary')
+                    ->falseIcon('heroicon-o-arrow-down-right')
+                    ->falseColor('secondary'),
                 TextColumn::make('name')
                     ->label(__('Name')),
                 TextColumn::make('email')
@@ -61,6 +78,7 @@ class MailResource extends Resource
                     ->label(__('Subject')),
             ])
             ->searchable()
+            ->striped()
             ->defaultSort('created_at', 'desc')
             ->filters([
                 //
