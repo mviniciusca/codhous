@@ -47,7 +47,7 @@ class MailResource extends Resource
         return $table
             ->columns([
                 IconColumn::make('is_favorite')
-                    ->label(__('Favorite'))
+                    ->label(__(''))
                     ->boolean()
                     ->trueIcon('heroicon-s-star')
                     ->trueColor('warning')
