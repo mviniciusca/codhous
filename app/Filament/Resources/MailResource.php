@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\MailResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\MailResource\RelationManagers;
+use Filament\Tables\Columns\IconColumn;
 
 class MailResource extends Resource
 {
@@ -45,6 +46,13 @@ class MailResource extends Resource
     {
         return $table
             ->columns([
+                IconColumn::make('is_favorite')
+                    ->label(__('Favorite'))
+                    ->boolean()
+                    ->trueIcon('heroicon-s-star')
+                    ->trueColor('warning')
+                    ->falseIcon('heroicon-o-star')
+                    ->falseColor('gray'),
                 TextColumn::make('name')
                     ->label(__('Name')),
                 TextColumn::make('email')
