@@ -104,11 +104,11 @@ class MailResource extends Resource
                     ->placeholder(__('All Messages'))
                     ->trueLabel(__('With Star'))
                     ->falseLabel(__('Without Star')),
-            ], layout: FiltersLayout::AboveContentCollapsible)
+            ], layout: FiltersLayout::Modal)
             ->persistFiltersInSession()
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
                 ])
             ])
             ->bulkActions([
