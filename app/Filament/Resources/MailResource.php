@@ -82,6 +82,7 @@ class MailResource extends Resource
             ])
             ->searchable()
             ->striped()
+            ->paginated(25)
             ->defaultSort('created_at', 'desc')
             ->filters([
                 //
