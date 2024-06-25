@@ -87,7 +87,8 @@ class MailResource extends Resource
                     ->label(__('Inbox'))
                     ->placeholder(__('All Messages'))
                     ->trueLabel(__('Read'))
-                    ->falseLabel(__('Unread')),
+                    ->falseLabel(__('Unread'))
+                    ->default(false),
                 TernaryFilter::make('is_sent')
                     ->label(__('Send Messages'))
                     ->placeholder(__('All Messages'))
