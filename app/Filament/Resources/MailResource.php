@@ -6,6 +6,7 @@ use Filament\Forms;
 use App\Models\Mail;
 use Filament\Tables;
 use Filament\Forms\Form;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -16,6 +17,7 @@ use App\Filament\Resources\MailResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\MailResource\RelationManagers;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -50,22 +52,11 @@ class MailResource extends Resource
     {
         return $table
             ->columns([
-                IconColumn::make('is_favorite')
-                    ->wrap()
-                    ->label(__(''))
-                    ->boolean()
-                    ->trueIcon('heroicon-s-star')
-                    ->trueColor('primary')
-                    ->falseIcon('heroicon-o-star')
-                    ->falseColor('gray'),
-                IconColumn::make('is_read')
-                    ->wrap()
-                    ->label(__(''))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-envelope-open')
-                    ->trueColor('gray')
-                    ->falseIcon('heroicon-s-envelope')
-                    ->falseColor('primary'),
+                ToggleColumn::make('is_favorite')
+                    ->label(__('Important'))
+                    ->inline()
+                    ->alignCenter()
+                    ->onIcon('heroicon-s-star'),
                 IconColumn::make('is_sent')
                     ->wrap()
                     ->label(__(''))
@@ -83,6 +74,9 @@ class MailResource extends Resource
                 TextColumn::make('subject')
                     ->limit(50)
                     ->label(__('Subject')),
+                CheckboxColumn::make('is_read')
+                    ->alignCenter()
+                    ->label(__('Mark as Read')),
             ])
             ->searchable()
             ->striped()
