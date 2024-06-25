@@ -26,7 +26,8 @@ use Filament\Tables\Filters\TernaryFilter;
 class MailResource extends Resource
 {
     protected static ?string $model = Mail::class;
-    protected static ?string $navigationIcon = 'heroicon-o-envelope-open';
+    protected static ?string $navigationGroup = 'Mail';
+    protected static ?string $navigationIcon = 'heroicon-o-inbox';
     public static function getNavigationBadge(): ?string
     {
         if (static::getModel()::count() != 0) {
@@ -42,11 +43,9 @@ class MailResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('email')
-                    ->disabled(),
+                //
             ]);
     }
-    protected static ?string $navigationGroup = 'Mail';
     public static function table(Table $table): Table
     {
         return $table
@@ -127,6 +126,7 @@ class MailResource extends Resource
             'create' => Pages\CreateMail::route('/create'),
             // 'edit' => Pages\EditMail::route('/{record}/edit'),
             'view' => Pages\ViewMail::route('/{record}/view'),
+            'view-important' => Pages\ViewImportantMail::route('/important'),
 
         ];
     }
