@@ -47,7 +47,7 @@ class MailResource extends Resource
                     ->disabled(),
             ]);
     }
-
+    protected static ?string $navigationGroup = 'Mail';
     public static function table(Table $table): Table
     {
         return $table
@@ -128,6 +128,8 @@ class MailResource extends Resource
             'create' => Pages\CreateMail::route('/create'),
             // 'edit' => Pages\EditMail::route('/{record}/edit'),
             'view' => Pages\ViewMail::route('/{record}/view'),
+            'important' => Pages\ImportantMail::route('/important'),
+
         ];
     }
 }
