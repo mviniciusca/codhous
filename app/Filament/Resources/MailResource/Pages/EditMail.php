@@ -9,6 +9,11 @@ use Filament\Resources\Pages\EditRecord;
 class EditMail extends EditRecord
 {
     protected static string $resource = MailResource::class;
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Important';
+    }
     protected function getHeaderActions(): array
     {
         return [

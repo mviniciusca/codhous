@@ -30,10 +30,7 @@ class MailResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
     public static function getNavigationBadge(): ?string
     {
-        if (static::getModel()::count() != 0) {
-            return static::getModel()::count();
-        }
-        return null;
+        return static::getModel()::count() != 0 ? static::getModel()::count() : null;
     }
     public static function getNavigationLabel(): string
     {
