@@ -31,6 +31,7 @@ class MailResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         $count = static::getModel()::count();
+     
         return $count != 0 ? $count : null;
     }
     public static function getNavigationLabel(): string
