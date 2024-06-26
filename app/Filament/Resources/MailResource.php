@@ -67,11 +67,14 @@ class MailResource extends Resource
                     ->limit(30)
                     ->label(__('Email')),
                 TextColumn::make('subject')
-                    ->limit(50)
+                    ->limit(30)
                     ->label(__('Subject')),
                 CheckboxColumn::make('is_read')
                     ->alignCenter()
                     ->label(__('Mark as Read')),
+                TextColumn::make('created_at')
+                ->label(__('Received'))
+                ->date('d-m-Y H:i')
             ])
             ->searchable()
             ->striped()

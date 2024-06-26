@@ -16,14 +16,11 @@ use Filament\Resources\Pages\EditRecord;
 class EditLayout extends EditRecord
 {
     protected static string $resource = SettingResource::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-paint-brush';
-
     public static function getNavigationLabel(): string
     {
         return __('Design & Appearance');
     }
-
     public function form(Form $form): Form
     {
         return $form
