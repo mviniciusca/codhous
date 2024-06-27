@@ -37,7 +37,6 @@ class ListImportantMail extends ListRecords
     {
         return __('Favorites');
     }
-
     public function table(Table $table): Table
     {
         return $table
