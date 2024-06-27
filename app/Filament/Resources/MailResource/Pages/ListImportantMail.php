@@ -1,29 +1,26 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\MailResource\Pages;
 
-use Filament\Forms;
-use App\Models\Mail;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Tables\Columns\TextColumn;
+use App\Filament\Resources\MailResource;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\MailResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\MailResource\RelationManagers;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\Filter;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 
-class MailResource extends Resource
+class ListImportantMail extends ListRecords
 {
-    protected static ?string $model = Mail::class;
+    protected static string $resource = MailResource::class;
     protected static ?string $navigationGroup = 'Mail';
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
     public static function getNavigationBadge(): ?string
@@ -33,25 +30,18 @@ class MailResource extends Resource
     }
     public static function getNavigationLabel(): string
     {
-        return __('Inbox');
+        return __('Favorites');
     }
-    public static function form(Form $form): Form
+
+    public function getTitle(): string|Htmlable
     {
-        return $form
-            ->schema([
-                //
-            ]);
+        return __('Favorites');
     }
-    public static function table(Table $table): Table
+
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
-                TernaryFilter::make('is_spam')
-                    ->label(__('Spam'))
-                    ->placeholder(__('All Messages'))
-                    ->trueLabel(__('Spam'))
-                    ->falseLabel(__('Not Spam'))
-                    ->default(false),
                 ToggleColumn::make('is_favorite')
                     ->label(__('Important'))
                     ->inline()
@@ -86,51 +76,40 @@ class MailResource extends Resource
             ->paginated(25)
             ->defaultSort('created_at', 'desc')
             ->filters([
+                TernaryFilter::make('is_spam')
+                    ->label(__('Spam'))
+                    ->placeholder(__('All Messages'))
+                    ->trueLabel(__('Spam'))
+                    ->falseLabel(__('Not Spam')),
                 TernaryFilter::make('is_read')
                     ->label(__('Inbox'))
                     ->placeholder(__('All Messages'))
                     ->trueLabel(__('Read'))
-                    ->falseLabel(__('Unread'))
-                    ->default(false),
+                    ->falseLabel(__('Unread')),
                 TernaryFilter::make('is_sent')
                     ->label(__('Send Messages'))
                     ->placeholder(__('All Messages'))
                     ->trueLabel(__('Sent'))
-                    ->falseLabel(__('Received'))
-                    ->default(false),
+                    ->falseLabel(__('Received')),
                 TernaryFilter::make('is_favorite')
                     ->label(__('Important Messages'))
                     ->placeholder(__('All Messages'))
                     ->trueLabel(__('With Star'))
-                    ->falseLabel(__('Without Star')),
+                    ->falseLabel(__('Without Star'))
+                    ->default(true),
             ], layout: FiltersLayout::Modal)
             ->persistFiltersInSession()
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    DeleteAction::make(),
                 ])
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
+
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListMails::route('/'),
-            'view' => Pages\ViewMail::route('/{record}/view'),
-            'create' => Pages\CreateMail::route('/create'),
-            'important' => Pages\ListImportantMail::route('/star')
-        ];
-    }
 }
