@@ -124,8 +124,6 @@ class MailResource extends Resource
             'index' => Pages\ListMails::route('/'),
             'create' => Pages\CreateMail::route('/create'),
             'view' => Pages\ViewMail::route('/{record}/view'),
-            'view-important' => Pages\ViewImportantMail::route('/important'),
-
         ];
     }
 }
