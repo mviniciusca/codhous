@@ -38,21 +38,19 @@ class Budget extends Component implements HasForms
                                     ->schema([
                                         Select::make('content.fck')
                                             ->options([
-                                                'pool' => __('Pool'),
-                                                'wall' => __('Wall'),
-                                                'floor' => __('Floor'),
-                                                'foundation' => __('Foundation'),
-                                                'other' => __('Other'),
+                                                15 => 15,
+                                                20 => 20,
+                                                25 => 25,
+                                                30 => 30,
+                                                35 => 35,
+                                                40 => 40
                                             ])
                                             ->label(__('FCK (Feature Compression Know)'))
                                             ->helperText(__('Feature Compression Know')),
-                                        Select::make('content.object')
+                                        Select::make('content.type')
                                             ->options([
-                                                'pool' => __('Pool'),
-                                                'wall' => __('Wall'),
-                                                'floor' => __('Floor'),
-                                                'foundation' => __('Foundation'),
-                                                'other' => __('Other'),
+                                                1 => __('Type 1'),
+                                                2 => __('Type 2'),
                                             ])
                                             ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
                                         Select::make('content.object')
@@ -71,7 +69,8 @@ class Budget extends Component implements HasForms
                                             ->minValue(3)
                                             ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
                                     ]),
-                            ])
+                            ]),
+                        Fieldset::make(__('Address & Contact'))
                     ]),
             ])
             ->statePath('data');
