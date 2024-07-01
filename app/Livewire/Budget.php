@@ -114,8 +114,8 @@ class Budget extends Component implements HasForms
     {
         BudgetModel::create($this->form->getState());
         Notification::make()
-            ->send()
-            ->title(__('Thanks for send your budget. Our team will answer you until 24 hours!'));
+            ->title(__('Thanks for send your budget. Our team will answer you until 24 hours!'))
+            ->send();
         $this->form->fill();
     }
     public function render()
