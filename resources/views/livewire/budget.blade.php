@@ -1,3 +1,8 @@
 <div>
-    {{-- If your happiness depends on money, you will never be happy with yourself. --}}
+    <form wire:submit='create'>
+        {{ $this->form }}
+        <x-ui.button>
+            Enviar
+        </x-ui.button>
+    </form>
 </div>
