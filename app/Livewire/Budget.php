@@ -45,6 +45,7 @@ class Budget extends Component implements HasForms
                                                 35 => 35,
                                                 40 => 40
                                             ])
+                                            ->required()
                                             ->label(__('FCK (Feature Compression Know)'))
                                             ->helperText(__('Feature Compression Know')),
                                         Select::make('content.type')
@@ -52,8 +53,11 @@ class Budget extends Component implements HasForms
                                                 1 => __('Type 1'),
                                                 2 => __('Type 2'),
                                             ])
-                                            ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
+                                            ->required()
+                                            ->label(__('Type of Concrete'))
+                                            ->helperText(__('Type of Concrete')),
                                         Select::make('content.object')
+                                            ->label(__('Local / Area'))
                                             ->options([
                                                 'pool' => __('Pool'),
                                                 'wall' => __('Wall'),
@@ -61,12 +65,14 @@ class Budget extends Component implements HasForms
                                                 'foundation' => __('Foundation'),
                                                 'other' => __('Other'),
                                             ])
-                                            ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
+                                            ->required()
+                                            ->helperText(__('Local or area to be concreted')),
                                         TextInput::make('content.quantity')
                                             ->label(__('Estimative Quantity m³'))
                                             ->numeric()
                                             ->default(3)
                                             ->minValue(3)
+                                            ->required()
                                             ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
                                     ]),
                             ]),
