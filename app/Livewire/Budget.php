@@ -44,6 +44,7 @@ class Budget extends Component implements HasForms
                                                 'foundation' => __('Foundation'),
                                                 'other' => __('Other'),
                                             ])
+                                            ->label(__('FCK (Feature Compression Know)'))
                                             ->helperText(__('Feature Compression Know')),
                                         Select::make('content.object')
                                             ->options([
@@ -54,13 +55,15 @@ class Budget extends Component implements HasForms
                                                 'other' => __('Other'),
                                             ])
                                             ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
-                                        Select::make('content.object')->options([
-                                            'pool' => __('Pool'),
-                                            'wall' => __('Wall'),
-                                            'floor' => __('Floor'),
-                                            'foundation' => __('Foundation'),
-                                            'other' => __('Other'),
-                                        ])->helperText(__('Min value is 3 (ABNT NBR 7212)')),
+                                        Select::make('content.object')
+                                            ->options([
+                                                'pool' => __('Pool'),
+                                                'wall' => __('Wall'),
+                                                'floor' => __('Floor'),
+                                                'foundation' => __('Foundation'),
+                                                'other' => __('Other'),
+                                            ])
+                                            ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
                                         TextInput::make('content.quantity')
                                             ->label(__('Estimative Quantity m³'))
                                             ->numeric()
