@@ -3,7 +3,7 @@
     <form wire:submit='create'>
         {{ $this->form }}
         <x-ui.button>
-            Enviar
+            {{ __('Send') }}
         </x-ui.button>
     </form>
 </div>
