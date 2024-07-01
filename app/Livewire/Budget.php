@@ -25,10 +25,8 @@ class Budget extends Component implements HasForms
 {
     use InteractsWithForms;
     public ?array $data = [];
-    public ?string $code;
     public function mount(): void
     {
-        $this->code = Str::random(10);
         $this->form->fill();
     }
     public function form(Form $form): Form
@@ -39,6 +37,8 @@ class Budget extends Component implements HasForms
                     ->schema([
                         Group::make()
                             ->schema([
+                                Hidden::make('code')
+                                    ->default(Str::random(8)),
                                 Fieldset::make(__('Construction Dimension'))
                                     ->columns(4)
                                     ->schema([
