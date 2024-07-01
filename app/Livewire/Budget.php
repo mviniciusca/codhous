@@ -2,7 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Models\Budget as BudgetModel;
 use Filament\Forms\Components\Fieldset;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Filament\Forms\Form;
 use Filament\Forms\Components\Group;
@@ -11,6 +14,7 @@ use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Components\ToggleButtons;
@@ -21,8 +25,10 @@ class Budget extends Component implements HasForms
 {
     use InteractsWithForms;
     public ?array $data = [];
-    public function month(): void
+    public ?string $code;
+    public function mount(): void
     {
+        $this->code = Str::random(10);
         $this->form->fill();
     }
     public function form(Form $form): Form
@@ -77,13 +83,40 @@ class Budget extends Component implements HasForms
                                     ]),
                             ]),
                         Fieldset::make(__('Address & Contact'))
+                            ->schema([
+                                Group::make()
+                                    ->columnSpanFull()
+                                    ->columns(4)
+                                    ->schema([
+                                        TextInput::make('content.cep')
+                                            ->required()
+                                            ->helperText(__(''))
+                                            ->label(__('Address CEP')),
+                                        TextInput::make('content.customer_name')
+                                            ->required()
+                                            ->helperText(__(''))
+                                            ->label(__('Name')),
+                                        TextInput::make('content.customer_phone')
+                                            ->required()
+                                            ->helperText(__(''))
+                                            ->label(__('Phone')),
+                                        TextInput::make('content.customer_email')
+                                            ->required()
+                                            ->helperText(__(''))
+                                            ->label(__('Email')),
+                                    ]),
+                            ]),
                     ]),
             ])
             ->statePath('data');
     }
     public function create(): void
     {
-        dd($this->form->getState());
+        BudgetModel::create($this->form->getState());
+        Notification::make()
+            ->success()
+            ->title(__('Thanks for send your budget. Our team will answer you until 24 hours!'));
+        $this->form->fill();
     }
     public function render()
     {
