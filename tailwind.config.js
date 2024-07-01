@@ -2,13 +2,13 @@
 const colors = require('tailwindcss/colors')
 export default {
     content: [
-    './app/Filament/**/*.php',
-    './resources/views/filament/**/*.blade.php',
-    './vendor/filament/**/*.blade.php',
-    './resources/**/*.blade.php',
-    "./resources/views/components/filament-fabricator/**/*.blade.php",
-    "./resources/**/*.js",
-    "./resources/**/*.vue",
+        './app/Filament/**/*.php',
+        './resources/views/filament/**/*.blade.php',
+        './vendor/filament/**/*.blade.php',
+        './resources/**/*.blade.php',
+        "./resources/views/components/filament-fabricator/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
     ],
     safelist: [
         'bg-contain', 'bg-cover', 'bg-auto', 'bg-scroll', 'bg-fixed', 'bg-center', 'bg-top',
@@ -26,12 +26,15 @@ export default {
             tertiary: colors.rose,
             gray: colors.zinc,
             white: colors.white,
+            info: colors.indigo,
+            danger: colors.red,
+            warning: colors.orange,
         },
         extend: {},
-  },
+    },
     plugins: [
-    require('@tailwindcss/typography'),
-    require('@tailwindcss/forms'),
-  ],
+        require('@tailwindcss/typography'),
+        require('@tailwindcss/forms'),
+    ],
 }
 

@@ -2,18 +2,20 @@
 
 namespace App\Livewire;
 
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Forms\Components\Fieldset;
 use Livewire\Component;
+use Filament\Forms\Form;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard\Step;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Concerns\InteractsWithForms;
 
 class Budget extends Component implements HasForms
 {
@@ -27,22 +29,22 @@ class Budget extends Component implements HasForms
     {
         return $form
             ->schema([
-                Section::make(__('Budget Order'))
-                    ->icon('heroicon-m-shopping-bag')
-                    ->description('Review your basket')
+                Group::make()
                     ->schema([
                         Group::make()
                             ->schema([
-                                Group::make()
+                                Fieldset::make(__('Construction Dimension'))
                                     ->columns(4)
                                     ->schema([
-                                        Select::make('content.type')
-                                            ->label(__('Cement Type'))
+                                        Select::make('content.fck')
                                             ->options([
-                                                'usinado' => __('Usinado'),
-                                                'convencional' => __('Convencional'),
+                                                'pool' => __('Pool'),
+                                                'wall' => __('Wall'),
+                                                'floor' => __('Floor'),
+                                                'foundation' => __('Foundation'),
+                                                'other' => __('Other'),
                                             ])
-                                            ->default('usinado'),
+                                            ->helperText(__('Feature Compression Know')),
                                         Select::make('content.object')
                                             ->options([
                                                 'pool' => __('Pool'),
@@ -50,17 +52,23 @@ class Budget extends Component implements HasForms
                                                 'floor' => __('Floor'),
                                                 'foundation' => __('Foundation'),
                                                 'other' => __('Other'),
-                                            ]),
+                                            ])
+                                            ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
+                                        Select::make('content.object')->options([
+                                            'pool' => __('Pool'),
+                                            'wall' => __('Wall'),
+                                            'floor' => __('Floor'),
+                                            'foundation' => __('Foundation'),
+                                            'other' => __('Other'),
+                                        ])->helperText(__('Min value is 3 (ABNT NBR 7212)')),
                                         TextInput::make('content.quantity')
-                                            ->label(__('Quantity m³'))
+                                            ->label(__('Estimative Quantity m³'))
                                             ->numeric()
+                                            ->default(3)
                                             ->minValue(3)
-                                            ->helperText(__('Quantity. In meters cubic (m³). Min value is 3 ABNT NBR 7212')),
-                                        Checkbox::make('content.quantity'),
-                                        TextInput::make('content.cep')
-                                            ->numeric()
-                                    ])
-                            ]),
+                                            ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
+                                    ]),
+                            ])
                     ]),
             ])
             ->statePath('data');

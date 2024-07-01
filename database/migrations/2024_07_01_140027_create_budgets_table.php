@@ -13,9 +13,6 @@ return new class extends Migration {
         Schema::create('budgets', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->string('name');
-            $table->string('email');
-            $table->string('phone');
             $table->json('content');
             $table->timestamps();
             $table->softDeletes();
