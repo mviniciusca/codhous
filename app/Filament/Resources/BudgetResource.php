@@ -57,13 +57,19 @@ class BudgetResource extends Resource
                                     ]),
                                 DateTimePicker::make('created_at')
                                     ->format('d/m/Y H:i')
-                                    ->readOnly()
                                     ->label(__('Date'))
+                                    ->readOnly()
+                                    ->helperText(__('When this budget was created'))
                             ]),
                     ]),
+                Section::make('Budget Content')
+                    ->description(__('Here is the content from your budget'))
+                    ->icon('heroicon-o-shopping-bag')
+                    ->schema([]),
                 Section::make('Budget Calculator')
-                    ->description(__('Here is the calculator for your budget'))
+                    ->description(__('Here is the calculator for your budget. Price and other values can be edited on Settings / Budget'))
                     ->icon('heroicon-o-pencil')
+                    ->schema([]),
             ]);
     }
 
