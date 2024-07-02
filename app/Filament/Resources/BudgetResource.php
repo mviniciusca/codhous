@@ -44,10 +44,6 @@ class BudgetResource extends Resource
                                     ->helperText(__('Enable or disable this budget from the dashboard view'))
                                     ->label(__('Active'))
                                     ->inline(),
-                                TextInput::make('code')
-                                    ->label(__('Budget Code'))
-                                    ->helperText(__('Use this code to search'))
-                                    ->readOnly(),
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
                                     ->options([
@@ -56,10 +52,14 @@ class BudgetResource extends Resource
                                         'done' => __('Done'),
                                         'ignored' => __('Ignored'),
                                     ]),
+                                TextInput::make('code')
+                                    ->label(__('Budget Code'))
+                                    ->helperText(__('Use this code to search'))
+                                    ->disabled(),
                                 DateTimePicker::make('created_at')
                                     ->format('d/m/Y H:i')
                                     ->label(__('Date'))
-                                    ->readOnly()
+                                    ->disabled()
                                     ->helperText(__('When this budget was created'))
                             ]),
                     ]),
