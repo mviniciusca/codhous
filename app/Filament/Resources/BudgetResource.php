@@ -65,7 +65,21 @@ class BudgetResource extends Resource
                 Section::make('Budget Content')
                     ->description(__('Here is the content from your budget'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->schema([]),
+                    ->columns(4)
+                    ->schema([
+                        TextInput::make('content.customer_name')
+                            ->disabled()
+                            ->label(__('Customer Name')),
+                        TextInput::make('content.customer_email')
+                            ->disabled()
+                            ->label(__('Email')),
+                        TextInput::make('content.customer_phone')
+                            ->disabled()
+                            ->label(__('Phone')),
+                        TextInput::make('content.cep')
+                            ->disabled()
+                            ->label(__('CEP')),
+                    ]),
                 Section::make('Budget Calculator')
                     ->description(__('Here is the calculator for your budget. Price and other values can be edited on Settings / Budget'))
                     ->icon('heroicon-o-pencil')
