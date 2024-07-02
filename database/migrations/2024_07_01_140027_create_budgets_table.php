@@ -13,6 +13,8 @@ return new class extends Migration {
         Schema::create('budgets', function (Blueprint $table) {
             $table->id();
             $table->string('code');
+            $table->string('status')->default('pending');
+            $table->boolean('is_active')->default(true);
             $table->json('content');
             $table->timestamps();
             $table->softDeletes();
