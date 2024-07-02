@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
@@ -65,20 +66,39 @@ class BudgetResource extends Resource
                 Section::make('Budget Content')
                     ->description(__('Here is the content from your budget'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->columns(4)
                     ->schema([
-                        TextInput::make('content.customer_name')
-                            ->disabled()
-                            ->label(__('Customer Name')),
-                        TextInput::make('content.customer_email')
-                            ->disabled()
-                            ->label(__('Email')),
-                        TextInput::make('content.customer_phone')
-                            ->disabled()
-                            ->label(__('Phone')),
-                        TextInput::make('content.cep')
-                            ->disabled()
-                            ->label(__('CEP')),
+                        Fieldset::make(__('Customer Information'))
+                            ->columns(4)
+                            ->schema([
+                                TextInput::make('content.customer_name')
+                                    ->disabled()
+                                    ->label(__('Customer Name')),
+                                TextInput::make('content.customer_email')
+                                    ->disabled()
+                                    ->label(__('Email')),
+                                TextInput::make('content.customer_phone')
+                                    ->disabled()
+                                    ->label(__('Phone')),
+                                TextInput::make('content.cep')
+                                    ->disabled()
+                                    ->label(__('CEP')),
+                            ]),
+                        Fieldset::make('Construction Components')
+                            ->columns(4)
+                            ->schema([
+                                TextInput::make('content.object')
+                                    ->label(__('Local / Area'))
+                                    ->helperText(__('Local or area to be concreted'))
+                                    ->disabled(),
+                                TextInput::make('content.quantity')
+                                    ->label(__('Estimative Quantity m³'))
+                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                    ->disabled(),
+                                TextInput::make('content.type')
+                                    ->label(__('Type of Concrete'))
+                                    ->helperText(__('Type of Concrete'))
+                                    ->disabled()
+                            ]),
                     ]),
                 Section::make('Budget Calculator')
                     ->description(__('Here is the calculator for your budget. Price and other values can be edited on Settings / Budget'))

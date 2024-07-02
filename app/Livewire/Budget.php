@@ -56,8 +56,8 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Feature Compression Know')),
                                         Select::make('content.type')
                                             ->options([
-                                                1 => __('Type 1'),
-                                                2 => __('Type 2'),
+                                                'usi' => __('Type 1'),
+                                                'bom' => __('Type 2'),
                                             ])
                                             ->required()
                                             ->label(__('Type of Concrete'))
