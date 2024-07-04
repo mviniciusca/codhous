@@ -90,7 +90,12 @@ class Budget extends Component implements HasForms
                                     ->schema([
                                         TextInput::make('content.cep')
                                             ->required()
+                                            ->minLength(9)
+                                            ->mask('99999-999')
+                                            ->placeholder('22022-000')
+                                            ->maxLength(9)
                                             ->helperText(__(''))
+                                            ->required()
                                             ->label(__('Address CEP')),
                                         TextInput::make('content.customer_name')
                                             ->required()
@@ -99,6 +104,9 @@ class Budget extends Component implements HasForms
                                         TextInput::make('content.customer_phone')
                                             ->required()
                                             ->helperText(__(''))
+                                            ->tel()
+                                            ->mask('(99)99999-9999')
+                                            ->placeholder(_('(DD)XXXX-XXXX'))
                                             ->label(__('Phone')),
                                         TextInput::make('content.customer_email')
                                             ->required()
