@@ -10,6 +10,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Tables;
 use App\Models\Budget;
 use Filament\Forms\Form;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -134,6 +135,10 @@ class BudgetResource extends Resource
                 TextColumn::make('created_at')
                     ->date('d/m/Y H:i')
                     ->label(__('Date')),
+                IconColumn::make('is_active')
+                    ->label(__('Active'))
+                    ->alignCenter()
+                    ->boolean()
             ])
             ->filters([
                 TernaryFilter::make('is_active')
