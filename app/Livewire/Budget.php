@@ -47,7 +47,7 @@ class Budget extends Component implements HasForms
                                 Hidden::make('code')
                                     ->default(Str::random(8)),
                                 Fieldset::make(__('Construction Dimension'))
-                                    ->columns(2)
+                                    ->columns(4)
                                     ->schema([
                                         Select::make('content.fck')
                                             ->options([
@@ -59,7 +59,7 @@ class Budget extends Component implements HasForms
                                                 40 => 40
                                             ])
                                             ->required()
-                                            ->label(__('FCK (Feature Compression Know)'))
+                                            ->label(__('FCK'))
                                             ->helperText(__('Feature Compression Know')),
                                         Select::make('content.type')
                                             ->options([
@@ -89,11 +89,18 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
                                     ]),
                             ]),
-                        Fieldset::make(__('Address & Contact'))
+                        Fieldset::make(__('Contact'))
+                            ->columns(3)
+                            ->schema([
+                                TextInput::make('content.customer_name')->required()->helperText(__('Your Full Name'))->label(__('Full Name')),
+                                TextInput::make('content.customer_phone')->required()->helperText(__(''))->tel()->mask('(99)99999-9999')->placeholder(_('(xx) XXXX-XXXX'))->helperText(__('Your phone with local area'))->label(__('Phone')),
+                                TextInput::make('content.customer_email')->required()->email()->helperText(__('Enter your contact email'))->label(__('Email')),
+                            ]),
+                        Fieldset::make(__('Address & Location'))
                             ->schema([
                                 Group::make()
                                     ->columnSpanFull()
-                                    ->columns(2)
+                                    ->columns(3)
                                     ->schema([
                                         TextInput::make('content.postcode')
                                             ->required()
@@ -133,9 +140,6 @@ class Budget extends Component implements HasForms
                                         TextInput::make('content.city')->required()->disabled()->helperText(__('City'))->label(__('City')),
                                         TextInput::make('content.neighborhood')->required()->disabled()->helperText(__('Neighborhood'))->label(__('Neighborhood')),
                                         TextInput::make('content.state')->required()->disabled()->helperText(__('UF'))->label(__('UF')),
-                                        TextInput::make('content.customer_name')->required()->helperText(__('Your Full Name'))->label(__('Name')),
-                                        TextInput::make('content.customer_phone')->required()->helperText(__(''))->tel()->mask('(99)99999-9999')->placeholder(_('(xx) XXXX-XXXX'))->helperText(__('Your phone with local area'))->label(__('Phone')),
-                                        TextInput::make('content.customer_email')->required()->email()->helperText(__('Enter your contact email'))->label(__('Email')),
                                     ]),
                             ]),
                     ]),
