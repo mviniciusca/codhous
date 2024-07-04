@@ -94,23 +94,25 @@ class Budget extends Component implements HasForms
                                             ->mask('99999-999')
                                             ->placeholder('22022-000')
                                             ->maxLength(9)
-                                            ->helperText(__(''))
+                                            ->helperText(__('CEP for your construction'))
                                             ->required()
-                                            ->label(__('Address CEP')),
+                                            ->label(__('Construction Address CEP')),
                                         TextInput::make('content.customer_name')
                                             ->required()
-                                            ->helperText(__(''))
+                                            ->helperText(__('Your Full Name'))
                                             ->label(__('Name')),
                                         TextInput::make('content.customer_phone')
                                             ->required()
                                             ->helperText(__(''))
                                             ->tel()
                                             ->mask('(99)99999-9999')
-                                            ->placeholder(_('(DD)XXXX-XXXX'))
+                                            ->placeholder(_('(xx) XXXX-XXXX'))
+                                            ->helperText(__('Your phone with local area'))
                                             ->label(__('Phone')),
                                         TextInput::make('content.customer_email')
                                             ->required()
-                                            ->helperText(__(''))
+                                            ->email()
+                                            ->helperText(__('Enter your contact email'))
                                             ->label(__('Email')),
                                     ]),
                             ]),
