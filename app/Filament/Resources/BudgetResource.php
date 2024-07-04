@@ -21,6 +21,7 @@ use App\Filament\Resources\BudgetResource\RelationManagers;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Filters\TernaryFilter;
 
 class BudgetResource extends Resource
 {
@@ -134,7 +135,11 @@ class BudgetResource extends Resource
                     ->label(__('Date')),
             ])
             ->filters([
-                //
+                TernaryFilter::make('status')
+                    ->placeholder(__('Default'))
+                    ->label(__('Status'))
+                    ->trueLabel(__('Active'))
+                    ->falseLabel(__('Inactive')),
             ])
             ->actions([
                 ActionGroup::make([
