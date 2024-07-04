@@ -10,6 +10,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Tables;
 use App\Models\Budget;
 use Filament\Forms\Form;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -135,11 +136,21 @@ class BudgetResource extends Resource
                     ->label(__('Date')),
             ])
             ->filters([
-                TernaryFilter::make('status')
+                TernaryFilter::make('is_active')
                     ->placeholder(__('Default'))
-                    ->label(__('Status'))
+                    ->label(__('Active Budget'))
                     ->trueLabel(__('Active'))
                     ->falseLabel(__('Inactive')),
+                SelectFilter::make('status')
+                    ->placeholder(__('All Status'))
+                    ->label(__('Status'))
+                    ->options([
+                        'pending' => __('Pending'),
+                        'on going' => __('On Going'),
+                        'done' => __('Done'),
+                        'ignored' => __('Ignored'),
+                    ])
+                    ->searchable(),
             ])
             ->actions([
                 ActionGroup::make([
