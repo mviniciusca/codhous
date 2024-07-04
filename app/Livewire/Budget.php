@@ -46,6 +46,27 @@ class Budget extends Component implements HasForms
                             ->schema([
                                 Hidden::make('code')
                                     ->default(Str::random(8)),
+                                Fieldset::make(__('Contact'))
+                                    ->columns(3)
+                                    ->schema([
+                                        TextInput::make('content.customer_name')
+                                            ->required()
+                                            ->helperText(__('Your Full Name'))
+                                            ->label(__('Full Name')),
+                                        TextInput::make('content.customer_phone')
+                                            ->required()
+                                            ->helperText(__(''))
+                                            ->tel()
+                                            ->mask('(99)99999-9999')
+                                            ->placeholder(_('(xx) XXXX-XXXX'))
+                                            ->helperText(__('Your phone with local area'))
+                                            ->label(__('Phone')),
+                                        TextInput::make('content.customer_email')
+                                            ->required()
+                                            ->email()
+                                            ->helperText(__('Enter your contact email'))
+                                            ->label(__('Email')),
+                                    ]),
                                 Fieldset::make(__('Construction Dimension'))
                                     ->columns(4)
                                     ->schema([
@@ -89,14 +110,7 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
                                     ]),
                             ]),
-                        Fieldset::make(__('Contact'))
-                            ->columns(3)
-                            ->schema([
-                                TextInput::make('content.customer_name')->required()->helperText(__('Your Full Name'))->label(__('Full Name')),
-                                TextInput::make('content.customer_phone')->required()->helperText(__(''))->tel()->mask('(99)99999-9999')->placeholder(_('(xx) XXXX-XXXX'))->helperText(__('Your phone with local area'))->label(__('Phone')),
-                                TextInput::make('content.customer_email')->required()->email()->helperText(__('Enter your contact email'))->label(__('Email')),
-                            ]),
-                        Fieldset::make(__('Address & Location'))
+                        Fieldset::make(__('Construction Address & Location'))
                             ->schema([
                                 Group::make()
                                     ->columnSpanFull()
@@ -135,11 +149,29 @@ class Budget extends Component implements HasForms
                                                         $set('content.state', $cepData['uf'] ?? null);
                                                     })
                                             ),
-                                        TextInput::make('content.number')->helperText(__('Number'))->label(__('Number')),
-                                        TextInput::make('content.street')->required()->disabled()->helperText(__('Street Address'))->label(__('Street')),
-                                        TextInput::make('content.city')->required()->disabled()->helperText(__('City'))->label(__('City')),
-                                        TextInput::make('content.neighborhood')->required()->disabled()->helperText(__('Neighborhood'))->label(__('Neighborhood')),
-                                        TextInput::make('content.state')->required()->disabled()->helperText(__('UF'))->label(__('UF')),
+                                        TextInput::make('content.number')
+                                            ->helperText(__('Number'))
+                                            ->label(__('Number')),
+                                        TextInput::make('content.street')
+                                            ->required()
+                                            ->disabled()
+                                            ->helperText(__('Street Address'))
+                                            ->label(__('Street')),
+                                        TextInput::make('content.city')
+                                            ->required()
+                                            ->disabled()
+                                            ->helperText(__('City'))
+                                            ->label(__('City')),
+                                        TextInput::make('content.neighborhood')
+                                            ->required()
+                                            ->disabled()
+                                            ->helperText(__('Neighborhood'))
+                                            ->label(__('Neighborhood')),
+                                        TextInput::make('content.state')
+                                            ->required()
+                                            ->disabled()
+                                            ->helperText(__('UF'))
+                                            ->label(__('UF')),
                                     ]),
                             ]),
                     ]),
