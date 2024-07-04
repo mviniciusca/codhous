@@ -40,7 +40,7 @@ class Budget extends Component implements HasForms
                                 Hidden::make('code')
                                     ->default(Str::random(8)),
                                 Fieldset::make(__('Construction Dimension'))
-                                    ->columns(4)
+                                    ->columns(2)
                                     ->schema([
                                         Select::make('content.fck')
                                             ->options([
@@ -86,7 +86,7 @@ class Budget extends Component implements HasForms
                             ->schema([
                                 Group::make()
                                     ->columnSpanFull()
-                                    ->columns(4)
+                                    ->columns(2)
                                     ->schema([
                                         TextInput::make('content.cep')
                                             ->required()
