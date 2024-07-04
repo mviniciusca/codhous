@@ -138,7 +138,8 @@ class BudgetResource extends Resource
             ->filters([
                 TernaryFilter::make('is_active')
                     ->placeholder(__('Default'))
-                    ->label(__('Active Budget'))
+                    ->default(true)
+                    ->label(__('Show Budgets'))
                     ->trueLabel(__('Active'))
                     ->falseLabel(__('Inactive')),
                 SelectFilter::make('status')
