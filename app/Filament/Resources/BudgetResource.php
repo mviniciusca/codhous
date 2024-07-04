@@ -129,6 +129,9 @@ class BudgetResource extends Resource
                     ->label(__('Email')),
                 TextColumn::make('content.customer_phone')
                     ->label(__('Phone')),
+                TextColumn::make('created_at')
+                    ->date('d/m/Y H:i')
+                    ->label(__('Date')),
             ])
             ->filters([
                 //
