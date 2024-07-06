@@ -121,19 +121,23 @@ class BudgetResource extends Resource
                                 TextInput::make('content.object')
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
-                                    ->disabled(),
+                                    ->disabled()
+                                    ->dehydrated(),
                                 TextInput::make('content.quantity')
                                     ->label(__('Estimative Quantity m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->disabled(),
+                                    ->disabled()
+                                    ->dehydrated(),
                                 TextInput::make('content.fck')
                                     ->label(__('FCK (Feature Compression Know)'))
                                     ->helperText(__('Feature Compression Know'))
-                                    ->disabled(),
+                                    ->disabled()
+                                    ->dehydrated(),
                                 TextInput::make('content.type')
                                     ->label(__('Type of Concrete'))
                                     ->helperText(__('Type of Concrete'))
                                     ->disabled()
+                                    ->dehydrated()
                             ]),
                     ]),
                 Section::make('Budget Calculator')
