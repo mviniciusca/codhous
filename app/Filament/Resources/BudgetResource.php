@@ -168,7 +168,19 @@ class BudgetResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        //
+                        Group::make()
+                            ->relationship('setting')
+                            ->schema([
+                                TextInput::make('budget.price')
+                                    ->default(10)
+                                    ->live(),
+                            ]),
+                        TextInput::make('content.quantity')
+                            ->default(10)
+                            ->live(),
+                        TextInput::make('content.total')
+                            ->default(10)
+                            ->live()
                     ]),
             ]);
     }
