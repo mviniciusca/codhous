@@ -73,16 +73,21 @@ class BudgetResource extends Resource
                         Fieldset::make(__('Customer Information'))
                             ->columns(4)
                             ->schema([
-                                TextInput::make('content.customer_name')
-                                    ->disabled()
-                                    ->label(__('Customer Name')),
-                                TextInput::make('content.customer_email')
-                                    ->disabled()
-                                    ->label(__('Email')),
-                                TextInput::make('content.customer_phone')
-                                    ->disabled()
-                                    ->label(__('Phone')),
-                                TextInput::make('content.cep')
+                                Group::make()
+                                    ->columns(3)
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        TextInput::make('content.customer_name')
+                                            ->disabled()
+                                            ->label(__('Customer Name')),
+                                        TextInput::make('content.customer_email')
+                                            ->disabled()
+                                            ->label(__('Email')),
+                                        TextInput::make('content.customer_phone')
+                                            ->disabled()
+                                            ->label(__('Phone')),
+                                    ]),
+                                TextInput::make('content.postcode')
                                     ->disabled()
                                     ->label(__('CEP')),
                             ]),
