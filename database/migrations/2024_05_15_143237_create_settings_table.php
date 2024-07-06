@@ -25,19 +25,15 @@ return new class extends Migration {
             $table->string('meta_keywords');
             $table->string('meta_description');
 
-            $table->boolean('maintenance_mode')
-                ->default(false);
-            $table->boolean('discovery_mode')
-                ->default(false);
+            $table->boolean('maintenance_mode')->default(false);
+            $table->boolean('discovery_mode')->default(false);
 
-            $table->text('header_scripts')
-                ->nullable();
-            $table->text('body_scripts')
-                ->nullable();
-            $table->text('google_tag')
-                ->nullable();
-            $table->text('google_analytics')
-                ->nullable();
+            $table->text('header_scripts')->nullable();
+            $table->text('body_scripts')->nullable();
+            $table->text('google_tag')->nullable();
+            $table->text('google_analytics')->nullable();
+
+            $table->json('budget');
 
             $table->timestamps();
         });

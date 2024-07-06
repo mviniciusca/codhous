@@ -14,6 +14,13 @@ class Setting extends Model
     use HasFactory;
     protected $guarded = [];
 
+    public function casts(): array
+    {
+        return [
+            'budget' => 'array'
+        ];
+    }
+
     /**
      * Summary of contact
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
@@ -41,8 +48,4 @@ class Setting extends Model
         return $this->hasOne(Navigation::class);
     }
 
-    public function budget(): HasOne
-    {
-        return $this->hasOne(Budget::class);
-    }
 }

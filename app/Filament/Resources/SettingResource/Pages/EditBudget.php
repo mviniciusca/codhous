@@ -25,9 +25,8 @@ class EditBudget extends EditRecord
                 Section::make(__('Options'))
                     ->description(__('Change the content for your budget tool'))
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->relationship('setting')
                     ->schema([
-                        Repeater::make('settings.fck')
+                        Repeater::make('budget.fck')
                             ->schema([
                                 TextInput::make('fck')
                                     ->label(__('FCK'))
