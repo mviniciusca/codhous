@@ -40,4 +40,9 @@ class Setting extends Model
     {
         return $this->hasOne(Navigation::class);
     }
+
+    public function budget(): HasOne
+    {
+        return $this->hasOne(Budget::class);
+    }
 }
