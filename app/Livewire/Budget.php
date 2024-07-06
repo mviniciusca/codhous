@@ -45,6 +45,8 @@ class Budget extends Component implements HasForms
                     ->schema([
                         Group::make()
                             ->schema([
+                                Hidden::make('setting_id')
+                                    ->default(Setting::select(['id'])->first()->id),
                                 Hidden::make('code')
                                     ->default(Str::random(8)),
                                 Fieldset::make(__('Contact'))

@@ -8,6 +8,7 @@ use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Set;
 use Filament\Tables;
 use App\Models\Budget;
 use Filament\Forms\Form;
@@ -25,6 +26,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Filters\TernaryFilter;
+use Illuminate\Support\Str;
 
 class BudgetResource extends Resource
 {
@@ -121,6 +123,7 @@ class BudgetResource extends Resource
                             ->schema([
                                 TextInput::make('content.quantity')
                                     ->label(__('Estimative Quantity m³'))
+                                    ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                     ->disabled()
                                     ->dehydrated(),
@@ -162,7 +165,11 @@ class BudgetResource extends Resource
                 Section::make('Budget Calculator')
                     ->description(__('Here is the calculator for your budget. Price and other values can be edited on Settings / Budget'))
                     ->icon('heroicon-o-pencil')
-                    ->schema([]),
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        //
+                    ]),
             ]);
     }
 

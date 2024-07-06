@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Budget;
 use App\Models\Contact;
 use App\Models\Layout;
 use App\Models\Navigation;
@@ -45,6 +46,16 @@ class Setting extends Model
     public function navigation(): HasOne
     {
         return $this->hasOne(Navigation::class);
+    }
+
+    /**
+     * Budget Relationship
+
+     * @return HasOne
+     */
+    public function budget(): HasOne
+    {
+        return $this->hasOne(Budget::class);
     }
 
 }
