@@ -26,16 +26,39 @@ class EditBudget extends EditRecord
                 Section::make(__('Options'))
                     ->description(__('Change the content for your budget tool'))
                     ->icon('heroicon-o-cog-6-tooth')
+                    ->columns(2)
                     ->schema([
                         TagsInput::make('budget.fck')
                             ->label(__('FCK'))
+                            ->required()
                             ->helperText(__('Enter the values of FCK that your company works')),
                         TagsInput::make('budget.type')
                             ->label(__('Type'))
-                            ->helperText(__('Enter the type of FCK that your company works')),
-                        TagsInput::make('budget.local_area')
-                            ->label(__('Type'))
-                            ->helperText(__('Enter the type of FCK that your company works')),
+                            ->required()
+                            ->helperText(__('Enter the type of concrete that your company works')),
+                        TagsInput::make('budget.area')
+                            ->label(__('Local / Area'))
+                            ->required()
+                            ->helperText(__('Enter the local or area that your company works')),
+                    ]),
+                Section::make(__('Pricing'))
+                    ->description(__('Define the pricing of the meter cubic (m³) for your concrete'))
+                    ->icon('heroicon-o-currency-dollar')
+                    ->columns(4)
+                    ->schema([
+                        TextInput::make('budget.price')
+                            ->label(__('Price'))
+                            ->regex('/^[0-9]/')
+                            ->prefix(__('U$'))
+                            ->required()
+                            ->suffix(', 00')
+                            ->helperText(__('Integer value')),
+                        TextInput::make('budget.tax')
+                            ->label(__('Tax (Optional)'))
+                            ->regex('/^[0-9]/')
+                            ->prefix(__('U$'))
+                            ->suffix(', 00')
+                            ->helperText(__('Integer value')),
                     ]),
             ]);
     }
