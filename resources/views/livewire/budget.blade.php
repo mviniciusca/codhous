@@ -6,7 +6,7 @@
     <div class="w-2/3">
         <form wire:submit='create'>
             {{ $this->form }}
-            <x-ui.button>
+            <x-ui.button :icon="'none'">
                 {{ __('Send') }}
             </x-ui.button>
         </form>
