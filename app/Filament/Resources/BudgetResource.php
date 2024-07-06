@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Models\Setting;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
@@ -118,24 +119,42 @@ class BudgetResource extends Resource
                         Fieldset::make('Construction Components')
                             ->columns(4)
                             ->schema([
-                                TextInput::make('content.object')
-                                    ->label(__('Local / Area'))
-                                    ->helperText(__('Local or area to be concreted'))
-                                    ->disabled()
-                                    ->dehydrated(),
                                 TextInput::make('content.quantity')
                                     ->label(__('Estimative Quantity m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                     ->disabled()
                                     ->dehydrated(),
-                                TextInput::make('content.fck')
-                                    ->label(__('FCK (Feature Compression Know)'))
-                                    ->helperText(__('Feature Compression Know'))
+                                Select::make('content.object')
+                                    ->label(__('Local / Area'))
+                                    ->helperText(__('Local or area to be concreted'))
+                                    ->options(
+                                        Setting::query()
+                                            ->select(['budget'])
+                                            ->get()
+                                            ->pluck('budget.area')
+                                    )
                                     ->disabled()
                                     ->dehydrated(),
-                                TextInput::make('content.type')
+                                Select::make('content.fck')
+                                    ->label(__('FCK (Feature Compression Know)'))
+                                    ->helperText(__('Feature Compression Know'))
+                                    ->options(
+                                        Setting::query()
+                                            ->select(['budget'])
+                                            ->get()
+                                            ->pluck('budget.fck')
+                                    )
+                                    ->disabled()
+                                    ->dehydrated(),
+                                Select::make('content.type')
                                     ->label(__('Type of Concrete'))
                                     ->helperText(__('Type of Concrete'))
+                                    ->options(
+                                        Setting::query()
+                                            ->select(['budget'])
+                                            ->get()
+                                            ->pluck('budget.type')
+                                    )
                                     ->disabled()
                                     ->dehydrated()
                             ]),

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Closure;
 use Exception;
+use App\Models\Setting;
 use Filament\Forms\Set;
 use Livewire\Component;
 use Filament\Forms\Form;
@@ -71,34 +72,33 @@ class Budget extends Component implements HasForms
                                     ->columns(4)
                                     ->schema([
                                         Select::make('content.fck')
-                                            ->options([
-                                                15 => 15,
-                                                20 => 20,
-                                                25 => 25,
-                                                30 => 30,
-                                                35 => 35,
-                                                40 => 40
-                                            ])
+                                            ->options(
+                                                Setting::query()
+                                                    ->select(['budget'])
+                                                    ->get()
+                                                    ->pluck('budget.fck')
+                                            )
                                             ->required()
                                             ->label(__('FCK'))
                                             ->helperText(__('Feature Compression Know')),
                                         Select::make('content.type')
-                                            ->options([
-                                                'usi' => __('Type 1'),
-                                                'bom' => __('Type 2'),
-                                            ])
+                                            ->options(
+                                                Setting::query()
+                                                    ->select(['budget'])
+                                                    ->get()
+                                                    ->pluck('budget.type')
+                                            )
                                             ->required()
                                             ->label(__('Type of Concrete'))
                                             ->helperText(__('Type of Concrete')),
                                         Select::make('content.object')
                                             ->label(__('Local / Area'))
-                                            ->options([
-                                                'pool' => __('Pool'),
-                                                'wall' => __('Wall'),
-                                                'floor' => __('Floor'),
-                                                'foundation' => __('Foundation'),
-                                                'other' => __('Other'),
-                                            ])
+                                            ->options(
+                                                Setting::query()
+                                                    ->select(['budget'])
+                                                    ->get()
+                                                    ->pluck('budget.area')
+                                            )
                                             ->required()
                                             ->helperText(__('Local or area to be concreted')),
                                         TextInput::make('content.quantity')
