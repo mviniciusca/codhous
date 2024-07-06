@@ -13,7 +13,6 @@ class Setting extends Model
 {
     use HasFactory;
     protected $guarded = [];
-
     public function casts(): array
     {
         return [
