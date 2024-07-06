@@ -79,31 +79,40 @@ class BudgetResource extends Resource
                                     ->schema([
                                         TextInput::make('content.customer_name')
                                             ->disabled()
+                                            ->dehydrated()
                                             ->label(__('Customer Name')),
                                         TextInput::make('content.customer_email')
                                             ->disabled()
+                                            ->dehydrated()
                                             ->label(__('Email')),
                                         TextInput::make('content.customer_phone')
                                             ->disabled()
+                                            ->dehydrated()
                                             ->label(__('Phone')),
                                     ]),
                                 TextInput::make('content.postcode')
                                     ->disabled()
+                                    ->dehydrated()
                                     ->label(__('CEP')),
                                 TextInput::make('content.street')
                                     ->disabled()
+                                    ->dehydrated()
                                     ->label(__('Street')),
                                 TextInput::make('content.number')
                                     ->disabled()
+                                    ->dehydrated()
                                     ->label(__('Number')),
                                 TextInput::make('content.city')
                                     ->disabled()
+                                    ->dehydrated()
                                     ->label(__('City')),
                                 TextInput::make('content.neighborhood')
                                     ->disabled()
+                                    ->dehydrated()
                                     ->label(__('Neighborhood')),
                                 TextInput::make('content.state')
                                     ->disabled()
+                                    ->dehydrated()
                                     ->label(__('State')),
                             ]),
                         Fieldset::make('Construction Components')
