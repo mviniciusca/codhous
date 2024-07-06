@@ -153,21 +153,25 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Number'))
                                             ->label(__('Number')),
                                         TextInput::make('content.street')
+                                            ->dehydrated()
                                             ->required()
                                             ->disabled()
                                             ->helperText(__('Street Address'))
                                             ->label(__('Street')),
                                         TextInput::make('content.city')
+                                            ->dehydrated()
                                             ->required()
                                             ->disabled()
                                             ->helperText(__('City'))
                                             ->label(__('City')),
                                         TextInput::make('content.neighborhood')
+                                            ->dehydrated()
                                             ->required()
                                             ->disabled()
                                             ->helperText(__('Neighborhood'))
                                             ->label(__('Neighborhood')),
                                         TextInput::make('content.state')
+                                            ->dehydrated()
                                             ->required()
                                             ->disabled()
                                             ->helperText(__('UF'))

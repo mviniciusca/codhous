@@ -71,7 +71,7 @@ class BudgetResource extends Resource
                     ->icon('heroicon-o-shopping-bag')
                     ->schema([
                         Fieldset::make(__('Customer Information'))
-                            ->columns(4)
+                            ->columns(3)
                             ->schema([
                                 Group::make()
                                     ->columns(3)
@@ -90,6 +90,21 @@ class BudgetResource extends Resource
                                 TextInput::make('content.postcode')
                                     ->disabled()
                                     ->label(__('CEP')),
+                                TextInput::make('content.street')
+                                    ->disabled()
+                                    ->label(__('Street')),
+                                TextInput::make('content.number')
+                                    ->disabled()
+                                    ->label(__('Number')),
+                                TextInput::make('content.city')
+                                    ->disabled()
+                                    ->label(__('City')),
+                                TextInput::make('content.neighborhood')
+                                    ->disabled()
+                                    ->label(__('Neighborhood')),
+                                TextInput::make('content.state')
+                                    ->disabled()
+                                    ->label(__('State')),
                             ]),
                         Fieldset::make('Construction Components')
                             ->columns(4)
