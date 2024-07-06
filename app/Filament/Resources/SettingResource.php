@@ -41,6 +41,7 @@ class SettingResource extends Resource
             Pages\EditNavigation::class,
             Pages\EditLayout::class,
             Pages\EditContact::class,
+            Pages\EditBudget::class
         ]);
     }
     public static function form(Form $form): Form
@@ -193,6 +194,7 @@ class SettingResource extends Resource
             'edit_layout' => Pages\EditLayout::route('/{record}/edit-layout'),
             'edit_contact' => Pages\EditContact::route('/{record}/edit-contact'),
             'edit_navigation' => Pages\EditNavigation::route('/{record}/edit-navigation'),
+            'edit_budget' => Pages\EditBudget::route('/{record}/edit-budget'),
         ];
     }
 }
