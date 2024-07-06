@@ -73,20 +73,18 @@ class Budget extends Component implements HasForms
                                     ->schema([
                                         Select::make('content.fck')
                                             ->options(
-                                                Setting::query()
-                                                    ->select(['budget'])
+                                                Setting::select(['budget'])
                                                     ->get()
-                                                    ->pluck('budget.fck')
+                                                    ->pluck('budget.fck', 'id')
                                             )
                                             ->required()
                                             ->label(__('FCK'))
                                             ->helperText(__('Feature Compression Know')),
                                         Select::make('content.type')
                                             ->options(
-                                                Setting::query()
-                                                    ->select(['budget'])
+                                                Setting::select(['budget'])
                                                     ->get()
-                                                    ->pluck('budget.type')
+                                                    ->pluck('budget.type', 'id')
                                             )
                                             ->required()
                                             ->label(__('Type of Concrete'))
@@ -94,10 +92,9 @@ class Budget extends Component implements HasForms
                                         Select::make('content.object')
                                             ->label(__('Local / Area'))
                                             ->options(
-                                                Setting::query()
-                                                    ->select(['budget'])
+                                                Setting::select(['budget'])
                                                     ->get()
-                                                    ->pluck('budget.area')
+                                                    ->pluck('budget.area', 'id')
                                             )
                                             ->required()
                                             ->helperText(__('Local or area to be concreted')),
