@@ -46,12 +46,6 @@ class MailResource extends Resource
     {
         return $table
             ->columns([
-                TernaryFilter::make('is_spam')
-                    ->label(__('Spam'))
-                    ->placeholder(__('All Messages'))
-                    ->trueLabel(__('Spam'))
-                    ->falseLabel(__('Not Spam'))
-                    ->default(false),
                 ToggleColumn::make('is_favorite')
                     ->label(__('Important'))
                     ->inline()
@@ -86,6 +80,12 @@ class MailResource extends Resource
             ->paginated(25)
             ->defaultSort('created_at', 'desc')
             ->filters([
+                TernaryFilter::make('is_spam')
+                    ->label(__('Spam'))
+                    ->placeholder(__('All Messages'))
+                    ->trueLabel(__('Spam'))
+                    ->falseLabel(__('Not Spam'))
+                    ->default(false),
                 TernaryFilter::make('is_read')
                     ->label(__('Inbox'))
                     ->placeholder(__('All Messages'))

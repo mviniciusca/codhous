@@ -153,27 +153,27 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Number'))
                                             ->label(__('Number')),
                                         TextInput::make('content.street')
+                                            ->disabled()
                                             ->dehydrated()
                                             ->required()
-                                            ->disabled()
                                             ->helperText(__('Street Address'))
                                             ->label(__('Street')),
                                         TextInput::make('content.city')
+                                            ->disabled()
                                             ->dehydrated()
                                             ->required()
-                                            ->disabled()
                                             ->helperText(__('City'))
                                             ->label(__('City')),
                                         TextInput::make('content.neighborhood')
+                                            ->disabled()
                                             ->dehydrated()
                                             ->required()
-                                            ->disabled()
                                             ->helperText(__('Neighborhood'))
                                             ->label(__('Neighborhood')),
                                         TextInput::make('content.state')
+                                            ->disabled()
                                             ->dehydrated()
                                             ->required()
-                                            ->disabled()
                                             ->helperText(__('UF'))
                                             ->label(__('UF')),
                                     ]),
