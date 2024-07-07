@@ -1,4 +1,4 @@
-@props(['code' => null, 'status' => null])
+@props(['code' => null])
 <x-layout.section>
     <x-layout.content>
         @if($status)
