@@ -34,9 +34,11 @@ class Budget extends Component implements HasForms
     use InteractsWithForms;
     public ?array $data = [];
     public $status;
+    public $image;
     public function mount(): void
     {
         $this->status = $this->status();
+        $this->image = $this->image();
         $this->form->fill();
     }
     public function form(Form $form): Form
@@ -203,5 +205,14 @@ class Budget extends Component implements HasForms
             ->first()
             ->budget_is_active;
         return $status;
+    }
+
+    public function image(): string|null
+    {
+        $image = Setting::query()
+            ->select(['budget_image'])
+            ->first()
+            ->budget_image;
+        return $image;
     }
 }

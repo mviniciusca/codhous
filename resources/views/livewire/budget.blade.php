@@ -3,10 +3,12 @@
     <x-layout.content>
         @if($status)
         <div class="inline-flex w-full gap-8">
+            @if($image)
             <div class="w-full hidden lg:block lg:w-1/3 bg-cover rounded-md bg-no-repeat bg-center"
-                style="background-image: url(https://www.guru.com/blog/wp-content/uploads/2023/04/civil-engineer-duties.jpg)">
+                style="background-image: url({{ asset('storage/' . $image ) }})">
             </div>
-            <div class="w-full lg:w-2/3">
+            @endif
+            <div class="w-full {{ $image ? 'lg:w-2/3' : 'lg:w-full' }}">
                 <form wire:submit='create'>
                     {{ $this->form }}
                     <span class="inline-flex">

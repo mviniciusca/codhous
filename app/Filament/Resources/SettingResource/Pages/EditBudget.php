@@ -4,6 +4,7 @@ namespace App\Filament\Resources\SettingResource\Pages;
 
 use App\Filament\Resources\SettingResource;
 use Filament\Actions;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TagsInput;
@@ -53,6 +54,17 @@ class EditBudget extends EditRecord
                             ->placeholder(__('press enter to add'))
                             ->required()
                             ->helperText(__('Enter the local or area that your company works')),
+                    ]),
+                Section::make(__('Design'))
+                    ->description(__('Change the design for your budget tool'))
+                    ->icon('heroicon-o-photo')
+                    ->schema([
+                        FileUpload::make('budget_image')
+                            ->image()
+                            ->imageEditor()
+                            ->directory('budget')
+                            ->label(__('Image Upload'))
+                            ->helperText(__('Upload a image for your budget tool'))
                     ]),
             ]);
     }
