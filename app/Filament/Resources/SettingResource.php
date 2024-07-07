@@ -38,6 +38,7 @@ class SettingResource extends Resource
     public static function getRecordSubNavigation(Page $page): array
     {
         return $page->generateNavigationItems([
+            Pages\EditSetting::class,
             Pages\EditNavigation::class,
             Pages\EditLayout::class,
             Pages\EditContact::class,
@@ -63,17 +64,20 @@ class SettingResource extends Resource
                             ->label(__('Public E-mail'))
                             ->helperText(__('Define here the e-mail address for you or your Company. This is a public information.'))
                             ->maxLength(140)
+                            ->email()
                             ->required(),
                         TextInput::make('phone')
                             ->label(__('Public Phone'))
+                            ->tel()
+                            ->mask('(99)9999-9999')
                             ->helperText(__('Define here the phone number for you or your Company. This is a public information.'))
-                            ->maxLength(140)
+                            ->maxLength(15)
                             ->tel()
                             ->required(),
                         TextInput::make('office_hour')
                             ->label(__('Office Hour'))
                             ->helperText(__('Define here the office hour of your Company.'))
-                            ->maxLength(140)
+                            ->maxLength(150)
                             ->required(),
                     ]),
                 Section::make(__('Security & Management'))
@@ -85,11 +89,11 @@ class SettingResource extends Resource
                         Toggle::make('maintenance_mode')
                             ->helperText(__('Active or disable the maintenance mode of the application'))
                             ->label(__('Maintenance Mode'))
-                            ->inline(false),
+                            ->inline(),
                         Toggle::make('discovery_mode')
                             ->helperText(__('This section is shown before closing the body tag'))
                             ->label(__('Discovery Mode'))
-                            ->inline(false),
+                            ->inline(),
                     ]),
                 Section::make(__('Modules Control'))
                     ->description(__('Control the global module visibility'))

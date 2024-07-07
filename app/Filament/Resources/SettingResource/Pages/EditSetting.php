@@ -12,6 +12,13 @@ class EditSetting extends EditRecord
 {
     protected static string $resource = SettingResource::class;
 
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('App Settings');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
