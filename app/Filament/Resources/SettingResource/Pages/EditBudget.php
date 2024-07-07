@@ -8,6 +8,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 
@@ -23,10 +24,19 @@ class EditBudget extends EditRecord
     {
         return $form
             ->schema([
+                Section::make(__('Visibility'))
+                    ->icon('heroicon-o-eye')
+                    ->description(__('Control the visibility of this section. This is a global action'))
+                    ->schema([
+                        Toggle::make('budget.is_active')
+                            ->label(__('Active'))
+                            ->inline()
+                            ->helperText(__('Enable or disable this section. This affects every page that this tool is on it'))
+                    ]),
                 Section::make(__('Options'))
                     ->description(__('Change the content for your budget tool'))
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->columns(2)
+                    ->columns(3)
                     ->schema([
                         TagsInput::make('budget.fck')
                             ->label(__('FCK'))
@@ -40,25 +50,6 @@ class EditBudget extends EditRecord
                             ->label(__('Local / Area'))
                             ->required()
                             ->helperText(__('Enter the local or area that your company works')),
-                    ]),
-                Section::make(__('Pricing'))
-                    ->description(__('Define the pricing of the meter cubic (m³) for your concrete'))
-                    ->icon('heroicon-o-currency-dollar')
-                    ->columns(4)
-                    ->schema([
-                        TextInput::make('budget.price')
-                            ->label(__('Price'))
-                            ->regex('/^[0-9]/')
-                            ->prefix(__('U$'))
-                            ->required()
-                            ->suffix(', 00')
-                            ->helperText(__('Integer value')),
-                        TextInput::make('budget.tax')
-                            ->label(__('Tax (Optional)'))
-                            ->regex('/^[0-9]/')
-                            ->prefix(__('U$'))
-                            ->suffix(', 00')
-                            ->helperText(__('Integer value')),
                     ]),
             ]);
     }

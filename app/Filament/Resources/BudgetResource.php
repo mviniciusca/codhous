@@ -162,26 +162,6 @@ class BudgetResource extends Resource
                                     ->dehydrated()
                             ]),
                     ]),
-                Section::make('Budget Calculator')
-                    ->description(__('Here is the calculator for your budget. Price and other values can be edited on Settings / Budget'))
-                    ->icon('heroicon-o-pencil')
-                    ->columnSpanFull()
-                    ->columns(2)
-                    ->schema([
-                        Group::make()
-                            ->relationship('setting')
-                            ->schema([
-                                TextInput::make('budget.price')
-                                    ->default(10)
-                                    ->live(),
-                            ]),
-                        TextInput::make('content.quantity')
-                            ->default(10)
-                            ->live(),
-                        TextInput::make('content.total')
-                            ->default(10)
-                            ->live()
-                    ]),
             ]);
     }
 

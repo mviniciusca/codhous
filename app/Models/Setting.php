@@ -47,15 +47,4 @@ class Setting extends Model
     {
         return $this->hasOne(Navigation::class);
     }
-
-    /**
-     * Budget Relationship
-
-     * @return HasOne
-     */
-    public function budget(): HasOne
-    {
-        return $this->hasOne(Budget::class);
-    }
-
 }

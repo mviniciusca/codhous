@@ -23,12 +23,4 @@ class Budget extends Model
             'content' => 'array',
         ];
     }
-
-    /**
-     *      * @return BelongsTo
-     */
-    public function setting(): BelongsTo
-    {
-        return $this->belongsTo(Setting::class);
-    }
 }
