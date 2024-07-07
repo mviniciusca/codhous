@@ -25,14 +25,14 @@ class EditBudget extends EditRecord
     {
         return $form
             ->schema([
-                Section::make(__('Visibility'))
+                Section::make(__('Visibility Control'))
                     ->icon('heroicon-o-eye')
-                    ->description(__('Control the visibility of this section. This is a global action'))
+                    ->description(__('Control the public visibility of this section.'))
                     ->schema([
                         Toggle::make('budget_is_active')
                             ->label(__('Active'))
                             ->inline()
-                            ->helperText(__('Enable or disable this section. This affects every page that this tool is on it'))
+                            ->helperText(__('Enable or disable this section. This is a global action.'))
                     ]),
                 Section::make(__('Options'))
                     ->description(__('Change the content for your budget tool'))

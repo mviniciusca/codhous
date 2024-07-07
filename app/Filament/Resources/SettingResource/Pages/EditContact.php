@@ -31,7 +31,9 @@ class EditContact extends EditRecord
                     ->description(__('Control the public visibility of this section.'))
                     ->schema([
                         Toggle::make('status')
-                            ->inline(false)
+                            ->inline()
+                            ->label(__('Active'))
+                            ->helperText(__('Enable or disable this section. This is a global action.'))
                     ]),
                 Section::make(__('Contact & Locale'))
                     ->description(__('Edit your address and localization settings'))
