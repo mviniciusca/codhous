@@ -11,6 +11,7 @@ use App\Models\Navigation;
 use App\Models\Newsletter;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -41,5 +42,9 @@ class DatabaseSeeder extends Seeder
 
         Newsletter::factory(20)->create();
         Mail::factory(20)->create();
+
+        // DB::table('pages')
+        //     ->create([]);
+
     }
 }

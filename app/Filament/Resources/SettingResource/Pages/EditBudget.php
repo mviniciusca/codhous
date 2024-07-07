@@ -41,13 +41,16 @@ class EditBudget extends EditRecord
                         TagsInput::make('budget.fck')
                             ->label(__('FCK'))
                             ->required()
+                            ->placeholder(__('press enter to add'))
                             ->helperText(__('Enter the values of FCK that your company works')),
                         TagsInput::make('budget.type')
                             ->label(__('Type'))
+                            ->placeholder(__('press enter to add'))
                             ->required()
                             ->helperText(__('Enter the type of concrete that your company works')),
                         TagsInput::make('budget.area')
                             ->label(__('Local / Area'))
+                            ->placeholder(__('press enter to add'))
                             ->required()
                             ->helperText(__('Enter the local or area that your company works')),
                     ]),
