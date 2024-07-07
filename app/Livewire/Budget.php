@@ -33,9 +33,10 @@ class Budget extends Component implements HasForms
 {
     use InteractsWithForms;
     public ?array $data = [];
-    public ?bool $status;
+    public $status;
     public function mount(): void
     {
+        $this->status = $this->status();
         $this->form->fill();
     }
     public function form(Form $form): Form
@@ -191,7 +192,16 @@ class Budget extends Component implements HasForms
     public function render()
     {
         return view('livewire.budget', [
-            'status' => Setting::select(['budget_is_active'])->get()
+            'status' => $this->status(),
         ]);
+    }
+
+    public function status(): bool
+    {
+        $status = Setting::query()
+            ->select(['budget_is_active'])
+            ->first()
+            ->budget_is_active;
+        return $status;
     }
 }
