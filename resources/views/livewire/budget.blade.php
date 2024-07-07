@@ -21,6 +21,10 @@
                 </form>
             </div>
         </div>
+        @else
+        @auth
+        <x-section.empty-section />
+        @endauth
         @endif
     </x-layout.content>
 </x-layout.section>
