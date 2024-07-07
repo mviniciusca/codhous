@@ -2,6 +2,7 @@
 
 namespace App\Filament\Fabricator\PageBlocks\Core;
 
+use App\Models\Setting;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
