@@ -28,7 +28,7 @@ class EditBudget extends EditRecord
                     ->icon('heroicon-o-eye')
                     ->description(__('Control the visibility of this section. This is a global action'))
                     ->schema([
-                        Toggle::make('budget.is_active')
+                        Toggle::make('budget_is_active')
                             ->label(__('Active'))
                             ->inline()
                             ->helperText(__('Enable or disable this section. This affects every page that this tool is on it'))

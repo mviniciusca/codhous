@@ -2,6 +2,7 @@
 
 namespace App\Filament\Fabricator\PageBlocks\Core;
 
+use App\Models\Setting;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
@@ -24,7 +25,6 @@ class BudgetTool extends PageBlock
                     ])
             ]);
     }
-
     public static function mutateData(array $data): array
     {
         return $data;

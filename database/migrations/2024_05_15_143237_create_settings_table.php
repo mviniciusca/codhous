@@ -33,6 +33,7 @@ return new class extends Migration {
             $table->text('google_tag')->nullable();
             $table->text('google_analytics')->nullable();
 
+            $table->boolean('budget_is_active')->default(true);
             $table->json('budget')->nullable();
 
             $table->timestamps();
