@@ -175,8 +175,8 @@ class Budget extends Component implements HasForms
                                             ->disabled()
                                             ->dehydrated()
                                             ->required()
-                                            ->helperText(__('UF'))
-                                            ->label(__('UF')),
+                                            ->helperText(__('State'))
+                                            ->label(__('State')),
                                     ]),
                             ]),
                     ]),
