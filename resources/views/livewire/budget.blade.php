@@ -2,11 +2,14 @@
 <x-layout.section>
     <x-layout.content>
         @if($status)
+
         <div class="inline-flex w-full gap-8">
             @if($image)
+
             <div class="w-full hidden lg:block lg:w-1/3 bg-cover rounded-md bg-no-repeat bg-center"
                 style="background-image: url({{ asset('storage/' . $image ) }})">
             </div>
+
             @endif
             <div class="w-full {{ $image ? 'lg:w-2/3' : 'lg:w-full' }}">
                 <form wire:submit='create'>
@@ -24,9 +27,12 @@
             </div>
         </div>
         @else
+
         @auth
         <x-section.empty-section />
         @endauth
+
         @endif
+
     </x-layout.content>
 </x-layout.section>
