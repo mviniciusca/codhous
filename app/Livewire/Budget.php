@@ -133,6 +133,7 @@ class Budget extends Component implements HasForms
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $set('content.neighborhood', null);
                                                         $set('content.street', null);
+                                                        $set('content.number', null);
                                                         $set('content.city', null);
                                                         $set('content.state', null);
                                                         $livewire->validateOnly('data.content.postcode');
