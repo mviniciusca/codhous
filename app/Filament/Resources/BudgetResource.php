@@ -34,6 +34,12 @@ class BudgetResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::count();
+        return $count != 0 ? $count : null;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -170,6 +176,7 @@ class BudgetResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('status')
+                    ->sortable()
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'pending' => 'primary',
@@ -178,6 +185,7 @@ class BudgetResource extends Resource
                         'ignored' => 'danger'
                     }),
                 TextColumn::make('content.customer_name')
+                    ->sortable()
                     ->label(__('Name')),
                 TextColumn::make('content.customer_email')
                     ->label(__('Email')),
@@ -185,12 +193,14 @@ class BudgetResource extends Resource
                     ->label(__('Phone')),
                 TextColumn::make('created_at')
                     ->date('d/m/Y H:i')
+                    ->sortable()
                     ->label(__('Date')),
                 IconColumn::make('is_active')
                     ->label(__('Active'))
                     ->alignCenter()
                     ->boolean()
             ])
+            ->defaultSort('id', 'desc')
             ->filters([
                 TernaryFilter::make('is_active')
                     ->placeholder(__('Default'))
