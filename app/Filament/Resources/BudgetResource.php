@@ -35,7 +35,6 @@ class BudgetResource extends Resource
     protected static ?string $recordTitleAttribute = 'Budget';
     protected static ?string $model = Budget::class;
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
-
     public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
     {
         return __('Budget');
