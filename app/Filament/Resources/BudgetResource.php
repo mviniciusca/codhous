@@ -18,8 +18,10 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\BudgetResource\Pages;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\BudgetResource\RelationManagers;
 use Filament\Forms\Components\DateTimePicker;
@@ -30,10 +32,25 @@ use Illuminate\Support\Str;
 
 class BudgetResource extends Resource
 {
+    protected static ?string $recordTitleAttribute = 'Budget';
     protected static ?string $model = Budget::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
+    public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
+    {
+        return __('Budget');
+    }
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['code', 'content'];
+    }
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            __('Customer') => $record->content['customer_name'],
+            __('Code') => $record->code,
+        ];
+    }
     public static function getNavigationBadge(): ?string
     {
         $count = static::getModel()::count();
@@ -175,6 +192,9 @@ class BudgetResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('code')
+                    ->searchable()
+                    ->label(__('Code')),
                 TextColumn::make('status')
                     ->sortable()
                     ->badge()
@@ -186,6 +206,7 @@ class BudgetResource extends Resource
                     }),
                 TextColumn::make('content.customer_name')
                     ->sortable()
+                    ->searchable()
                     ->label(__('Name')),
                 TextColumn::make('content.customer_email')
                     ->label(__('Email')),
