@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Models\User;
+use App\Notifications\NewBudget;
 use Closure;
 use Exception;
 use App\Models\Setting;
@@ -187,9 +189,14 @@ class Budget extends Component implements HasForms
     public function create(): void
     {
         BudgetModel::create($this->form->getState());
+
+        $user = new User();
+        $user->first()->notify(new NewBudget());
+
         Notification::make()
             ->title(__('Thanks! Our team will answer you until 24 hours!'))
             ->send();
+
         $this->form->fill();
     }
     public function render()
