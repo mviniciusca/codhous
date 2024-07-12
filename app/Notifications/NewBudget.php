@@ -36,8 +36,8 @@ class NewBudget extends Notification
     {
         return (new MailMessage)
             ->line(__('The introduction to the notification.'))
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+            ->action(__('Notification URL'), url('/'))
+            ->line(__('Thank you for using our application!'));
     }
 
     /**
