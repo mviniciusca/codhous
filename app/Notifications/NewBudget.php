@@ -47,7 +47,11 @@ class NewBudget extends Notification
             ->line(__('You\'ve received a new budget offer.'))
             ->line(__('Code: ' . $this->budget['code']))
             ->line(__('Customer: ') . $this->budget['content']['customer_name'])
-            ->action(__('View Now'), url(env('APP_URL') . '/admin/budgets/' . $this->budget['id'] . '/edit'))
+            ->action(
+                __('View Now'),
+                url(env('APP_URL') . '/admin/budgets/' .
+                    $this->budget['id'] . '/edit')
+            )
             ->line(__('Check it out in your Dashboard'));
     }
 
