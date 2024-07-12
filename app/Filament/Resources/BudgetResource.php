@@ -144,7 +144,7 @@ class BudgetResource extends Resource
                             ->columns(4)
                             ->schema([
                                 TextInput::make('content.quantity')
-                                    ->label(__('Estimative Quantity m³'))
+                                    ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                     ->disabled()
@@ -161,7 +161,7 @@ class BudgetResource extends Resource
                                     ->disabled()
                                     ->dehydrated(),
                                 Select::make('content.fck')
-                                    ->label(__('FCK (Feature Compression Know)'))
+                                    ->label(__('FCK'))
                                     ->helperText(__('Feature Compression Know'))
                                     ->options(
                                         Setting::query()
@@ -172,7 +172,7 @@ class BudgetResource extends Resource
                                     ->disabled()
                                     ->dehydrated(),
                                 Select::make('content.type')
-                                    ->label(__('Type of Concrete'))
+                                    ->label(__('Type'))
                                     ->helperText(__('Type of Concrete'))
                                     ->options(
                                         Setting::query()
