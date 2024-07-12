@@ -188,10 +188,10 @@ class Budget extends Component implements HasForms
     }
     public function create(): void
     {
-        BudgetModel::create($this->form->getState());
+        $budget = BudgetModel::create($this->form->getState());
 
         $user = new User();
-        $user->first()->notify(new NewBudget());
+        $user->first()->notify(new NewBudget($budget->toArray()));
 
         Notification::make()
             ->title(__('Thanks! Our team will answer you until 24 hours!'))

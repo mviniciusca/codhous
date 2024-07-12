@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,12 +12,14 @@ class NewBudget extends Notification
 {
     use Queueable;
 
+    public ?array $budget;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct($budget)
     {
-        //
+        $this->budget = $budget;
     }
 
     /**
@@ -35,9 +38,13 @@ class NewBudget extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line(__('The introduction to the notification.'))
-            ->action(__('Notification URL'), url('/'))
-            ->line(__('Thank you for using our application!'));
+            ->subject(__('New Budget Offer. ID:' . $this->budget['id']))
+            ->greeting(__('Hey!'))
+            ->line(__('You\'ve received a new budget offer.'))
+            ->line(__('Code: ' . $this->budget['code']))
+            ->line(__('Customer: ' . $this->budget['content']['customer_name']))
+            ->action(__('View Now'), url(env('APP_URL') . '/admin/budgets/' . $this->budget['id'] . '/edit'))
+            ->line(__('Check it out in your Dashboard'));
     }
 
     /**
