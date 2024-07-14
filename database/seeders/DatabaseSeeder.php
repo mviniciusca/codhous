@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Mail;
+use App\Models\Partner;
 use App\Models\User;
 use App\Models\Layout;
 use App\Models\Contact;
@@ -38,6 +39,10 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+        ]);
+
+        Partner::factory(20)->create([
+            'setting_id' => $setting->id,
         ]);
 
         Newsletter::factory(20)->create();
