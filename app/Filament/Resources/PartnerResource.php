@@ -35,7 +35,7 @@ class PartnerResource extends Resource
                             ->inline()
                             ->required(),
                         Forms\Components\Hidden::make('setting_id')
-                            ->default(Setting::first()->setting_id)
+                            ->default(Setting::first()->id)
                             ->required(),
                         Forms\Components\TextInput::make('name')
                             ->required()
