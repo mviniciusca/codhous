@@ -11,6 +11,9 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -75,13 +78,18 @@ class PartnerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\IconColumn::make('is_active')
+                    ->alignCenter()
+                    ->label(__('Active'))
                     ->boolean(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('Company'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('content.phone')
                     ->label(__('Phone'))
+                    ->label(__('Phone'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label(__('Email'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -93,10 +101,17 @@ class PartnerResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                TernaryFilter::make('is_active')
+                    ->default(true)
+                    ->label(__('Status'))
+                    ->placeholder(__('Show All'))
+                    ->trueLabel(__('Active'))
+                    ->falseLabel(__('Inactive')),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
