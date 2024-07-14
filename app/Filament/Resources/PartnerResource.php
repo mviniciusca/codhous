@@ -50,18 +50,14 @@ class PartnerResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('setting_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('postcode')
+                Tables\Columns\TextColumn::make('content.phone')
+                    ->label(__('Phone'))
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

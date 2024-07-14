@@ -26,6 +26,7 @@ class PartnerFactory extends Factory
             'postcode' => $this->faker->postcode(),
             'content' => [
                 'address' => [$this->faker->address()],
+                'phone' => [$this->faker->phoneNumber()],
                 'number' => [$this->faker->randomNumber(3)],
                 'city' => [$this->faker->city()],
                 'state' => [$this->faker->citySuffix()],
