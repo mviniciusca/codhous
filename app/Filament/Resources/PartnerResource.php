@@ -7,6 +7,7 @@ use App\Filament\Resources\PartnerResource\RelationManagers;
 use App\Models\Partner;
 use App\Models\Setting;
 use Filament\Forms;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -36,49 +37,60 @@ class PartnerResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(1)
             ->schema([
-                Section::make(__('Partner'))
-                    ->description(_('Partner'))
-                    ->columns(4)
-                    ->icon('heroicon-o-cube')
+                Group::make()
+                    ->columns(5)
                     ->schema([
-                        Forms\Components\Toggle::make('is_active')
-                            ->default(true)
-                            ->inline()
-                            ->required(),
-                        Forms\Components\Hidden::make('setting_id')
-                            ->default(Setting::first()->id)
-                            ->required(),
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('slug')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('email')
-                            ->email()
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('postcode')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('content.phone')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('content.address')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('content.city')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('content.state')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('content.country')
-                            ->required()
-                            ->maxLength(255),
-
+                        Section::make(__('Partner Information'))
+                            ->columnSpan(4)
+                            ->columns(2)
+                            ->schema([
+                                Forms\Components\Hidden::make('setting_id')
+                                    ->default(Setting::first()->id)
+                                    ->required(),
+                                Forms\Components\TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('slug')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('email')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('postcode')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('content.phone')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('content.address')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('content.city')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('content.state')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('content.country')
+                                    ->required()
+                                    ->maxLength(255),
+                            ]),
+                        Section::make(__('Status & Control'))
+                            ->description(_(''))
+                            ->columnSpan(1)
+                            ->icon('heroicon-o-eye')
+                            ->schema([
+                                Forms\Components\Toggle::make('is_active')
+                                    ->default(true)
+                                    ->label(__('Status'))
+                                    ->helperText(__('Active or disable this Partner'))
+                                    ->inline(),
+                            ]),
                     ]),
+
             ]);
     }
 
