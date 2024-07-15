@@ -21,8 +21,17 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::count();
+        return $count != 0 ? $count : null;
+    }
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    public static function getNavigationLabel(): string
+    {
+        return __('Partners');
+    }
 
     public static function form(Form $form): Form
     {
