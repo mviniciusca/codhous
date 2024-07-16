@@ -48,19 +48,23 @@ class PartnerResource extends Resource
                             ->schema([
                                 Forms\Components\Hidden::make('setting_id')
                                     ->default(Setting::first()->id)
+                                    ->label(__(''))
                                     ->required(),
                                 Forms\Components\TextInput::make('name')
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('slug')
                                     ->required()
+                                    ->label(__(''))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('email')
                                     ->email()
+                                    ->label(__(''))
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('postcode')
                                     ->required()
+                                    ->label(__(''))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.phone')
                                     ->required()
