@@ -18,6 +18,7 @@ use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Forms\Components\Actions\Action;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Filament\Resources\PartnerResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -56,11 +57,14 @@ class PartnerResource extends Resource
                                 Forms\Components\TextInput::make('name')
                                     ->required()
                                     ->label(__('Company'))
+                                    ->lazy()
+                                    ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state)))
                                     ->maxLength(255),
-                                Forms\Components\TextInput::make('slug')
+                                Forms\Components\Hidden::make('slug')
                                     ->required()
-                                    ->label(__('Slug'))
-                                    ->maxLength(255),
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->label(__('Slug')),
                                 Forms\Components\TextInput::make('email')
                                     ->email()
                                     ->label(__('Email'))

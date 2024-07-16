@@ -30,7 +30,7 @@ class PartnerFactory extends Factory
                 'number' => [$this->faker->randomNumber(3)],
                 'city' => [$this->faker->city()],
                 'state' => [$this->faker->citySuffix()],
-                'country' => [$this->faker->country()],
+                'neighborhood' => [$this->faker->city()],
             ]
         ];
     }
