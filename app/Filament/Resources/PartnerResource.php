@@ -47,9 +47,11 @@ class PartnerResource extends Resource
                 Group::make()
                     ->columns(5)
                     ->schema([
-                        Section::make(__('Partner Information'))
+                        Section::make(__('Partner'))
+                            ->icon('heroicon-o-cube')
+                            ->description(__('Add or control your partner'))
                             ->columnSpan(4)
-                            ->columns(2)
+                            ->columns(3)
                             ->schema([
                                 Forms\Components\Hidden::make('setting_id')
                                     ->default(Setting::first()->id)
@@ -69,6 +71,10 @@ class PartnerResource extends Resource
                                     ->email()
                                     ->label(__('Email'))
                                     ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('content.phone')
+                                    ->required()
+                                    ->label(__('Phone'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('postcode')
                                     ->required()
@@ -104,16 +110,16 @@ class PartnerResource extends Resource
                                                 $set('content.state', $cepData['uf'] ?? null);
                                             })
                                     ),
-                                Forms\Components\TextInput::make('content.phone')
-                                    ->required()
-                                    ->label(__('Phone'))
-                                    ->maxLength(255),
                                 Forms\Components\TextInput::make('content.address')
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
                                     ->label(__('Address'))
                                     ->maxLength(255),
+                                Forms\Components\TextInput::make('content.number')
+                                    ->label(__('Number'))
+                                    ->columnSpan(1)
+                                    ->maxLength(140),
                                 Forms\Components\TextInput::make('content.neighborhood')
                                     ->required()
                                     ->disabled()
