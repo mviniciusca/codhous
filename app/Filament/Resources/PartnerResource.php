@@ -64,15 +64,15 @@ class PartnerResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('postcode')
                                     ->required()
-                                    ->label(__(''))
+                                    ->label(__('Postcode'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.phone')
                                     ->required()
-                                    ->label(__(''))
+                                    ->label(__('Phone'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.address')
                                     ->required()
-                                    ->label(__(''))
+                                    ->label(__('Address'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.city')
                                     ->required()
@@ -80,11 +80,11 @@ class PartnerResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.state')
                                     ->required()
-                                    ->label(__(''))
+                                    ->label(__('State'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.country')
                                     ->required()
-                                    ->label(__(''))
+                                    ->label(__('Country'))
                                     ->maxLength(255),
                             ]),
                         Section::make(__('Status & Control'))
