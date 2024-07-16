@@ -74,8 +74,12 @@ class PartnerResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.phone')
                                     ->required()
-                                    ->label(__('Phone'))
-                                    ->maxLength(255),
+                                    ->helperText(__('Phone Number'))
+                                    ->tel()
+                                    ->mask('(99)99999-9999')
+                                    ->placeholder(_('(xx) XXXX-XXXX'))
+                                    ->helperText(__('Your phone with local area'))
+                                    ->label(__('Phone')),
                                 Forms\Components\TextInput::make('postcode')
                                     ->required()
                                     ->minLength(9)

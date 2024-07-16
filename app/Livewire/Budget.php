@@ -62,7 +62,7 @@ class Budget extends Component implements HasForms
                                             ->label(__('Full Name')),
                                         TextInput::make('content.customer_phone')
                                             ->required()
-                                            ->helperText(__(''))
+                                            ->helperText(__('Phone Number'))
                                             ->tel()
                                             ->mask('(99)99999-9999')
                                             ->placeholder(_('(xx) XXXX-XXXX'))
