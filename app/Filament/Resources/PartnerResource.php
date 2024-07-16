@@ -2,22 +2,26 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PartnerResource\Pages;
-use App\Filament\Resources\PartnerResource\RelationManagers;
+use Filament\Forms;
+use Filament\Tables;
 use App\Models\Partner;
 use App\Models\Setting;
-use Filament\Forms;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Group;
+use Illuminate\Support\Facades\Http;
+use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Components\Actions\Action;
+use Illuminate\Validation\ValidationException;
+use App\Filament\Resources\PartnerResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PartnerResource\RelationManagers;
 
 class PartnerResource extends Resource
 {
@@ -64,27 +68,65 @@ class PartnerResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('postcode')
                                     ->required()
+                                    ->minLength(9)
+                                    ->mask('99999-999')
+                                    ->placeholder('22022-000')
+                                    ->maxLength(9)
+                                    ->helperText(__('Postcode'))
+                                    ->required()
                                     ->label(__('Postcode'))
-                                    ->maxLength(255),
+                                    ->suffixAction(
+                                        fn($state, $set, $livewire) =>
+                                        Action::make('search-action')
+                                            ->icon('heroicon-o-magnifying-glass')
+                                            ->action(function () use ($state, $livewire, $set) {
+                                                $set('content.neighborhood', null);
+                                                $set('content.address', null);
+                                                $set('content.number', null);
+                                                $set('content.city', null);
+                                                $set('content.state', null);
+                                                $livewire->validateOnly('data.content.postcode');
+                                                $cepData = Http::get("https://viacep.com.br/ws/{$state}/json/")
+                                                    ->throw()
+                                                    ->json();
+                                                if (isset($cepData['erro'])) {
+                                                    throw ValidationException::withMessages([
+                                                        'data.postcode' => __('CEP not Found'),
+                                                    ]);
+                                                }
+                                                $set('content.neighborhood', $cepData['bairro'] ?? null);
+                                                $set('content.address', $cepData['logradouro'] ?? null);
+                                                $set('content.city', $cepData['localidade'] ?? null);
+                                                $set('content.state', $cepData['uf'] ?? null);
+                                            })
+                                    ),
                                 Forms\Components\TextInput::make('content.phone')
                                     ->required()
                                     ->label(__('Phone'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.address')
                                     ->required()
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->label(__('Address'))
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('content.neighborhood')
+                                    ->required()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->label(__('Neighborhood'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.city')
                                     ->required()
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->label(__('City'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.state')
                                     ->required()
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->label(__('State'))
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('content.country')
-                                    ->required()
-                                    ->label(__('Country'))
                                     ->maxLength(255),
                             ]),
                         Section::make(__('Status & Control'))
