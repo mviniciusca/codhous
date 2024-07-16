@@ -76,7 +76,7 @@ class PartnerResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.city')
                                     ->required()
-                                    ->label(__(''))
+                                    ->label(__('City'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.state')
                                     ->required()
