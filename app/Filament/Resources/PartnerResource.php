@@ -68,18 +68,23 @@ class PartnerResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.phone')
                                     ->required()
+                                    ->label(__(''))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.address')
                                     ->required()
+                                    ->label(__(''))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.city')
                                     ->required()
+                                    ->label(__(''))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.state')
                                     ->required()
+                                    ->label(__(''))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.country')
                                     ->required()
+                                    ->label(__(''))
                                     ->maxLength(255),
                             ]),
                         Section::make(__('Status & Control'))
