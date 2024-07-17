@@ -42,6 +42,7 @@ class Form extends Component implements HasForms
                     ->minLength(8)
                     ->maxLength(200)
                     ->label(__('Phone'))
+                    ->mask('(99)99999-9999')
                     ->required(),
                 Select::make('subject')
                     ->required()
