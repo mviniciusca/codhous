@@ -46,7 +46,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Newsletter::factory(20)->create();
-        Mail::factory(20)->create();
+        Mail::factory(100)->create();
 
         // DB::table('pages')
         //     ->create([]);
