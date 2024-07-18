@@ -47,7 +47,7 @@ class Newsletter extends Component implements HasForms
         $subscribe = NewsletterModel::create($this->form->getState());
 
         $user = new User();
-        $user->first()->notify(new NewSubscribe($subscribe));
+        $user->first()->notify(new NewSubscribe($subscribe->toArray()));
 
         Notification::make()
             ->title(__('Thanks for subscribe!'))
