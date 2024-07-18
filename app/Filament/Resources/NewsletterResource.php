@@ -41,14 +41,23 @@ class NewsletterResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->columns(3)
+            ->columns(6)
             ->schema([
+                Toggle::make('is_active')
+                    ->label(__('Status'))
+                    ->helperText(__('Subscriber status'))
+                    ->columnSpan(1)
+                    ->inline(false),
                 TextInput::make('name')
+                    ->label(__('Name'))
+                    ->helperText(__('Subscriber username'))
+                    ->columnSpan(3)
                     ->disabled(),
                 TextInput::make('email')
+                    ->label(__('Email'))
+                    ->helperText(__('Subscriber email'))
+                    ->columnSpan(2)
                     ->disabled(),
-                Toggle::make('is_active')
-                    ->inline(false),
             ]);
     }
 
