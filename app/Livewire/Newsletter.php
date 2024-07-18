@@ -29,7 +29,14 @@ class Newsletter extends Component implements HasForms
     public function form(Form $form): Form
     {
         return $form
+            ->columns(2)
             ->schema([
+                TextInput::make('name')
+                    ->required()
+                    ->maxLength(150)
+                    ->minLength(10)
+                    ->hiddenLabel()
+                    ->placeholder(__('Name')),
                 TextInput::make('email')
                     ->email()
                     ->unique(table: NewsletterModel::class)

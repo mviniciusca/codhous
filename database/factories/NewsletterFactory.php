@@ -18,6 +18,7 @@ class NewsletterFactory extends Factory
     {
         return [
             'email' => $this->faker->unique()->email(),
+            'name' => $this->faker->name(),
             'created_at' => $this->faker->dateTimeBetween(date('2024-01-01'))
         ];
     }
