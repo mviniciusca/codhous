@@ -35,9 +35,10 @@ class NewSubscribe extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+            ->subject(__('You have a new Subscribe'))
+            ->greeting(__('Great news!'))
+            ->line($this->data['email'] . __('has subscribed in your mailing list.'))
+            ->action('View on Dashboard', url(env('APP_URL') . '/admin/newsletter'));
     }
 
     /**
