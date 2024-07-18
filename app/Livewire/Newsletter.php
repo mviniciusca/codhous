@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Newsletter as NewsletterModel;
+use App\Models\User;
+use App\Notifications\NewSubscribe;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -42,12 +44,16 @@ class Newsletter extends Component implements HasForms
 
     public function create(): void
     {
-        NewsletterModel::create($this->form->getState());
-        $this->form->fill();
+        $subscribe = NewsletterModel::create($this->form->getState());
+
+        $user = new User();
+        $user->first()->notify(new NewSubscribe($subscribe));
+
         Notification::make()
             ->title(__('Thanks for subscribe!'))
             ->success()
             ->send();
+        $this->form->fill();
     }
     public function render()
     {
