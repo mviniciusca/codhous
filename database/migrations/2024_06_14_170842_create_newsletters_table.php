@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('email')->unique();
             $table->string('name');
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

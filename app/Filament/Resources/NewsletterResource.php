@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\NewsletterResource\Widgets\NewsletterOverwview;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\Newsletter;
@@ -17,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\NewsletterResource\Pages;
 use App\Filament\Resources\NewsletterResource\RelationManagers;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\View\LegacyComponents\Widget;
 
 class NewsletterResource extends Resource
@@ -38,8 +41,14 @@ class NewsletterResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                //
+                TextInput::make('name')
+                    ->disabled(),
+                TextInput::make('email')
+                    ->disabled(),
+                Toggle::make('is_active')
+                    ->inline(false),
             ]);
     }
 
@@ -47,17 +56,22 @@ class NewsletterResource extends Resource
     {
         return $table
             ->columns([
+                IconColumn::make('is_active')
+                    ->label(__('Status'))
+                    ->boolean()
+                    ->alignCenter(),
                 TextColumn::make('name')
                     ->label(__('Name')),
                 TextColumn::make('email')
                     ->label(__('Email')),
-                IconColumn::make('active')
-                    ->label(__('Status'))
-                    ->boolean()
-                    ->alignCenter()
             ])
             ->filters([
-                //
+                TernaryFilter::make('is_active')
+                    ->label(__('Status'))
+                    ->placeholder(__('Show All'))
+                    ->trueLabel(__('Active'))
+                    ->falseLabel(__('Inactive'))
+                    ->default(true)
             ])
             ->actions([
                 ActionGroup::make([
