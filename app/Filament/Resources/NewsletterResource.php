@@ -47,6 +47,8 @@ class NewsletterResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('name')
+                    ->label(__('Name')),
                 TextColumn::make('email')
                     ->label(__('Email')),
                 IconColumn::make('active')

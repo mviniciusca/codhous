@@ -34,7 +34,7 @@ class Newsletter extends Component implements HasForms
                 TextInput::make('name')
                     ->required()
                     ->maxLength(150)
-                    ->minLength(10)
+                    ->minLength(5)
                     ->hiddenLabel()
                     ->placeholder(__('Name')),
                 TextInput::make('email')
