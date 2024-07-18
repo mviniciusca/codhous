@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\MailResource\Pages\SentMail;
 use App\Filament\Resources\SettingResource;
 use App\Filament\Resources\SettingResource\Pages\EditSetting;
 use Filament\Pages;
