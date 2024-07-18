@@ -195,6 +195,7 @@ class Budget extends Component implements HasForms
 
         Notification::make()
             ->title(__('Thanks! Our team will answer you until 24 hours!'))
+            ->success()
             ->send();
 
         $this->form->fill();

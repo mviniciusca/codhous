@@ -72,10 +72,10 @@ class Form extends Component implements HasForms
     public function create(): void
     {
         $data = $this->form->getState();
-        MailModel::create($data);
+        $mail = MailModel::create($data);
 
         $user = User::first();
-        $user->notify(new NewMessage($data));
+        $user->notify(new NewMessage($mail->toArray()));
 
         Notification::make()
             ->title(__('Message Sent'))
