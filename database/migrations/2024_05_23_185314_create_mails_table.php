@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->boolean('is_read')->default(false);
             $table->boolean('is_favorite')->default(false);
             $table->boolean('is_spam')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
