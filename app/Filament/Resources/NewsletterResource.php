@@ -38,7 +38,6 @@ class NewsletterResource extends Resource
     {
         return __('Subscribers');
     }
-
     public static function form(Form $form): Form
     {
         return $form

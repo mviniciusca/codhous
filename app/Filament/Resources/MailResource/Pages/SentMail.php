@@ -22,6 +22,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 
 class SentMail extends Page implements HasForms, HasTable
 {
@@ -41,6 +42,11 @@ class SentMail extends Page implements HasForms, HasTable
             ->where('is_sent', true)
             ->where('is_spam', false)
             ->count();
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('Sent');
     }
     public function table(Table $table): Table
     {

@@ -18,11 +18,16 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use App\Filament\Resources\MailResource;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Contracts\Support\Htmlable;
 
 class BinMail extends ListRecords
 {
     protected static string $resource = MailResource::class;
 
+    public function getTitle(): string|Htmlable
+    {
+        return __('Trash');
+    }
     public static function count(): string
     {
         return Mail::onlyTrashed()

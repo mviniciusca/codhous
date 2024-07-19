@@ -16,6 +16,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use App\Filament\Resources\MailResource;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Contracts\Support\Htmlable;
 
 class FavoriteMail extends ListRecords
 {
@@ -28,6 +29,10 @@ class FavoriteMail extends ListRecords
             ->where('is_favorite', true)
             ->where('is_spam', false)
             ->count();
+    }
+    public function getTitle(): string|Htmlable
+    {
+        return __('Important');
     }
     public function table(Table $table): Table
     {

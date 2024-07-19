@@ -16,6 +16,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ReadMail extends ListRecords
 {
@@ -28,6 +29,11 @@ class ReadMail extends ListRecords
             ->where('is_sent', false)
             ->where('is_spam', false)
             ->count();
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('Read');
     }
     public function table(Table $table): Table
     {

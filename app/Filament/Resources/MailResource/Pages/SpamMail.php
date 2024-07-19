@@ -16,6 +16,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 
 class SpamMail extends ListRecords
 {
@@ -25,6 +26,10 @@ class SpamMail extends ListRecords
             ->where('is_spam', true)
             ->where('is_sent', false)
             ->count();
+    }
+    public function getTitle(): string|Htmlable
+    {
+        return __('Spam');
     }
     protected static string $resource = MailResource::class;
 
