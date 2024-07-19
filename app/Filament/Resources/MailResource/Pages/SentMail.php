@@ -36,12 +36,13 @@ class SentMail extends Page implements HasForms, HasTable
         return __('Sent');
     }
 
-    public static function count(): string
+    public static function count(): ?string
     {
-        return Mail::query()
+        $count = Mail::query()
             ->where('is_sent', true)
             ->where('is_spam', false)
             ->count();
+        return $count !== 0 ? $count : null;
     }
 
     public function getTitle(): string|Htmlable

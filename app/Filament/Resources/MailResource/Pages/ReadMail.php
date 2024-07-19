@@ -22,13 +22,14 @@ class ReadMail extends ListRecords
 {
     protected static string $resource = MailResource::class;
 
-    public static function count(): string
+    public static function count(): ?string
     {
-        return Mail::query()
+        $count = Mail::query()
             ->where('is_read', true)
             ->where('is_sent', false)
             ->where('is_spam', false)
             ->count();
+        return $count !== 0 ? $count : null;
     }
 
     public function getTitle(): string|Htmlable

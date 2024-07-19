@@ -27,13 +27,14 @@ class MailResource extends Resource
     protected static ?string $model = Mail::class;
     protected static ?string $navigationGroup = 'Mail';
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
-    public static function count(): string
+    public static function count(): ?string
     {
-        return Mail::query()
+        $count = Mail::query()
             ->where('is_read', false)
             ->where('is_sent', false)
             ->where('is_spam', false)
             ->count();
+        return $count !== 0 ? $count : null;
     }
     public static function getNavigationLabel(): string
     {

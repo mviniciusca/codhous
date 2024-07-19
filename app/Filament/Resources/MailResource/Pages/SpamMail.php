@@ -24,7 +24,6 @@ class SpamMail extends ListRecords
     {
         $count = Mail::query()
             ->where('is_spam', true)
-            ->where('is_sent', false)
             ->count();
         return $count !== 0 ? $count : null;
     }
@@ -39,7 +38,6 @@ class SpamMail extends ListRecords
         return $table
             ->query(
                 Mail::query()
-                    ->where('is_sent', false)
                     ->where('is_spam', true)
             )
             ->columns([
