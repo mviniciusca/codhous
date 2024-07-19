@@ -74,6 +74,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('spam')
                     ->label(fn(): string => __('Spam'))
                     ->url(fn(): string => SpamMail::getUrl())
+                    ->badge(fn(): string => SpamMail::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.spam'))
                     ->icon('heroicon-o-flag')
                     ->group(__('Mail'))
