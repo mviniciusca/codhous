@@ -30,8 +30,9 @@ class BinMail extends ListRecords
     }
     public static function count(): string
     {
-        return Mail::onlyTrashed()
+        $count = Mail::onlyTrashed()
             ->count();
+        return $count !== 0 ?? null;
     }
 
     public function table(Table $table): Table
