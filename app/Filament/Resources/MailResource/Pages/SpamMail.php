@@ -20,12 +20,13 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class SpamMail extends ListRecords
 {
-    public static function count(): string
+    public static function count(): ?string
     {
-        return Mail::query()
+        $count = Mail::query()
             ->where('is_spam', true)
             ->where('is_sent', false)
             ->count();
+        return $count !== 0 ? $count : null;
     }
     public function getTitle(): string|Htmlable
     {

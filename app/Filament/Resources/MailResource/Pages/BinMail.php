@@ -28,11 +28,11 @@ class BinMail extends ListRecords
     {
         return __('Trash');
     }
-    public static function count(): string
+    public static function count(): ?string
     {
         $count = Mail::onlyTrashed()
             ->count();
-        return $count !== 0 ?? null;
+        return $count !== 0 ? $count : null;
     }
 
     public function table(Table $table): Table
