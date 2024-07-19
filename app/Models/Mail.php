@@ -11,4 +11,8 @@ class Mail extends Model
     use HasFactory;
     use SoftDeletes;
     protected $guarded = [];
+    public function trash()
+    {
+        return $this->withTrashed();
+    }
 }
