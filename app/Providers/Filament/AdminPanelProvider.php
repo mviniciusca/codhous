@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('sent')
                     ->label(fn(): string => __('Sent'))
                     ->url(fn(): string => SentMail::getUrl())
-                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.pages.dashboard'))
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.sent'))
                     ->icon('heroicon-o-paper-airplane')
                     ->group(__('Mail'))
                     ->sort(1),
