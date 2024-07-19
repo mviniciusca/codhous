@@ -19,6 +19,7 @@ return new class extends Migration {
                 ->default('main');
             $table->text('map');
             $table->string('address');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

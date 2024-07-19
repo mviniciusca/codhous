@@ -16,8 +16,8 @@ return new class extends Migration {
             $table->string('status')->default('pending');
             $table->boolean('is_active')->default(true);
             $table->json('content');
-            $table->timestamps();
             $table->softDeletes();
+            $table->timestamps();
         });
     }
 

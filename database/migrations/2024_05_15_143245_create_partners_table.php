@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('email');
             $table->string('postcode');
             $table->json('content');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

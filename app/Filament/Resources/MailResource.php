@@ -48,23 +48,29 @@ class MailResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(
+                Mail::query()
+                    ->where('is_spam', false)
+                    ->where('is_sent', false)
+                    ->where('is_read', false)
+            )
             ->columns([
+                IconColumn::make('is_sent')
+                    ->wrap()
+                    ->label(__(''))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-pencil')
+                    ->trueColor('secondary')
+                    ->falseIcon('heroicon-o-inbox')
+                    ->falseColor('primary'),
                 ToggleColumn::make('is_favorite')
                     ->label(__('Important'))
                     ->inline()
                     ->alignCenter()
                     ->onIcon('heroicon-s-star'),
-                IconColumn::make('is_sent')
-                    ->wrap()
-                    ->label(__(''))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-arrow-up-left')
-                    ->trueColor('secondary')
-                    ->falseIcon('heroicon-o-arrow-down-right')
-                    ->falseColor('primary'),
                 TextColumn::make('name')
                     ->limit(25)
-                    ->label(__('Name')),
+                    ->label(__('From')),
                 TextColumn::make('email')
                     ->limit(30)
                     ->label(__('Email')),
@@ -83,30 +89,8 @@ class MailResource extends Resource
             ->paginated(25)
             ->defaultSort('created_at', 'desc')
             ->filters([
-                TernaryFilter::make('is_spam')
-                    ->label(__('Spam'))
-                    ->placeholder(__('All Messages'))
-                    ->trueLabel(__('Spam Tagged'))
-                    ->falseLabel(__('Not Spam'))
-                    ->default(false),
-                TernaryFilter::make('is_read')
-                    ->label(__('Message'))
-                    ->placeholder(__('All Messages'))
-                    ->trueLabel(__('Read'))
-                    ->falseLabel(__('Unread'))
-                    ->default(false),
-                TernaryFilter::make('is_sent')
-                    ->label(__('Mail'))
-                    ->placeholder(__('All Messages'))
-                    ->trueLabel(__('Sent'))
-                    ->falseLabel(__('Received'))
-                    ->default(false),
-                TernaryFilter::make('is_favorite')
-                    ->label(__('Important Messages'))
-                    ->placeholder(__('All Messages'))
-                    ->trueLabel(__('With Star'))
-                    ->falseLabel(__('Without Star')),
-            ], layout: FiltersLayout::Modal)
+                //
+            ])
             ->persistFiltersInSession()
             ->actions([
                 ActionGroup::make([
