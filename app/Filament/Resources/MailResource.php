@@ -72,17 +72,14 @@ class MailResource extends Resource
                     ->limit(25)
                     ->label(__('From')),
                 TextColumn::make('email')
-                    ->limit(30)
+                    ->limit(25)
                     ->label(__('Email')),
                 TextColumn::make('subject')
                     ->limit(30)
-                    ->label(__('Subject')),
-                CheckboxColumn::make('is_read')
-                    ->alignCenter()
-                    ->label(__('Mark as Read')),
+                    ->label(ucfirst(__('Subject'))),
                 TextColumn::make('created_at')
                     ->label(__('Received'))
-                    ->date('d-m-Y H:i')
+                    ->date('d/m/Y H:i')
             ])
             ->searchable()
             ->striped()
@@ -94,16 +91,17 @@ class MailResource extends Resource
             ->persistFiltersInSession()
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()->label(__('Trash')),
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
                 ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label(__('Trash all Messages')),
+                    // Tables\Actions\ForceDeleteBulkAction::make(),
+                    //Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
