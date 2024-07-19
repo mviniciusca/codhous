@@ -37,8 +37,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Codhous Software',
+            'email' => 'codhous@codhous.app',
         ]);
 
         Partner::factory(20)->create([
