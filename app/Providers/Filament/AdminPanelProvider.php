@@ -34,6 +34,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->navigationItems([
+                NavigationItem::make('sent')
+                    ->label(fn(): string => __('Sent'))
+                    ->url(fn(): string => SentMail::getUrl())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.pages.dashboard'))
+                    ->icon('heroicon-o-paper-airplane')
+                    ->group(__('Mail'))
+                    ->sort(1),
                 NavigationItem::make('setting')
                     ->label(fn(): string => __('App Settings'))
                     ->url(fn(): string => EditSetting::getUrl([1]))
