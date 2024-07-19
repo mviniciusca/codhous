@@ -30,6 +30,7 @@ class MailResource extends Resource
     {
         return Mail::query()
             ->where('is_read', false)
+            ->where('is_sent', false)
             ->where('is_spam', false)
             ->count();
     }

@@ -15,6 +15,7 @@ class ReadMail extends ListRecords
     {
         return Mail::query()
             ->where('is_read', true)
+            ->where('is_sent', false)
             ->where('is_spam', false)
             ->count();
     }
