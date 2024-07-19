@@ -9,7 +9,10 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -39,58 +42,63 @@ class SentMail extends Page implements HasForms, HasTable
             ->where('is_spam', false)
             ->count();
     }
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
-            ->query(Mail::query()->where('is_sent', true))
+            ->query(
+                Mail::query()
+                    ->where('is_spam', false)
+                    ->where('is_sent', true)
+            )
             ->columns([
+                IconColumn::make('is_sent')
+                    ->wrap()
+                    ->label(__(''))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-paper-airplane')
+                    ->trueColor('primary')
+                    ->falseIcon('heroicon-o-inbox')
+                    ->falseColor('primary'),
                 ToggleColumn::make('is_favorite')
                     ->label(__('Important'))
                     ->inline()
                     ->alignCenter()
                     ->onIcon('heroicon-s-star'),
-                IconColumn::make('is_sent')
-                    ->wrap()
-                    ->label(__(''))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-arrow-up-left')
-                    ->trueColor('secondary')
-                    ->falseIcon('heroicon-o-arrow-down-right')
-                    ->falseColor('primary'),
                 TextColumn::make('name')
                     ->limit(25)
-                    ->label(__('Name')),
+                    ->label(__('From')),
                 TextColumn::make('email')
-                    ->limit(30)
+                    ->limit(25)
                     ->label(__('Email')),
                 TextColumn::make('subject')
                     ->limit(30)
-                    ->label(__('Subject')),
-                CheckboxColumn::make('is_read')
-                    ->alignCenter()
-                    ->label(__('Mark as Read')),
+                    ->label(ucfirst(__('Subject'))),
                 TextColumn::make('created_at')
-                    ->label(__('Sent'))
-                    ->date('d-m-Y H:i')
+                    ->label(__('Received'))
+                    ->date('d/m/Y H:i')
             ])
             ->searchable()
             ->striped()
             ->paginated(25)
             ->defaultSort('created_at', 'desc')
             ->filters([
-
-            ], layout: FiltersLayout::Modal)
+                //
+            ])
             ->persistFiltersInSession()
             ->actions([
                 ActionGroup::make([
-                    //
+                    DeleteAction::make()->label(__('Trash')),
+                    ForceDeleteAction::make(),
+                    RestoreAction::make(),
                 ])
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
+                        ->label(__('Trash all Messages')),
+                    // Tables\Actions\ForceDeleteBulkAction::make(),
+                    //Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
-
 }

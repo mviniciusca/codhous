@@ -59,8 +59,8 @@ class MailResource extends Resource
                     ->wrap()
                     ->label(__(''))
                     ->boolean()
-                    ->trueIcon('heroicon-o-pencil')
-                    ->trueColor('secondary')
+                    ->trueIcon('heroicon-o-paper-airplane')
+                    ->trueColor('primary')
                     ->falseIcon('heroicon-o-inbox')
                     ->falseColor('primary'),
                 ToggleColumn::make('is_favorite')
