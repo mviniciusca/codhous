@@ -131,6 +131,9 @@ class MailResource extends Resource
             'sent' => Pages\SentMail::route('/sent'),
             'view' => Pages\ViewMail::route('/{record}/view'),
             'create' => Pages\CreateMail::route('/create'),
+            'fav' => Pages\FavoriteMail::route('/fav'),
+            'spam' => Pages\SpamMail::route('/spam'),
+            'bin' => Pages\BinMail::route('/bin'),
         ];
     }
 }

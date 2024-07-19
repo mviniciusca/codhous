@@ -3,7 +3,11 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\MailSent;
+use App\Filament\Resources\MailResource;
+use App\Filament\Resources\MailResource\Pages\BinMail;
+use App\Filament\Resources\MailResource\Pages\FavoriteMail;
 use App\Filament\Resources\MailResource\Pages\SentMail;
+use App\Filament\Resources\MailResource\Pages\SpamMail;
 use App\Filament\Resources\SettingResource;
 use App\Filament\Resources\SettingResource\Pages\EditSetting;
 use Filament\Pages;
@@ -34,13 +38,41 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->navigationItems([
+                NavigationItem::make('inbox')
+                    ->label(fn(): string => __('Inbox'))
+                    ->url(fn(): string => MailResource::getUrl())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.index'))
+                    ->icon('heroicon-o-envelope')
+                    ->group(__('Mail'))
+                    ->sort(1),
                 NavigationItem::make('sent')
                     ->label(fn(): string => __('Sent'))
                     ->url(fn(): string => SentMail::getUrl())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.sent'))
                     ->icon('heroicon-o-paper-airplane')
                     ->group(__('Mail'))
-                    ->sort(1),
+                    ->sort(2),
+                NavigationItem::make('fav')
+                    ->label(fn(): string => __('Important'))
+                    ->url(fn(): string => FavoriteMail::getUrl())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.fav'))
+                    ->icon('heroicon-o-heart')
+                    ->group(__('Mail'))
+                    ->sort(2),
+                NavigationItem::make('spam')
+                    ->label(fn(): string => __('Spam'))
+                    ->url(fn(): string => SpamMail::getUrl())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.spam'))
+                    ->icon('heroicon-o-flag')
+                    ->group(__('Mail'))
+                    ->sort(3),
+                NavigationItem::make('bin')
+                    ->label(fn(): string => __('Trash'))
+                    ->url(fn(): string => BinMail::getUrl())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.bin'))
+                    ->icon('heroicon-o-trash')
+                    ->group(__('Mail'))
+                    ->sort(4),
                 NavigationItem::make('setting')
                     ->label(fn(): string => __('App Settings'))
                     ->url(fn(): string => EditSetting::getUrl([1]))
