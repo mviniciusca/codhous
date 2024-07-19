@@ -26,10 +26,12 @@ class MailResource extends Resource
     protected static ?string $model = Mail::class;
     protected static ?string $navigationGroup = 'Mail';
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
-    public static function getNavigationBadge(): ?string
+    public static function count(): string
     {
-        $count = static::getModel()::count();
-        return $count != 0 ? $count : null;
+        return Mail::query()
+            ->where('is_read', false)
+            ->where('is_spam', false)
+            ->count();
     }
     public static function getNavigationLabel(): string
     {
@@ -132,6 +134,7 @@ class MailResource extends Resource
             'view' => Pages\ViewMail::route('/{record}/view'),
             'create' => Pages\CreateMail::route('/create'),
             'fav' => Pages\FavoriteMail::route('/fav'),
+            'read' => Pages\ReadMail::route('/read'),
             'spam' => Pages\SpamMail::route('/spam'),
             'bin' => Pages\BinMail::route('/bin'),
         ];

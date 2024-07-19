@@ -6,6 +6,7 @@ use App\Filament\Pages\MailSent;
 use App\Filament\Resources\MailResource;
 use App\Filament\Resources\MailResource\Pages\BinMail;
 use App\Filament\Resources\MailResource\Pages\FavoriteMail;
+use App\Filament\Resources\MailResource\Pages\ReadMail;
 use App\Filament\Resources\MailResource\Pages\SentMail;
 use App\Filament\Resources\MailResource\Pages\SpamMail;
 use App\Filament\Resources\SettingResource;
@@ -40,14 +41,24 @@ class AdminPanelProvider extends PanelProvider
             ->navigationItems([
                 NavigationItem::make('inbox')
                     ->label(fn(): string => __('Inbox'))
+                    ->badge(fn(): string => MailResource::count())
                     ->url(fn(): string => MailResource::getUrl())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.index'))
                     ->icon('heroicon-o-envelope')
                     ->group(__('Mail'))
                     ->sort(1),
+                NavigationItem::make('read')
+                    ->label(fn(): string => __('Read'))
+                    ->badge(fn(): string => ReadMail::count())
+                    ->url(fn(): string => ReadMail::getUrl())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.read'))
+                    ->icon('heroicon-o-envelope-open')
+                    ->group(__('Mail'))
+                    ->sort(1),
                 NavigationItem::make('sent')
                     ->label(fn(): string => __('Sent'))
                     ->url(fn(): string => SentMail::getUrl())
+                    ->badge(fn(): string => SentMail::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.sent'))
                     ->icon('heroicon-o-paper-airplane')
                     ->group(__('Mail'))
@@ -55,6 +66,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('fav')
                     ->label(fn(): string => __('Important'))
                     ->url(fn(): string => FavoriteMail::getUrl())
+                    ->badge(fn(): string => FavoriteMail::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.fav'))
                     ->icon('heroicon-o-heart')
                     ->group(__('Mail'))
