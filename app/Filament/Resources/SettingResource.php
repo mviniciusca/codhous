@@ -42,6 +42,7 @@ class SettingResource extends Resource
             Pages\EditNavigation::class,
             Pages\EditLayout::class,
             Pages\EditContact::class,
+            Pages\EditSocial::class,
             Pages\EditBudget::class
         ]);
     }
@@ -198,6 +199,7 @@ class SettingResource extends Resource
             'edit_layout' => Pages\EditLayout::route('/{record}/edit-layout'),
             'edit_contact' => Pages\EditContact::route('/{record}/edit-contact'),
             'edit_navigation' => Pages\EditNavigation::route('/{record}/edit-navigation'),
+            'edit_social' => Pages\EditSocial::route('/{record}/edit-social'),
             'edit_budget' => Pages\EditBudget::route('/{record}/edit-budget'),
         ];
     }
