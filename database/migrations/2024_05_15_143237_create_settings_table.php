@@ -37,6 +37,8 @@ return new class extends Migration {
             $table->string('budget_image')->nullable();
             $table->json('budget')->nullable();
 
+            $table->json('social')->nullable();
+
             $table->timestamps();
         });
     }

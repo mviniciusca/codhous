@@ -19,7 +19,8 @@ class Setting extends Model
     public function casts(): array
     {
         return [
-            'budget' => 'array'
+            'budget' => 'array',
+            'social' => 'array',
         ];
     }
 
