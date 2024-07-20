@@ -10,10 +10,20 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SettingResource;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditSocial extends EditRecord
 {
     protected static string $resource = SettingResource::class;
+    protected static ?string $navigationIcon = 'heroicon-o-share';
+    public static function getNavigationLabel(): string
+    {
+        return __('Social Network');
+    }
+    public function getTitle(): string|Htmlable
+    {
+        return __('Edit Social Network');
+    }
 
     public function form(Form $form): Form
     {
@@ -24,6 +34,7 @@ class EditSocial extends EditRecord
                     ->description(__('Manage your social network accounts'))
                     ->schema([
                         Repeater::make('social')
+                            ->label(__('Social Network'))
                             ->columns(6)
                             ->schema([
                                 Toggle::make('status')
