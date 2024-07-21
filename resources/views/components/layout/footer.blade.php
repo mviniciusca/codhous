@@ -3,7 +3,10 @@
         <footer>
             <div class="mx-auto w-full max-w-screen-xl p-4 md:py-8">
                 <div class="sm:flex sm:items-center sm:justify-between">
-                    <x-core.header.logo />
+                    <span class="flex items-center">
+                        <x-core.header.logo />
+                        <x-ui.social-network />
+                    </span>
                     <ul class="mb-6 flex flex-wrap items-center text-sm font-medium sm:mb-0">
                         @if($navigation['navigation'])
                         @foreach ($navigation['navigation'] as $item )
