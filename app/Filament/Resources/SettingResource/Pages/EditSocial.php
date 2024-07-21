@@ -56,7 +56,6 @@ class EditSocial extends EditRecord
                                     ->columnSpan(2)
                                     ->helperText(__('Use ionicons for name'))
                                     ->label(__('Icon (Ionicon Name)')),
-
                             ]),
                     ]),
             ]);
