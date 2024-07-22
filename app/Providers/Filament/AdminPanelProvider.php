@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\MailSent;
+use App\Filament\Resources\BudgetResource\Pages\BudgetBin;
 use App\Filament\Resources\MailResource;
 use App\Filament\Resources\MailResource\Pages\BinMail;
 use App\Filament\Resources\MailResource\Pages\FavoriteMail;
@@ -40,6 +41,15 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->navigationItems([
+                NavigationItem::make('budget_bin')
+                    ->label(fn(): string => __('Trash'))
+                    ->url(fn(): string => BudgetBin::getUrl())
+                    ->badge(fn(): ?string => BudgetBin::count())
+                    ->icon('heroicon-o-trash')
+                    ->group(__('Budget'))
+                    ->sort(2),
+
+
                 NavigationItem::make('inbox')
                     ->label(fn(): string => __('Inbox'))
                     ->badge(fn(): ?string => MailResource::count())
@@ -88,6 +98,8 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-trash')
                     ->group(__('Mail'))
                     ->sort(4),
+
+
 
                 NavigationItem::make('subscriber_bin')
                     ->label(fn(): string => __('Trash'))

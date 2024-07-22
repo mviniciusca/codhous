@@ -39,6 +39,7 @@ class BudgetResource extends Resource
     {
         return __('Budget');
     }
+    protected static ?string $navigationGroup = 'Budget';
     public static function getGloballySearchableAttributes(): array
     {
         return ['code', 'content'];
@@ -264,6 +265,7 @@ class BudgetResource extends Resource
             'index' => Pages\ListBudgets::route('/'),
             'create' => Pages\CreateBudget::route('/create'),
             'edit' => Pages\EditBudget::route('/{record}/edit'),
+            'bin' => Pages\BudgetBin::route('/bin'),
         ];
     }
 }
