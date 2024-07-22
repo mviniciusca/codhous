@@ -8,6 +8,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Columns\ToggleColumn;
 use App\Filament\Resources\NewsletterResource;
+use Z3d0X\FilamentFabricator\Resources\PageResource\Pages\ViewPage;
 
 class SubscriberBin extends ListRecords
 {
@@ -18,9 +19,12 @@ class SubscriberBin extends ListRecords
         return $table
             ->query(Newsletter::onlyTrashed())
             ->columns([
-                ToggleColumn::make('is_active'),
-                TextColumn::make('name'),
-                TextColumn::make('email'),
+                ToggleColumn::make('is_active')
+                    ->label(__('Status')),
+                TextColumn::make('name')
+                    ->label(__('Name')),
+                TextColumn::make('email')
+                    ->label(__('Email')),
             ]);
     }
 }

@@ -9,6 +9,7 @@ use App\Filament\Resources\MailResource\Pages\FavoriteMail;
 use App\Filament\Resources\MailResource\Pages\ReadMail;
 use App\Filament\Resources\MailResource\Pages\SentMail;
 use App\Filament\Resources\MailResource\Pages\SpamMail;
+use App\Filament\Resources\NewsletterResource\Pages\SubscriberBin;
 use App\Filament\Resources\SettingResource;
 use App\Filament\Resources\SettingResource\Pages\EditSetting;
 use Filament\Pages;
@@ -87,6 +88,15 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-trash')
                     ->group(__('Mail'))
                     ->sort(4),
+
+                NavigationItem::make('subscriber_bin')
+                    ->label(fn(): string => __('Trash'))
+                    ->url(fn(): string => SubscriberBin::getUrl())
+                    ->icon('heroicon-o-trash')
+                    ->group(__('Mailing'))
+                    ->sort(2),
+
+
                 NavigationItem::make('setting')
                     ->label(fn(): string => __('App Settings'))
                     ->url(fn(): string => EditSetting::getUrl([1]))
