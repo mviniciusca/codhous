@@ -114,6 +114,7 @@ class NewsletterResource extends Resource
             'index' => Pages\ListNewsletters::route('/'),
             'create' => Pages\CreateNewsletter::route('/create'),
             'edit' => Pages\EditNewsletter::route('/{record}/edit'),
+            'bin' => Pages\SubscriberBin::route('/bin'),
         ];
     }
 }
