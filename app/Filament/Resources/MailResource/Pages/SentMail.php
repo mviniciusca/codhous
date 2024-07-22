@@ -6,6 +6,7 @@ use App\Filament\Resources\MailResource;
 use App\Models\Mail;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -24,10 +25,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
-class SentMail extends Page implements HasForms, HasTable
+class SentMail extends ListRecords
 {
-    use InteractsWithTable;
-    use InteractsWithForms;
     protected static ?string $model = Mail::class;
     protected static string $resource = MailResource::class;
     protected static string $view = 'filament.resources.mail-resource.pages.sent-mail';

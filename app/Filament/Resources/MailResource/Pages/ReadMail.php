@@ -21,7 +21,6 @@ use Illuminate\Contracts\Support\Htmlable;
 class ReadMail extends ListRecords
 {
     protected static string $resource = MailResource::class;
-
     public static function count(): ?string
     {
         $count = Mail::query()
