@@ -14,6 +14,12 @@ class SubscriberBin extends ListRecords
 {
     protected static string $resource = NewsletterResource::class;
 
+    public static function count(): ?string
+    {
+        $count = Newsletter::onlyTrashed()->count();
+        return $count !== 0 ? $count : null;
+    }
+
     public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
     {
         return $table

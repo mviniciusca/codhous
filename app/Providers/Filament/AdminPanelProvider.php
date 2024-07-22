@@ -92,6 +92,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('subscriber_bin')
                     ->label(fn(): string => __('Trash'))
                     ->url(fn(): string => SubscriberBin::getUrl())
+                    ->badge(fn(): ?string => SubscriberBin::count())
                     ->icon('heroicon-o-trash')
                     ->group(__('Mailing'))
                     ->sort(2),
