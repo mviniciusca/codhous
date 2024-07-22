@@ -12,12 +12,17 @@ use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Columns\ToggleColumn;
 use App\Filament\Resources\NewsletterResource;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SubscriberBin extends ListRecords
 {
     protected static string $resource = NewsletterResource::class;
+    public function getTitle(): string|Htmlable
+    {
+        return __('Trash');
+    }
     public static function count(): ?string
     {
         $count = Newsletter::onlyTrashed()->count();
