@@ -8,9 +8,11 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Set;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SettingResource;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Str;
 
 class EditSocial extends EditRecord
 {
@@ -43,7 +45,10 @@ class EditSocial extends EditRecord
                                     ->default(true)
                                     ->inline(false),
                                 TextInput::make('social_network')
-                                    ->columnSpan(1)
+                                    ->columnSpan(2)
+                                    ->lazy()
+                                    ->debounce(250)
+                                    ->afterStateUpdated(fn(Set $set, ?string $state) => $set('icon', Str::slug($state)))
                                     ->helperText(__('ex: Facebook'))
                                     ->label(__('Social Network')),
                                 TextInput::make('link')
@@ -51,10 +56,12 @@ class EditSocial extends EditRecord
                                     ->helperText(__('ex: https://www.facebook.com'))
                                     ->label(__('Link')),
                                 TextInput::make('icon')
-                                    ->prefix('name')
-                                    ->columnSpan(2)
-                                    ->helperText(__('Use ionicons for name'))
-                                    ->label(__('Icon (Ionicon Name)')),
+                                    ->lazy()
+                                    ->dehydrated()
+                                    ->readonly()
+                                    ->columnSpan(1)
+                                    ->helperText(__('Automatic'))
+                                    ->label(__('Icon')),
                             ]),
                     ]),
             ]);
