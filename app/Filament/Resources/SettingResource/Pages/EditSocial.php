@@ -48,8 +48,7 @@ class EditSocial extends EditRecord
                                     ->label(__('Social Network')),
                                 TextInput::make('link')
                                     ->columnSpan(2)
-                                    ->prefix('https://')
-                                    ->helperText(__('ex: facebook.com'))
+                                    ->helperText(__('ex: https://www.facebook.com'))
                                     ->label(__('Link')),
                                 TextInput::make('icon')
                                     ->prefix('name')

@@ -11,8 +11,8 @@
                         @if($navigation['navigation'])
                         @foreach ($navigation['navigation'] as $item )
                         <li>
-                            <a target="{{ $item['target'] }}" href="{{ $item['menu_url'] }}"
-                                class="me-4 hover:underline md:me-6">{{ $item['menu_title'] }}</a>
+                            <a target="_blank" href={{ $item['menu_url'] }}" class="me-4 hover:underline md:me-6">{{
+                                $item['menu_title'] }}</a>
                         </li>
                         @endforeach
                         @endif
