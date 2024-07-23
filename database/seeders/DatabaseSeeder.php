@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Budget;
 use App\Models\Mail;
 use App\Models\Partner;
 use App\Models\User;
@@ -44,6 +45,8 @@ class DatabaseSeeder extends Seeder
         Partner::factory(20)->create([
             'setting_id' => $setting->id,
         ]);
+
+        Budget::factory(100)->create();
 
         Newsletter::factory(20)->create();
         Mail::factory(100)->create();
