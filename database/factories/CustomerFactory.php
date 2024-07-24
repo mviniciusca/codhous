@@ -26,7 +26,7 @@ class CustomerFactory extends Factory
                 'number' => $this->faker->numerify('##'),
                 'neighborhood' => $this->faker->city(),
                 'city' => $this->faker->city(),
-                'state' => $this->faker->citySuffix(),
+                'state' => $this->faker->countryCode(),
             ],
         ];
     }
