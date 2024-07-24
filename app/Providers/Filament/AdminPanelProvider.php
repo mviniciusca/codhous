@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\MailSent;
+use App\Filament\Resources\BudgetResource;
 use App\Filament\Resources\BudgetResource\Pages\BudgetBin;
 use App\Filament\Resources\CustomerResource;
 use App\Filament\Resources\CustomerResource\Pages\CustomerBin;
@@ -58,12 +59,21 @@ class AdminPanelProvider extends PanelProvider
                     ->group(__('Customer'))
                     ->sort(2),
 
+                NavigationItem::make('budget')
+                    ->url(fn(): string => BudgetResource::getUrl())
+                    ->label(fn(): string => __('Budgets'))
+                    ->icon('heroicon-o-currency-dollar')
+                    ->badge(fn(): ?string => BudgetResource::getNavigationBadge())
+                    ->group(__('Budget'))
+                    ->sort(1)
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.index')),
                 NavigationItem::make('budget_bin')
                     ->label(fn(): string => __('Trash'))
                     ->url(fn(): string => BudgetBin::getUrl())
                     ->badge(fn(): ?string => BudgetBin::count())
                     ->icon('heroicon-o-trash')
                     ->group(__('Budget'))
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
                     ->sort(2),
 
 

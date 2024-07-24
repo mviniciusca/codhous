@@ -20,6 +20,7 @@ use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\BudgetResource;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -31,6 +32,10 @@ class BudgetBin extends ListRecords
     {
         $count = Budget::onlyTrashed()->count();
         return $count !== 0 ? $count : null;
+    }
+    public function getTitle(): string|Htmlable
+    {
+        return __('Trash');
     }
 
     public function table(Table $table): Table
