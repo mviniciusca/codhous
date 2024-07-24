@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\MailSent;
 use App\Filament\Resources\BudgetResource\Pages\BudgetBin;
 use App\Filament\Resources\CustomerResource;
+use App\Filament\Resources\CustomerResource\Pages\CustomerBin;
 use App\Filament\Resources\MailResource;
 use App\Filament\Resources\MailResource\Pages\BinMail;
 use App\Filament\Resources\MailResource\Pages\FavoriteMail;
@@ -47,6 +48,13 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn(): string => CustomerResource::getUrl())
                     ->badge(fn(): ?string => CustomerResource::count())
                     ->icon('heroicon-o-user')
+                    ->group(__('Customer'))
+                    ->sort(1),
+                NavigationItem::make('customer_bin')
+                    ->label(fn(): string => __('Trash'))
+                    ->url(fn(): string => CustomerBin::getUrl())
+                    ->badge(fn(): ?string => CustomerBin::count())
+                    ->icon('heroicon-o-trash')
                     ->group(__('Customer'))
                     ->sort(2),
 
