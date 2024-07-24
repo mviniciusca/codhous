@@ -44,10 +44,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->navigationItems([
+                /** Customers */
                 NavigationItem::make('customer')
                     ->label(fn(): string => __('Customer'))
                     ->url(fn(): string => CustomerResource::getUrl())
                     ->badge(fn(): ?string => CustomerResource::count())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.index'))
                     ->icon('heroicon-o-user')
                     ->group(__('Customer'))
                     ->sort(1),
@@ -56,9 +58,10 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn(): string => CustomerBin::getUrl())
                     ->badge(fn(): ?string => CustomerBin::count())
                     ->icon('heroicon-o-trash')
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.bin'))
                     ->group(__('Customer'))
                     ->sort(2),
-
+                /** Budgets */
                 NavigationItem::make('budget')
                     ->url(fn(): string => BudgetResource::getUrl())
                     ->label(fn(): string => __('Budgets'))
@@ -75,8 +78,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group(__('Budget'))
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
                     ->sort(2),
-
-
+                /** Inbox */
                 NavigationItem::make('inbox')
                     ->label(fn(): string => __('Inbox'))
                     ->badge(fn(): ?string => MailResource::count())
@@ -125,9 +127,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-trash')
                     ->group(__('Mail'))
                     ->sort(4),
-
-
-
+                /** Mailing List */
                 NavigationItem::make('subscriber_bin')
                     ->label(fn(): string => __('Trash'))
                     ->url(fn(): string => SubscriberBin::getUrl())
@@ -135,14 +135,13 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-trash')
                     ->group(__('Mailing'))
                     ->sort(2),
-
-
+                /** App Setting */
                 NavigationItem::make('setting')
                     ->label(fn(): string => __('App Settings'))
                     ->url(fn(): string => EditSetting::getUrl([1]))
                     ->icon('heroicon-o-cog-6-tooth')
                     ->group(__('Setting'))
-                    ->sort(6),
+                    ->sort(1),
             ])
             ->plugins([
                 FilamentFabricatorPlugin::make(),
