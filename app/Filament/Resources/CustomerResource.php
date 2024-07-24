@@ -17,8 +17,18 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
+    protected static ?string $navigationGroup = 'Customer';
+    public static function getNavigationLabel(): string
+    {
+        return __('Customer');
+    }
+    protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    public static function count(): ?string
+    {
+        $count = Customer::withoutTrashed()->count();
+        return $count !== 0 ? $count : null;
+    }
 
     public static function form(Form $form): Form
     {
