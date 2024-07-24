@@ -8,6 +8,7 @@ use App\Models\Partner;
 use App\Models\User;
 use App\Models\Layout;
 use App\Models\Contact;
+use App\Models\Customer;
 use App\Models\Setting;
 use App\Models\Navigation;
 use App\Models\Newsletter;
@@ -50,6 +51,7 @@ class DatabaseSeeder extends Seeder
 
         Newsletter::factory(20)->create();
         Mail::factory(100)->create();
+        Customer::factory(100)->create();
 
         // DB::table('pages')
         //     ->create([]);
