@@ -39,6 +39,10 @@ class EditWhatsapp extends EditRecord
                             ->columnSpanFull()
                             ->rows(3),
                     ]),
+                Section::make(__('Design & Layout'))->description(__('Edit your company whatsapp settings'))
+                    ->columns(2)
+                    ->icon('heroicon-o-photo')
+                    ->schema([])
             ]);
     }
 }
