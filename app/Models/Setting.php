@@ -21,6 +21,7 @@ class Setting extends Model
         return [
             'budget' => 'array',
             'social' => 'array',
+            'whatsapp' => 'array',
         ];
     }
 

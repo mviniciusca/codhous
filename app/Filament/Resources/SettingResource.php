@@ -43,7 +43,8 @@ class SettingResource extends Resource
             Pages\EditLayout::class,
             Pages\EditContact::class,
             Pages\EditSocial::class,
-            Pages\EditBudget::class
+            Pages\EditBudget::class,
+            Pages\EditWhatsapp::class
         ]);
     }
     public static function form(Form $form): Form
@@ -201,6 +202,7 @@ class SettingResource extends Resource
             'edit_navigation' => Pages\EditNavigation::route('/{record}/edit-navigation'),
             'edit_social' => Pages\EditSocial::route('/{record}/edit-social'),
             'edit_budget' => Pages\EditBudget::route('/{record}/edit-budget'),
+            'edit_whatsapp' => Pages\EditWhatsapp::route('/{record}/edit-whatsapp'),
         ];
     }
 }

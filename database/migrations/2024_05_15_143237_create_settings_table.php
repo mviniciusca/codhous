@@ -38,6 +38,7 @@ return new class extends Migration {
             $table->json('budget')->nullable();
 
             $table->json('social')->nullable();
+            $table->json('whatsapp')->nullable();
 
             $table->timestamps();
         });
