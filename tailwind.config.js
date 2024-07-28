@@ -27,6 +27,7 @@ export default {
             gray: colors.zinc,
             white: colors.white,
             info: colors.indigo,
+            green: colors.green,
             danger: colors.red,
             warning: colors.orange,
         },

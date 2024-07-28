@@ -1,0 +1,10 @@
+<div>
+    @if ($data->whatsapp['status'])
+    <a target="" href="">
+        <div
+            class="w-16 h-16 bg-green-600 hover:bg-green-500 cursor-pointer fixed z-50  bottom-0 mb-5 mr-5 animate-pulse grid items-center justify-center right-0 text-white text-center rounded-full">
+            <ion-icon class="text-4xl p-2" name="logo-whatsapp"></ion-icon>
+        </div>
+    </a>
+    @endif
+</div>
