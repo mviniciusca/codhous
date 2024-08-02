@@ -33,6 +33,7 @@ class EditWhatsapp extends EditRecord
                         TextInput::make('whatsapp.phone')
                             ->label(__('Whatsapp Phone Number'))
                             ->prefixIcon('heroicon-o-phone')
+                            ->required()
                             ->prefix('+55')
                             ->tel()
                             ->helperText(__('Define here your phone number of your Whatsapp Account. Only numbers')),
