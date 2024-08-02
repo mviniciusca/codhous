@@ -35,7 +35,6 @@ class EditWhatsapp extends EditRecord
                             ->prefixIcon('heroicon-o-phone')
                             ->prefix('+55')
                             ->tel()
-                            ->placeholder(__('5521966134366'))
                             ->helperText(__('Define here your phone number of your Whatsapp Account. Only numbers')),
                         Textarea::make('whatsapp.message')
                             ->label(__('Callout Message'))
