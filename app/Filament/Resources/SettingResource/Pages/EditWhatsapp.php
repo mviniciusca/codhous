@@ -38,7 +38,7 @@ class EditWhatsapp extends EditRecord
                             ->helperText(__('Define here your phone number of your Whatsapp Account. Only numbers')),
                         Textarea::make('whatsapp.message')
                             ->label(__('Callout Message'))
-                            ->placeholder(__('Example: How Can I assist you?'))
+                            ->placeholder(__('Example: I wanna a budget for your service.'))
                             ->helperText(__('Set the callout message that your customer will send to you.'))
                             ->columnSpanFull()
                             ->rows(3),
