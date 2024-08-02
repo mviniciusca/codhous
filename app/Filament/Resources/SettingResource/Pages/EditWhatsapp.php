@@ -32,7 +32,11 @@ class EditWhatsapp extends EditRecord
                             ->default(true),
                         TextInput::make('whatsapp.phone')
                             ->label(__('Whatsapp Phone Number'))
-                            ->helperText(__('Define here your phone number of your Whatsapp Account')),
+                            ->prefixIcon('heroicon-o-phone')
+                            ->prefix('+55')
+                            ->tel()
+                            ->placeholder(__('5521966134366'))
+                            ->helperText(__('Define here your phone number of your Whatsapp Account. Only numbers')),
                         Textarea::make('whatsapp.message')
                             ->label(__('Callout Message'))
                             ->placeholder(__('Example: How Can I assist you?'))
