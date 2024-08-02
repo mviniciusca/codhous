@@ -46,8 +46,8 @@ class EditSocial extends EditRecord
                                     ->inline(false),
                                 TextInput::make('social_network')
                                     ->columnSpan(2)
-                                    ->lazy()
-                                    ->debounce(250)
+                                    ->live()
+                                    ->debounce(700)
                                     ->afterStateUpdated(fn(Set $set, ?string $state) => $set('icon', Str::slug($state)))
                                     ->helperText(__('ex: Facebook'))
                                     ->label(__('Social Network')),
