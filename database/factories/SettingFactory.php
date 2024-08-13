@@ -35,8 +35,9 @@ class SettingFactory extends Factory
             'meta_description' => 'Codhous is a software built with Laravel and Filament and it\'s ready to manager your entire website easily.',
 
             'whatsapp' => [
-                'status' => [true],
-                'message' => ['I need some help! It\'s from your website.'],
+                'status' => true,
+                'phone' => '',
+                'message' => 'I need some help! It\'s from your website.',
             ],
 
             /** Budget Tool */
