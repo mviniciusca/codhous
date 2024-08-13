@@ -37,6 +37,8 @@ class SettingFactory extends Factory
             'whatsapp' => [
                 'status' => true,
                 'phone' => '',
+                'color' => '#25d366',
+                'icon' => 'logo-whatsapp',
                 'message' => 'I need some help! It\'s from your website.',
             ],
 

@@ -49,8 +49,8 @@ class EditWhatsapp extends EditRecord
                     ->icon('heroicon-o-photo')
                     ->schema([
                         ColorPicker::make('whatsapp.color')
-                            ->default('#128c7e')
-                            ->helperText(__('Default color: #128c7e')),
+                            ->default('#25d366')
+                            ->helperText(__('Default color: #25d366')),
                         TextInput::make('whatsapp.icon')
                             ->prefix('name=')
                             ->helperText(__('Ionicon\'s icon name. Default is logo-whatsapp')),
