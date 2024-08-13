@@ -43,24 +43,12 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->id('admin')
             ->path('admin')
+            ->navigationGroups([
+                __('Budget'),
+                __('Mail'),
+                __('Customer'),
+            ])
             ->navigationItems([
-                /** Customers */
-                NavigationItem::make('customer')
-                    ->label(fn(): string => __('Customer'))
-                    ->url(fn(): string => CustomerResource::getUrl())
-                    ->badge(fn(): ?string => CustomerResource::count())
-                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.index'))
-                    ->icon('heroicon-o-user')
-                    ->group(__('Customer'))
-                    ->sort(1),
-                NavigationItem::make('customer_bin')
-                    ->label(fn(): string => __('Trash'))
-                    ->url(fn(): string => CustomerBin::getUrl())
-                    ->badge(fn(): ?string => CustomerBin::count())
-                    ->icon('heroicon-o-trash')
-                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.bin'))
-                    ->group(__('Customer'))
-                    ->sort(2),
                 /** Budgets */
                 NavigationItem::make('budget')
                     ->url(fn(): string => BudgetResource::getUrl())
@@ -127,6 +115,23 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-trash')
                     ->group(__('Mail'))
                     ->sort(4),
+                /** Customers */
+                NavigationItem::make('customer')
+                    ->label(fn(): string => __('Customer'))
+                    ->url(fn(): string => CustomerResource::getUrl())
+                    ->badge(fn(): ?string => CustomerResource::count())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.index'))
+                    ->icon('heroicon-o-user')
+                    ->group(__('Customer'))
+                    ->sort(1),
+                NavigationItem::make('customer_bin')
+                    ->label(fn(): string => __('Trash'))
+                    ->url(fn(): string => CustomerBin::getUrl())
+                    ->badge(fn(): ?string => CustomerBin::count())
+                    ->icon('heroicon-o-trash')
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.bin'))
+                    ->group(__('Customer'))
+                    ->sort(2),
                 /** Mailing List */
                 NavigationItem::make('subscriber_bin')
                     ->label(fn(): string => __('Trash'))
