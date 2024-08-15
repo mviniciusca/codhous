@@ -17,6 +17,7 @@
     @livewire('notifications')
     <div class="main-base">
 
+
         {{-- Maintenance Mode Module --}}
         @if($maintenance_mode)
         <x-maintenance.section />
@@ -34,7 +35,11 @@
     </div>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    @if($maintenance_mode)
     <x-layout.footer />
+    @endif
+
     @filamentScripts
     @vite('resources/js/app.js')
 </body>
