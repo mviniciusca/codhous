@@ -1,3 +1,4 @@
+@if($maintenance_mode)
 <div class="absolute w-full h-full z-50 bg-primary-50 dark:bg-primary-900 justify-center grid">
     <section class="grid items-center justify-center">
         <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
@@ -18,3 +19,4 @@
         </div>
     </section>
 </div>
+@endif
