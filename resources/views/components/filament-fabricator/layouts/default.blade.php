@@ -17,10 +17,8 @@
     @livewire('notifications')
     <div class="main-base">
 
-        <x-maintenance.section />
-
-
         <x-core.header />
+        <x-maintenance.section />
         <x-layout.background />
         <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
         <x-ui.whatsapp />
