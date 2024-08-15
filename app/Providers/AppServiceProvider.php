@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $value = Setting::select(['maintenance_mode'])->first()->maintenance_mode;
-        View::share('maintenance_mode', $value);
+        View::share('discovery_mode', Setting::select(['discovery_mode'])->first()->discovery_mode);
+        View::share('maintenance_mode', Setting::select(['maintenance_mode'])->first()->maintenance_mode);
     }
 }

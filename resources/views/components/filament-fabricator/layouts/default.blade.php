@@ -17,11 +17,20 @@
     @livewire('notifications')
     <div class="main-base">
 
-        <x-core.header />
+        {{-- Maintenance Mode Module --}}
+        @if($maintenance_mode)
         <x-maintenance.section />
+        @endif
+
+        {{-- Application --}}
+        @if(!$maintenance_mode)
+        <x-core.header />
         <x-layout.background />
         <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
         <x-ui.whatsapp />
+        @endif
+
+
     </div>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
