@@ -17,11 +17,6 @@
     @livewire('notifications')
     <div class="main-base">
 
-        {{-- Maintenance Mode Module --}}
-        @if($maintenance_mode && (!$discovery_mode || !auth()->hasUser()))
-        <x-maintenance.section />
-        @endif
-
         {{-- Application --}}
         @if(!$maintenance_mode || $discovery_mode && auth()->hasUser())
         <x-core.header />
@@ -30,6 +25,10 @@
         <x-ui.whatsapp />
         @endif
 
+        {{-- Maintenance Mode Module --}}
+        @if($maintenance_mode && (!$discovery_mode || !auth()->hasUser()))
+        <x-maintenance.section />
+        @endif
     </div>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
