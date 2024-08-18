@@ -18,12 +18,12 @@
     <div class="main-base">
 
         {{-- Maintenance Mode Module --}}
-        @if($maintenance_mode)
+        @if($maintenance_mode && (!$discovery_mode || !auth()->hasUser()))
         <x-maintenance.section />
         @endif
 
         {{-- Application --}}
-        @if(!$maintenance_mode)
+        @if(!$maintenance_mode || ($discovery_mode && auth()->hasUser()))
         <x-core.header />
         <x-layout.background />
         <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
