@@ -23,7 +23,7 @@
         @endif
 
         {{-- Application --}}
-        @if(!$maintenance_mode || ($discovery_mode && auth()->hasUser()))
+        @if(!$maintenance_mode || $discovery_mode && auth()->hasUser())
         <x-core.header />
         <x-layout.background />
         <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
