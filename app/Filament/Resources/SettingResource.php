@@ -71,6 +71,7 @@ class SettingResource extends Resource
                         TextInput::make('phone')
                             ->label(__('Public Phone'))
                             ->tel()
+                            ->prefix('+' . env('COUNTRY_CODE'))
                             ->mask('(99)9999-9999')
                             ->helperText(__('Define here the phone number for you or your Company. This is a public information.'))
                             ->maxLength(15)
