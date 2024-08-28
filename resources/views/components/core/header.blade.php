@@ -1,7 +1,10 @@
 <header class="fixed z-10 mx-auto w-full bg-primary-100 dark:bg-primary-950">
-    @if($maintenance_mode && $discovery_mode && auth()->hasUser())
+
+    {{-- Discovery Mode --}}
+    @if($maintenance_mode && ($discovery_mode && auth()->hasUser()))
     <x-maintenance.discovery />
     @endif
+
     <x-layout.content>
         <div class="mx-auto flex flex-col flex-wrap items-center md:flex-row">
             {{-- Application Logo --}}
