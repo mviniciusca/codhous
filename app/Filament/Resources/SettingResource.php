@@ -58,6 +58,7 @@ class SettingResource extends Resource
                     ->columns(2)
                     ->schema([
                         TextInput::make('app_name')
+                            ->prefixIcon('heroicon-o-cube')
                             ->label(__('Application Name'))
                             ->helperText(__('Define here the Application or Website Name.'))
                             ->maxLength(140)
@@ -66,11 +67,13 @@ class SettingResource extends Resource
                             ->label(__('Public E-mail'))
                             ->helperText(__('Define here the e-mail address for you or your Company. This is a public information.'))
                             ->maxLength(140)
+                            ->prefixIcon('heroicon-o-envelope')
                             ->email()
                             ->required(),
                         TextInput::make('phone')
                             ->label(__('Public Phone'))
                             ->tel()
+                            ->prefixIcon('heroicon-o-phone')
                             ->prefix('+' . env('COUNTRY_CODE'))
                             ->mask('(99)9999-9999')
                             ->helperText(__('Define here the phone number for you or your Company. This is a public information.'))
@@ -78,6 +81,7 @@ class SettingResource extends Resource
                             ->tel()
                             ->required(),
                         TextInput::make('office_hour')
+                            ->prefixIcon('heroicon-o-clock')
                             ->label(__('Office Hour'))
                             ->helperText(__('Define here the office hour of your Company.'))
                             ->maxLength(150)
