@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Budget;
 use App\Models\Contact;
 use App\Models\Layout;
+use App\Models\Module;
 use App\Models\Navigation;
 use App\Models\Partner;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,15 @@ class Setting extends Model
             'social' => 'array',
             'whatsapp' => 'array',
         ];
+    }
+
+    /**
+     * Summary of module
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function module(): HasOne
+    {
+        return $this->hasOne(Module::class);
     }
 
     /**

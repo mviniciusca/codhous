@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -105,10 +106,17 @@ class SettingResource extends Resource
                 Section::make(__('Modules Control'))
                     ->description(__('Control the global module visibility'))
                     ->icon('heroicon-o-eye')
+                    ->relationship('module')
                     ->collapsible()
-                    ->columns(2)
                     ->schema([
-
+                        Group::make()
+                            ->columns(4)
+                            ->schema([
+                                Toggle::make('module.header'),
+                                Toggle::make('module.contact'),
+                                Toggle::make('module.newsletter'),
+                                Toggle::make('module.footer')
+                            ])
                     ]),
                 Section::make(__('SEO & Meta'))
                     ->description(__('Define here the search engine optimization with meta tags'))
