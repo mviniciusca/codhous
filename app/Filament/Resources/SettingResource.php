@@ -112,10 +112,14 @@ class SettingResource extends Resource
                         Group::make()
                             ->columns(4)
                             ->schema([
-                                Toggle::make('module.header'),
-                                Toggle::make('module.contact'),
-                                Toggle::make('module.newsletter'),
+                                Toggle::make('module.header')
+                                    ->label(__('Header')),
+                                Toggle::make('module.contact')
+                                    ->label(__('Contact')),
+                                Toggle::make('module.newsletter')
+                                    ->label(__('Newsletter')),
                                 Toggle::make('module.footer')
+                                    ->label(__('Footer'))
                             ])
                     ]),
                 Section::make(__('SEO & Meta'))
