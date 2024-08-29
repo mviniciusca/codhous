@@ -99,7 +99,7 @@ class SettingResource extends Resource
                             ->label(__('Maintenance Mode'))
                             ->inline(),
                         Toggle::make('discovery_mode')
-                            ->helperText(__('This section is shown before closing the body tag'))
+                            ->helperText(__('See the application when Maintenance Mode is active'))
                             ->label(__('Discovery Mode'))
                             ->inline(),
                     ]),
