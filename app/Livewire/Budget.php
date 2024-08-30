@@ -47,10 +47,20 @@ class Budget extends Component implements HasForms
         $this->module = $this->module();
     }
 
+    /**
+     * Summary of module
+     * @return mixed
+     */
     public function module()
     {
         return Module::first()->module['budget'];
     }
+
+    /**
+     * Summary of form
+     * @param \Filament\Forms\Form $form
+     * @return \Filament\Forms\Form
+     */
     public function form(Form $form): Form
     {
         return $form
@@ -215,6 +225,11 @@ class Budget extends Component implements HasForms
         ]);
     }
 
+
+    /**
+     * Summary of status
+     * @return bool
+     */
     public function status(): bool
     {
         $status = Setting::query()
@@ -224,6 +239,11 @@ class Budget extends Component implements HasForms
         return $status;
     }
 
+
+    /**
+     * Summary of image
+     * @return string|null
+     */
     public function image(): string|null
     {
         $image = Setting::query()
