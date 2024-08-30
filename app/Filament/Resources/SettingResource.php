@@ -110,7 +110,7 @@ class SettingResource extends Resource
                     ->collapsible()
                     ->schema([
                         Group::make()
-                            ->columns(4)
+                            ->columns(5)
                             ->schema([
                                 Toggle::make('module.header')
                                     ->label(__('Header')),

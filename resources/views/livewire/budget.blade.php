@@ -1,5 +1,6 @@
 @props(['code' => null])
 <x-layout.section>
+    @if($module)
     <x-layout.content>
         @if($status)
 
@@ -35,4 +36,5 @@
         @endif
 
     </x-layout.content>
+    @endif
 </x-layout.section>
