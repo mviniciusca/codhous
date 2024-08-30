@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Core;
 
+use App\Models\Module;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -21,6 +22,8 @@ class Header extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.core.header');
+        return view('components.core.header', [
+            'header' => Module::first()->module['header'],
+        ]);
     }
 }

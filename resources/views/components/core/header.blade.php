@@ -1,3 +1,4 @@
+@if($header)
 <header class="fixed z-10 mx-auto w-full bg-primary-100 dark:bg-primary-950">
 
     {{-- Discovery Mode --}}
@@ -20,3 +21,4 @@
         </div>
     </x-layout.content>
 </header>
+@endif

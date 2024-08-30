@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Module;
 use App\Models\Newsletter as NewsletterModel;
 use App\Models\User;
 use App\Notifications\NewSubscribe;
@@ -21,9 +22,11 @@ class Newsletter extends Component implements HasForms
     public ?string $subtitle;
     public ?string $info;
     public ?string $btn_text;
+    public ?bool $newsletter;
     public function mount(): void
     {
         $this->form->fill();
+        $this->newsletter = $this->newsletter();
     }
 
     public function form(Form $form): Form
@@ -61,6 +64,11 @@ class Newsletter extends Component implements HasForms
             ->success()
             ->send();
         $this->form->fill();
+    }
+
+    public function newsletter()
+    {
+        return Module::first()->module['newsletter'];
     }
     public function render()
     {
