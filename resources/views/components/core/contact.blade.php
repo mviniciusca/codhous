@@ -1,3 +1,4 @@
+@if($module)
 @if($contact && $contact->status)
 <x-layout.section>
     <x-layout.content>
@@ -34,4 +35,5 @@
         </div>
     </x-layout.content>
 </x-layout.section>
+@endif
 @endif

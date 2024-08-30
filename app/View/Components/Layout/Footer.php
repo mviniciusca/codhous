@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Layout;
 
+use App\Models\Module;
 use App\Models\Navigation;
 use App\Models\Setting;
 use Closure;
@@ -30,6 +31,7 @@ class Footer extends Component
             'app' => Setting::query()
                 ->select(['app_name'])
                 ->first(),
+            'module' => Module::first()->module['footer'],
         ]);
     }
 }

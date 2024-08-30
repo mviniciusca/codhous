@@ -1,3 +1,4 @@
+@if($module)
 <x-layout.section>
     <x-layout.content>
         <footer>
@@ -32,3 +33,4 @@
         </footer>
     </x-layout.content>
 </x-layout.section>
+@endif

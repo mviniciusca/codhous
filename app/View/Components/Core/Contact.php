@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Core;
 
+use App\Models\Module;
 use Closure;
 use App\Models\Contact as ContactModel;
 use Illuminate\View\Component;
@@ -24,7 +25,10 @@ class Contact extends Component
     {
         return view(
             'components.core.contact',
-            ['contact' => ContactModel::first()]
+            [
+                'contact' => ContactModel::first(),
+                'module' => Module::first()->module['contact'],
+            ]
         );
     }
 }

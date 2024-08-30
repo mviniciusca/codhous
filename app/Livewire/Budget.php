@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Module;
 use App\Models\User;
 use App\Notifications\NewBudget;
 use Closure;
@@ -37,11 +38,18 @@ class Budget extends Component implements HasForms
     public ?array $data = [];
     public $status;
     public $image;
+    public ?bool $module;
     public function mount(): void
     {
         $this->status = $this->status();
         $this->image = $this->image();
         $this->form->fill();
+        $this->module = $this->module();
+    }
+
+    public function module()
+    {
+        return Module::first()->module['budget'];
     }
     public function form(Form $form): Form
     {

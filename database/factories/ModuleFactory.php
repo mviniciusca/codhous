@@ -19,6 +19,7 @@ class ModuleFactory extends Factory
         return [
             'module' => [
                 'footer' => true,
+                'budget' => true,
                 'header' => true,
                 'newsletter' => true,
                 'contact' => true

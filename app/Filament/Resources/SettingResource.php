@@ -118,6 +118,8 @@ class SettingResource extends Resource
                                     ->label(__('Contact')),
                                 Toggle::make('module.newsletter')
                                     ->label(__('Newsletter')),
+                                Toggle::make('module.budget')
+                                    ->label(__('Budget Tool')),
                                 Toggle::make('module.footer')
                                     ->label(__('Footer'))
                             ])
