@@ -26,20 +26,24 @@ class Bumper extends PageBlock
                     ->schema([
                         Toggle::make('status')
                             ->label('Active')
+                            ->helperText(__('Visibility'))
                             ->inline(false)
                             ->default(true),
                         TextInput::make('info')
-                            ->label('Tag Info')
+                            ->helperText(__('Tag before title'))
+                            ->label('Tag')
                             ->required()
                             ->columnSpan(2)
                             ->maxLength(50),
                         TextInput::make('title')
-                            ->label('Title of bumper')
+                            ->label('Title')
+                            ->helperText(__('Set the title of the bumper'))
                             ->required()
                             ->columnSpan(3)
                             ->maxLength(120),
                         TextInput::make('link')
-                            ->label('URL Link')
+                            ->label('Link')
+                            ->helperText(__('URL Link (same window)'))
                             ->required()
                             ->columnSpan(3)
                             ->prefixIcon('heroicon-o-link')
@@ -48,13 +52,14 @@ class Bumper extends PageBlock
                             ->columnSpan(3)
                             ->schema([
                                 Select::make('bumper_position')
+                                    ->helperText(__('Bumper position. Default value is center'))
                                     ->label('Bumper Position')
                                     ->options([
                                         'center' => 'Center',
                                         'left' => 'Left',
                                         'right' => 'Right',
                                     ])
-                                    ->default('centers')
+                                    ->default('center')
                                     ->selectablePlaceholder(false)
                             ])
                     ])
