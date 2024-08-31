@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,7 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::share('discovery_mode', Setting::select(['discovery_mode'])->first()->discovery_mode);
-        View::share('maintenance_mode', Setting::select(['maintenance_mode'])->first()->maintenance_mode);
+        if (DB::table('settings')) {
+            View::share('discovery_mode', Setting::select(['discovery_mode'])->first()->discovery_mode);
+            View::share('maintenance_mode', Setting::select(['maintenance_mode'])->first()->maintenance_mode);
+        }
     }
 }

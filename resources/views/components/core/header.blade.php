@@ -1,5 +1,6 @@
 @if($header)
-<header class="fixed z-10 mx-auto w-full bg-primary-100 dark:bg-primary-950">
+<header
+    class="{{ $navbar->fixed ? 'fixed shadow-primary-200 dark:shadow-primary-950 shadow-md' : 'block' }} z-10 mx-auto w-full bg-primary-100 dark:bg-primary-950">
 
     {{-- Discovery Mode --}}
     @if($maintenance_mode && ($discovery_mode && auth()->hasUser()))
@@ -21,4 +22,9 @@
         </div>
     </x-layout.content>
 </header>
+
+@if($navbar->fixed)
+<div id="layout-breaker" class="py-12"></div>
+@endif
+
 @endif

@@ -19,6 +19,7 @@ class NavigationFactory extends Factory
         return [
             'navigation' => '',
             'nav_button' => '',
+            'fixed' => false,
         ];
     }
 }
