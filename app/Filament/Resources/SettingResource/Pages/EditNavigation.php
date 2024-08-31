@@ -35,6 +35,9 @@ class EditNavigation extends EditRecord
                     ->relationship('navigation')
                     ->collapsible()
                     ->schema([
+                        Toggle::make('fixed')
+                            ->helperText(__('Define if the navigation will be scrollable or fixed. Default is scrollable.'))
+                            ->label(__('Fixed Menu')),
                         Repeater::make('navigation')
                             ->columns(3)
                             ->cloneable()
