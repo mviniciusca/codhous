@@ -24,7 +24,7 @@
 </header>
 
 @if($navbar->fixed)
-<div id="layout-breaker" class="py-12"></div>
+<div id="layout-breaker" class="py-24"></div>
 @endif
 
 @endif

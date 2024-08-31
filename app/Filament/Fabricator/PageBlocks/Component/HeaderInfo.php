@@ -36,13 +36,13 @@ class HeaderInfo extends PageBlock
                 Section::make(__('Section Title + Subtitle'))
                     ->description(__('Header and subtitle box info'))
                     ->icon('heroicon-o-pencil')
-                    ->columns(5)
+                    ->columns(4)
                     ->collapsed()
                     ->schema([
                         TextInput::make('title')
-                            ->columnSpan(5)
+                            ->columnSpanFull()
                             ->label(__('Title'))
-                            ->helperText(__('Add a title for the section'))
+                            ->helperText(__('Section title. HTML allowed ✨'))
                             ->maxLength(255)
                             ->required(),
                         Group::make()
@@ -55,41 +55,36 @@ class HeaderInfo extends PageBlock
                                     ->columnSpanFull()
                                     ->rows(3),
                             ]),
-                        Section::make('Layout')
-                            ->description(__('Layout Settings'))
-                            ->icon('heroicon-o-cog-6-tooth')
-                            ->columns(4)
-                            ->collapsed()
-                            ->schema([
-                                Select::make('title_font_size')
-                                    ->options([
-                                        'small' => __('Small'),
-                                        'normal' => __('Normal'),
-                                        'large' => __('Large')
-                                    ])
-                                    ->default('normal'),
-                                Select::make('position')
-                                    ->options([
-                                        'center' => __('Center'),
-                                        'left' => __('Left'),
-                                    ])
-                                    ->default('center')
-                                    ->selectablePlaceholder(true),
-                                Toggle::make('padding')
-                                    ->label(__('Vertical Padding'))
-                                    ->inline(false)
-                                    ->helperText(__('Applies a vertical space in the title'))
-                                    ->default(false),
-                                Select::make('color')
-                                    ->label(__('Text Color'))
-                                    ->helperText(__('Set the color of the text. This affects the title and subtitle'))
-                                    ->options([
-                                        'dark' => __('Dark'),
-                                        'light' => __('Light'),
-                                        'default' => __('Default'),
-                                    ])->default('default'),
-                            ]),
+
+                        Toggle::make('padding')
+                            ->label(__('Vertical Padding'))
+                            ->inline(false)
+                            ->helperText(__('Applies a vertical space in the title'))
+                            ->default(false),
+                        Select::make('title_font_size')
+                            ->options([
+                                'small' => __('Small'),
+                                'normal' => __('Normal'),
+                                'large' => __('Large')
+                            ])
+                            ->default('normal'),
+                        Select::make('position')
+                            ->options([
+                                'center' => __('Center'),
+                                'left' => __('Left'),
+                            ])
+                            ->default('center')
+                            ->selectablePlaceholder(true),
+                        Select::make('color')
+                            ->label(__('Text Color'))
+                            ->helperText(__('Set the color of the text. This affects the title and subtitle'))
+                            ->options([
+                                'dark' => __('Dark'),
+                                'light' => __('Light'),
+                                'default' => __('Default'),
+                            ])->default('default'),
                     ]),
+
             ]);
     }
 

@@ -9,11 +9,16 @@
         ($title_font_size === 'small' ? 'text-xl md:text-2xl lg:text-4xl' : 'text-xl md:text-2xl lg:text-4xl')}}">
 
         <span class="{{ $color === 'dark' ? 'text-primary-800' : ($color === 'light' ? 'text-primary-50' : '' ) }}">
+
             <h1 class="mb-4 {{ $padding ? 'pt-8' : '' }} font-bold
             {{ $title_font_size === 'small'  ? 'leading-normal tracking-tighter' :  'leading-none tracking-tighter'}}">
-                {!! $title !!}</h1>
-            <p class="mb-8 text-lg font-normal lg:text-xl">
-                {!! $subtitle !!}</p>
+                {!! $title !!}
+            </h1>
+
+            <p class="mb-8 text-2xl tracking-tighter leading-tight max-w-3xl mx-auto">
+                {!! $subtitle !!}
+            </p>
+
         </span>
 
     </div>
