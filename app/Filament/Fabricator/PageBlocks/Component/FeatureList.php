@@ -72,19 +72,19 @@ class FeatureList extends PageBlock
                                     ->helperText(__('Set the name of Ionicon\'s icon'))
                                     ->prefix('ionicon')
                                     ->maxLength(140),
-                                TextInput::make('title')
-                                    ->label(__('Card Title'))
-                                    ->required()
-                                    ->helperText(__('The title of the card'))
-                                    ->columnSpan(2)
-                                    ->maxLength(100),
                                 TextInput::make('link')
                                     ->label(__('Card Link'))
                                     ->required()
                                     ->helperText(__('The link of the card'))
-                                    ->columnSpanFull()
+                                    ->columnSpan(2)
                                     ->prefixIcon('heroicon-o-link')
                                     ->maxLength(140),
+                                TextInput::make('title')
+                                    ->label(__('Card Title'))
+                                    ->required()
+                                    ->helperText(__('The title of the card'))
+                                    ->columnSpanFull()
+                                    ->maxLength(100),
                                 Textarea::make('info')
                                     ->label(__('Card Short Description'))
                                     ->helperText(__('The description of the card'))
