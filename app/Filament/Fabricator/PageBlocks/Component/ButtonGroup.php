@@ -34,6 +34,7 @@ class ButtonGroup extends PageBlock
                                     ->maxLength(80),
                                 TextInput::make('link')
                                     ->label(__('URL Link'))
+                                    ->prefixIcon('heroicon-o-link')
                                     ->helperText(__('Button Link. Max 255 characters'))
                                     ->maxLength(255),
                                 Toggle::make('target')
@@ -47,11 +48,11 @@ class ButtonGroup extends PageBlock
                                 TextInput::make('icon')
                                     ->label(__('Button Icon'))
                                     ->prefix('ionicon')
-                                    ->helperText(__('Button Icon. Max 255 characters'))
+                                    ->helperText(__('Ionicon\'s icon name'))
                                     ->maxLength(255),
                                 Toggle::make('iconLeft')
                                     ->default(true)
-                                    ->label(__('Icon Position'))
+                                    ->label(__('Icon of Left'))
                                     ->helperText(__('When active, the icon appears before the text')),
                             ]),
                     ])
