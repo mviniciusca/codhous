@@ -49,19 +49,19 @@ class HeaderInfo extends PageBlock
                             ->columnSpanFull()
                             ->schema([
                                 Textarea::make('subtitle')
-                                    ->label(__('Subtitle'))
-                                    ->helperText(__('Add a subtitle for the section'))
+                                    ->label(__('Subtitle (optional)'))
+                                    ->helperText(__('Section subtitle. HTML allowed ✨'))
                                     ->maxLength(255)
                                     ->columnSpanFull()
                                     ->rows(3),
                             ]),
-
                         Toggle::make('padding')
-                            ->label(__('Vertical Padding'))
+                            ->label(__('Title Padding'))
                             ->inline(false)
-                            ->helperText(__('Applies a vertical space in the title'))
+                            ->helperText(__('Applies a vertical space in the title.'))
                             ->default(false),
                         Select::make('title_font_size')
+                            ->helperText(__('Select the font size.'))
                             ->options([
                                 'small' => __('Small'),
                                 'normal' => __('Normal'),
@@ -69,6 +69,8 @@ class HeaderInfo extends PageBlock
                             ])
                             ->default('normal'),
                         Select::make('position')
+                            ->label(__('Text Align'))
+                            ->helperText(__('Set the text position.'))
                             ->options([
                                 'center' => __('Center'),
                                 'left' => __('Left'),
@@ -77,7 +79,7 @@ class HeaderInfo extends PageBlock
                             ->selectablePlaceholder(true),
                         Select::make('color')
                             ->label(__('Text Color'))
-                            ->helperText(__('Set the color of the text. This affects the title and subtitle'))
+                            ->helperText(__('This affects the title and subtitle.'))
                             ->options([
                                 'dark' => __('Dark'),
                                 'light' => __('Light'),
