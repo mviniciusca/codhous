@@ -29,7 +29,7 @@ class HeaderInfo extends PageBlock
                             ->label(__('Active Module'))
                             ->helperText(__('Active or disable this section')),
                         Toggle::make('section_filled')
-                            ->default(true)
+                            ->default(false)
                             ->label(__('Fill Section'))
                             ->helperText(__('Fill this section with a contrast color')),
                     ]),

@@ -15,7 +15,7 @@
                 {!! $title !!}
             </h1>
 
-            <p class="mb-8 text-2xl tracking-tighter leading-tight max-w-3xl mx-auto">
+            <p class="mb-8 text-xl tracking-tighter leading-tight max-w-4xl mx-auto">
                 {!! $subtitle !!}
             </p>
 
