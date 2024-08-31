@@ -12,6 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditBudget extends EditRecord
 {
@@ -20,6 +21,11 @@ class EditBudget extends EditRecord
     public static function getNavigationLabel(): string
     {
         return __('Budget Tool');
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('Budget Tool Settings');
     }
     public function form(Form $form): Form
     {

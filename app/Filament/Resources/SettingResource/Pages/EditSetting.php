@@ -7,6 +7,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SettingResource;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditSetting extends EditRecord
 {
@@ -18,6 +19,11 @@ class EditSetting extends EditRecord
     {
         return __('App Settings');
     }
+    public function getTitle(): string|Htmlable
+    {
+        return __('App Settings');
+    }
+
 
     protected function getHeaderActions(): array
     {

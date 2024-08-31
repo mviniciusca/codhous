@@ -12,6 +12,7 @@ use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SettingResource;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditContact extends EditRecord
 {
@@ -21,6 +22,11 @@ class EditContact extends EditRecord
     {
         return __('Contact & Locale');
     }
+    public function getTitle(): string|Htmlable
+    {
+        return __('Contact & Locale Settings');
+    }
+
     public function form(Form $form): Form
     {
         return $form

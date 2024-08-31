@@ -11,11 +11,20 @@ use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditWhatsapp extends EditRecord
 {
     protected static string $resource = SettingResource::class;
     protected static ?string $navigationIcon = 'heroicon-o-phone';
+    public static function getNavigationLabel(): string
+    {
+        return __('Whatsapp Web Chat');
+    }
+    public function getTitle(): string|Htmlable
+    {
+        return __('Whatsapp Web Chat Settings');
+    }
     public function form(Form $form): Form
     {
         return $form

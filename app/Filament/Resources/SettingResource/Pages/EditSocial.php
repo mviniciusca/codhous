@@ -24,7 +24,7 @@ class EditSocial extends EditRecord
     }
     public function getTitle(): string|Htmlable
     {
-        return __('Edit Social Network');
+        return __('Social Network Settings');
     }
 
     public function form(Form $form): Form
