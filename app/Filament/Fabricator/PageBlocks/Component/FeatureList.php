@@ -69,28 +69,28 @@ class FeatureList extends PageBlock
                                 TextInput::make('icon')
                                     ->label(__('Icon Name'))
                                     ->required()
-                                    ->helperText(__('Set the name of Ionicon\'s icon'))
+                                    ->helperText(__('Set the name of Ionicon\'s icon.  Max.: 140 characters'))
                                     ->prefix('ionicon')
                                     ->maxLength(140),
                                 TextInput::make('link')
                                     ->label(__('Card Link'))
                                     ->required()
-                                    ->helperText(__('The link of the card'))
+                                    ->helperText(__('The link of the card.  Max.: 200 characters'))
                                     ->columnSpan(2)
                                     ->prefixIcon('heroicon-o-link')
-                                    ->maxLength(140),
+                                    ->maxLength(200),
                                 TextInput::make('title')
                                     ->label(__('Card Title'))
                                     ->required()
-                                    ->helperText(__('The title of the card'))
+                                    ->helperText(__('The title of the card.  Max.: 100 characters'))
                                     ->columnSpanFull()
                                     ->maxLength(100),
                                 Textarea::make('info')
                                     ->label(__('Card Short Description'))
-                                    ->helperText(__('The description of the card'))
+                                    ->helperText(__('The description of the card. Max.: 300 characters'))
                                     ->columnSpanFull()
                                     ->rows(3)
-                                    ->maxLength(200),
+                                    ->maxLength(300),
                             ]),
                     ]),
             ]);
