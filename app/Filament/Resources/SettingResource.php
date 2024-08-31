@@ -45,7 +45,8 @@ class SettingResource extends Resource
             Pages\EditContact::class,
             Pages\EditSocial::class,
             Pages\EditBudget::class,
-            Pages\EditWhatsapp::class
+            Pages\EditWhatsapp::class,
+            Pages\EditAddons::class
         ]);
     }
     public static function form(Form $form): Form
@@ -153,32 +154,6 @@ class SettingResource extends Resource
                             ->rows(3)
                             ->required(),
                     ]),
-                Section::make(__('Add-ons & External Complements'))
-                    ->description(__('Boost the website with complements or scripts from external source'))
-                    ->icon('heroicon-o-puzzle-piece')
-                    ->collapsed()
-                    ->schema([
-                        Textarea::make('header_scripts')
-                            ->label(__('Header Scripts'))
-                            ->helperText(__('Define here the of the application. This section is shown before opening the body tag'))
-                            ->rows(3)
-                            ->maxLength(2000),
-                        Textarea::make('body_scripts')
-                            ->label(__('Body Scripts'))
-                            ->helperText(__('Define here the of the application. This section is shown before closing the body tag'))
-                            ->rows(3)
-                            ->maxLength(2000),
-                        Textarea::make('google_analytics')
-                            ->label(__('Google Analytics'))
-                            ->helperText(__('Paste here the entire Google Analytics Codes'))
-                            ->rows(3)
-                            ->maxLength(2000),
-                        Textarea::make('google_tag')
-                            ->label(__('Google Tag'))
-                            ->helperText(__('Paste here the entire Google Tag Code'))
-                            ->rows(3)
-                            ->maxLength(2000),
-                    ]),
             ]);
     }
 
@@ -222,6 +197,7 @@ class SettingResource extends Resource
             'edit_social' => Pages\EditSocial::route('/{record}/edit-social'),
             'edit_budget' => Pages\EditBudget::route('/{record}/edit-budget'),
             'edit_whatsapp' => Pages\EditWhatsapp::route('/{record}/edit-whatsapp'),
+            'edit_addons' => Pages\EditAddons::route('/{record}/edit-addons'),
         ];
     }
 }

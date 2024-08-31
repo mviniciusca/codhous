@@ -22,7 +22,6 @@ class EditBudget extends EditRecord
     {
         return __('Budget Tool');
     }
-
     public function getTitle(): string|Htmlable
     {
         return __('Budget Tool Settings');
