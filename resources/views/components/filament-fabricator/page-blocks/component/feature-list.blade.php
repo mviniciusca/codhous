@@ -11,9 +11,9 @@
                 <div class="{{ $centered ? 'text-center' : 'text-left' }}">
                     <div class="{{ $centered ? 'mx-auto' : '' }}
                 mb-4 flex h-10 w-10 items-center justify-center rounded-full lg:h-12 lg:w-12
-                {{ $icon_filled ? 'dark:bg-primary-950 bg-secondary-500 text-primary-50' : 'bg-none' }}
+                {{ $icon_filled ? 'dark:bg-secondary-500 bg-secondary-500 text-primary-50' : 'bg-none' }}
                 ">
-                        <x-ionicon :icon="$card['icon']" />
+                        <x-ionicon :size="'big'" :icon="$card['icon']" />
                     </div>
                     <h3 class="mb-2 text-xl font-bold">{{ $card['title'] }}</h3>
                     <p> {{ $card['info'] }} </p>

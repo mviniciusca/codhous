@@ -69,7 +69,7 @@ class FeatureList extends PageBlock
                                 TextInput::make('icon')
                                     ->label(__('Icon Name'))
                                     ->required()
-                                    ->helperText(__('Set the name of Ionicon\'s icon.  Max.: 140 characters'))
+                                    ->helperText(__('Set the name of Ionicon\'s icon.'))
                                     ->prefix('ionicon')
                                     ->maxLength(140),
                                 TextInput::make('link')
