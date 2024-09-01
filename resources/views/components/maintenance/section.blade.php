@@ -8,7 +8,7 @@
             <div class="mx-auto max-w-screen-sm text-center">
                 <img class="w-96 mx-auto" src="{{ asset('/img/under-construction.svg') }}">
                 <p class="mb-4 text-3xl tracking-tight font-bold md:text-4xl">
-                    {{ __('Maintenace Mode') }}
+                    {{ __('Maintenance') }}
                 </p>
                 <p class="mb-4 text-lg font-light">{{ __('We\'re updating our website.
                     Please, come back soon!') }}</p>
