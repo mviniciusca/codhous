@@ -27,89 +27,91 @@ class Cta extends PageBlock
                     ->collapsed()
                     ->schema([
                         Repeater::make('content')
-                            ->collapsible()
-                            ->cloneable()
+                            ->label(__('Content'))
                             ->schema([
-                                Group::make([
-                                    Group::make()
-                                        ->schema([
-                                            Group::make()
-                                                ->schema([
-                                                    Toggle::make('status')
-                                                        ->default(true)
-                                                        ->label(__('Active'))
-                                                        ->helperText(__('Show this CTA'))
-                                                        ->inline(),
-                                                    Toggle::make('axis')
-                                                        ->default(true)
-                                                        ->label(__('Invert'))
-                                                        ->helperText(__('Invert the position of the CTA components'))
-                                                        ->inline(true),
-                                                ])->columns(2),
-                                            FileUpload::make('image')
-                                                ->label(__('Upload Image'))
-                                                ->image()
-                                                ->directory('cta')
-                                                ->required()
-                                                ->imageEditor()
-                                                ->imageCropAspectRatio('16:9')
-                                                ->helperText(__('This will automatically crop into a 16:9 ratio format')),
-                                        ])->columnSpan(2),
-                                    Group::make()
-                                        ->schema([
-                                            TextInput::make('title')
-                                                ->required()
-                                                ->label(__('Title'))
-                                                ->columnSpan(4)
-                                                ->helperText(__('Title for Content. Max 140 characters'))
-                                                ->maxLength(140),
-                                            Textarea::make('subtitle')
-                                                ->rows(4)
-                                                ->columnSpan(4)
-                                                ->label(__('Subtitle'))
-                                                ->helperText(__('Short description about the content. Max 240 characters'))
-                                                ->maxLength(240),
-                                        ])->columnSpan(4),
-                                    FieldSet::make('Button Settings')
-                                        ->schema([
-                                            TextInput::make('btn_text')
-                                                ->label(__('Button Text (Optional)'))
-                                                ->columnSpan(3)
-                                                ->helperText(__('This show the button on page. Max 140 characters'))
-                                                ->maxLength(140),
-                                            TextInput::make('btn_url')
-                                                ->label(__('Button URL (Optional)'))
-                                                ->columnSpan(3)
-                                                ->helperText(__('Link for the button. Max 255 characters'))
-                                                ->prefixIcon('heroicon-o-link')
-                                                ->maxLength(250),
-                                            Toggle::make('target')
-                                                ->label(__('Ext. Link'))
-                                                ->helperText(__('Open this link in a new window'))
-                                                ->columnSpan(1)
-                                                ->inline(false)
-                                                ->default(false),
-                                            Toggle::make('iconLeft')
-                                                ->label(__('Icon Position'))
-                                                ->helperText(__('Place the icon before or after the text. Active is on the left.'))
-                                                ->columnSpan(1)
-                                                ->inline(false)
-                                                ->default(true),
-                                            TextInput::make('icon')
-                                                ->label(__('Ionicon name'))
-                                                ->helperText(__('Use a icon name from Ionicon. Ex.: bulb-outline'))
-                                                ->columnSpan(3)
-                                                ->prefix('ionicon'),
-                                            Toggle::make('filled')
-                                                ->label(__('Filled Style'))
-                                                ->helperText(__('Filled or clean button style'))
-                                                ->columnSpan(1)
-                                                ->default(true)
-                                                ->inline(false),
-                                        ])->columns(6)
-                                ])->columns(6)
-                            ])
-                    ])
+                                Section::make(__('Content'))
+                                    ->collapsible()
+                                    ->icon('heroicon-o-pencil')
+                                    ->schema([
+                                        Group::make()
+                                            ->schema([
+                                                TextInput::make('title')
+                                                    ->required()
+                                                    ->label(__('Title'))
+                                                    ->helperText(__('Title for Content. Max 200 characters'))
+                                                    ->maxLength(200),
+                                                Textarea::make('subtitle')
+                                                    ->rows(3)
+                                                    ->label(__('Subtitle'))
+                                                    ->helperText(__('Short description about the content. Max 300 characters'))
+                                                    ->maxLength(300),
+                                                FileUpload::make('image')
+                                                    ->label(__('Upload Image'))
+                                                    ->image()
+                                                    ->directory('cta')
+                                                    ->required()
+                                                    ->imageEditor()
+                                                    ->imageCropAspectRatio('16:9')
+                                                    ->helperText(__('This will automatically crop into a 16:9 ratio format')),
+                                            ])
+                                    ]),
+                                Section::make(__('Button'))
+                                    ->collapsible()
+                                    ->icon('heroicon-o-cube')
+                                    ->columns(3)
+                                    ->schema([
+                                        TextInput::make('btn_text')
+                                            ->label(__('Button Text (Optional)'))
+
+                                            ->helperText(__('This show the button on page. Max 140 characters'))
+                                            ->maxLength(140),
+                                        TextInput::make('btn_url')
+                                            ->label(__('Button URL (Optional)'))
+
+                                            ->helperText(__('Link for the button. Max 255 characters'))
+                                            ->prefixIcon('heroicon-o-link')
+                                            ->maxLength(250),
+                                        Toggle::make('target')
+                                            ->label(__('External Link'))
+                                            ->helperText(__('Open this link in a new window'))
+                                            ->inline(false)
+                                            ->default(false),
+                                        Toggle::make('iconLeft')
+                                            ->label(__('Icon Position'))
+                                            ->helperText(__('Place the icon before or after the text. Active is on the left.'))
+                                            ->inline(false)
+                                            ->default(true),
+                                        TextInput::make('icon')
+                                            ->label(__('Ionicon name'))
+                                            ->helperText(__('Use a icon name from Ionicon. Ex.: bulb-outline'))
+                                            ->prefix('ionicon'),
+                                        Toggle::make('filled')
+                                            ->label(__('Filled Style'))
+                                            ->helperText(__('Filled or clean button style'))
+                                            ->default(true)
+                                            ->inline(false),
+                                    ]),
+                                Section::make(__('Settings'))
+                                    ->collapsible()
+                                    ->icon('heroicon-o-cog-6-tooth')
+                                    ->schema([
+                                        Group::make()
+                                            ->schema([
+                                                Toggle::make('status')
+                                                    ->default(true)
+                                                    ->label(__('Active'))
+                                                    ->helperText(__('Show this CTA'))
+                                                    ->inline(),
+                                                Toggle::make('axis')
+                                                    ->default(true)
+                                                    ->label(__('Invert'))
+                                                    ->helperText(__('Invert the position of the CTA components'))
+                                                    ->inline(true),
+                                            ])
+                                            ->columns(2),
+                                    ]),
+                            ]),
+                    ]),
             ]);
     }
 
