@@ -27,10 +27,10 @@ class Cta extends PageBlock
                     ->collapsed()
                     ->schema([
                         Repeater::make('content')
-                            ->label(__('Content'))
+                            ->label(__('Card'))
                             ->schema([
                                 Section::make(__('Content'))
-                                    ->collapsible()
+                                    ->collapsed()
                                     ->icon('heroicon-o-pencil')
                                     ->schema([
                                         Group::make()
@@ -56,18 +56,16 @@ class Cta extends PageBlock
                                             ])
                                     ]),
                                 Section::make(__('Button'))
-                                    ->collapsible()
+                                    ->collapsed()
                                     ->icon('heroicon-o-cube')
                                     ->columns(3)
                                     ->schema([
                                         TextInput::make('btn_text')
                                             ->label(__('Button Text (Optional)'))
-
                                             ->helperText(__('This show the button on page. Max 140 characters'))
                                             ->maxLength(140),
                                         TextInput::make('btn_url')
                                             ->label(__('Button URL (Optional)'))
-
                                             ->helperText(__('Link for the button. Max 255 characters'))
                                             ->prefixIcon('heroicon-o-link')
                                             ->maxLength(250),
@@ -92,7 +90,7 @@ class Cta extends PageBlock
                                             ->inline(false),
                                     ]),
                                 Section::make(__('Settings'))
-                                    ->collapsible()
+                                    ->collapsed()
                                     ->icon('heroicon-o-cog-6-tooth')
                                     ->schema([
                                         Group::make()
