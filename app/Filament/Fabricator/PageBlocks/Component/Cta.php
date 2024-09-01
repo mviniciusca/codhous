@@ -18,54 +18,58 @@ class Cta extends PageBlock
     public static function getBlockSchema(): Block
     {
         return Block::make('component.cta')
-            ->icon('heroicon-o-cube')
+            ->icon('heroicon-o-bolt')
             ->label(__('CTA'))
             ->schema([
                 Section::make('CTA')
                     ->description('CTA is a group with a image + text and subtitle + action button')
-                    ->icon('heroicon-o-stop')
+                    ->icon('heroicon-o-bolt')
                     ->collapsed()
                     ->schema([
                         Repeater::make('content')
+                            ->collapsible()
                             ->cloneable()
                             ->schema([
                                 Group::make([
-                                    Group::make()->schema([
-                                        Group::make()->schema([
-                                            Toggle::make('status')
-                                                ->default(true)
-                                                ->label(__('Show'))
-                                                ->helperText(__('Show this CTA'))
-                                                ->inline(true),
-                                            Toggle::make('axis')
-                                                ->default(true)
-                                                ->label(__('Invert'))
-                                                ->helperText(__('Invert the position of the CTA components'))
-                                                ->inline(true),
-                                        ])->columns(2),
-                                        FileUpload::make('image')
-                                            ->label(__('Upload Image'))
-                                            ->image()
-                                            ->directory('cta')
-                                            ->required()
-                                            ->imageEditor()
-                                            ->imageCropAspectRatio('16:9')
-                                            ->helperText(__('This will automatically crop into a 16:9 ratio format')),
-                                    ])->columnSpan(2),
-                                    Group::make()->schema([
-                                        TextInput::make('title')
-                                            ->required()
-                                            ->label(__('Title'))
-                                            ->columnSpan(4)
-                                            ->helperText(__('Title for Content. Max 140 characters'))
-                                            ->maxLength(140),
-                                        Textarea::make('subtitle')
-                                            ->rows(4)
-                                            ->columnSpan(4)
-                                            ->label(__('Subtitle'))
-                                            ->helperText(__('Short description about the content. Max 240 characters'))
-                                            ->maxLength(240),
-                                    ])->columnSpan(4),
+                                    Group::make()
+                                        ->schema([
+                                            Group::make()
+                                                ->schema([
+                                                    Toggle::make('status')
+                                                        ->default(true)
+                                                        ->label(__('Active'))
+                                                        ->helperText(__('Show this CTA'))
+                                                        ->inline(),
+                                                    Toggle::make('axis')
+                                                        ->default(true)
+                                                        ->label(__('Invert'))
+                                                        ->helperText(__('Invert the position of the CTA components'))
+                                                        ->inline(true),
+                                                ])->columns(2),
+                                            FileUpload::make('image')
+                                                ->label(__('Upload Image'))
+                                                ->image()
+                                                ->directory('cta')
+                                                ->required()
+                                                ->imageEditor()
+                                                ->imageCropAspectRatio('16:9')
+                                                ->helperText(__('This will automatically crop into a 16:9 ratio format')),
+                                        ])->columnSpan(2),
+                                    Group::make()
+                                        ->schema([
+                                            TextInput::make('title')
+                                                ->required()
+                                                ->label(__('Title'))
+                                                ->columnSpan(4)
+                                                ->helperText(__('Title for Content. Max 140 characters'))
+                                                ->maxLength(140),
+                                            Textarea::make('subtitle')
+                                                ->rows(4)
+                                                ->columnSpan(4)
+                                                ->label(__('Subtitle'))
+                                                ->helperText(__('Short description about the content. Max 240 characters'))
+                                                ->maxLength(240),
+                                        ])->columnSpan(4),
                                     FieldSet::make('Button Settings')
                                         ->schema([
                                             TextInput::make('btn_text')
