@@ -17,7 +17,14 @@ class LayoutFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'content' => [
+                'status' => true,
+                'bg_position' => 'bg-top',
+                'bg_repeat' => 'bg-no-repeat',
+                'bg_attachment' => 'bg-scroll',
+                'bg_size' => 'bg-cover',
+                'bg_height' => 680,
+            ]
         ];
     }
 }

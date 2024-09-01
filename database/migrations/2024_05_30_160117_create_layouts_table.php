@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('background_image')->nullable();
             $table->string('favicon')->nullable();
             $table->json('content')->nullable();
+            $table->json('maintenance')->nullable();
             $table->timestamps();
         });
     }

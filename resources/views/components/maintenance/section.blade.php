@@ -1,3 +1,4 @@
+@dd($layout)
 @if($maintenance_mode)
 <div class="absolute w-full h-full z-50 bg-primary-50 dark:bg-primary-900 justify-center grid">
     <section class="grid items-center justify-center">
