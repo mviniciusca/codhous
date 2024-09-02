@@ -6,13 +6,13 @@
                 @livewire('darkmode')
             </div>
             <div class="mx-auto max-w-screen-sm text-center">
-                <img class="w-96 mx-auto rounded-xl mb-4 object-center" src="{{ $layout['image'] ? 
+                <img class="w-96 mx-auto rounded-xl  object-center" src="{{ $layout['image'] ? 
                     asset('storage/' . $layout['image']) :
                      asset('/img/under-construction.svg') }}">
-                <p class="mb-4 text-3xl tracking-tight font-bold md:text-4xl">
+                <p class="mt-8 text-3xl tracking-tight font-bold md:text-4xl">
                     {{ $layout['title'] ?? __('Maintenance Mode') }}
                 </p>
-                <p class="mb-4 text-lg font-light">
+                <p class="my-4 text-md max-w-2xl font-light">
                     {{ $layout['message'] ??
                     __('This application is under Maintenance. Please, come back soon. Thanks') }}
                 </p>
