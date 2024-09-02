@@ -53,11 +53,11 @@ class EditMaintenance extends EditRecord
                         TextInput::make('title')
                             ->label(__('Title'))
                             ->required()
-                            ->helperText(__('')),
+                            ->helperText(__('Define the main tittle of the maintenance mode')),
                         Textarea::make('message')
                             ->label(__('Message'))
                             ->required()
-                            ->helperText(__('')),
+                            ->helperText(__('Define the main message of the maintenance mode')),
                         FileUpload::make('image')
                             ->image()
                             ->columnSpanFull()
