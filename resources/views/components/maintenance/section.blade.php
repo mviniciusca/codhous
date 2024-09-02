@@ -1,4 +1,3 @@
-@dd($layout)
 @if($maintenance_mode)
 <div class="absolute w-full h-full z-50 bg-primary-50 dark:bg-primary-900 justify-center grid">
     <section class="grid items-center justify-center">
@@ -9,13 +8,19 @@
             <div class="mx-auto max-w-screen-sm text-center">
                 <img class="w-96 mx-auto" src="{{ asset('/img/under-construction.svg') }}">
                 <p class="mb-4 text-3xl tracking-tight font-bold md:text-4xl">
-                    {{ __('Maintenance') }}
+                    {{ $layout['title'] ?? __('Maintenance Mode') }}
                 </p>
-                <p class="mb-4 text-lg font-light">{{ __('We\'re updating our website.
-                    Please, come back soon!') }}</p>
-                <x-ui.button>
-                    {{ __('Github') }}
-                </x-ui.button>
+                <p class="mb-4 text-lg font-light">
+                    {{ $layout['message'] ??
+                    __('This application is under Maintenance. Please, come back soon. Thanks') }}
+                </p>
+
+                @if($layout['show'])
+                <span>
+                    <x-ui.social-network :size="'big'" />
+                </span>
+                @endif
+
             </div>
         </div>
     </section>
