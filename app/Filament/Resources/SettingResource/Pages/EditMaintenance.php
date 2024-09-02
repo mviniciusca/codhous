@@ -4,14 +4,15 @@ namespace App\Filament\Resources\SettingResource\Pages;
 
 use Filament\Actions;
 use Filament\Forms\Form;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
-use Filament\Resources\Pages\EditRecord;
-use Illuminate\Contracts\Support\Htmlable;
-use App\Filament\Resources\SettingResource;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Resources\Pages\EditRecord;
+use Filament\Forms\Components\FileUpload;
+use Illuminate\Contracts\Support\Htmlable;
+use App\Filament\Resources\SettingResource;
 
 class EditMaintenance extends EditRecord
 {
@@ -51,27 +52,30 @@ class EditMaintenance extends EditRecord
                     ->collapsible()
                     ->relationship('layout')
                     ->schema([
-                        Toggle::make('maintenance.show_social')
-                            ->label(__('Social Network Module'))
-                            ->helperText(__('Show social network links if they available'))
-                            ->inline(true)
-                            ->default(true),
-                        TextInput::make('maintenance.title')
-                            ->label(__('Title'))
-                            ->required()
-                            ->placeholder(__('Maintenance Mode'))
-                            ->helperText(__('Define the main tittle of the maintenance mode page.')),
-                        Textarea::make('maintenance.message')
-                            ->label(__('Message'))
-                            ->required()
-                            ->placeholder(__('This page is under maintenance mode. Please, come back soon! Thanks.'))
-                            ->helperText(__('Define the main message of the maintenance mode page.')),
-                        FileUpload::make('maintenance.image')
-                            ->image()
-                            ->columnSpanFull()
-                            ->helperText(__('Upload the image for maintenance page.'))
-                            ->directory('maintenance')
-                            ->label(__('Image Upload')),
+                        Group::make()
+                            ->schema([
+                                Toggle::make('maintenance.show')
+                                    ->label(__('Social Network Module'))
+                                    ->helperText(__('Show social network links if they available'))
+                                    ->inline(true)
+                                    ->default(true),
+                                TextInput::make('maintenance.title')
+                                    ->label(__('Title'))
+                                    ->required()
+                                    ->placeholder(__('Maintenance Mode'))
+                                    ->helperText(__('Define the main tittle of the maintenance mode page.')),
+                                Textarea::make('maintenance.message')
+                                    ->label(__('Message'))
+                                    ->required()
+                                    ->placeholder(__('This page is under maintenance mode. Please, come back soon! Thanks.'))
+                                    ->helperText(__('Define the main message of the maintenance mode page.')),
+                                FileUpload::make('maintenance.image')
+                                    ->image()
+                                    ->columnSpanFull()
+                                    ->helperText(__('Upload the image for maintenance page.'))
+                                    ->directory('maintenance')
+                                    ->label(__('Image Upload')),
+                            ]),
                     ]),
             ]);
     }
