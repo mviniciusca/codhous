@@ -46,7 +46,8 @@ class SettingResource extends Resource
             Pages\EditSocial::class,
             Pages\EditBudget::class,
             Pages\EditWhatsapp::class,
-            Pages\EditAddons::class
+            Pages\EditAddons::class,
+            Pages\EditMaintenance::class,
         ]);
     }
     public static function form(Form $form): Form
@@ -88,21 +89,6 @@ class SettingResource extends Resource
                             ->helperText(__('Define here the office hour of your Company.'))
                             ->maxLength(150)
                             ->required(),
-                    ]),
-                Section::make(__('Security & Management'))
-                    ->description(__('Control the visibility of application'))
-                    ->icon('heroicon-o-shield-exclamation')
-                    ->collapsible()
-                    ->columns(2)
-                    ->schema([
-                        Toggle::make('maintenance_mode')
-                            ->helperText(__('Active or disable the maintenance mode of the application'))
-                            ->label(__('Maintenance Mode'))
-                            ->inline(),
-                        Toggle::make('discovery_mode')
-                            ->helperText(__('See the application when Maintenance Mode is active'))
-                            ->label(__('Discovery Mode'))
-                            ->inline(),
                     ]),
                 Section::make(__('Modules Control'))
                     ->description(__('Control the global module visibility'))
@@ -198,6 +184,7 @@ class SettingResource extends Resource
             'edit_budget' => Pages\EditBudget::route('/{record}/edit-budget'),
             'edit_whatsapp' => Pages\EditWhatsapp::route('/{record}/edit-whatsapp'),
             'edit_addons' => Pages\EditAddons::route('/{record}/edit-addons'),
+            'edit_maintenance' => Pages\EditMaintenance::route('/{record}/edit-maintenance'),
         ];
     }
 }
