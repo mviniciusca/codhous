@@ -49,23 +49,24 @@ class EditMaintenance extends EditRecord
                     ->description(__('Configure the maintenance page design layout.'))
                     ->icon('heroicon-o-paint-brush')
                     ->collapsible()
+                    ->relationship('layout')
                     ->schema([
-                        Toggle::make('show_social')
+                        Toggle::make('maintenance.show_social')
                             ->label(__('Social Network Module'))
                             ->helperText(__('Show social network links if they available'))
                             ->inline(true)
                             ->default(true),
-                        TextInput::make('title')
+                        TextInput::make('maintenance.title')
                             ->label(__('Title'))
                             ->required()
                             ->placeholder(__('Maintenance Mode'))
                             ->helperText(__('Define the main tittle of the maintenance mode page.')),
-                        Textarea::make('message')
+                        Textarea::make('maintenance.message')
                             ->label(__('Message'))
                             ->required()
                             ->placeholder(__('This page is under maintenance mode. Please, come back soon! Thanks.'))
                             ->helperText(__('Define the main message of the maintenance mode page.')),
-                        FileUpload::make('image')
+                        FileUpload::make('maintenance.image')
                             ->image()
                             ->columnSpanFull()
                             ->helperText(__('Upload the image for maintenance page.'))
