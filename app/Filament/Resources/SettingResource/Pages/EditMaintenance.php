@@ -9,6 +9,9 @@ use Filament\Forms\Components\Section;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\SettingResource;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 
 class EditMaintenance extends EditRecord
 {
@@ -41,6 +44,25 @@ class EditMaintenance extends EditRecord
                             ->helperText(__('See the application when Maintenance Mode is active'))
                             ->label(__('Discovery Mode'))
                             ->inline(),
+                    ]),
+                Section::make(__('Maintenance Page Design'))
+                    ->description(__('Configure the maintenance page design layout'))
+                    ->icon('heroicon-o-paint-brush')
+                    ->collapsible()
+                    ->schema([
+                        TextInput::make('title')
+                            ->label(__('Title'))
+                            ->required()
+                            ->helperText(__('')),
+                        Textarea::make('message')
+                            ->label(__('Message'))
+                            ->required()
+                            ->helperText(__('')),
+                        FileUpload::make('image')
+                            ->image()
+                            ->columnSpanFull()
+                            ->directory('maintenance')
+                            ->label(__('Image Upload')),
                     ]),
             ]);
     }
