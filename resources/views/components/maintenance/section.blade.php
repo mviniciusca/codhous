@@ -6,7 +6,9 @@
                 @livewire('darkmode')
             </div>
             <div class="mx-auto max-w-screen-sm text-center">
-                <img class="w-96 mx-auto" src="{{ asset('/img/under-construction.svg') }}">
+                <img class="w-96 mx-auto rounded-xl mb-4 object-center" src="{{ $layout['image'] ? 
+                    asset('storage/' . $layout['image']) :
+                     asset('/img/under-construction.svg') }}">
                 <p class="mb-4 text-3xl tracking-tight font-bold md:text-4xl">
                     {{ $layout['title'] ?? __('Maintenance Mode') }}
                 </p>
@@ -14,13 +16,12 @@
                     {{ $layout['message'] ??
                     __('This application is under Maintenance. Please, come back soon. Thanks') }}
                 </p>
-
+                {{-- Scoial Network Module --}}
                 @if($layout['show'])
                 <span>
                     <x-ui.social-network :size="'big'" />
                 </span>
                 @endif
-
             </div>
         </div>
     </section>
