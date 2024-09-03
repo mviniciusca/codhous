@@ -58,6 +58,7 @@ class EditMaintenance extends EditRecord
                     ->relationship('layout')
                     ->schema([
                         Group::make()
+                            ->columns(3)
                             ->schema([
                                 Toggle::make('maintenance.show')
                                     ->label(__('Social Network Module'))
@@ -65,21 +66,22 @@ class EditMaintenance extends EditRecord
                                     ->inline(true)
                                     ->default(true),
                                 TextInput::make('maintenance.title')
+                                    ->columnSpan(2)
                                     ->label(__('Title'))
                                     ->required()
                                     ->placeholder(__('Maintenance Mode'))
                                     ->helperText(__('Define the main tittle of the maintenance mode page.')),
-                                Textarea::make('maintenance.message')
-                                    ->label(__('Message'))
-                                    ->required()
-                                    ->placeholder(__('This page is under maintenance mode. Please, come back soon! Thanks.'))
-                                    ->helperText(__('Define the main message of the maintenance mode page.')),
                                 FileUpload::make('maintenance.image')
                                     ->image()
-                                    ->columnSpanFull()
                                     ->helperText(__('Upload the image for maintenance page.'))
                                     ->directory('maintenance')
                                     ->label(__('Image Upload')),
+                                Textarea::make('maintenance.message')
+                                    ->label(__('Message'))
+                                    ->columnSpan(2)
+                                    ->required()
+                                    ->placeholder(__('This page is under maintenance mode. Please, come back soon! Thanks.'))
+                                    ->helperText(__('Define the main message of the maintenance mode page.')),
                             ]),
                     ]),
             ]);
