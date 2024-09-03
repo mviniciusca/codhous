@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\SettingResource\Pages;
 
 use Filament\Actions;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Toggle;
@@ -38,10 +40,13 @@ class EditMaintenance extends EditRecord
                     ->columns(2)
                     ->schema([
                         Toggle::make('maintenance_mode')
+                            ->live()
                             ->helperText(__('Active or disable the maintenance mode of the application.'))
                             ->label(__('Maintenance Mode'))
+                            ->afterStateUpdated(fn(Set $set): bool => $set('discovery_mode', false))
                             ->inline(),
                         Toggle::make('discovery_mode')
+                            ->visible(fn(Get $get): bool => $get('maintenance_mode'))
                             ->helperText(__('See the application when Maintenance Mode is active.'))
                             ->label(__('Discovery Mode'))
                             ->inline(),
