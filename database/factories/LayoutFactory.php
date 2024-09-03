@@ -24,7 +24,12 @@ class LayoutFactory extends Factory
                 'bg_attachment' => 'bg-scroll',
                 'bg_size' => 'bg-cover',
                 'bg_height' => 680,
-            ]
+            ],
+            'maintenance' => [
+                'show' => true,
+                'title' => 'Maintenance Mode',
+                'message' => 'This application is under maintenance. Please, come back soon. Thanks!',
+            ],
         ];
     }
 }
