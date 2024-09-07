@@ -14,7 +14,6 @@ use App\Filament\Resources\MailResource\Pages\ReadMail;
 use App\Filament\Resources\MailResource\Pages\SentMail;
 use App\Filament\Resources\MailResource\Pages\SpamMail;
 use App\Filament\Resources\NewsletterResource\Pages\SubscriberBin;
-use App\Filament\Resources\SettingResource;
 use App\Filament\Resources\SettingResource\Pages\EditSetting;
 use Filament\Pages;
 use Filament\Panel;
