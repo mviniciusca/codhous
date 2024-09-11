@@ -16,13 +16,28 @@ class SubscribersWidget extends BaseWidget
             Stat::make('Application Status', '')
                 ->icon('heroicon-o-wrench-screwdriver')
                 ->value(view('components.badge', [
-                    'status' => Setting::select(['discovery_mode', 'maintenance_mode'])->first()
+                    'status' => Setting::select(['discovery_mode', 'maintenance_mode'])
+                        ->first()
                 ]))
-                ->description(Setting::first()->maintenance_mode ? __('Maintenance Mode is Active') : __('Application is Live'))
+                ->description(Setting::first()
+                    ->maintenance_mode ?
+                    __('Maintenance Mode is Active') : __('Application is Live'))
                 ->color('secondary'),
-            Stat::make('Subscribers', $this->count())->icon('heroicon-o-wrench-screwdriver')->description('32k increase')->descriptionIcon('heroicon-m-arrow-trending-up'),
-            Stat::make('Subscribers', $this->count())->icon('heroicon-o-wrench-screwdriver')->description('32k increase')->descriptionIcon('heroicon-m-arrow-trending-up'),
-            Stat::make('Subscribers', $this->count())->icon('heroicon-o-wrench-screwdriver')->description('32k increase')->descriptionIcon('heroicon-m-arrow-trending-up'),
+
+            Stat::make('Subscribers', $this->count())
+                ->icon('heroicon-o-envelope')
+                ->description('32k increase')
+                ->descriptionIcon('heroicon-m-arrow-trending-up'),
+
+            Stat::make('Subscribers', $this->count())
+                ->icon('heroicon-o-currency-dollar')
+                ->description('32k increase')
+                ->descriptionIcon('heroicon-m-arrow-trending-up'),
+
+            Stat::make('Subscribers', $this->count())
+                ->icon('heroicon-o-wrench-screwdriver')
+                ->description('32k increase')
+                ->descriptionIcon('heroicon-m-arrow-trending-up'),
         ];
     }
 
