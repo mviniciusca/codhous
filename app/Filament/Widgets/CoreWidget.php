@@ -10,7 +10,7 @@ use Filament\Widgets\TableWidget as BaseWidget;
 class CoreWidget extends BaseWidget
 {
     // protected int|string|array $columnSpan = 'full';
-    protected static ?int $sort = 0;
+    protected static ?int $sort = 1;
     public function table(Table $table): Table
     {
         return $table
