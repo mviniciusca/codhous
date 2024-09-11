@@ -18,8 +18,8 @@ class SubscribersWidget extends BaseWidget
                 ->value(view('components.badge', [
                     'status' => Setting::select(['discovery_mode', 'maintenance_mode'])->first()
                 ]))
-                ->description(Setting::first()->maintenance_mode ? 'Maintenance Mode' : 'Application is Live')
-                ->color('primary'),
+                ->description(Setting::first()->maintenance_mode ? __('Maintenance Mode is Active') : __('Application is Live'))
+                ->color('secondary'),
             Stat::make('Subscribers', $this->count())->icon('heroicon-o-wrench-screwdriver')->description('32k increase')->descriptionIcon('heroicon-m-arrow-trending-up'),
             Stat::make('Subscribers', $this->count())->icon('heroicon-o-wrench-screwdriver')->description('32k increase')->descriptionIcon('heroicon-m-arrow-trending-up'),
             Stat::make('Subscribers', $this->count())->icon('heroicon-o-wrench-screwdriver')->description('32k increase')->descriptionIcon('heroicon-m-arrow-trending-up'),

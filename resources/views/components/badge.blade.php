@@ -11,13 +11,19 @@
 
     @if(!$status->maintenance_mode)
     <span
-        class="animate-pulse rounded-md bg-green-600 px-3 py-1 text-xs leading-normal tracking-normal text-white">Live</span>
+        class="animate-pulse rounded-md dark:bg-white bg-primary-500 px-3 py-1 text-xs leading-normal tracking-normal dark:text-primary-600 text-white">
+        {{ __('Live') }}
+    </span>
     @else
     <span
-        class="animate-pulse rounded-md bg-danger-600 px-3 py-1 text-xs leading-normal tracking-normal text-white">Off</span>
+        class="animate-pulse rounded-md dark:bg-white bg-primary-500 px-3 py-1 text-xs leading-normal tracking-normal dark:text-primary-600 text-white">
+        {{ __('Maintenance') }}
+    </span>
     @if($status->discovery_mode)
     <span
-        class="animate-pulse rounded-md bg-secondary-600 px-3 py-1 text-xs leading-normal tracking-normal text-white">Discovery</span>
+        class="animate-pulse rounded-md dark:bg-white bg-primary-500 px-3 py-1 text-xs leading-normal tracking-normal dark:text-primary-600 text-white">
+        {{ __('Discovery') }}
+    </span>
     @endif
     @endif
 
