@@ -28,12 +28,12 @@ class SubscribersWidget extends BaseWidget
                     __('Maintenance Mode is Active') : __('Application is Live'))
                 ->color('secondary'),
 
-            Stat::make('Subscribers', Newsletter::count())
+            Stat::make('Mailing List', Newsletter::count())
                 ->icon('heroicon-o-envelope')
                 ->chart($this->chartData()->toArray())
                 ->color('primary')
-                ->description('32k increase')
-                ->descriptionIcon('heroicon-m-arrow-trending-up'),
+                ->description(__('Your Subscribers'))
+                ->descriptionIcon('heroicon-m-user'),
 
             Stat::make('Subscribers', 20)
                 ->icon('heroicon-o-currency-dollar')
