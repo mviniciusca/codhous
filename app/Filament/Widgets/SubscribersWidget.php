@@ -2,8 +2,11 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Newsletter;
 use App\Models\Setting;
+use App\Models\Newsletter;
+use Flowframe\Trend\Trend;
+use Flowframe\Trend\TrendValue;
+use Filament\Notifications\Collection;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
@@ -27,21 +30,40 @@ class SubscribersWidget extends BaseWidget
 
             Stat::make('Subscribers', Newsletter::count())
                 ->icon('heroicon-o-envelope')
-                ->chart([10, 24, 1])
+                ->chart($this->chartData()->toArray())
                 ->color('primary')
                 ->description('32k increase')
                 ->descriptionIcon('heroicon-m-arrow-trending-up'),
 
-            Stat::make('Subscribers', $this->count())
+            Stat::make('Subscribers', 20)
                 ->icon('heroicon-o-currency-dollar')
                 ->description('32k increase')
                 ->descriptionIcon('heroicon-m-arrow-trending-up'),
 
-            Stat::make('Subscribers', $this->count())
+            Stat::make('Subscribers', 30)
                 ->icon('heroicon-o-wrench-screwdriver')
                 ->description('32k increase')
                 ->descriptionIcon('heroicon-m-arrow-trending-up'),
         ];
+    }
+
+    /**
+     * Summary of chartData
+     * @return \Filament\Notifications\Collection
+     */
+    public function chartData()
+    {
+        $data = Trend::model(Newsletter::class)
+            ->between(
+                start: now()->startOfYear(),
+                end: now(),
+            )
+            ->perMonth()
+            ->count();
+
+        $data = $data->map(fn(TrendValue $value) => $value->aggregate);
+
+        return $data;
     }
 
 }
