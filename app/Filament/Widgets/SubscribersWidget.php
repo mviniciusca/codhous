@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Budget;
+use App\Models\Customer;
 use App\Models\Setting;
 use App\Models\Newsletter;
 use Flowframe\Trend\Trend;
@@ -35,12 +37,13 @@ class SubscribersWidget extends BaseWidget
                 ->description(__('Your Subscribers'))
                 ->descriptionIcon('heroicon-m-user'),
 
-            Stat::make('Subscribers', 20)
+            Stat::make('Budgets', Budget::count())
                 ->icon('heroicon-o-currency-dollar')
-                ->description('32k increase')
-                ->descriptionIcon('heroicon-m-arrow-trending-up'),
+                ->description(__('Total of Budgets'))
+                ->descriptionIcon('heroicon-m-wallet')
+                ->color('primary'),
 
-            Stat::make('Subscribers', 30)
+            Stat::make(__('Customers'), Customer::count())
                 ->icon('heroicon-o-wrench-screwdriver')
                 ->description('32k increase')
                 ->descriptionIcon('heroicon-m-arrow-trending-up'),
