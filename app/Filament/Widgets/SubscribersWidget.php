@@ -33,20 +33,20 @@ class SubscribersWidget extends BaseWidget
             Stat::make('Mailing List', Newsletter::count())
                 ->icon('heroicon-o-envelope')
                 ->chart($this->chartData()->toArray())
-                ->color('primary')
-                ->description(__('Your Subscribers'))
-                ->descriptionIcon('heroicon-m-user'),
 
-            Stat::make('Budgets', Budget::count())
+                ->description(__('Your Subscribers'))
+                ->descriptionIcon('heroicon-m-inbox-stack'),
+
+            Stat::make(__('Budgets'), Budget::count())
                 ->icon('heroicon-o-currency-dollar')
                 ->description(__('Total of Budgets'))
                 ->descriptionIcon('heroicon-m-wallet')
-                ->color('primary'),
+            ,
 
             Stat::make(__('Customers'), Customer::count())
                 ->icon('heroicon-o-wrench-screwdriver')
                 ->description('32k increase')
-                ->descriptionIcon('heroicon-m-arrow-trending-up'),
+                ->descriptionIcon('heroicon-m-user'),
         ];
     }
 
