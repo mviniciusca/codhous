@@ -10,6 +10,7 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 class SubscribersWidget extends BaseWidget
 {
     protected static ?int $sort = 0;
+    protected static ?string $pollingInterval = '10s';
     protected function getStats(): array
     {
         return [
@@ -24,8 +25,10 @@ class SubscribersWidget extends BaseWidget
                     __('Maintenance Mode is Active') : __('Application is Live'))
                 ->color('secondary'),
 
-            Stat::make('Subscribers', $this->count())
+            Stat::make('Subscribers', Newsletter::count())
                 ->icon('heroicon-o-envelope')
+                ->chart([10, 24, 1])
+                ->color('primary')
                 ->description('32k increase')
                 ->descriptionIcon('heroicon-m-arrow-trending-up'),
 
@@ -41,8 +44,4 @@ class SubscribersWidget extends BaseWidget
         ];
     }
 
-    public function count(): ?int
-    {
-        return Newsletter::all()->count();
-    }
 }
