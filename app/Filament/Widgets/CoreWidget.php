@@ -14,7 +14,8 @@ class CoreWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('Modules'))
+            ->heading(__('Quick Access'))
+            ->description(__('Manage your app modules here.'))
             ->query(Module::query()
                 ->select()
                 ->take(5))
