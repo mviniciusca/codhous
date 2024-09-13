@@ -19,7 +19,7 @@ class CoreWidget extends BaseWidget
             ->heading(__('Quick Access'))
             ->headerActions([
                 Action::make('settings')
-                    ->icon('heroicon-o-envelope')
+                    ->icon('heroicon-o-cog-6-tooth')
                     ->url(route('filament.admin.resources.settings.edit', Setting::first()->id))
             ])
             ->description(__('Manage your app modules here.'))
