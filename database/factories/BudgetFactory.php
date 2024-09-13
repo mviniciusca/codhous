@@ -34,7 +34,12 @@ class BudgetFactory extends Factory
                 'postcode' => $this->faker->postcode(),
                 'customer_name' => $this->faker->name(),
                 'customer_email' => $this->faker->email(),
-                'customer_phone' => $this->faker->phoneNumber()
+                'customer_phone' => $this->faker->phoneNumber(),
+                'street' => $this->faker->streetAddress(),
+                'number' => $this->faker->randomNumber(),
+                'city' => $this->faker->city(),
+                'neighborhood' => $this->faker->city(),
+                'state' => $this->faker->countryCode(),
             ]
         ];
     }
