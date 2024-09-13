@@ -28,7 +28,7 @@ class MaintenanceWidget extends BaseWidget
                 Action::make('edit')
                     ->label(__('Settings'))
                     ->color('primary')
-                    ->url(route('filament.admin.resources.settings.edit', 'app'))
+                    ->url(route('filament.admin.resources.settings.edit', Setting::first()->id))
             ])
             ->columns([
                 ToggleColumn::make('maintenance_mode')
