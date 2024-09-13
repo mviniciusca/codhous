@@ -14,20 +14,25 @@ class CoreWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('Core Features'))
+            ->heading(__('Modules'))
             ->query(Module::query()
                 ->select()
                 ->take(5))
             ->columns([
                 ToggleColumn::make('module.header')
+                    ->alignCenter()
                     ->label(__('Header')),
                 ToggleColumn::make('module.contact')
+                    ->alignCenter()
                     ->label(__('Contact')),
                 ToggleColumn::make('module.budget')
+                    ->alignCenter()
                     ->label(__('Budget Tool')),
                 ToggleColumn::make('module.newsletter')
+                    ->alignCenter()
                     ->label(__('Newsletter')),
                 ToggleColumn::make('module.footer')
+                    ->alignCenter()
                     ->label(__('Footer')),
             ])
             ->paginated(false);
