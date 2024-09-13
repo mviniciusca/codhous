@@ -27,9 +27,6 @@ class MailWidget extends BaseWidget
                 TextColumn::make('name')
                     ->label(__('Name'))
                     ->limit(30),
-                TextColumn::make('email')
-                    ->label(__('Email'))
-                    ->limit(30),
                 TextColumn::make('subject')
                     ->label(__('Subject'))
                     ->limit(30),
