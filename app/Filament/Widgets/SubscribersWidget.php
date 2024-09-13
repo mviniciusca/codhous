@@ -30,20 +30,22 @@ class SubscribersWidget extends BaseWidget
                     __('Maintenance Mode is Active') : __('Application is Live'))
                 ->color('secondary'),
 
-            Stat::make('Mailing List', Newsletter::count())
+            Stat::make('Mailing List', Newsletter::withoutTrashed()->count())
                 ->icon('heroicon-o-envelope')
-                ->chart($this->chartData()->toArray())
+                ->chart($this->chartData(Newsletter::class)->toArray())
                 ->description(__('Your Subscribers'))
                 ->descriptionIcon('heroicon-m-inbox-stack'),
 
-            Stat::make(__('Budgets'), Budget::count())
+            Stat::make(__('Budgets'), Budget::withoutTrashed()->count())
                 ->icon('heroicon-o-currency-dollar')
+                ->chart($this->chartData(Budget::class)->toArray())
                 ->description(__('Total of Budgets'))
                 ->descriptionIcon('heroicon-m-wallet'),
 
-            Stat::make(__('Customers'), Customer::count())
+            Stat::make(__('Customers'), Customer::withoutTrashed()->count())
                 ->icon('heroicon-o-wrench-screwdriver')
-                ->description('32k increase')
+                ->chart($this->chartData(Customer::class)->toArray())
+                ->description(__('Total of Customers'))
                 ->descriptionIcon('heroicon-m-user'),
         ];
     }
@@ -52,9 +54,9 @@ class SubscribersWidget extends BaseWidget
      * Summary of chartData
      * @return \Filament\Notifications\Collection
      */
-    public function chartData()
+    public function chartData($model)
     {
-        $data = Trend::model(Newsletter::class)
+        $data = Trend::model($model)
             ->between(
                 start: now()->startOfYear(),
                 end: now(),

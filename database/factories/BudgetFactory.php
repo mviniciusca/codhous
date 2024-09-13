@@ -17,6 +17,7 @@ class BudgetFactory extends Factory
     public function definition(): array
     {
         return [
+            'created_at' => $this->faker->dateTimeBetween(date('2024-01-01')),
             'code' => $this->faker->numerify('###'),
             'is_active' => $this->faker->boolean(),
             'status' => $this->faker->randomElement([

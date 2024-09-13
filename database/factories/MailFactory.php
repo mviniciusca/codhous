@@ -26,6 +26,7 @@ class MailFactory extends Factory
             'is_favorite' => $this->faker->boolean(),
             'is_spam' => $this->faker->boolean(),
             'is_sent' => $this->faker->boolean(),
+            'created_at' => $this->faker->dateTimeBetween(date('2024-01-01')),
         ];
     }
 }
