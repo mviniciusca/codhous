@@ -15,7 +15,10 @@ class BudgetWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->description(__('Quick view in your pending budgets here.'))
+            ->recordUrl(
+                fn(Budget $record): string => route('filament.admin.resources.budgets.edit', ['record' => $record]),
+            )
+            ->description(__('Quick view in your pending and active budgets here.'))
             ->headerActions([
                 Action::make('edit')
                     ->label(__('Budgets'))
@@ -25,6 +28,7 @@ class BudgetWidget extends BaseWidget
             ->heading(__(
                 'Budget (' .
                 Budget::where('status', '=', 'pending')
+                    ->where('is_active', '=', true)
                     ->count()
             ) . ')')
             ->query(
