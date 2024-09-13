@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Mail;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
@@ -47,10 +48,11 @@ class MailWidget extends BaseWidget
             ->actions([
                 ActionGroup::make([
                     ViewAction::make()
+                        ->modalHeading(__('Quick View: Mail'))
                         ->label(__('Quick View'))
                         ->form([
                             Group::make()
-                                ->columns(3)
+                                ->columns(2)
                                 ->schema([
                                     TextInput::make('name')
                                         ->helperText(__('Sender\'s Name'))
@@ -61,6 +63,9 @@ class MailWidget extends BaseWidget
                                     TextInput::make('subject')
                                         ->helperText(__('Message Subject'))
                                         ->label(__('Subject')),
+                                    DatePicker::make('created_at')
+                                        ->label(__('Received'))
+                                        ->format('d/m/Y H:i'),
                                     Textarea::make('message')
                                         ->helperText(__('Sender\'s Message'))
                                         ->rows(3)
