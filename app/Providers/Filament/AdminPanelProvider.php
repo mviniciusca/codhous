@@ -45,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 __('Budget'),
                 __('Mail'),
-                __('Customer'),
+                __('Customers & Partners'),
             ])
             ->navigationItems([
                 /** Budgets */
