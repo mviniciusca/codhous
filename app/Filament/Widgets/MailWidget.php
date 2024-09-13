@@ -7,6 +7,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Tables\Actions\Action;
 
 class MailWidget extends BaseWidget
 {
@@ -30,6 +31,12 @@ class MailWidget extends BaseWidget
                 TextColumn::make('subject')
                     ->label(__('Subject'))
                     ->limit(30),
+            ])
+            ->headerActions([
+                Action::make('edit')
+                    ->label(__('Inbox'))
+                    ->icon('heroicon-o-envelope')
+                    ->url(route('filament.admin.resources.mails.index'))
             ])
             ->heading(__('Inbox (' .
                 Mail::where('is_read', false)
