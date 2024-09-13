@@ -27,6 +27,7 @@ use App\Filament\Resources\PartnerResource\RelationManagers;
 class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
+    protected static ?string $navigationGroup = 'Customers & Partners';
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
     public static function getNavigationBadge(): ?string
     {

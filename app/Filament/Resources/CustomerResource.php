@@ -25,10 +25,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
-    protected static ?string $navigationGroup = 'Customer';
+    protected static ?string $navigationGroup = 'Customers & Partners';
     public static function getNavigationLabel(): string
     {
-        return __('Customer');
+        return __('Customers');
     }
     protected static ?string $navigationIcon = 'heroicon-o-user';
 

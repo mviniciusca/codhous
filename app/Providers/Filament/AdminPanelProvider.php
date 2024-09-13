@@ -116,12 +116,12 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(4),
                 /** Customers */
                 NavigationItem::make('customer')
-                    ->label(fn(): string => __('Customer'))
+                    ->label(fn(): string => __('Customers'))
                     ->url(fn(): string => CustomerResource::getUrl())
                     ->badge(fn(): ?string => CustomerResource::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.index'))
                     ->icon('heroicon-o-user')
-                    ->group(__('Customer'))
+                    ->group(__('Customers & Partners'))
                     ->sort(1),
                 NavigationItem::make('customer_bin')
                     ->label(fn(): string => __('Trash'))
@@ -129,7 +129,7 @@ class AdminPanelProvider extends PanelProvider
                     ->badge(fn(): ?string => CustomerBin::count())
                     ->icon('heroicon-o-trash')
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.bin'))
-                    ->group(__('Customer'))
+                    ->group(__('Customers & Partners'))
                     ->sort(2),
                 /** Mailing List */
                 NavigationItem::make('subscriber_bin')
