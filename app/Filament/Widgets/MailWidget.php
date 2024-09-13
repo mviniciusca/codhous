@@ -10,8 +10,8 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class MailWidget extends BaseWidget
 {
-    protected static ?int $sort = 1;
-    //protected int|string|array $columnSpan = 'full';
+    protected static ?int $sort = 5;
+    protected int|string|array $columnSpan = 'full';
     public function table(Table $table): Table
     {
         return $table
@@ -26,10 +26,19 @@ class MailWidget extends BaseWidget
                 TextColumn::make('name')
                     ->label(__('Name'))
                     ->limit(30),
+                TextColumn::make('email')
+                    ->label(__('Email'))
+                    ->limit(30),
                 TextColumn::make('subject')
                     ->label(__('Subject'))
                     ->limit(30),
             ])
+            ->heading(__('Inbox (' .
+                Mail::where('is_read', false)
+                    ->where('is_sent', false)
+                    ->where('is_spam', false)
+                    ->withoutTrashed()
+                    ->count()) . ')')
             ->striped()
             ->paginated(false);
     }
