@@ -26,10 +26,10 @@ class MaintenanceWidget extends BaseWidget
             ->striped()
             ->headerActions([
                 Action::make('edit')
-                    ->label(__('Settings'))
-                    ->icon('heroicon-o-cog-6-tooth')
+                    ->label(__('Security'))
+                    ->icon('heroicon-o-shield-check')
                     ->color('primary')
-                    ->url(route('filament.admin.resources.settings.edit', Setting::first()->id))
+                    ->url(route('filament.admin.resources.settings.edit_maintenance', Setting::first()->id))
             ])
             ->columns([
                 ToggleColumn::make('maintenance_mode')
