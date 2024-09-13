@@ -47,12 +47,6 @@ class SubscribersWidget extends BaseWidget
                 ->chart($this->chartData(Customer::class)->toArray())
                 ->description(__('Total of Customers'))
                 ->descriptionIcon('heroicon-m-user'),
-
-            Stat::make(__('Customers'), Customer::withoutTrashed()->count())
-                ->icon('heroicon-o-wrench-screwdriver')
-                ->chart($this->chartData(Customer::class)->toArray())
-                ->description(__('Total of Customers'))
-                ->descriptionIcon('heroicon-m-user'),
         ];
     }
 
