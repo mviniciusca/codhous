@@ -3,16 +3,17 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Mail;
-use Filament\Forms\Components\Textarea;
 use Filament\Tables;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class MailWidget extends BaseWidget
@@ -48,10 +49,24 @@ class MailWidget extends BaseWidget
                     ViewAction::make()
                         ->label(__('Quick View'))
                         ->form([
-                            TextInput::make('name'),
-                            TextInput::make('email'),
-                            TextInput::make('subject'),
-                            Textarea::make('message'),
+                            Group::make()
+                                ->columns(3)
+                                ->schema([
+                                    TextInput::make('name')
+                                        ->helperText(__('Sender\'s Name'))
+                                        ->label(__('Name')),
+                                    TextInput::make('email')
+                                        ->helperText(__('Sender\'s Email address'))
+                                        ->label(__('Email')),
+                                    TextInput::make('subject')
+                                        ->helperText(__('Message Subject'))
+                                        ->label(__('Subject')),
+                                    Textarea::make('message')
+                                        ->helperText(__('Sender\'s Message'))
+                                        ->rows(3)
+                                        ->columnSpanFull()
+                                        ->label(__('Message')),
+                                ]),
                         ]),
                     DeleteAction::make()
                         ->requiresConfirmation(),
