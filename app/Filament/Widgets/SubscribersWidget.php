@@ -43,7 +43,7 @@ class SubscribersWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-wallet'),
 
             Stat::make(__('Customers'), Customer::withoutTrashed()->count())
-                ->icon('heroicon-o-wrench-screwdriver')
+                ->icon('heroicon-o-user')
                 ->chart($this->chartData(Customer::class)->toArray())
                 ->description(__('Total of Customers'))
                 ->descriptionIcon('heroicon-m-user'),
