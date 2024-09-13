@@ -3,7 +3,9 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Module;
+use App\Models\Setting;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Widgets\TableWidget as BaseWidget;
 
@@ -15,6 +17,11 @@ class CoreWidget extends BaseWidget
     {
         return $table
             ->heading(__('Quick Access'))
+            ->headerActions([
+                Action::make('settings')
+                    ->icon('heroicon-o-envelope')
+                    ->url(route('filament.admin.resources.settings.edit', Setting::first()->id))
+            ])
             ->description(__('Manage your app modules here.'))
             ->query(Module::query()
                 ->select()
