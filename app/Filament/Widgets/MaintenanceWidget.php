@@ -27,6 +27,7 @@ class MaintenanceWidget extends BaseWidget
             ->headerActions([
                 Action::make('edit')
                     ->label(__('Settings'))
+                    ->icon('heroicon-o-cog-6-tooth')
                     ->color('primary')
                     ->url(route('filament.admin.resources.settings.edit', Setting::first()->id))
             ])
