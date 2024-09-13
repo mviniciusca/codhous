@@ -15,8 +15,11 @@ class BudgetWidget extends BaseWidget
     {
         return $table
             ->description(__('Quick view in your pending budgets here.'))
-            ->heading(__('Budget (' .
-                Budget::count()) . ')')
+            ->heading(__(
+                'Budget (' .
+                Budget::where('status', '=', 'pending')
+                    ->count()
+            ) . ')')
             ->query(
                 Budget::query()
                     ->select()
