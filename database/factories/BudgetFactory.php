@@ -30,7 +30,7 @@ class BudgetFactory extends Factory
 
                 'fck' => $this->faker->randomElement([10, 20, 30, 40, 50]),
                 'type' => $this->faker->randomElement(['bombeado', 'usinado']),
-                'object' => $this->faker->randomElement(['floor', 'indoor', 'pool']),
+                'area' => $this->faker->randomElement(['floor', 'indoor', 'pool']),
                 'quantity' => $this->faker->randomElement([10, 20, 5]),
 
                 'postcode' => $this->faker->postcode(),
