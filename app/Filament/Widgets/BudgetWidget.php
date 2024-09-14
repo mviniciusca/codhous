@@ -4,9 +4,11 @@ namespace App\Filament\Widgets;
 
 use Filament\Tables;
 use App\Models\Budget;
+use App\Models\Setting;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class BudgetWidget extends BaseWidget
@@ -15,6 +17,7 @@ class BudgetWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->recordUrl(
                 fn(Budget $record): string => route('filament.admin.resources.budgets.edit', ['record' => $record]),
             )
@@ -35,6 +38,7 @@ class BudgetWidget extends BaseWidget
                 Budget::query()
                     ->select()
                     ->where('status', '=', 'pending')
+                    ->where('is_active', '=', true)
                     ->take(5)
             )
             ->paginated(false)
@@ -44,10 +48,8 @@ class BudgetWidget extends BaseWidget
                     ->label(__('Code')),
                 TextColumn::make('content.customer_name')
                     ->label(__('Customer Name')),
-                TextColumn::make('content.type')
-                    ->label(__('Type')),
-                TextColumn::make('content.area')
-                    ->label(__('Area / Local')),
+                TextColumn::make('content.object')
+                    ->label(__('Local / Area')),
             ]);
     }
 }

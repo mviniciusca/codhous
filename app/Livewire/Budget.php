@@ -118,7 +118,7 @@ class Budget extends Component implements HasForms
                                             ->options(
                                                 Setting::select(['budget'])
                                                     ->get()
-                                                    ->pluck('budget.area', 'id')
+                                                    ->pluck('budget.object', 'id')
                                             )
                                             ->required()
                                             ->helperText(__('Local or area to be concreted')),
