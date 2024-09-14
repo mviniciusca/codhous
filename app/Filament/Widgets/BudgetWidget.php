@@ -49,7 +49,7 @@ class BudgetWidget extends BaseWidget
                 TextColumn::make('content.customer_name')
                     ->label(__('Customer Name')),
                 TextColumn::make('content.area')
-                    ->label(__('Local / Area')),
+                    ->label(__('Area')),
             ]);
     }
 }
