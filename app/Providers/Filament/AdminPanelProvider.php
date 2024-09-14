@@ -46,6 +46,11 @@ class AdminPanelProvider extends PanelProvider
                 __('Budget'),
                 __('Mail'),
                 __('Customers & Partners'),
+                __('Mailing'),
+                __('Settings'),
+            ])
+            ->resources([
+                config('filament-logger.activity_resource')
             ])
             ->navigationItems([
                 /** Budgets */
@@ -140,11 +145,11 @@ class AdminPanelProvider extends PanelProvider
                     ->group(__('Mailing'))
                     ->sort(2),
                 /** App Setting */
-                NavigationItem::make('setting')
+                NavigationItem::make('settings')
                     ->label(fn(): string => __('App Settings'))
                     ->url(fn(): string => EditSetting::getUrl([1]))
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->group(__('Setting'))
+                    ->group(__('Settings'))
                     ->sort(1),
             ])
             ->plugins([
