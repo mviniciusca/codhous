@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Filament\Exports\BudgetExporter;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Filters\SelectFilter;
@@ -195,8 +196,9 @@ class BudgetResource extends Resource
     {
         return $table
             ->headerActions([
-                ExportAction::make()
-                    ->exporter(BudgetExporter::class)
+                CreateAction::make()
+                    ->icon('heroicon-o-currency-dollar')
+                    ->label(__('New Budget')),
             ])
             ->columns([
                 TextColumn::make('code')
