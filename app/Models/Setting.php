@@ -3,15 +3,16 @@
 namespace App\Models;
 
 use App\Models\Budget;
-use App\Models\Contact;
 use App\Models\Layout;
 use App\Models\Module;
-use App\Models\Navigation;
+use App\Models\Contact;
 use App\Models\Partner;
+use App\Models\Product;
+use App\Models\Navigation;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Setting extends Model
 {
@@ -24,6 +25,15 @@ class Setting extends Model
             'social' => 'array',
             'whatsapp' => 'array',
         ];
+    }
+
+    /**
+     * Summary of product
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function product(): HasOne
+    {
+        return $this->hasOne(Product::class);
     }
 
     /**

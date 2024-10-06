@@ -2,17 +2,18 @@
 
 namespace App\Filament\Resources\SettingResource\Pages;
 
-use App\Filament\Resources\SettingResource;
 use Filament\Actions;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Form;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Contracts\Support\Htmlable;
+use App\Filament\Resources\SettingResource;
+use Filament\Forms\Components\Actions\Action;
 
 class EditBudget extends EditRecord
 {
@@ -50,7 +51,7 @@ class EditBudget extends EditRecord
                             ->placeholder(__('press enter to add'))
                             ->helperText(__('Enter the values of FCK that your company works')),
                         TagsInput::make('budget.type')
-                            ->label(__('Type'))
+                            ->label(__('Product'))
                             ->placeholder(__('press enter to add'))
                             ->required()
                             ->helperText(__('Enter the type of concrete that your company works')),
@@ -59,6 +60,39 @@ class EditBudget extends EditRecord
                             ->placeholder(__('press enter to add'))
                             ->required()
                             ->helperText(__('Enter the local or area that your company works')),
+                    ]),
+                Section::make(__('Products Basket'))
+                    ->footerActions([
+                        Action::make('save')
+                            ->color('success')
+                            ->label(__('Save'))
+                    ])
+                    ->relationship('product')
+                    ->description(__('Add products in your budget tool. Prices are hidden for your customers.'))
+                    ->icon('heroicon-o-shopping-bag')
+                    ->schema([
+                        Repeater::make('content')
+                            ->label(__('Products Basket'))
+                            ->cloneable()
+                            ->collapsible()
+                            ->columnSpanFull()
+                            ->columns(6)
+                            ->schema([
+                                Toggle::make('active')
+                                    ->helperText(__('Visibility'))
+                                    ->default(true)
+                                    ->inline(false),
+                                TextInput::make('name')
+                                    ->label(__('Product Name'))
+                                    ->helperText(__('Visible for visitors'))
+                                    ->columnSpan(3),
+                                TextInput::make('price')
+                                    ->helperText(__('Hidden for visitors'))
+                                    ->label(__('Price'))
+                                    ->columnSpan(2)
+                                    ->numeric()
+                                    ->prefix(env('CURRENCY_SUFFIX')),
+                            ]),
                     ]),
                 Section::make(__('Design'))
                     ->description(__('Change the design for your budget tool'))

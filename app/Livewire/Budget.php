@@ -2,16 +2,17 @@
 
 namespace App\Livewire;
 
-use App\Models\Module;
-use App\Models\User;
-use App\Notifications\NewBudget;
 use Closure;
 use Exception;
+use App\Models\User;
+use App\Models\Module;
+use App\Models\Product;
 use App\Models\Setting;
 use Filament\Forms\Set;
 use Livewire\Component;
 use Filament\Forms\Form;
 use Illuminate\Support\Str;
+use App\Notifications\NewBudget;
 use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Http;
 use App\Models\Budget as BudgetModel;
@@ -104,15 +105,18 @@ class Budget extends Component implements HasForms
                                             ->required()
                                             ->label(__('FCK'))
                                             ->helperText(__('Feature Compression Know')),
-                                        Select::make('content.type')
-                                            ->options(
-                                                Setting::select(['budget'])
-                                                    ->get()
-                                                    ->pluck('budget.type', 'id')
-                                            )
+
+
+                                        Select::make('budget.product')
+
+
+
                                             ->required()
                                             ->label(__('Type of Concrete'))
                                             ->helperText(__('Type of Concrete')),
+
+
+
                                         Select::make('content.object')
                                             ->label(__('Local / Area'))
                                             ->options(
