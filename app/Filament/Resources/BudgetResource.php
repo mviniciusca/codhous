@@ -154,37 +154,19 @@ class BudgetResource extends Resource
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                     ->disabled()
                                     ->dehydrated(),
-                                Select::make('content.object')
+                                TextInput::make('content.area')
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
-                                    ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.area')
-                                    )
                                     ->disabled()
                                     ->dehydrated(),
-                                Select::make('content.fck')
+                                TextInput::make('content.fck')
                                     ->label(__('FCK'))
                                     ->helperText(__('Feature Compression Know'))
-                                    ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.fck')
-                                    )
                                     ->disabled()
                                     ->dehydrated(),
-                                Select::make('content.type')
-                                    ->label(__('Type'))
+                                TextInput::make('content.product')
+                                    ->label(__('Product'))
                                     ->helperText(__('Type of Concrete'))
-                                    ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.type')
-                                    )
                                     ->disabled()
                                     ->dehydrated()
                             ]),

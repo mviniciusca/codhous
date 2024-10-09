@@ -3,7 +3,10 @@
 namespace App\Filament\Resources\SettingResource\Pages;
 
 use Filament\Actions;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
+use Illuminate\Support\Str;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
@@ -50,7 +53,7 @@ class EditBudget extends EditRecord
                             ->required()
                             ->placeholder(__('press enter to add'))
                             ->helperText(__('Enter the values of FCK that your company works')),
-                        TagsInput::make('budget.type')
+                        TagsInput::make('budget.product')
                             ->label(__('Product'))
                             ->placeholder(__('press enter to add'))
                             ->required()

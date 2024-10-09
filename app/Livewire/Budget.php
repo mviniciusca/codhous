@@ -100,12 +100,12 @@ class Budget extends Component implements HasForms
                                             ->options(
                                                 Setting::select(['budget'])
                                                     ->get()
-                                                    ->pluck('budget.type', 'id')
+                                                    ->pluck('budget.product', 'id')
                                             )
                                             ->required()
                                             ->label(__('Type of Concrete'))
                                             ->helperText(__('Type of Concrete')),
-                                        Select::make('content.object')
+                                        Select::make('content.area')
                                             ->label(__('Local / Area'))
                                             ->options(
                                                 Setting::select(['budget'])

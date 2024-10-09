@@ -45,8 +45,8 @@ class SettingFactory extends Factory
             /** Budget Tool */
             'budget' => [
                 'fck' => ["10", "15", "20", "25", "30", "35", "40", "45", "50"],
-                'area' => ["Floor", "Indoor"],
-                'type' => ["Usinado", "Bombeado"],
+                'area' => ["Floor", "Indoor", 'Street'],
+                'product' => ["Usinado", 'Bombeado', 'Type 3'],
             ]
         ];
     }
