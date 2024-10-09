@@ -109,24 +109,29 @@ class BudgetResource extends Resource
                                     ->schema([
                                         TextInput::make('content.customer_name')
                                             ->disabled()
+                                            ->required()
                                             ->dehydrated()
                                             ->label(__('Customer Name')),
                                         TextInput::make('content.customer_email')
                                             ->disabled()
+                                            ->required()
                                             ->dehydrated()
                                             ->label(__('Email')),
                                         TextInput::make('content.customer_phone')
                                             ->disabled()
+                                            ->required()
                                             ->dehydrated()
                                             ->label(__('Phone')),
                                     ]),
                                 TextInput::make('content.postcode')
                                     ->disabled()
+                                    ->required()
                                     ->dehydrated()
                                     ->label(__('CEP')),
                                 TextInput::make('content.street')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->required()
                                     ->label(__('Street')),
                                 TextInput::make('content.number')
                                     ->disabled()
@@ -134,14 +139,17 @@ class BudgetResource extends Resource
                                     ->label(__('Number')),
                                 TextInput::make('content.city')
                                     ->disabled()
+                                    ->required()
                                     ->dehydrated()
                                     ->label(__('City')),
                                 TextInput::make('content.neighborhood')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->required()
                                     ->label(__('Neighborhood')),
                                 TextInput::make('content.state')
                                     ->disabled()
+                                    ->required()
                                     ->dehydrated()
                                     ->label(__('State')),
                             ]),
@@ -149,22 +157,26 @@ class BudgetResource extends Resource
                             ->columns(4)
                             ->schema([
                                 TextInput::make('content.quantity')
+                                    ->required()
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                     ->disabled()
                                     ->dehydrated(),
                                 TextInput::make('content.area')
+                                    ->required()
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
                                     ->disabled()
                                     ->dehydrated(),
                                 TextInput::make('content.fck')
+                                    ->required()
                                     ->label(__('FCK'))
                                     ->helperText(__('Feature Compression Know'))
                                     ->disabled()
                                     ->dehydrated(),
                                 TextInput::make('content.product')
+                                    ->required()
                                     ->label(__('Product'))
                                     ->helperText(__('Type of Concrete'))
                                     ->disabled()

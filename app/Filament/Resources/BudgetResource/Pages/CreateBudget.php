@@ -134,14 +134,14 @@ class CreateBudget extends CreateRecord
                                     )
                                     ->disabled()
                                     ->dehydrated(),
-                                Select::make('content.type')
-                                    ->label(__('Type'))
+                                Select::make('content.product')
+                                    ->label(__('Product'))
                                     ->helperText(__('Type of Concrete'))
                                     ->options(
                                         Setting::query()
                                             ->select(['budget'])
                                             ->get()
-                                            ->pluck('budget.type')
+                                            ->pluck('budget.product')
                                     )
                                     ->disabled()
                                     ->dehydrated()
