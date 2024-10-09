@@ -2,8 +2,6 @@
 
 namespace App\Livewire;
 
-use Closure;
-use Exception;
 use App\Models\User;
 use App\Models\Module;
 use App\Models\Product;
@@ -18,18 +16,11 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Budget as BudgetModel;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Components\ToggleButtons;
-use Illuminate\Http\Client\RequestException;
 use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\MarkdownEditor;
 use Illuminate\Validation\ValidationException;
 use Filament\Forms\Concerns\InteractsWithForms;
 
@@ -44,8 +35,8 @@ class Budget extends Component implements HasForms
     {
         $this->status = $this->status();
         $this->image = $this->image();
-        $this->form->fill();
         $this->module = $this->module();
+        $this->form->fill();
     }
 
     /**
@@ -105,18 +96,15 @@ class Budget extends Component implements HasForms
                                             ->required()
                                             ->label(__('FCK'))
                                             ->helperText(__('Feature Compression Know')),
-
-
-                                        Select::make('budget.product')
-
-
-
+                                        Select::make('content.product')
+                                            ->options(
+                                                Setting::select(['budget'])
+                                                    ->get()
+                                                    ->pluck('budget.type', 'id')
+                                            )
                                             ->required()
                                             ->label(__('Type of Concrete'))
                                             ->helperText(__('Type of Concrete')),
-
-
-
                                         Select::make('content.object')
                                             ->label(__('Local / Area'))
                                             ->options(
