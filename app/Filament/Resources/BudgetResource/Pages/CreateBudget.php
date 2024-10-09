@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
+use DateTime;
 use Filament\Actions;
 use App\Models\Setting;
 use Filament\Forms\Form;
@@ -11,6 +12,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use App\Filament\Resources\BudgetResource;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Forms\Components\DateTimePicker;
@@ -34,23 +36,28 @@ class CreateBudget extends CreateRecord
                                 Toggle::make('is_active')
                                     ->helperText(__('Enable or disable this budget from the dashboard view'))
                                     ->label(__('Active'))
+                                    ->default(true)
                                     ->inline(),
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
+                                    ->disabled()
                                     ->options([
                                         'pending' => __('Pending'),
                                         'on going' => __('On Going'),
                                         'done' => __('Done'),
                                         'ignored' => __('Ignored'),
-                                    ]),
+                                    ])
+                                    ->default('pending'),
                                 TextInput::make('code')
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
-                                    ->disabled(),
+                                    ->default('ADMIN' . rand(10000, 99999)),
                                 DateTimePicker::make('created_at')
-                                    ->format('d/m/Y H:i')
+                                    ->format('d/m/Y')
+                                    ->default(now())
                                     ->label(__('Date'))
-                                    ->disabled()
                                     ->helperText(__('When this budget was created'))
                             ]),
                     ]),
@@ -68,6 +75,7 @@ class CreateBudget extends CreateRecord
                                         TextInput::make('content.customer_name')
                                             ->disabled()
                                             ->dehydrated()
+                                            ->default('Admin')
                                             ->label(__('Customer Name')),
                                         TextInput::make('content.customer_email')
                                             ->disabled()
