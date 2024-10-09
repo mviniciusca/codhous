@@ -7,7 +7,7 @@
     @foreach ($buttons as $item)
     <a target="{{ $item['target'] ? '_blank' : '_self'}}" href="{{ $item['link'] }}">
         <x-ui.button :icon="$item['icon']" :iconLeft="$item['iconLeft']" :filled="$item['filled']">
-            {{ $item['title'] }}
+            {!! $item['title'] !!}
         </x-ui.button>
     </a>
     @endforeach

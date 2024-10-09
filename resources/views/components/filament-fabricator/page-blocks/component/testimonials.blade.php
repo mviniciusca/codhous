@@ -16,8 +16,12 @@
             <figcaption class="mt-6 flex items-center justify-center space-x-3">
                 <img class="h-6 w-6 rounded-full" src="{{ asset('storage/' . $avatar) }}" alt="profile picture">
                 <div class="divide-gray-500 dark:divide-gray-700 flex items-center divide-x-2">
-                    <div class="text-gray-900 dark:text-white pr-3 font-medium">{{ $name }}</div>
-                    <div class="text-gray-500 dark:text-gray-400 pl-3 text-sm font-light">{{ $job_position }}</div>
+                    <div class="text-gray-900 dark:text-white pr-3 font-medium">
+                        {!! $name !!}
+                    </div>
+                    <div class="text-gray-500 dark:text-gray-400 pl-3 text-sm font-light">
+                        {{ $job_position }}
+                    </div>
                 </div>
             </figcaption>
         </figure>

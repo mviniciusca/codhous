@@ -15,7 +15,7 @@
 
             @if($item['title'])
             <h2 class="mb-4 text-4xl font-extrabold tracking-tight">
-                {!! $item['title']!!}
+                {!! $item['title'] !!}
             </h2>
             @endif
 

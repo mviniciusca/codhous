@@ -15,8 +15,12 @@
                 ">
                         <x-ionicon :size="'big'" :icon="$card['icon']" />
                     </div>
-                    <h3 class="mb-2 text-xl font-bold">{{ $card['title'] }}</h3>
-                    <p class="text-sm md:text-md lg:text-base"> {{ $card['info'] }} </p>
+                    <h3 class="mb-2 text-xl font-bold">
+                        {!! $card['title'] !!}
+                    </h3>
+                    <p class="text-sm md:text-md lg:text-base">
+                        {!! $card['info'] !!}
+                    </p>
                 </div>
             </a>
             @endforeach

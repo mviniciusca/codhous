@@ -13,15 +13,21 @@
             @if(!$only_images)
 
             @if($only_subtitle)
-            <p class="my-2 text-xs font-bold uppercase text-secondary-500">{{ $item['subtitle'] }}</p>
+            <p class="my-2 text-xs font-bold uppercase text-secondary-500">
+                {!! $item['subtitle'] !!}
+            </p>
             @endif
 
             @if($only_title)
-            <p class="text-xl font-bold leading-tight tracking-tight">{{ $item['title'] }}</p>
+            <p class="text-xl font-bold leading-tight tracking-tight">
+                {!! $item['title'] !!}
+            </p>
             @endif
 
             @if($only_info)
-            <p class="my-1">{{ $item['info'] }}</p>
+            <p class="my-1">
+                {!! $item['info'] !!}
+            </p>
             @endif
 
             @endif
