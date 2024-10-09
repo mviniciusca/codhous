@@ -28,7 +28,7 @@ class BudgetFactory extends Factory
             ]),
             'content' => [
                 'fck' => $this->faker->randomElement([10, 20, 30, 40, 50]),
-                'product' => 'Bombeado',
+                'product' => $this->faker->randomElement(['Bombeado', 'Usinado']),
                 'area' => $this->faker->randomElement(['Floor', 'Indoor', 'Street']),
                 'quantity' => $this->faker->randomElement([10, 20, 5]),
                 'postcode' => $this->faker->postcode(),
