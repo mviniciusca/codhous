@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
 
         Budget::factory(100)->create();
 
-        Newsletter::factory(1000)->create();
+        Newsletter::factory(10)->create();
         Mail::factory(143)->create();
         Customer::factory(36)->create();
 
