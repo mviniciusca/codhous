@@ -40,7 +40,7 @@ class CreateBudget extends CreateRecord
                                     ->inline(),
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
-                                    ->disabled()
+
                                     ->options([
                                         'pending' => __('Pending'),
                                         'on going' => __('On Going'),
@@ -49,7 +49,7 @@ class CreateBudget extends CreateRecord
                                     ])
                                     ->default('pending'),
                                 TextInput::make('code')
-                                    ->disabled()
+
                                     ->dehydrated()
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
@@ -73,41 +73,32 @@ class CreateBudget extends CreateRecord
                                     ->columnSpanFull()
                                     ->schema([
                                         TextInput::make('content.customer_name')
-                                            ->disabled()
                                             ->dehydrated()
                                             ->default('Admin')
                                             ->label(__('Customer Name')),
                                         TextInput::make('content.customer_email')
-                                            ->disabled()
                                             ->dehydrated()
                                             ->label(__('Email')),
                                         TextInput::make('content.customer_phone')
-                                            ->disabled()
                                             ->dehydrated()
                                             ->label(__('Phone')),
                                     ]),
                                 TextInput::make('content.postcode')
-                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('CEP')),
                                 TextInput::make('content.street')
-                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('Street')),
                                 TextInput::make('content.number')
-                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('Number')),
                                 TextInput::make('content.city')
-                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('City')),
                                 TextInput::make('content.neighborhood')
-                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('Neighborhood')),
                                 TextInput::make('content.state')
-                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('State')),
                             ]),
@@ -118,7 +109,6 @@ class CreateBudget extends CreateRecord
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->disabled()
                                     ->dehydrated(),
                                 Select::make('content.object')
                                     ->label(__('Local / Area'))
@@ -127,9 +117,8 @@ class CreateBudget extends CreateRecord
                                         Setting::query()
                                             ->select(['budget'])
                                             ->get()
-                                            ->pluck('budget.area')
+                                            ->pluck('budget.area', 'id')
                                     )
-                                    ->disabled()
                                     ->dehydrated(),
                                 Select::make('content.fck')
                                     ->label(__('FCK'))
@@ -138,9 +127,8 @@ class CreateBudget extends CreateRecord
                                         Setting::query()
                                             ->select(['budget'])
                                             ->get()
-                                            ->pluck('budget.fck')
+                                            ->pluck('budget.fck', 'id')
                                     )
-                                    ->disabled()
                                     ->dehydrated(),
                                 Select::make('content.product')
                                     ->label(__('Product'))
@@ -149,9 +137,8 @@ class CreateBudget extends CreateRecord
                                         Setting::query()
                                             ->select(['budget'])
                                             ->get()
-                                            ->pluck('budget.product')
+                                            ->pluck('budget.product', 'id')
                                     )
-                                    ->disabled()
                                     ->dehydrated()
                             ]),
                     ]),
