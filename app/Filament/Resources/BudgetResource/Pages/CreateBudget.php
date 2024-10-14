@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
+use Closure;
 use DateTime;
 use Filament\Actions;
 use App\Models\Setting;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Illuminate\Support\Carbon;
@@ -45,7 +47,6 @@ class CreateBudget extends CreateRecord
                                     ->inline(),
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
-
                                     ->options([
                                         'pending' => __('Pending'),
                                         'on going' => __('On Going'),
@@ -54,7 +55,6 @@ class CreateBudget extends CreateRecord
                                     ])
                                     ->default('pending'),
                                 TextInput::make('code')
-
                                     ->dehydrated()
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
@@ -145,9 +145,11 @@ class CreateBudget extends CreateRecord
                             ->columns(4)
                             ->schema([
                                 TextInput::make('content.quantity')
+                                    ->live()
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                    ->afterStateUpdated(fn(Set $set, string $state) => $set('quantity', $state))
                                     ->dehydrated(),
                                 Select::make('content.object')
                                     ->label(__('Local / Area'))
@@ -181,6 +183,68 @@ class CreateBudget extends CreateRecord
                                     ->dehydrated()
                             ]),
                     ]),
+                Section::make(__('Pricing'))
+                    ->icon('heroicon-o-currency-dollar')
+                    ->description(__('Pricing Definition & Total Cost'))
+                    ->columns(5)
+                    ->schema([
+                        TextInput::make('quantity')
+                            ->live()
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->suffix('m³')
+                            ->numeric(),
+                        TextInput::make('price')
+                            ->live()
+                            ->dehydrated()
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->label(__('Price per Unity (m³)'))
+                            ->required()
+                            ->numeric()
+                            ->step(0.01)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                            }),
+                        TextInput::make('tax')
+                            ->live()
+                            ->dehydrated()
+                            ->prefix('+' . env('CURRENCY_SUFFIX'))
+                            ->numeric()
+                            ->required()
+                            ->default(0)
+                            ->step(0.01)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                            }),
+                        TextInput::make('discount')
+                            ->live()
+                            ->dehydrated()
+                            ->numeric()
+                            ->required()
+                            ->prefix('-' . env('CURRENCY_SUFFIX'))
+                            ->step(0.01)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                            }),
+                        TextInput::make('total')
+                            ->disabled()
+                            ->dehydrated()
+                            ->numeric()
+                            ->required()
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->step(0.01),
+                    ])
             ]);
+    }
+    private function calculateTotal(Get $get, Set $set): void
+    {
+        $quantity = floatval($get('quantity') ?? 0);
+        $price = floatval($get('price') ?? 0);
+        $tax = floatval($get('tax') ?? 0);
+        $discount = floatval($get('discount') ?? 0);
+
+        $total = ($quantity * $price) + $tax - $discount;
+        $set('total', number_format($total, 2, '.', ''));
     }
 }
