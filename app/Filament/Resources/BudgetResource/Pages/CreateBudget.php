@@ -190,10 +190,12 @@ class CreateBudget extends CreateRecord
                     ->schema([
                         TextInput::make('quantity')
                             ->live(onBlur: true)
-                            ->disabled()
                             ->dehydrated()
                             ->required()
                             ->suffix('m³')
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                            })
                             ->numeric(),
                         TextInput::make('price')
                             ->live(onBlur: true)
@@ -245,7 +247,7 @@ class CreateBudget extends CreateRecord
         $tax = floatval($get('tax') ?? 0);
         $discount = floatval($get('discount') ?? 0);
 
-        $total = ($quantity * $price) + $tax - $discount;
+        $total = $quantity * $price + $tax - $discount;
         $set('total', number_format($total, 2, '.', ''));
     }
 }
