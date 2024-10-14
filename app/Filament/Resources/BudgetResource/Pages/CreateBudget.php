@@ -189,14 +189,14 @@ class CreateBudget extends CreateRecord
                     ->columns(5)
                     ->schema([
                         TextInput::make('quantity')
-                            ->live()
+                            ->live(onBlur: true)
                             ->disabled()
                             ->dehydrated()
                             ->required()
                             ->suffix('m³')
                             ->numeric(),
                         TextInput::make('price')
-                            ->live()
+                            ->live(onBlur: true)
                             ->dehydrated()
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity (m³)'))
@@ -207,7 +207,7 @@ class CreateBudget extends CreateRecord
                                 $this->calculateTotal($get, $set);
                             }),
                         TextInput::make('tax')
-                            ->live()
+                            ->live(onBlur: true)
                             ->dehydrated()
                             ->prefix('+' . env('CURRENCY_SUFFIX'))
                             ->numeric()
@@ -218,7 +218,7 @@ class CreateBudget extends CreateRecord
                                 $this->calculateTotal($get, $set);
                             }),
                         TextInput::make('discount')
-                            ->live()
+                            ->live(onBlur: true)
                             ->dehydrated()
                             ->numeric()
                             ->required()
@@ -228,8 +228,9 @@ class CreateBudget extends CreateRecord
                                 $this->calculateTotal($get, $set);
                             }),
                         TextInput::make('total')
-                            ->disabled()
+                            ->live(onBlur: true)
                             ->dehydrated()
+                            ->disabled()
                             ->numeric()
                             ->required()
                             ->prefix(env('CURRENCY_SUFFIX'))
