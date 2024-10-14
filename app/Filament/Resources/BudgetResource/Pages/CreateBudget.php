@@ -5,8 +5,11 @@ namespace App\Filament\Resources\BudgetResource\Pages;
 use DateTime;
 use Filament\Actions;
 use App\Models\Setting;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
+use Illuminate\Support\Carbon;
 use Filament\Forms\Components\Group;
+use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
@@ -15,7 +18,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use App\Filament\Resources\BudgetResource;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
+use Illuminate\Validation\ValidationException;
 
 class CreateBudget extends CreateRecord
 {
@@ -55,8 +60,9 @@ class CreateBudget extends CreateRecord
                                     ->helperText(__('Use this code to search'))
                                     ->default('ADMIN' . rand(10000, 99999)),
                                 DateTimePicker::make('created_at')
-                                    ->format('d/m/Y')
-                                    ->default(now())
+                                    ->format('Y-m-d H:i:s')
+                                    ->displayFormat('d/m/Y H:i')
+                                    ->default(fn() => Carbon::now()->format('Y-m-d H:i:s'))
                                     ->label(__('Date'))
                                     ->helperText(__('When this budget was created'))
                             ]),
@@ -84,21 +90,54 @@ class CreateBudget extends CreateRecord
                                             ->label(__('Phone')),
                                     ]),
                                 TextInput::make('content.postcode')
-                                    ->dehydrated()
+                                    ->required()
+                                    ->minLength(9)
+                                    ->mask('99999-999')
+                                    ->placeholder('22022-000')
+                                    ->maxLength(9)
+                                    ->suffixAction(
+                                        fn($state, Set $set, $livewire) =>
+                                        Action::make('search-action')
+                                            ->icon('heroicon-o-magnifying-glass')
+                                            ->action(function () use ($state, $livewire, $set) {
+                                                $set('content.neighborhood', null);
+                                                $set('content.street', null);
+                                                $set('content.number', null);
+                                                $set('content.city', null);
+                                                $set('content.state', null);
+                                                $livewire->validateOnly('data.content.postcode');
+                                                $cepData = Http::get("https://viacep.com.br/ws/{$state}/json/")
+                                                    ->throw()
+                                                    ->json();
+                                                if (isset($cepData['erro'])) {
+                                                    throw ValidationException::withMessages([
+                                                        'data.content.postcode' => __('CEP not Found'),
+                                                    ]);
+                                                }
+                                                $set('content.neighborhood', $cepData['bairro'] ?? null);
+                                                $set('content.street', $cepData['logradouro'] ?? null);
+                                                $set('content.city', $cepData['localidade'] ?? null);
+                                                $set('content.state', $cepData['uf'] ?? null);
+                                            })
+                                    )
                                     ->label(__('CEP')),
                                 TextInput::make('content.street')
+                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('Street')),
                                 TextInput::make('content.number')
                                     ->dehydrated()
                                     ->label(__('Number')),
                                 TextInput::make('content.city')
+                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('City')),
                                 TextInput::make('content.neighborhood')
+                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('Neighborhood')),
                                 TextInput::make('content.state')
+                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('State')),
                             ]),

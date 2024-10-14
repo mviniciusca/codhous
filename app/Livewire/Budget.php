@@ -136,7 +136,6 @@ class Budget extends Component implements HasForms
                                             ->placeholder('22022-000')
                                             ->maxLength(9)
                                             ->helperText(__('Postcode for your construction'))
-                                            ->required()
                                             ->label(__('Construction Address Postcode'))
                                             ->suffixAction(
                                                 fn($state, Set $set, $livewire) =>
