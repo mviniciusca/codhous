@@ -192,7 +192,7 @@ class BudgetResource extends Resource
                     ->collapsible()
                     ->columns(5)
                     ->schema([
-                        TextInput::make('quantity')
+                        TextInput::make('content.quantity')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->readonly()
@@ -202,7 +202,7 @@ class BudgetResource extends Resource
                                 self::calculateTotal($get, $set);
                             })
                             ->numeric(),
-                        TextInput::make('price')
+                        TextInput::make('content.price')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->prefix(env('CURRENCY_SUFFIX'))
@@ -213,7 +213,7 @@ class BudgetResource extends Resource
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 self::calculateTotal($get, $set);
                             }),
-                        TextInput::make('tax')
+                        TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->prefix('+' . env('CURRENCY_SUFFIX'))
@@ -224,7 +224,7 @@ class BudgetResource extends Resource
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 self::calculateTotal($get, $set);
                             }),
-                        TextInput::make('discount')
+                        TextInput::make('content.discount')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->numeric()
@@ -234,7 +234,7 @@ class BudgetResource extends Resource
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 self::calculateTotal($get, $set);
                             }),
-                        TextInput::make('total')
+                        TextInput::make('content.total')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->disabled()
@@ -248,13 +248,13 @@ class BudgetResource extends Resource
 
     public static function calculateTotal(Get $get, Set $set): void
     {
-        $quantity = floatval($get('quantity') ?? 0);
-        $price = floatval($get('price') ?? 0);
-        $tax = floatval($get('tax') ?? 0);
-        $discount = floatval($get('discount') ?? 0);
+        $quantity = floatval($get('content.quantity') ?? 0);
+        $price = floatval($get('content.price') ?? 0);
+        $tax = floatval($get('content.tax') ?? 0);
+        $discount = floatval($get('content.discount') ?? 0);
 
         $total = $quantity * $price + $tax - $discount;
-        $set('total', number_format($total, 2, '.', ''));
+        $set('content.total', number_format($total, 2, '.', ''));
     }
     public static function table(Table $table): Table
     {
