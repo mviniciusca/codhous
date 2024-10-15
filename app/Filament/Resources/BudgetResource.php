@@ -184,10 +184,12 @@ class BudgetResource extends Resource
                                     ->disabled()
                                     ->dehydrated()
                             ]),
-                    ]),
+                    ])
+                    ->collapsible(),
                 Section::make(__('Pricing'))
                     ->icon('heroicon-o-currency-dollar')
                     ->description(__('Pricing Definition & Total Cost'))
+                    ->collapsible()
                     ->columns(5)
                     ->schema([
                         TextInput::make('quantity')
