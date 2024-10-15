@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\Budget;
 use App\Models\Setting;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
@@ -161,6 +162,7 @@ class BudgetResource extends Resource
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                    ->afterStateHydrated(fn(Set $set, string $state) => $set('quantity', $state))
                                     ->disabled()
                                     ->dehydrated(),
                                 TextInput::make('content.area')
@@ -183,9 +185,75 @@ class BudgetResource extends Resource
                                     ->dehydrated()
                             ]),
                     ]),
+                Section::make(__('Pricing'))
+                    ->icon('heroicon-o-currency-dollar')
+                    ->description(__('Pricing Definition & Total Cost'))
+                    ->columns(5)
+                    ->schema([
+                        TextInput::make('quantity')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->readonly()
+                            ->required()
+                            ->suffix('m³')
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                self::calculateTotal($get, $set);
+                            })
+                            ->numeric(),
+                        TextInput::make('price')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->label(__('Price per Unity (m³)'))
+                            ->required()
+                            ->numeric()
+                            ->step(0.01)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                self::calculateTotal($get, $set);
+                            }),
+                        TextInput::make('tax')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->prefix('+' . env('CURRENCY_SUFFIX'))
+                            ->numeric()
+                            ->required()
+                            ->default(0)
+                            ->step(0.01)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                self::calculateTotal($get, $set);
+                            }),
+                        TextInput::make('discount')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->numeric()
+                            ->required()
+                            ->prefix('-' . env('CURRENCY_SUFFIX'))
+                            ->step(0.01)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                self::calculateTotal($get, $set);
+                            }),
+                        TextInput::make('total')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->disabled()
+                            ->numeric()
+                            ->required()
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->step(0.01),
+                    ]),
             ]);
     }
 
+    public static function calculateTotal(Get $get, Set $set): void
+    {
+        $quantity = floatval($get('quantity') ?? 0);
+        $price = floatval($get('price') ?? 0);
+        $tax = floatval($get('tax') ?? 0);
+        $discount = floatval($get('discount') ?? 0);
+
+        $total = $quantity * $price + $tax - $discount;
+        $set('total', number_format($total, 2, '.', ''));
+    }
     public static function table(Table $table): Table
     {
         return $table
