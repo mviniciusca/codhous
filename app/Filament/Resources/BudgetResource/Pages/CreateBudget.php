@@ -147,7 +147,7 @@ class CreateBudget extends CreateRecord
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                     ->afterStateUpdated(fn(Set $set, string $state) => $set('quantity', $state))
                                     ->dehydrated(),
-                                Select::make('content.object')
+                                Select::make('content.area')
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
                                     ->options(
