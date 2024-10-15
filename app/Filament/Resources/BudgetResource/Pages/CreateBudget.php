@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
-use Closure;
-use DateTime;
-use Filament\Actions;
 use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -17,7 +14,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DatePicker;
 use App\Filament\Resources\BudgetResource;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Forms\Components\Actions\Action;
@@ -188,7 +184,7 @@ class CreateBudget extends CreateRecord
                     ->description(__('Pricing Definition & Total Cost'))
                     ->columns(5)
                     ->schema([
-                        TextInput::make('quantity')
+                        TextInput::make('content.quantity')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->required()
@@ -197,7 +193,7 @@ class CreateBudget extends CreateRecord
                                 $this->calculateTotal($get, $set);
                             })
                             ->numeric(),
-                        TextInput::make('price')
+                        TextInput::make('content.price')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->prefix(env('CURRENCY_SUFFIX'))
@@ -208,7 +204,7 @@ class CreateBudget extends CreateRecord
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                             }),
-                        TextInput::make('tax')
+                        TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->prefix('+' . env('CURRENCY_SUFFIX'))
@@ -219,7 +215,7 @@ class CreateBudget extends CreateRecord
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                             }),
-                        TextInput::make('discount')
+                        TextInput::make('content.discount')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->numeric()
@@ -229,7 +225,7 @@ class CreateBudget extends CreateRecord
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                             }),
-                        TextInput::make('total')
+                        TextInput::make('content.total')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->disabled()
@@ -242,12 +238,12 @@ class CreateBudget extends CreateRecord
     }
     private function calculateTotal(Get $get, Set $set): void
     {
-        $quantity = floatval($get('quantity') ?? 0);
-        $price = floatval($get('price') ?? 0);
-        $tax = floatval($get('tax') ?? 0);
-        $discount = floatval($get('discount') ?? 0);
+        $quantity = floatval($get('content.quantity') ?? 0);
+        $price = floatval($get('content.price') ?? 0);
+        $tax = floatval($get('content.tax') ?? 0);
+        $discount = floatval($get('content.discount') ?? 0);
 
         $total = $quantity * $price + $tax - $discount;
-        $set('total', number_format($total, 2, '.', ''));
+        $set('content.total', number_format($total, 2, '.', ''));
     }
 }
