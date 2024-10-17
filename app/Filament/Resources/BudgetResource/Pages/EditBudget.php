@@ -51,12 +51,10 @@ class EditBudget extends EditRecord
                                     ->action(function ($state) {
 
                                         Pdf::view('pdf.invoice', ['state' => $state])
-                                            ->headerView('pdf.header')
-                                            ->footerView('pdf.footer')
                                             ->format('a4')
-                                            ->save(storage_path('app/public/documents/' . $state['id'] . '-invoice.pdf'));
+                                            ->save(storage_path('app/public/' . $state['id'] . '-invoice.pdf'));
 
-                                        return response()->download(storage_path('app/public/documents/' . $state['id'] . '-invoice.pdf'));
+                                        return response()->download(storage_path('app/public/' . $state['id'] . '-invoice.pdf'));
                                     })
                             ])
                             ->columns(4)
