@@ -244,6 +244,7 @@ class EditBudget extends EditRecord
                             ->dehydrated()
                             ->numeric()
                             ->required()
+                            ->helperText(__('Applies a discount in ' . env('CURRENCY_SUFFIX')))
                             ->prefix('-' . env('CURRENCY_SUFFIX'))
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
