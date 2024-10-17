@@ -21,20 +21,20 @@
         <div class="flex items-center justify-between mb-8">
             <div class="flex items-center">
                 <div class="text-gray-950">
-                    <p class="font-semibold text-3xl">{{ env('APP_NAME') . ' ' . __('') }}</p>
+                    <p class="font-semibold text-2xl">{{ env('APP_NAME') . ' ' . __('') }}</p>
                     <p>Rua Rio de Janeiro, 25 - Rio de Janeiro, RJ </p>
                     <p>CNPJ: 54012200000441/4000</p>
-                    <p>Phone:(21) 966134366 • Email: sac@codhous.app</p>
+                    <p>Phone: (21) 966134366 • Email: sac@codhous.app</p>
                 </div>
 
             </div>
             <div class="text-gray-700">
                 <div class="font-bold text-xl mb-2 uppercase">{{ __('Budget') }}</div>
                 <div class="text-sm">{{ date('d/m/Y H:i', strtotime($state['created_at'])) }}</div>
-                <div class="text-sm">{{ __('Budget') . ': #' }} </div>
+                <div class="text-sm">{{ __('Budget') . ': #' . $state['code']}} </div>
             </div>
         </div>
-        <div class="border-b-2 border-gray-300 pb-8 mb-8">
+        <div class="pb-8 mb-8">
             <h2 class="text-2xl font-bold mb-4">{{ _('Budget to') }}:</h2>
             <div class="text-gray-700 mb-2">
                 {{ $state['content']['customer_name'] ?? __('No Customer Name') }}
@@ -54,34 +54,33 @@
         <table class="w-full text-left mb-8">
             <thead>
                 <tr>
-                    <th class="text-gray-700 font-bold uppercase py-2">Description</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">Quantity</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">Price</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">Total</th>
+                    <th class="text-gray-700 font-bold uppercase py-2">{{ _('Description') }}</th>
+                    <th class="text-gray-700 font-bold uppercase py-2">{{ __('Quantity') }}</th>
+                    <th class="text-gray-700 font-bold uppercase py-2">{{ __('Price') }}</th>
+                    <th class="text-gray-700 font-bold uppercase py-2">{{ __('Total') }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td class="py-4 text-gray-700">Product 1</td>
-                    <td class="py-4 text-gray-700">1</td>
-                    <td class="py-4 text-gray-700">$100.00</td>
-                    <td class="py-4 text-gray-700">$100.00</td>
+                    <td class="py-4 text-gray-700">{!! $product_name['name'] !!}</td>
+                    <td class="py-4 text-gray-700">{{ $state['content']['quantity'] . 'm³' }}</td>
+                    <td class="py-4 text-gray-700">{{ env('CURRENCY_SUFFIX').' '.$state['content']['price'] }}</td>
+                    <td class="py-4 text-gray-700">{{ env('CURRENCY_SUFFIX').' '.$state['content']['total'] }}</td>
                 </tr>
             </tbody>
         </table>
-        <div class="flex justify-end mb-8">
-            <div class="text-gray-700 mr-2">Subtotal:</div>
-            <div class="text-gray-700">$425.00</div>
-        </div>
+        <hr class="my-2">
         <div class="text-right mb-8">
-            <div class="text-gray-700 mr-2">Tax:</div>
-            <div class="text-gray-700">$25.50</div>
+            <div class="text-gray-700 mr-2">{{ __('Tax') }}: </div>
+            <div class="text-gray-700 mr-2">{{ env('CURRENCY_SUFFIX').' '. $state['content']['tax'] }}</div>
+            <hr class="my-2">
+            <div class="text-gray-700 mr-2">{{ __('Discount') }}: </div>
+            <div class="text-gray-700 mr-2">{{ env('CURRENCY_SUFFIX').' '. $state['content']['discount'] }}</div>
+            <hr class="my-2">
+            <div class="text-gray-700 mr-2 font-bold">{{ __('Total') }}: </div>
+            <div class="text-gray-700 font-bold">{{ env('CURRENCY_SUFFIX').' '.$state['content']['total'] }}</div>
+        </div>
 
-        </div>
-        <div class="flex justify-end mb-8">
-            <div class="text-gray-700 mr-2">Total:</div>
-            <div class="text-gray-700 font-bold text-xl">$450.50</div>
-        </div>
         <div class="border-t-2 border-gray-300 pt-8 mb-8">
             <div class="text-gray-700 mb-2">Payment is due within 30 days. Late payments are subject to fees.</div>
             <div class="text-gray-700 mb-2">Please make checks payable to Your Company Name and mail to:</div>

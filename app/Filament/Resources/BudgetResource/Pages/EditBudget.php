@@ -50,7 +50,12 @@ class EditBudget extends EditRecord
                                     ->icon('heroicon-o-document')
                                     ->action(function ($state) {
 
-                                        Pdf::view('pdf.invoice', ['state' => $state])
+                                        Pdf::view('pdf.invoice', [
+                                            'state' => $state,
+                                            'product_name' => Product::select('name')
+                                                ->where('id', '=', $state['content']['product'])
+                                                ->first()
+                                        ])
                                             ->format('a4')
                                             ->save(storage_path('app/public/' . $state['id'] . '-invoice.pdf'));
 
