@@ -77,13 +77,23 @@ class CreateBudget extends CreateRecord
                                     ->schema([
                                         TextInput::make('content.customer_name')
                                             ->dehydrated()
-                                            ->default('Admin')
+                                            ->default('' ?? env('APP_NAME'))
+                                            ->required()
+                                            ->helperText(__('Customer name'))
                                             ->label(__('Customer Name')),
                                         TextInput::make('content.customer_email')
                                             ->dehydrated()
+                                            ->email()
+                                            ->required()
+                                            ->helperText(__('Customer email address'))
                                             ->label(__('Email')),
                                         TextInput::make('content.customer_phone')
-                                            ->dehydrated()
+                                            ->required()
+                                            ->helperText(__('Phone Number'))
+                                            ->tel()
+                                            ->mask('(99)99999-9999')
+                                            ->placeholder(_('(xx) XXXX-XXXX'))
+                                            ->helperText(__('Customer phone number'))
                                             ->label(__('Phone')),
                                     ]),
                                 TextInput::make('content.postcode')
@@ -91,6 +101,7 @@ class CreateBudget extends CreateRecord
                                     ->minLength(9)
                                     ->mask('99999-999')
                                     ->placeholder('22022-000')
+                                    ->helperText(__('Customer postcode'))
                                     ->maxLength(9)
                                     ->suffixAction(
                                         fn($state, Set $set, $livewire) =>
@@ -121,22 +132,30 @@ class CreateBudget extends CreateRecord
                                 TextInput::make('content.street')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->required()
+                                    ->helperText(__('Customer street.'))
                                     ->label(__('Street')),
                                 TextInput::make('content.number')
                                     ->dehydrated()
+                                    ->helperText(__('Customer street number. Optional'))
                                     ->label(__('Number')),
                                 TextInput::make('content.city')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->helperText(__('Customer neighborhood.'))
                                     ->label(__('City')),
                                 TextInput::make('content.neighborhood')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->required()
+                                    ->helperText(__('Customer neighborhood.'))
                                     ->label(__('Neighborhood')),
                                 TextInput::make('content.state')
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('State')),
+                                    ->required()
+                                    ->helperText(__('Customer UF.'))
+                                    ->label(__('UF')),
                             ]),
                         Fieldset::make('Construction Components')
                             ->columns(4)
@@ -194,6 +213,7 @@ class CreateBudget extends CreateRecord
                             ->dehydrated()
                             ->required()
                             ->suffix('m³')
+                            ->helperText(__('Quantity of items'))
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                             })
@@ -209,6 +229,7 @@ class CreateBudget extends CreateRecord
                             ->label(__('Price per Unity (m³)'))
                             ->required()
                             ->numeric()
+                            ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
                             ->step(0.01)
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
@@ -223,6 +244,7 @@ class CreateBudget extends CreateRecord
                             ->numeric()
                             ->default(0)
                             ->required()
+                            ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
                             ->step(0.01)
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
@@ -235,6 +257,7 @@ class CreateBudget extends CreateRecord
                             ->numeric()
                             ->required()
                             ->prefix('-' . env('CURRENCY_SUFFIX'))
+                            ->helperText(__('Applies a discount in ' . env('CURRENCY_SUFFIX')))
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
@@ -247,12 +270,19 @@ class CreateBudget extends CreateRecord
                             ->disabled()
                             ->numeric()
                             ->required()
+                            ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->step(0.01),
                     ])
             ]);
     }
 
+    /**
+     * Summary of getPrice
+     * @param \Filament\Forms\Get $get
+     * @param \Filament\Forms\Set $set
+     * @return void
+     */
     private function getPrice(Get $get, Set $set)
     {
         $id = $get('content.product');
@@ -262,6 +292,13 @@ class CreateBudget extends CreateRecord
         $set('content.price', $price->price ?? 0);
     }
 
+    /**
+     * Summary of updatePrice
+     * @param \Filament\Forms\Get $get
+     * @param \Filament\Forms\Set $set
+     * @param mixed $productId
+     * @return void
+     */
     private function updatePrice(Get $get, Set $set, $productId): void
     {
         if ($productId) {
