@@ -108,6 +108,7 @@ class EditBudget extends EditRecord
                                     ->minLength(9)
                                     ->mask('99999-999')
                                     ->placeholder('22022-000')
+                                    ->helperText(__('Customer postcode'))
                                     ->maxLength(9)
                                     ->suffixAction(
                                         fn($state, Set $set, $livewire) =>
