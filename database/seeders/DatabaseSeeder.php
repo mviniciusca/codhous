@@ -2,18 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\Budget;
 use App\Models\Mail;
-use App\Models\Module;
-use App\Models\Partner;
 use App\Models\User;
+use App\Models\Budget;
 use App\Models\Layout;
+use App\Models\Module;
 use App\Models\Contact;
-use App\Models\Customer;
+use App\Models\Partner;
+use App\Models\Product;
 use App\Models\Setting;
+use App\Models\Customer;
 use App\Models\Navigation;
-use App\Models\Newsletter;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Newsletter;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -53,6 +54,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Budget::factory(100)->create();
+
+        Product::factory(5)->create();
 
         Newsletter::factory(10)->create();
         Mail::factory(143)->create();

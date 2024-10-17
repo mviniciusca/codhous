@@ -254,11 +254,10 @@ class EditBudget extends EditRecord
     private function getPrice(Get $get, Set $set)
     {
         $id = $get('content.product');
-        $price = Product::select('price')
+        $price = Product::select(['price'])
             ->where('id', '=', $id)
-            ->first()
-            ->price;
-        $set('content.price', $price);
+            ->first();
+        $set('content.price', $price->price ?? 0);
     }
     protected function getHeaderActions(): array
     {
