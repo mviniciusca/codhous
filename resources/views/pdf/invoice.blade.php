@@ -81,10 +81,12 @@
             <div class="text-gray-700 font-bold">{{ env('CURRENCY_SUFFIX').' '.$state['content']['total'] }}</div>
         </div>
 
-        <div class="border-t-2 border-gray-300 pt-8 mb-8">
-            <div class="text-gray-700 mb-2">Payment is due within 30 days. Late payments are subject to fees.</div>
-            <div class="text-gray-700 mb-2">Please make checks payable to Your Company Name and mail to:</div>
-            <div class="text-gray-700">123 Main St., Anytown, USA 12345</div>
+        <div class="border-t-1 border-gray-300 pt-8 mb-8">
+            <div class="text-gray-700 mb-2">{{
+                __('This is a Budget document. This don\'t replace a
+                fiscal Documentation or Legal Contract') }}
+            </div>
+            <div class="text-gray-700">{{ env('APP_NAME') }}</div>
         </div>
     </div>
 
