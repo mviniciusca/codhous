@@ -40,9 +40,12 @@
                 {{ $state['content']['customer_name'] ?? __('No Customer Name') }}
             </div>
             <div class="text-gray-700 mb-2">
-                {{ $state['content']['street'] ?? __('No Address') }}
+                {{ $state['content']['street'] ? $state['content']['street'] . ', ' . $state['content']['number'] :
+                __('No Address') }}
             </div>
-            <div class="text-gray-700 mb-2">Anytown, USA 12345</div>
+            <div class="text-gray-700 mb-2">
+                {{ $state['content']['city'] . ' - ' . $state['content']['state'] }}
+            </div>
             <div class="text-gray-700">
                 {{ $state['content']['customer_email'] }} •
                 {{ $state['content']['customer_phone'] }}
