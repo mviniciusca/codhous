@@ -149,13 +149,15 @@ class EditBudget extends EditRecord
                             ->columns(4)
                             ->schema([
                                 TextInput::make('content.quantity')
-                                    ->live()
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateUpdated(fn(Set $set, string $state) => $set('quantity', $state))
-                                    ->dehydrated(),
+                                    ->afterStateUpdated(fn(Set $set, string $state) => $set('quantity', $state)),
                                 Select::make('content.area')
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
                                     ->options(
@@ -165,16 +167,11 @@ class EditBudget extends EditRecord
                                             ->pluck('budget.area', 'id')
                                     )
                                     ->dehydrated(),
-                                Select::make('content.fck')
+                                TextInput::make('content.fck')
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->label(__('FCK'))
-                                    ->helperText(__('Feature Compression Know'))
-                                    ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.fck', 'id')
-                                    )
-                                    ->dehydrated(),
+                                    ->helperText(__('Feature Compression Know')),
                                 Select::make('content.product')
                                     ->dehydrated()
                                     ->options(
@@ -193,6 +190,7 @@ class EditBudget extends EditRecord
                     ->schema([
                         TextInput::make('content.quantity')
                             ->live(onBlur: true)
+                            ->disabled()
                             ->dehydrated()
                             ->required()
                             ->suffix('m³')
@@ -202,6 +200,8 @@ class EditBudget extends EditRecord
                             ->numeric(),
                         TextInput::make('content.price')
                             ->live(onBlur: true)
+                            ->disabled()
+                            ->dehydrated()
                             ->afterStateHydrated(function (Get $get, Set $set) {
                                 $this->getPrice($get, $set);
                             })
