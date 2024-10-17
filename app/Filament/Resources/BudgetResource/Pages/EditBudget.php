@@ -193,13 +193,13 @@ class EditBudget extends EditRecord
                                     ->label(__('FCK'))
                                     ->helperText(__('Feature Compression Know')),
                                 Select::make('content.product')
+                                    ->disabled()
                                     ->dehydrated()
                                     ->options(
                                         Product::all()
                                             ->pluck('name', 'id')
                                     )
                                     ->label(__('Product'))
-                                    ->disabled()
                                     ->helperText(__('Type of Concrete'))
                             ]),
                     ]),
