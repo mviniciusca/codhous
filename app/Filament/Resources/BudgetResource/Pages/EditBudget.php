@@ -144,6 +144,7 @@ class EditBudget extends EditRecord
                                     ->label(__('Street')),
                                 TextInput::make('content.number')
                                     ->dehydrated()
+                                    ->helperText(__('Customer street number. Optional'))
                                     ->label(__('Number')),
                                 TextInput::make('content.city')
                                     ->disabled()
@@ -209,6 +210,7 @@ class EditBudget extends EditRecord
                             ->disabled()
                             ->dehydrated()
                             ->required()
+                            ->helperText(__('Quantity of items'))
                             ->suffix('m³')
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
@@ -218,6 +220,7 @@ class EditBudget extends EditRecord
                             ->live(onBlur: true)
                             ->disabled()
                             ->dehydrated()
+                            ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
                             ->afterStateHydrated(function (Get $get, Set $set) {
                                 $this->getPrice($get, $set);
                             })
@@ -230,6 +233,7 @@ class EditBudget extends EditRecord
                             ->prefix('+' . env('CURRENCY_SUFFIX'))
                             ->numeric()
                             ->required()
+                            ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
                             ->default(0)
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
