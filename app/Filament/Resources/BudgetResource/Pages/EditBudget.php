@@ -256,6 +256,7 @@ class EditBudget extends EditRecord
                             ->disabled()
                             ->numeric()
                             ->required()
+                            ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->step(0.01),
                     ])
