@@ -2,21 +2,14 @@
 
 namespace App\Filament\Resources\SettingResource\Pages;
 
-use Filament\Actions;
-use Filament\Forms\Set;
 use Filament\Forms\Form;
-use Illuminate\Support\Str;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\SettingResource;
-use Filament\Forms\Components\Actions\Action;
 
 class EditBudget extends EditRecord
 {
@@ -46,18 +39,13 @@ class EditBudget extends EditRecord
                 Section::make(__('Options'))
                     ->description(__('Change the content for your budget tool'))
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->columns(3)
+                    ->columns(2)
                     ->schema([
                         TagsInput::make('budget.fck')
                             ->label(__('FCK'))
                             ->required()
                             ->placeholder(__('press enter to add'))
                             ->helperText(__('Enter the values of FCK that your company works')),
-                        TagsInput::make('budget.product')
-                            ->label(__('Product'))
-                            ->placeholder(__('press enter to add'))
-                            ->required()
-                            ->helperText(__('Enter the type of concrete that your company works')),
                         TagsInput::make('budget.area')
                             ->label(__('Local / Area'))
                             ->placeholder(__('press enter to add'))

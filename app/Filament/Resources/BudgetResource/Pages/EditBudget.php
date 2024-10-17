@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 use Filament\Actions;
+use App\Models\Product;
 use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -175,15 +176,14 @@ class EditBudget extends EditRecord
                                     )
                                     ->dehydrated(),
                                 Select::make('content.product')
-                                    ->label(__('Product'))
-                                    ->helperText(__('Type of Concrete'))
-                                    ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.product', 'id')
-                                    )
                                     ->dehydrated()
+                                    ->options(
+                                        Product::all()
+                                            ->pluck('name', 'id')
+                                    )
+                                    ->label(__('Product'))
+                                    ->disabled()
+                                    ->helperText(__('Type of Concrete'))
                             ]),
                     ]),
                 Section::make(__('Pricing'))
@@ -202,15 +202,12 @@ class EditBudget extends EditRecord
                             ->numeric(),
                         TextInput::make('content.price')
                             ->live(onBlur: true)
-                            ->dehydrated()
+                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                $this->getPrice($get, $set);
+                            })
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity (m³)'))
-                            ->required()
-                            ->numeric()
-                            ->step(0.01)
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                            }),
+                            ->required(),
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
@@ -252,6 +249,16 @@ class EditBudget extends EditRecord
 
         $total = $quantity * $price + $tax - $discount;
         $set('content.total', number_format($total, 2, '.', ''));
+    }
+
+    private function getPrice(Get $get, Set $set)
+    {
+        $id = $get('content.product');
+        $price = Product::select('price')
+            ->where('id', '=', $id)
+            ->first()
+            ->price;
+        $set('content.price', $price);
     }
     protected function getHeaderActions(): array
     {

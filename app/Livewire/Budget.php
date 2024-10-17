@@ -98,9 +98,7 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Feature Compression Know')),
                                         Select::make('content.product')
                                             ->options(
-                                                Setting::select(['budget'])
-                                                    ->get()
-                                                    ->pluck('budget.product', 'id')
+                                                Product::all()->pluck('name', 'id')
                                             )
                                             ->required()
                                             ->label(__('Type of Concrete'))
