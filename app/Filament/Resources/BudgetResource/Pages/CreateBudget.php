@@ -142,7 +142,7 @@ class CreateBudget extends CreateRecord
                                 TextInput::make('content.city')
                                     ->disabled()
                                     ->dehydrated()
-                                    ->helperText(__('Customer neighborhood.'))
+                                    ->helperText(__('Customer city.'))
                                     ->label(__('City')),
                                 TextInput::make('content.neighborhood')
                                     ->disabled()

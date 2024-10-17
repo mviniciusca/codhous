@@ -148,14 +148,17 @@ class EditBudget extends EditRecord
                                 TextInput::make('content.city')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->helperText(__('Customer city.'))
                                     ->label(__('City')),
                                 TextInput::make('content.neighborhood')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->helperText(__('Customer neighborhood.'))
                                     ->label(__('Neighborhood')),
                                 TextInput::make('content.state')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->helperText(__('Customer UF.'))
                                     ->label(__('State')),
                             ]),
                         Fieldset::make('Construction Components')
