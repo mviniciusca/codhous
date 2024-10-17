@@ -82,44 +82,15 @@
         </div>
 
         <div class="border-t-1 border-gray-300 pt-8 mb-8">
-            <div class="text-gray-700 mb-2">{{
-                __('This is a Budget document. This don\'t replace a
+            <div class="text-gray-700 mb-12">{{
+                __('This is a Budget document.') }} <p></p>
+                {{ __(' This don\'t replace a
                 fiscal Documentation or Legal Contract') }}
             </div>
-            <div class="text-gray-700">{{ env('APP_NAME') }}</div>
+            <div class="text-gray-700 mt-4">{{ env('APP_NAME') }}</div>
         </div>
     </div>
 
 </body>
 
 </html>
-
-<!--
-    "id" => 99
-  "code" => "964"
-  "status" => "done"
-  "is_active" => true
-  "content" => array:17 [▼
-    "fck" => 40
-    "area" => 5
-    "city" => "New Shyanne"
-    "state" => "FK"
-    "number" => 5412982
-    "street" => "902 Lesch Extension"
-    "product" => 2
-    "postcode" => "21279-462"
-    "quantity" => 90
-    "neighborhood" => "North Mikayla"
-    "customer_name" => "Dr. Ola Wisoky Jr."
-    "customer_email" => "aflatley@yahoo.com"
-    "customer_phone" => "(86)37251-058"
-    "total" => "0.00"
-    "price" => "523.94"
-    "tax" => null
-    "discount" => null
-  ]
-  "deleted_at" => null
-  "created_at" => "2024-07-14 22:02:32"
-  "updated_at" => "2024-10-17T15:18:17.000000Z"
-]
-  !-->
