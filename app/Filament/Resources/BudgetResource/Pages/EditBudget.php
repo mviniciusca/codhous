@@ -95,7 +95,12 @@ class EditBudget extends EditRecord
                                             ->helperText(__('Customer email address'))
                                             ->label(__('Email')),
                                         TextInput::make('content.customer_phone')
-                                            ->dehydrated()
+                                            ->required()
+                                            ->helperText(__('Phone Number'))
+                                            ->tel()
+                                            ->mask('(99)99999-9999')
+                                            ->placeholder(_('(xx) XXXX-XXXX'))
+                                            ->helperText(__('Customer phone number'))
                                             ->label(__('Phone')),
                                     ]),
                                 TextInput::make('content.postcode')
