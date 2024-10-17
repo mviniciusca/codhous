@@ -84,10 +84,15 @@ class EditBudget extends EditRecord
                                     ->schema([
                                         TextInput::make('content.customer_name')
                                             ->dehydrated()
+                                            ->required()
+                                            ->helperText(__('Customer name'))
                                             ->default('Admin')
                                             ->label(__('Customer Name')),
                                         TextInput::make('content.customer_email')
                                             ->dehydrated()
+                                            ->email()
+                                            ->required()
+                                            ->helperText(__('Customer email address'))
                                             ->label(__('Email')),
                                         TextInput::make('content.customer_phone')
                                             ->dehydrated()
