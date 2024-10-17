@@ -35,11 +35,20 @@ class EditBudget extends EditRecord
     public function form(Form $form): Form
     {
         return $form
+
             ->schema([
                 Group::make()
                     ->columnSpanFull()
                     ->schema([
                         Section::make(__('Budget Overview'))
+                            ->headerActions([
+                                Action::make('export_pdf')
+                                    ->label(__('Budgets'))
+                                    ->label(__('Download PDF'))
+                                    ->color('warning')
+                                    ->icon('heroicon-o-document')
+                                    ->url(route('filament.admin.resources.budgets.create')),
+                            ])
                             ->columns(4)
                             ->description(__('Organize your budget report'))
                             ->icon('heroicon-o-document')
