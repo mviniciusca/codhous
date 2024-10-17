@@ -59,11 +59,14 @@ class EditBudget extends EditRecord
                                     ])
                                     ->default('pending'),
                                 TextInput::make('code')
+                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
                                     ->default('ADMIN' . rand(10000, 99999)),
                                 DateTimePicker::make('created_at')
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
                                     ->default(fn() => Carbon::now()->format('Y-m-d H:i:s'))
