@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="pb-8 mb-8">
-            <h2 class="text-2xl font-bold mb-4">{{ _('Budget to') }}:</h2>
+            <h2 class="text-2xl font-bold mb-4">{{ _('Budget to') }}: </h2>
             <div class="text-gray-700 mb-2">
                 {{ $state['content']['customer_name'] ?? __('No Customer Name') }}
             </div>
