@@ -146,8 +146,10 @@ class CreateBudget extends CreateRecord
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateUpdated(fn(Set $set, string $state) => $set('quantity', $state))
-                                    ->dehydrated(),
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        $set('quantity', $state);
+                                        $this->calculateTotal($get, $set);
+                                    }),
                                 Select::make('content.area')
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
@@ -172,16 +174,12 @@ class CreateBudget extends CreateRecord
                                     ->live()
                                     ->label(__('Product'))
                                     ->helperText(__('Type of Concrete'))
-                                    ->options(
-                                        Product::pluck('name', 'id')
-                                    )
+                                    ->options(Product::pluck('name', 'id'))
+                                    ->afterStateHydrated(function (Get $get, Set $set, $state) {
+                                        $this->updatePrice($get, $set, $state);
+                                    })
                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        if ($state) {
-                                            $price = Product::where('id', $state)->value('price') ?? 0;
-                                            $set('content.price', $price);
-                                        } else {
-                                            $set('content.price', 0);
-                                        }
+                                        $this->updatePrice($get, $set, $state);
                                     })
                                     ->dehydrated()
                             ]),
@@ -199,41 +197,53 @@ class CreateBudget extends CreateRecord
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                             })
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                            })
                             ->numeric(),
                         TextInput::make('content.price')
                             ->live()
+                            ->disabled()
+                            ->dehydrated()
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity (m³)'))
                             ->required()
                             ->numeric()
                             ->step(0.01)
-                            ->afterStateHydrated(function (Get $get, Set $set) {
-                                $this->getPrice($get, $set);
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                            })
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
                             }),
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->prefix('+' . env('CURRENCY_SUFFIX'))
                             ->numeric()
-                            ->required()
                             ->default(0)
+                            ->required()
                             ->step(0.01)
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                            })
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                             }),
                         TextInput::make('content.discount')
                             ->live(onBlur: true)
-                            ->dehydrated()
                             ->numeric()
                             ->required()
                             ->prefix('-' . env('CURRENCY_SUFFIX'))
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
+                            })
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
                             }),
                         TextInput::make('content.total')
-                            ->live(onBlur: true)
-                            ->dehydrated()
+                            ->live()
                             ->disabled()
                             ->numeric()
                             ->required()
@@ -251,6 +261,18 @@ class CreateBudget extends CreateRecord
             ->first();
         $set('content.price', $price->price ?? 0);
     }
+
+    private function updatePrice(Get $get, Set $set, $productId): void
+    {
+        if ($productId) {
+            $price = Product::where('id', $productId)->value('price') ?? 0;
+        } else {
+            $price = 0;
+        }
+        $set('content.price', $price);
+        $this->calculateTotal($get, $set);
+    }
+
     private function calculateTotal(Get $get, Set $set): void
     {
         $quantity = floatval($get('content.quantity') ?? 0);
