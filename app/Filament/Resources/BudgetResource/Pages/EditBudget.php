@@ -139,6 +139,8 @@ class EditBudget extends EditRecord
                                 TextInput::make('content.street')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->required()
+                                    ->helperText(__('Customer street.'))
                                     ->label(__('Street')),
                                 TextInput::make('content.number')
                                     ->dehydrated()
