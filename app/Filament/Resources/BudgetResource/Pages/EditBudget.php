@@ -22,6 +22,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Illuminate\Validation\ValidationException;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class EditBudget extends EditRecord
 {
@@ -47,7 +48,16 @@ class EditBudget extends EditRecord
                                     ->label(__('Download PDF'))
                                     ->color('warning')
                                     ->icon('heroicon-o-document')
-                                    ->url(route('filament.admin.resources.budgets.create')),
+                                    ->action(function ($state) {
+
+                                        Pdf::view('pdf.invoice', ['state' => $state])
+                                            ->headerView('pdf.header')
+                                            ->footerView('pdf.footer')
+                                            ->format('a4')
+                                            ->save(storage_path('app/public/documents/' . $state['id'] . '-invoice.pdf'));
+
+                                        return response()->download(storage_path('app/public/documents/' . $state['id'] . '-invoice.pdf'));
+                                    })
                             ])
                             ->columns(4)
                             ->description(__('Organize your budget report'))
