@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
+use App\Models\Product;
 use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -168,14 +169,20 @@ class CreateBudget extends CreateRecord
                                     )
                                     ->dehydrated(),
                                 Select::make('content.product')
+                                    ->live()
                                     ->label(__('Product'))
                                     ->helperText(__('Type of Concrete'))
                                     ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.product', 'id')
+                                        Product::pluck('name', 'id')
                                     )
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        if ($state) {
+                                            $price = Product::where('id', $state)->value('price') ?? 0;
+                                            $set('content.price', $price);
+                                        } else {
+                                            $set('content.price', 0);
+                                        }
+                                    })
                                     ->dehydrated()
                             ]),
                     ]),
@@ -194,15 +201,14 @@ class CreateBudget extends CreateRecord
                             })
                             ->numeric(),
                         TextInput::make('content.price')
-                            ->live(onBlur: true)
-                            ->dehydrated()
+                            ->live()
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity (m³)'))
                             ->required()
                             ->numeric()
                             ->step(0.01)
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
+                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                $this->getPrice($get, $set);
                             }),
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
@@ -235,6 +241,15 @@ class CreateBudget extends CreateRecord
                             ->step(0.01),
                     ])
             ]);
+    }
+
+    private function getPrice(Get $get, Set $set)
+    {
+        $id = $get('content.product');
+        $price = Product::select(['price'])
+            ->where('id', '=', $id)
+            ->first();
+        $set('content.price', $price->price ?? 0);
     }
     private function calculateTotal(Get $get, Set $set): void
     {
