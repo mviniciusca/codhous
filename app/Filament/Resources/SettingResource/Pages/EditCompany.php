@@ -45,7 +45,7 @@ class EditCompany extends EditRecord
                     ]),
                 Section::make(__('Budget / Invoice Document Settings'))
                     ->icon('heroicon-o-document')
-                    ->description(__('Define information that will be displayed at the end of each budget document or invoice.'))
+                    ->description(__('Define information (disclaimer) that will be displayed at the end of each Budget or Invoice Document.'))
                     ->relationship('company')
                     ->columns(2)
                     ->schema([
