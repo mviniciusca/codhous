@@ -13,6 +13,8 @@ class CompanySetting extends Model
     /** @use HasFactory<\Database\Factories\CompanySettingFactory> */
     use HasFactory;
     use SoftDeletes;
+
+    protected $guarded = [];
     protected $casts = [
         'address' => 'array',
     ];
