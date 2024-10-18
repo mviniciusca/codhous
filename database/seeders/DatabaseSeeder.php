@@ -40,10 +40,10 @@ class DatabaseSeeder extends Seeder
             ->has(Partner::factory()->count(5))
             ->create();
 
-        Budget::factory(20)->create();
+        Budget::factory(50)->create();
         Product::factory(3)->create();
         Newsletter::factory(10)->create();
-        Mail::factory(20)->create();
+        Mail::factory(50)->create();
         Customer::factory(10)->create();
     }
 }
