@@ -3,23 +3,23 @@
 namespace App\Filament\Resources\SettingResource\Pages;
 
 use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SettingResource;
-use Filament\Forms\Components\Textarea;
 
 class EditCompany extends EditRecord
 {
     protected static string $resource = SettingResource::class;
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
-
     public static function getNavigationLabel(): string
     {
         return __('Company Information');
     }
 
-    public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
