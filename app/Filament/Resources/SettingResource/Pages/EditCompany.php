@@ -3,7 +3,10 @@
 namespace App\Filament\Resources\SettingResource\Pages;
 
 use Filament\Actions;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
+use Illuminate\Support\Str;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -88,8 +91,13 @@ class EditCompany extends EditRecord
                             ->maxLength(255)
                             ->label(__('City')),
                         TextInput::make('address.state')
+                            ->live()
+                            ->debounce(500)
                             ->required()
-                            ->maxLength(255)
+                            ->maxLength(2)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                return $set('address.state', Str::upper($state));
+                            })
                             ->label(__('UF')),
                     ]),
                 Section::make(__('Budget / Invoice Document Settings'))
