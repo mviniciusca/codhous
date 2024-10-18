@@ -37,13 +37,13 @@ class DatabaseSeeder extends Seeder
             ->has(Layout::factory())
             ->has(Navigation::factory())
             ->has(CompanySetting::factory())
-            ->has(Partner::factory()->count(20))
+            ->has(Partner::factory()->count(5))
             ->create();
 
-        Budget::factory(100)->create();
+        Budget::factory(20)->create();
         Product::factory(3)->create();
         Newsletter::factory(10)->create();
-        Mail::factory(143)->create();
-        Customer::factory(36)->create();
+        Mail::factory(20)->create();
+        Customer::factory(10)->create();
     }
 }
