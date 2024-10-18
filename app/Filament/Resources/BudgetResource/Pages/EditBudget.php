@@ -44,10 +44,9 @@ class EditBudget extends EditRecord
                         Section::make(__('Budget Overview'))
                             ->headerActions([
                                 Action::make('export_pdf')
-                                    ->label(__('Budgets'))
                                     ->label(__('Download PDF'))
-                                    ->color('warning')
-                                    ->icon('heroicon-o-document')
+                                    ->color('primary')
+                                    ->icon('heroicon-o-arrow-down-tray')
                                     ->action(function ($state) {
 
                                         Pdf::view('pdf.invoice', [
