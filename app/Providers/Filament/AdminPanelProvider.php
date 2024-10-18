@@ -2,36 +2,37 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\MailSent;
-use App\Filament\Resources\BudgetResource;
-use App\Filament\Resources\BudgetResource\Pages\BudgetBin;
-use App\Filament\Resources\CustomerResource;
-use App\Filament\Resources\CustomerResource\Pages\CustomerBin;
-use App\Filament\Resources\MailResource;
-use App\Filament\Resources\MailResource\Pages\BinMail;
-use App\Filament\Resources\MailResource\Pages\FavoriteMail;
-use App\Filament\Resources\MailResource\Pages\ReadMail;
-use App\Filament\Resources\MailResource\Pages\SentMail;
-use App\Filament\Resources\MailResource\Pages\SpamMail;
-use App\Filament\Resources\NewsletterResource\Pages\SubscriberBin;
-use App\Filament\Resources\SettingResource\Pages\EditSetting;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
+use App\Filament\Pages\MailSent;
 use Filament\Support\Colors\Color;
+use Filament\Navigation\NavigationItem;
+use App\Filament\Resources\MailResource;
+use App\Filament\Resources\BudgetResource;
 use Filament\Http\Middleware\Authenticate;
+use App\Filament\Resources\ProductResource;
+use App\Filament\Resources\CustomerResource;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use App\Filament\Resources\MailResource\Pages\BinMail;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Z3d0X\FilamentFabricator\FilamentFabricatorPlugin;
+use App\Filament\Resources\MailResource\Pages\ReadMail;
+use App\Filament\Resources\MailResource\Pages\SentMail;
+use App\Filament\Resources\MailResource\Pages\SpamMail;
 use Filament\Http\Middleware\DisableBladeIconComponents;
+use App\Filament\Resources\BudgetResource\Pages\BudgetBin;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationItem;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use App\Filament\Resources\MailResource\Pages\FavoriteMail;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use App\Filament\Resources\SettingResource\Pages\EditSetting;
+use App\Filament\Resources\CustomerResource\Pages\CustomerBin;
+use App\Filament\Resources\NewsletterResource\Pages\SubscriberBin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -62,6 +63,14 @@ class AdminPanelProvider extends PanelProvider
                     ->group(__('Budget'))
                     ->sort(1)
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.index')),
+                NavigationItem::make('product')
+                    ->url(fn(): string => ProductResource::getUrl())
+                    ->label(fn(): string => __('Products'))
+                    ->icon('heroicon-o-shopping-bag')
+                    ->badge(fn(): ?string => ProductResource::getNavigationBadge())
+                    ->group(__('Budget'))
+                    ->sort(1)
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
                 NavigationItem::make('budget_bin')
                     ->label(fn(): string => __('Trash'))
                     ->url(fn(): string => BudgetBin::getUrl())

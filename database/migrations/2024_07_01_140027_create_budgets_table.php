@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('status')->default('pending');
             $table->boolean('is_active')->default(true);
             $table->json('content');
+            $table->string('pdf_document')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
