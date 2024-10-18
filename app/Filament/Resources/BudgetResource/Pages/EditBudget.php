@@ -44,19 +44,6 @@ class EditBudget extends EditRecord
                     ->schema([
                         Section::make(__('Budget Overview'))
                             ->headerActions([
-                                //
-                                Action::make('notify_email')
-                                    ->label(__('Send Email'))
-                                    ->color('primary')
-                                    ->icon('heroicon-o-envelope')
-                                    ->requiresConfirmation()
-                                    ->disabled(function (Get $get, ?array $state) {
-                                        return self::checkId($get, $state);
-                                    })
-                                    ->action(function () {
-                                        //
-                                    }),
-                                //
                                 Action::make('export_pdf')
                                     ->label(__('Download PDF'))
                                     ->color('warning')
