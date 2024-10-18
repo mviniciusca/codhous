@@ -72,12 +72,16 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__(''))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
+                    ->label(__(''))
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
+                    ->label(__(''))
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__(''))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
