@@ -3,12 +3,14 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 use Filament\Actions;
+use App\Models\Budget;
 use App\Models\Product;
 use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Illuminate\Support\Carbon;
+use Spatie\LaravelPdf\Facades\Pdf;
 use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Select;
@@ -22,7 +24,6 @@ use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Illuminate\Validation\ValidationException;
-use Spatie\LaravelPdf\Facades\Pdf;
 
 class EditBudget extends EditRecord
 {
@@ -48,11 +49,21 @@ class EditBudget extends EditRecord
                                     ->label(__('Download PDF'))
                                     ->color('primary')
                                     ->disabled(function (Get $get, ?array $state): bool {
-                                        if ($get('content.tax') === null or $get('content.discount') === null) {
+
+                                        $field = Budget::select('content')
+                                            ->where('id', '=', $get('id'))
+                                            ->first()
+                                            ->content;
+
+                                        $discount = $field['discount'] ?? null;
+                                        $tax = $field['tax'] ?? null;
+
+                                        if ($discount === null or $tax === null) {
                                             return true;
                                         } else {
                                             return false;
                                         }
+
                                     })
                                     ->icon('heroicon-o-arrow-down-tray')
                                     ->action(function ($state) {
