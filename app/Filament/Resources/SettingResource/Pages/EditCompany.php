@@ -95,7 +95,7 @@ class EditCompany extends EditRecord
                             ->debounce(500)
                             ->required()
                             ->maxLength(2)
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                            ->afterStateUpdated(function (Set $set, ?string $state) {
                                 return $set('address.state', Str::upper($state));
                             })
                             ->label(__('UF')),
