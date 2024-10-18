@@ -2,26 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
 use App\Models\Mail;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\MailResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\MailResource\RelationManagers;
-use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\TernaryFilter;
-
 class MailResource extends Resource
 {
     protected static ?string $model = Mail::class;
