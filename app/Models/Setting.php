@@ -8,6 +8,7 @@ use App\Models\Module;
 use App\Models\Contact;
 use App\Models\Partner;
 use App\Models\Navigation;
+use App\Models\CompanySetting;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,6 +25,15 @@ class Setting extends Model
             'social' => 'array',
             'whatsapp' => 'array',
         ];
+    }
+
+    /**
+     * Summary of company
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function company(): HasOne
+    {
+        return $this->hasOne(CompanySetting::class);
     }
 
     /**
