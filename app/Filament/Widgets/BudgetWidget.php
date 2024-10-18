@@ -55,6 +55,9 @@ class BudgetWidget extends BaseWidget
                     ->label(__('Budget Code')),
                 TextColumn::make('content.customer_name')
                     ->label(__('Customer Name')),
+                TextColumn::make('created_at')
+                    ->datetime('d/m/Y H:i')
+                    ->label(__('Received At')),
             ]);
     }
 }
