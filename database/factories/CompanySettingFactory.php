@@ -24,7 +24,7 @@ class CompanySettingFactory extends Factory
                 'street' => $this->faker->streetName(),
                 'number' => $this->faker->randomNumber(),
                 'city' => $this->faker->city(),
-                'state' => $this->faker->citySuffix(),
+                'state' => $this->faker->countryCode(),
             ],
             'cnpj' => $this->faker->numerify('#############'),
             'email' => $this->faker->email(),
