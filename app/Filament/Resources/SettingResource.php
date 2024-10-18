@@ -40,6 +40,7 @@ class SettingResource extends Resource
     {
         return $page->generateNavigationItems([
             Pages\EditSetting::class,
+            Pages\EditCompany::class,
             Pages\EditNavigation::class,
             Pages\EditLayout::class,
             Pages\EditContact::class,
@@ -185,6 +186,7 @@ class SettingResource extends Resource
             'edit_whatsapp' => Pages\EditWhatsapp::route('/{record}/edit-whatsapp'),
             'edit_addons' => Pages\EditAddons::route('/{record}/edit-addons'),
             'edit_maintenance' => Pages\EditMaintenance::route('/{record}/edit-maintenance'),
+            'edit_company' => Pages\EditCompany::route('/{record}/edit-company'),
         ];
     }
 }
