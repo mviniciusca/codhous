@@ -46,7 +46,7 @@ class EditBudget extends EditRecord
                             ->headerActions([
                                 Action::make('export_pdf')
                                     ->label(__('Download PDF'))
-                                    ->color('primary')
+                                    ->color('warning')
                                     ->disabled(function (Get $get, ?array $state): bool {
 
                                         $field = Budget::select('content')
