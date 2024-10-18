@@ -8,6 +8,7 @@ use App\Models\Product;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\ProductResource\Pages;
@@ -37,14 +38,32 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('price')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('is_active')
-                    ->required(),
+                Section::make(__('Product'))
+                    ->icon('heroicon-o-shopping-bag')
+                    ->description(__('Manager your product for your Budget Tool'))
+                    ->columns(5)
+                    ->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->default(true)
+                            ->label(__('Active'))
+                            ->helperText(__('Product status'))
+                            ->inline(false)
+                            ->required(),
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->columnSpan(2)
+                            ->label(__('Name'))
+                            ->helperText(__('Product name'))
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('price')
+                            ->required()
+                            ->columnSpan(2)
+                            ->numeric()
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->maxValue(42949672.95)
+                            ->label(__('Price'))
+                            ->helperText(__('Price per unity')),
+                    ])
             ]);
     }
 
