@@ -70,6 +70,7 @@ class AdminPanelProvider extends PanelProvider
                     ->badge(fn(): ?string => ProductResource::getNavigationBadge())
                     ->group(__('Budget'))
                     ->sort(1)
+                    ->badge(fn(): ?string => ProductResource::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
                 NavigationItem::make('budget_bin')
                     ->label(fn(): string => __('Trash'))

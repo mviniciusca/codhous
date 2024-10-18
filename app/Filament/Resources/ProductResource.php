@@ -25,6 +25,14 @@ class ProductResource extends Resource
         return __('Products');
     }
 
+    public static function count(): ?string
+    {
+        $count = Product::query()
+            ->where('is_active', true)
+            ->count();
+        return $count !== 0 ? $count : null;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
