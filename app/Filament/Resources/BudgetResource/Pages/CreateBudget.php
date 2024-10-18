@@ -163,6 +163,9 @@ class CreateBudget extends CreateRecord
                             ->schema([
                                 TextInput::make('content.quantity')
                                     ->live()
+                                    ->integer()
+                                    ->required()
+                                    ->minValue(3)
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
@@ -213,6 +216,8 @@ class CreateBudget extends CreateRecord
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->required()
+                            ->integer()
+                            ->minValue(3)
                             ->suffix('m³')
                             ->helperText(__('Quantity of items'))
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
