@@ -67,12 +67,25 @@ class EditCompany extends EditRecord
                     ->relationship('company')
                     ->columns(2)
                     ->schema([
-                        TextInput::make('address.postcode'),
-                        TextInput::make('address.street'),
-                        TextInput::make('address.number'),
-                        TextInput::make('address.neighborhood'),
-                        TextInput::make('address.city'),
-                        TextInput::make('address.state'),
+                        TextInput::make('address.postcode')
+                            ->required()
+                            ->label(__('CEP'))
+                            ->mask('99.999-999'),
+                        TextInput::make('address.street')
+                            ->required()
+                            ->label(__('Street')),
+                        TextInput::make('address.number')
+                            ->required()
+                            ->label(__('Number (optional)')),
+                        TextInput::make('address.neighborhood')
+                            ->required()
+                            ->label(__('Neighborhood')),
+                        TextInput::make('address.city')
+                            ->required()
+                            ->label(__('City')),
+                        TextInput::make('address.state')
+                            ->required()
+                            ->label(__('UF')),
                     ]),
                 Section::make(__('Budget / Invoice Document Settings'))
                     ->icon('heroicon-o-document')
