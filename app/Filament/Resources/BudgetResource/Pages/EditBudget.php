@@ -44,11 +44,18 @@ class EditBudget extends EditRecord
                         Section::make(__('Budget Overview'))
                             ->headerActions([
                                 Action::make('export_pdf')
+                                    ->label(__('Budgets'))
                                     ->label(__('Download PDF'))
                                     ->color('primary')
+                                    ->disabled(function (Get $get, ?array $state): bool {
+                                        if ($get('content.tax') === null or $get('content.discount') === null) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    })
                                     ->icon('heroicon-o-arrow-down-tray')
                                     ->action(function ($state) {
-
                                         Pdf::view('pdf.invoice', [
                                             'state' => $state,
                                             'product_name' => Product::select('name')
