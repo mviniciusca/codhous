@@ -12,6 +12,12 @@ use Filament\Forms\Components\Textarea;
 class EditCompany extends EditRecord
 {
     protected static string $resource = SettingResource::class;
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Company Information');
+    }
 
     public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
     {
