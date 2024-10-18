@@ -52,7 +52,7 @@ class BudgetWidget extends BaseWidget
             ->striped()
             ->columns([
                 TextColumn::make('code')
-                    ->label(__('Budget Code')),
+                    ->label(__('Code')),
                 TextColumn::make('content.customer_name')
                     ->label(__('Customer Name')),
                 TextColumn::make('created_at')

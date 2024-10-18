@@ -52,6 +52,7 @@ class CreateBudget extends CreateRecord
                                     ])
                                     ->default('pending'),
                                 TextInput::make('code')
+                                    ->disabled()
                                     ->dehydrated()
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
