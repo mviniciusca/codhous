@@ -29,7 +29,7 @@ class EditCompany extends EditRecord
                 Section::make(__('Company Information'))
                     ->icon('heroicon-o-building-office')
                     ->description(__('Manager your Company Information. This information it will be used in Budget or Invoice Documents.'))
-                    ->relationship('company')
+                    ->relationship('companySetting')
                     ->columns(2)
                     ->schema([
                         TextInput::make('trade_name')
@@ -67,7 +67,7 @@ class EditCompany extends EditRecord
                 Section::make(__('Company Address'))
                     ->icon('heroicon-o-map')
                     ->description(__('Manager your Company Information. This information it will be used in Budget or Invoice Documents.'))
-                    ->relationship('company')
+                    ->relationship('companySetting')
                     ->columns(2)
                     ->schema([
                         TextInput::make('address.postcode')
@@ -109,7 +109,7 @@ class EditCompany extends EditRecord
                 Section::make(__('Budget / Invoice Document Settings'))
                     ->icon('heroicon-o-document')
                     ->description(__('Define information that will be displayed at the end of each Budget or Invoice Document.'))
-                    ->relationship('company')
+                    ->relationship('companySetting')
                     ->columns(2)
                     ->schema([
                         Textarea::make('budget_information')

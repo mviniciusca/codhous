@@ -26,39 +26,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $setting = Setting::factory()
-            ->create();
-        Contact::factory()->create([
-            'setting_id' => $setting->id
-        ]);
-        Module::factory()->create([
-            'setting_id' => $setting->id
-        ]);
-        Layout::factory()->create([
-            'setting_id' => $setting->id,
-        ]);
-        Navigation::factory()->create([
-            'setting_id' => $setting->id,
-        ]);
         User::factory()->create([
             'name' => 'Codhous Software',
             'email' => 'codhous@codhous.app',
         ]);
-        Partner::factory(20)->create([
-            'setting_id' => $setting->id,
-        ]);
-        CompanySetting::factory()->create([
-            'setting_id' => $setting->id,
-        ]);
+
+        Setting::factory()
+            ->has(Contact::factory())
+            ->has(Module::factory())
+            ->has(Layout::factory())
+            ->has(Navigation::factory())
+            ->has(CompanySetting::factory())
+            ->has(Partner::factory()->count(20))
+            ->create();
 
         Budget::factory(100)->create();
         Product::factory(3)->create();
         Newsletter::factory(10)->create();
         Mail::factory(143)->create();
         Customer::factory(36)->create();
-
-        // DB::table('pages')
-        //     ->create([]);
-
     }
 }

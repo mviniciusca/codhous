@@ -31,7 +31,7 @@ class Setting extends Model
      * Summary of company
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function company(): HasOne
+    public function companySetting(): HasOne
     {
         return $this->hasOne(CompanySetting::class);
     }
