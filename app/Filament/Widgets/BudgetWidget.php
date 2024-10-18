@@ -52,19 +52,9 @@ class BudgetWidget extends BaseWidget
             ->striped()
             ->columns([
                 TextColumn::make('code')
-                    ->label(__('Code')),
+                    ->label(__('Budget Code')),
                 TextColumn::make('content.customer_name')
                     ->label(__('Customer Name')),
-                SelectColumn::make('content.area')
-                    ->label(__('Local / Area'))
-                    ->disabled()
-                    ->options(
-                        Setting::query()
-                            ->select(['budget'])
-                            ->get()
-                            ->pluck('budget.area', 'id')
-                            ->first()
-                    )
             ]);
     }
 }
