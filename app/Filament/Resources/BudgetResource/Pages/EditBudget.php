@@ -44,9 +44,18 @@ class EditBudget extends EditRecord
                     ->schema([
                         Section::make(__('Budget Overview'))
                             ->headerActions([
+                                //
+                                Action::make('notify_email')
+                                    ->label(__('Send Email'))
+                                    ->color('primary')
+                                    ->action(function () {
+                                        //
+                                    }),
+                                //
                                 Action::make('export_pdf')
                                     ->label(__('Download PDF'))
                                     ->color('warning')
+                                    ->icon('heroicon-o-arrow-down-tray')
                                     ->disabled(function (Get $get, ?array $state): bool {
 
                                         $field = Budget::select('content')
@@ -64,7 +73,6 @@ class EditBudget extends EditRecord
                                         }
 
                                     })
-                                    ->icon('heroicon-o-arrow-down-tray')
                                     ->action(function ($state) {
                                         Pdf::view('pdf.invoice', [
                                             'state' => $state,
