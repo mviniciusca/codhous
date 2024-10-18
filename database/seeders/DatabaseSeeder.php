@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Mail;
 use App\Models\User;
 use App\Models\Budget;
+use App\Models\CompanySetting;
 use App\Models\Layout;
 use App\Models\Module;
 use App\Models\Contact;
@@ -50,6 +51,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Partner::factory(20)->create([
+            'setting_id' => $setting->id,
+        ]);
+
+        CompanySetting::factory()->create([
             'setting_id' => $setting->id,
         ]);
 

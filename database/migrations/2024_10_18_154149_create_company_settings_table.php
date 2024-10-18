@@ -20,7 +20,8 @@ return new class extends Migration {
             $table->string('cnpj');
             $table->string('phone');
             $table->string('email');
-            $table->text('budget_information');
+            $table->text('budget_information')
+                ->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -17,7 +17,20 @@ class CompanySettingFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'trade_name' => $this->faker->company(),
+            'legal_name' => $this->faker->company(),
+            'address' => [
+                'postcode' => $this->faker->numerify('2####-###'),
+                'street' => $this->faker->streetName(),
+                'number' => $this->faker->randomNumber(),
+                'city' => $this->faker->city(),
+                'state' => $this->faker->citySuffix(),
+            ],
+            'cnpj' => $this->faker->numerify('#############'),
+            'email' => $this->faker->email(),
+            'phone' => $this->faker->phoneNumber(),
+            'budget_information' => $this->faker->sentence(),
+
         ];
     }
 }
