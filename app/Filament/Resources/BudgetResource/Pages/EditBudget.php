@@ -45,7 +45,6 @@ class EditBudget extends EditRecord
                         Section::make(__('Budget Overview'))
                             ->headerActions([
                                 Action::make('export_pdf')
-                                    ->label(__('Budgets'))
                                     ->label(__('Download PDF'))
                                     ->color('primary')
                                     ->disabled(function (Get $get, ?array $state): bool {
