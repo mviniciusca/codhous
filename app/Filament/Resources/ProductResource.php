@@ -70,18 +70,21 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__(''))
+                    ->label(__('Name'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->label(__(''))
+                    ->label(__('Price (Unity)'))
+                    ->prefix(env('CURRENCY_SUFFIX') . ' ')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label(__(''))
+                    ->label(__('Active'))
+                    ->alignCenter()
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__(''))
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
