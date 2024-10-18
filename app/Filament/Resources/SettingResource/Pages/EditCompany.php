@@ -113,6 +113,7 @@ class EditCompany extends EditRecord
                     ->columns(2)
                     ->schema([
                         Textarea::make('budget_information')
+                            ->helperText(__('Enter your information here (optional)'))
                             ->label(__('Information (optional)'))
                             ->rows(5)
                             ->maxLength(300)
