@@ -233,7 +233,6 @@ class CreateBudget extends CreateRecord
                             ->dehydrated()
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity (m³)'))
-                            ->required()
                             ->numeric()
                             ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
                             ->step(0.01)
@@ -273,9 +272,10 @@ class CreateBudget extends CreateRecord
                             }),
                         TextInput::make('content.total')
                             ->live()
-                            ->disabled()
+                            ->readonly()
                             ->numeric()
                             ->required()
+                            ->label(__('Total Price'))
                             ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->step(0.01),
