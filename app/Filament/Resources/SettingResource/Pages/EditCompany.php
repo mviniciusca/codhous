@@ -69,22 +69,27 @@ class EditCompany extends EditRecord
                     ->schema([
                         TextInput::make('address.postcode')
                             ->required()
+                            ->maxLength(255)
                             ->label(__('CEP'))
                             ->mask('99.999-999'),
                         TextInput::make('address.street')
                             ->required()
+                            ->maxLength(255)
                             ->label(__('Street')),
                         TextInput::make('address.number')
-                            ->required()
+                            ->maxLength(255)
                             ->label(__('Number (optional)')),
                         TextInput::make('address.neighborhood')
                             ->required()
+                            ->maxLength(255)
                             ->label(__('Neighborhood')),
                         TextInput::make('address.city')
                             ->required()
+                            ->maxLength(255)
                             ->label(__('City')),
                         TextInput::make('address.state')
                             ->required()
+                            ->maxLength(255)
                             ->label(__('UF')),
                     ]),
                 Section::make(__('Budget / Invoice Document Settings'))
@@ -94,7 +99,9 @@ class EditCompany extends EditRecord
                     ->columns(2)
                     ->schema([
                         Textarea::make('budget_information')
+                            ->label(__('Information (optional)'))
                             ->rows(5)
+                            ->maxLength(300)
                             ->columnSpanFull(),
                     ]),
             ]);
