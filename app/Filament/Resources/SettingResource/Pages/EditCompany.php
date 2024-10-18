@@ -7,6 +7,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SettingResource;
+use Filament\Forms\Components\Textarea;
 
 class EditCompany extends EditRecord
 {
@@ -41,6 +42,16 @@ class EditCompany extends EditRecord
                         TextInput::make('address.neighborhood'),
                         TextInput::make('address.city'),
                         TextInput::make('address.state'),
+                    ]),
+                Section::make(__('Budget / Invoice Document Settings'))
+                    ->icon('heroicon-o-document')
+                    ->description(__('Define information that will be displayed at the end of each budget document or invoice.'))
+                    ->relationship('company')
+                    ->columns(2)
+                    ->schema([
+                        Textarea::make('budget_information')
+                            ->rows(5)
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
