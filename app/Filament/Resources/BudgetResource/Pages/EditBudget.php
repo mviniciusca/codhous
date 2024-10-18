@@ -48,6 +48,11 @@ class EditBudget extends EditRecord
                                 Action::make('notify_email')
                                     ->label(__('Send Email'))
                                     ->color('primary')
+                                    ->icon('heroicon-o-envelope')
+                                    ->requiresConfirmation()
+                                    ->disabled(function (Get $get, ?array $state) {
+                                        return self::checkId($get, $state);
+                                    })
                                     ->action(function () {
                                         //
                                     }),
@@ -56,22 +61,9 @@ class EditBudget extends EditRecord
                                     ->label(__('Download PDF'))
                                     ->color('warning')
                                     ->icon('heroicon-o-arrow-down-tray')
-                                    ->disabled(function (Get $get, ?array $state): bool {
-
-                                        $field = Budget::select('content')
-                                            ->where('id', '=', $get('id'))
-                                            ->first()
-                                            ->content;
-
-                                        $discount = $field['discount'] ?? null;
-                                        $tax = $field['tax'] ?? null;
-
-                                        if ($discount === null or $tax === null) {
-                                            return true;
-                                        } else {
-                                            return false;
-                                        }
-
+                                    ->requiresConfirmation()
+                                    ->disabled(function (Get $get, ?array $state) {
+                                        return self::checkId($get, $state);
                                     })
                                     ->action(function ($state) {
                                         Pdf::view('pdf.invoice', [
@@ -311,6 +303,13 @@ class EditBudget extends EditRecord
                     ])
             ]);
     }
+
+    /**
+     * Summary of calculateTotal
+     * @param \Filament\Forms\Get $get
+     * @param \Filament\Forms\Set $set
+     * @return void
+     */
     private function calculateTotal(Get $get, Set $set): void
     {
         $quantity = floatval($get('content.quantity') ?? 0);
@@ -322,6 +321,12 @@ class EditBudget extends EditRecord
         $set('content.total', number_format($total, 2, '.', ''));
     }
 
+    /**
+     * Summary of getPrice
+     * @param \Filament\Forms\Get $get
+     * @param \Filament\Forms\Set $set
+     * @return void
+     */
     private function getPrice(Get $get, Set $set)
     {
         $id = $get('content.product');
@@ -329,6 +334,29 @@ class EditBudget extends EditRecord
             ->where('id', '=', $id)
             ->first();
         $set('content.price', $price->price ?? 0);
+    }
+
+    /**
+     * Summary of checkId
+     * @param \Filament\Forms\Get $get
+     * @param mixed $state
+     * @return bool
+     */
+    private function checkId(Get $get, ?array $state): bool
+    {
+        $field = Budget::select('content')
+            ->where('id', '=', $get('id'))
+            ->first()
+            ->content;
+
+        $discount = $field['discount'] ?? null;
+        $tax = $field['tax'] ?? null;
+
+        if ($discount === null or $tax === null) {
+            return true;
+        } else {
+            return false;
+        }
     }
     protected function getHeaderActions(): array
     {
