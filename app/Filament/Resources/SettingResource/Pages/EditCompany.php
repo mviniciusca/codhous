@@ -38,6 +38,7 @@ class EditCompany extends EditRecord
                         TextInput::make('address.postcode'),
                         TextInput::make('address.street'),
                         TextInput::make('address.number'),
+                        TextInput::make('address.neighborhood'),
                         TextInput::make('address.city'),
                         TextInput::make('address.state'),
                     ]),

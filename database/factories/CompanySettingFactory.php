@@ -23,6 +23,7 @@ class CompanySettingFactory extends Factory
                 'postcode' => $this->faker->numerify('2####-###'),
                 'street' => $this->faker->streetName(),
                 'number' => $this->faker->randomNumber(),
+                'neighborhood' => $this->faker->city(),
                 'city' => $this->faker->city(),
                 'state' => $this->faker->countryCode(),
             ],
