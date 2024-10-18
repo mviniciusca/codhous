@@ -30,7 +30,7 @@ class EditCompany extends EditRecord
                             ->columnSpanFull(),
                     ]),
                 Section::make(__('Company Address'))
-                    ->icon('heroicon-o-building-office')
+                    ->icon('heroicon-o-map')
                     ->description(__('Manager your Company Information. This information it will be used in Budget or Invoice Documents.'))
                     ->relationship('company')
                     ->columns(2)
