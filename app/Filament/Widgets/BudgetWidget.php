@@ -21,7 +21,7 @@ class BudgetWidget extends BaseWidget
             ->recordUrl(
                 fn(Budget $record): string => route('filament.admin.resources.budgets.edit', ['record' => $record]),
             )
-            ->description(__('Quick view in your budgets here.'))
+            ->description(__('New and pending budgets'))
             ->headerActions([
                 Action::make('new')
                     ->label(__('Budgets'))
@@ -56,6 +56,7 @@ class BudgetWidget extends BaseWidget
                 TextColumn::make('content.customer_name')
                     ->label(__('Customer Name')),
                 TextColumn::make('created_at')
+                    ->sortable()
                     ->datetime('d/m/Y H:i')
                     ->label(__('Received At')),
             ]);
