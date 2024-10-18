@@ -27,7 +27,7 @@ class CompanySettingFactory extends Factory
                 'city' => $this->faker->city(),
                 'state' => $this->faker->countryCode(),
             ],
-            'cnpj' => $this->faker->numerify('#############'),
+            'cnpj' => $this->faker->numerify('##.###.###/####-##'),
             'email' => $this->faker->email(),
             'phone' => $this->faker->phoneNumber(),
             'budget_information' => $this->faker->sentence(),

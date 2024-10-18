@@ -29,11 +29,36 @@ class EditCompany extends EditRecord
                     ->relationship('company')
                     ->columns(2)
                     ->schema([
-                        TextInput::make('trade_name'),
-                        TextInput::make('legal_name'),
-                        TextInput::make('phone'),
-                        TextInput::make('email'),
+                        TextInput::make('trade_name')
+                            ->helperText(__(''))
+                            ->required()
+                            ->maxLength(255)
+                            ->label(__('Company Name')),
+                        TextInput::make('legal_name')
+                            ->helperText(__(''))
+                            ->required()
+                            ->maxLength(255)
+                            ->label(__('Company Legal Name / Trade Name')),
+                        TextInput::make('phone')
+                            ->helperText(__(''))
+                            ->tel()
+                            ->required()
+                            ->maxLength(255)
+                            ->prefix('+' . env('COUNTRY_CODE'))
+                            ->mask('(99) 9999-9999')
+                            ->label(__('Phone Number')),
+                        TextInput::make('email')
+                            ->helperText(__(''))
+                            ->email()
+                            ->required()
+                            ->maxLength(255)
+                            ->label(__('Email Address')),
                         TextInput::make('cnpj')
+                            ->required()
+                            ->maxLength(255)
+                            ->mask('99.999.999/9999-99')
+                            ->helperText(__(''))
+                            ->label(__('CNPJ'))
                             ->columnSpanFull(),
                     ]),
                 Section::make(__('Company Address'))
