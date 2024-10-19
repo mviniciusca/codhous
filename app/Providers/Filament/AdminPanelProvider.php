@@ -56,37 +56,37 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationItems([
                 /** Budgets */
-                NavigationItem::make('budget')
-                    ->url(fn(): string => BudgetResource::getUrl())
-                    ->label(fn(): string => __('Budgets'))
-                    ->icon('heroicon-o-currency-dollar')
-                    ->badge(fn(): ?string => BudgetResource::getNavigationBadge())
-                    ->group(__('Budget'))
-                    ->sort(1)
-                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.index')),
-                NavigationItem::make('product')
-                    ->url(fn(): string => ProductResource::getUrl())
-                    ->label(fn(): string => __('Products'))
-                    ->icon('heroicon-o-shopping-bag')
-                    ->badge(fn(): ?string => ProductResource::getNavigationBadge())
-                    ->group(__('Budget'))
-                    ->sort(2)
-                    ->badge(fn(): ?string => ProductResource::count())
-                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
-                NavigationItem::make('budget_bin')
-                    ->label(fn(): string => __('Trash'))
-                    ->url(fn(): string => BudgetBin::getUrl())
-                    ->badge(fn(): ?string => BudgetBin::count())
-                    ->icon('heroicon-o-trash')
-                    ->group(__('Budget'))
-                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
-                    ->sort(4),
-                NavigationItem::make('budget')
-                    ->url(fn(): string => EditBudget::getUrl([Setting::first()->id]), )
-                    ->label(fn(): string => __('Budget Tool'))
-                    ->icon('heroicon-o-arrow-up-right')
-                    ->group(__('Budget'))
-                    ->sort(3),
+                // NavigationItem::make('budget')
+                //     ->url(fn(): string => BudgetResource::getUrl())
+                //     ->label(fn(): string => __('Budgets'))
+                //     ->icon('heroicon-o-currency-dollar')
+                //     ->badge(fn(): ?string => BudgetResource::getNavigationBadge())
+                //     ->group(__('Budget'))
+                //     ->sort(1)
+                //     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.index')),
+                // NavigationItem::make('product')
+                //     ->url(fn(): string => ProductResource::getUrl())
+                //     ->label(fn(): string => __('Products'))
+                //     ->icon('heroicon-o-shopping-bag')
+                //     ->badge(fn(): ?string => ProductResource::getNavigationBadge())
+                //     ->group(__('Budget'))
+                //     ->sort(2)
+                //     ->badge(fn(): ?string => ProductResource::count())
+                //     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
+                // NavigationItem::make('budget_bin')
+                //     ->label(fn(): string => __('Trash'))
+                //     ->url(fn(): string => BudgetBin::getUrl())
+                //     ->badge(fn(): ?string => BudgetBin::count())
+                //     ->icon('heroicon-o-trash')
+                //     ->group(__('Budget'))
+                //     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
+                //     ->sort(4),
+                // NavigationItem::make('budget')
+                //     ->url(fn(): string => EditBudget::getUrl([Setting::first()->id]), )
+                //     ->label(fn(): string => __('Budget Tool'))
+                //     ->icon('heroicon-o-arrow-up-right')
+                //     ->group(__('Budget'))
+                //     ->sort(3),
                 /** Inbox */
                 // NavigationItem::make('inbox')
                 //     ->label(fn(): string => __('Inbox'))
@@ -137,37 +137,37 @@ class AdminPanelProvider extends PanelProvider
                 //     ->group(__('Mail'))
                 //     ->sort(4),
                 /** Customers */
-                NavigationItem::make('customer')
-                    ->label(fn(): string => __('Customers'))
-                    ->url(fn(): string => CustomerResource::getUrl())
-                    ->badge(fn(): ?string => CustomerResource::count())
-                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.index'))
-                    ->icon('heroicon-o-user')
-                    ->group(__('Customers & Partners'))
-                    ->sort(1),
-                NavigationItem::make('customer_bin')
-                    ->label(fn(): string => __('Trash'))
-                    ->url(fn(): string => CustomerBin::getUrl())
-                    ->badge(fn(): ?string => CustomerBin::count())
-                    ->icon('heroicon-o-trash')
-                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.bin'))
-                    ->group(__('Customers & Partners'))
-                    ->sort(2),
-                /** Mailing List */
-                NavigationItem::make('subscriber_bin')
-                    ->label(fn(): string => __('Trash'))
-                    ->url(fn(): string => SubscriberBin::getUrl())
-                    ->badge(fn(): ?string => SubscriberBin::count())
-                    ->icon('heroicon-o-trash')
-                    ->group(__('Mailing'))
-                    ->sort(2),
-                /** App Setting */
-                NavigationItem::make('settings')
-                    ->label(fn(): string => __('App Settings'))
-                    ->url(fn(): string => EditSetting::getUrl([1]))
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->group(__('Settings'))
-                    ->sort(1),
+                // NavigationItem::make('customer')
+                //     ->label(fn(): string => __('Customers'))
+                //     ->url(fn(): string => CustomerResource::getUrl())
+                //     ->badge(fn(): ?string => CustomerResource::count())
+                //     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.index'))
+                //     ->icon('heroicon-o-user')
+                //     ->group(__('Customers & Partners'))
+                //     ->sort(1),
+                // NavigationItem::make('customer_bin')
+                //     ->label(fn(): string => __('Trash'))
+                //     ->url(fn(): string => CustomerBin::getUrl())
+                //     ->badge(fn(): ?string => CustomerBin::count())
+                //     ->icon('heroicon-o-trash')
+                //     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.bin'))
+                //     ->group(__('Customers & Partners'))
+                //     ->sort(2),
+                // /** Mailing List */
+                // NavigationItem::make('subscriber_bin')
+                //     ->label(fn(): string => __('Trash'))
+                //     ->url(fn(): string => SubscriberBin::getUrl())
+                //     ->badge(fn(): ?string => SubscriberBin::count())
+                //     ->icon('heroicon-o-trash')
+                //     ->group(__('Mailing'))
+                //     ->sort(2),
+                // /** App Setting */
+                // NavigationItem::make('settings')
+                //     ->label(fn(): string => __('App Settings'))
+                //     ->url(fn(): string => EditSetting::getUrl([1]))
+                //     ->icon('heroicon-o-cog-6-tooth')
+                //     ->group(__('Settings'))
+                //     ->sort(1),
             ])
             ->plugins([
                 FilamentFabricatorPlugin::make(),
@@ -175,10 +175,11 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Indigo,
-                'secondary' => Color::Zinc,
-                'danger' => Color::Red,
                 'info' => Color::Blue,
+                'danger' => Color::Red,
                 'success' => Color::Green,
+                'secondary' => Color::Zinc,
+                'tertiary' => Color::Rose,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
