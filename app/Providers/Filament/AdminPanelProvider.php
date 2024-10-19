@@ -162,12 +162,12 @@ class AdminPanelProvider extends PanelProvider
                 //     ->group(__('Mailing'))
                 //     ->sort(2),
                 // /** App Setting */
-                // NavigationItem::make('settings')
-                //     ->label(fn(): string => __('App Settings'))
-                //     ->url(fn(): string => EditSetting::getUrl([1]))
-                //     ->icon('heroicon-o-cog-6-tooth')
-                //     ->group(__('Settings'))
-                //     ->sort(1),
+                NavigationItem::make('settings')
+                    ->label(fn(): string => __('App Settings'))
+                    ->url(fn(): string => EditSetting::getUrl([1]))
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->group(__('Settings'))
+                    ->sort(1),
             ])
             ->plugins([
                 FilamentFabricatorPlugin::make(),
