@@ -9,6 +9,7 @@ use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -252,6 +253,7 @@ class BudgetResource extends Resource
         return $table
             ->headerActions([
                 CreateAction::make()
+                    ->color('primary')
                     ->icon('heroicon-o-currency-dollar')
                     ->label(__('New Budget')),
             ])
