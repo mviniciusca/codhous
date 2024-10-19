@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Resources\Pages\Page;
+use App\Filament\Clusters\MailCluster;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
@@ -20,8 +21,7 @@ class MailResource extends Resource
 {
     protected static ?string $model = Mail::class;
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
-
-    // protected static ?string $navigationGroup = 'Mail';
+    protected static ?string $navigationGroup = 'Mail';
     public static function count(): ?string
     {
         $count = Mail::query()

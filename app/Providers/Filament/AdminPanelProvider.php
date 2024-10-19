@@ -128,14 +128,14 @@ class AdminPanelProvider extends PanelProvider
                 //     ->icon('heroicon-o-flag')
                 //     ->group(__('Mail'))
                 //     ->sort(3),
-                // NavigationItem::make('bin')
-                //     ->label(fn(): string => __('Trash'))
-                //     ->url(fn(): string => BinMail::getUrl())
-                //     ->badge(fn(): ?string => BinMail::count())
-                //     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.bin'))
-                //     ->icon('heroicon-o-trash')
-                //     ->group(__('Mail'))
-                //     ->sort(4),
+                NavigationItem::make('bin')
+                    ->label(fn(): string => __('Trash'))
+                    ->url(fn(): string => BinMail::getUrl())
+                    ->badge(fn(): ?string => BinMail::count())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.mails.bin'))
+                    ->icon('heroicon-o-trash')
+                    ->group(__('Mail'))
+                    ->sort(4),
                 /** Customers */
                 // NavigationItem::make('customer')
                 //     ->label(fn(): string => __('Customers'))
