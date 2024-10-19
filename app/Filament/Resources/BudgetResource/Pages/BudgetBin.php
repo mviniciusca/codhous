@@ -35,7 +35,6 @@ class BudgetBin extends ListRecords
     {
         return __('Trash');
     }
-
     public function table(Table $table): Table
     {
         return $table

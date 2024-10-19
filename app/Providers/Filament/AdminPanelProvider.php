@@ -7,7 +7,6 @@ use Filament\Panel;
 use Filament\Widgets;
 use App\Models\Setting;
 use Filament\PanelProvider;
-use App\Filament\Pages\MailSent;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationItem;
 use App\Filament\Resources\MailResource;
