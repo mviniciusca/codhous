@@ -74,14 +74,14 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(2)
                     ->badge(fn(): ?string => ProductResource::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
-                // NavigationItem::make('budget_bin')
-                //     ->label(fn(): string => __('Trash'))
-                //     ->url(fn(): string => BudgetBin::getUrl())
-                //     ->badge(fn(): ?string => BudgetBin::count())
-                //     ->icon('heroicon-o-trash')
-                //     ->group(__('Budget'))
-                //     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
-                //     ->sort(4),
+                NavigationItem::make('budget_bin')
+                    ->label(fn(): string => __('Trash'))
+                    ->url(fn(): string => BudgetBin::getUrl())
+                    ->badge(fn(): ?string => BudgetBin::count())
+                    ->icon('heroicon-o-trash')
+                    ->group(__('Budget'))
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
+                    ->sort(4),
                 NavigationItem::make('budget')
                     ->url(fn(): string => EditBudget::getUrl([Setting::first()->id]), )
                     ->label(fn(): string => __('Budget Tool'))
