@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class BudgetBin extends ListRecords
 {
     protected static string $resource = BudgetResource::class;
-
     public static function count(): ?string
     {
         $count = Budget::onlyTrashed()->count();
