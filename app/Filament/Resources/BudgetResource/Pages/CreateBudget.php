@@ -54,9 +54,10 @@ class CreateBudget extends CreateRecord
                                 TextInput::make('code')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->prefix('#')
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
-                                    ->default('ADMIN' . rand(10000, 99999)),
+                                    ->default(rand(10000, 99999)),
                                 DateTimePicker::make('created_at')
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
