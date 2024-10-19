@@ -5,19 +5,22 @@ namespace App\Filament\Resources;
 use App\Models\Mail;
 use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Clusters\Mail as ClusterMail;
 use App\Filament\Resources\MailResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Columns\IconColumn;
+
 class MailResource extends Resource
 {
     protected static ?string $model = Mail::class;
     protected static ?string $navigationGroup = 'Mail';
+    protected static ?string $cluster = ClusterMail::class;
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
     public static function count(): ?string
     {
