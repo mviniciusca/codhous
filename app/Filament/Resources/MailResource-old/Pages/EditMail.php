@@ -4,16 +4,20 @@ namespace App\Filament\Resources\MailResource\Pages;
 
 use App\Filament\Resources\MailResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\EditRecord;
 
-class ListMails extends ListRecords
+class EditMail extends EditRecord
 {
     protected static string $resource = MailResource::class;
 
+    public static function getNavigationLabel(): string
+    {
+        return 'Important';
+    }
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }
