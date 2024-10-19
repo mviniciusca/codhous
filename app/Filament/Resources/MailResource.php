@@ -5,24 +5,22 @@ namespace App\Filament\Resources;
 use App\Models\Mail;
 use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Pages\Page;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Resources\Pages\Page;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Clusters\Mail as ClusterMail;
 use App\Filament\Resources\MailResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MailResource extends Resource
 {
     protected static ?string $model = Mail::class;
-    protected static ?string $navigationGroup = 'Mail';
-
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
+    protected static ?string $navigationGroup = 'Mail';
     public static function count(): ?string
     {
         $count = Mail::query()
@@ -36,6 +34,7 @@ class MailResource extends Resource
     {
         return __('Inbox');
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -118,7 +117,12 @@ class MailResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
-
+    public static function getRecordSubNavigation(Page $page): array
+    {
+        return $page->generateNavigationItems([
+            Pages\BinMail::class,
+        ]);
+    }
     public static function getPages(): array
     {
         return [
