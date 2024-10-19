@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
+use App\Models\Setting;
 use Filament\PanelProvider;
 use App\Filament\Pages\MailSent;
 use Filament\Support\Colors\Color;
@@ -29,6 +30,7 @@ use App\Filament\Resources\BudgetResource\Pages\BudgetBin;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use App\Filament\Resources\MailResource\Pages\FavoriteMail;
+use App\Filament\Resources\SettingResource\Pages\EditBudget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use App\Filament\Resources\SettingResource\Pages\EditSetting;
 use App\Filament\Resources\CustomerResource\Pages\CustomerBin;
@@ -69,7 +71,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-shopping-bag')
                     ->badge(fn(): ?string => ProductResource::getNavigationBadge())
                     ->group(__('Budget'))
-                    ->sort(1)
+                    ->sort(2)
                     ->badge(fn(): ?string => ProductResource::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
                 NavigationItem::make('budget_bin')
@@ -79,7 +81,13 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-trash')
                     ->group(__('Budget'))
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
-                    ->sort(2),
+                    ->sort(4),
+                NavigationItem::make('budget')
+                    ->url(fn(): string => EditBudget::getUrl([Setting::first()->id]), )
+                    ->label(fn(): string => __('Budget Tool'))
+                    ->icon('heroicon-o-arrow-up-right')
+                    ->group(__('Budget'))
+                    ->sort(3),
                 /** Inbox */
                 NavigationItem::make('inbox')
                     ->label(fn(): string => __('Inbox'))
