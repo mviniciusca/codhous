@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -23,9 +22,7 @@ use App\Filament\Resources\SettingResource\RelationManagers;
 class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
-
     public static function getNavigationLabel(): string
     {
         return __('App Settings');

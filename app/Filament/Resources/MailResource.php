@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Models\Mail;
 use Filament\Tables;
 use Filament\Forms\Form;
+use Filament\Pages\Page;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -20,7 +21,7 @@ class MailResource extends Resource
 {
     protected static ?string $model = Mail::class;
     protected static ?string $navigationGroup = 'Mail';
-    protected static ?string $cluster = ClusterMail::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
     public static function count(): ?string
     {
