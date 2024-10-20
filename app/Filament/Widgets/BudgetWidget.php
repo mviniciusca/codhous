@@ -8,7 +8,6 @@ use App\Models\Setting;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\SelectColumn;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class BudgetWidget extends BaseWidget
@@ -23,17 +22,17 @@ class BudgetWidget extends BaseWidget
             )
             ->description(__('New and pending budgets'))
             ->headerActions([
-                Action::make('new')
+                Action::make('new_budget')
                     ->label(__('Budgets'))
                     ->label(__('New'))
                     ->color('success')
                     ->icon('heroicon-o-currency-dollar')
                     ->url(route('filament.admin.resources.budgets.create')),
-                Action::make('edit')
+                Action::make('view_all')
                     ->label(__('Budgets'))
                     ->label(__('View All'))
                     ->icon('heroicon-o-eye')
-                    ->url(route('filament.admin.resources.budgets.index'))
+                    ->url(route('filament.admin.resources.budgets.index')),
             ])
             ->heading(__(
                 'Budget (' .
