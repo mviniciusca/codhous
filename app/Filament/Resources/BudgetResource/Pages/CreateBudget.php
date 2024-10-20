@@ -280,7 +280,7 @@ class CreateBudget extends CreateRecord
                             ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->step(0.01),
-                    ])
+                    ]),
             ]);
     }
 
