@@ -19,7 +19,7 @@ class StatsWidget extends BaseWidget
     {
         return [
             Stat::make(__('Application Status'), '')
-                ->label(__('App Status'))
+                ->label(__('Website Status'))
                 ->icon('heroicon-o-wifi')
                 ->value(view('components.badge', [
                     'status' => Setting::select(['discovery_mode', 'maintenance_mode'])
