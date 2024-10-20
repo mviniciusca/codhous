@@ -266,6 +266,7 @@ class EditBudget extends EditRecord
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
                             }),
                         TextInput::make('content.discount')
                             ->live(onBlur: true)
@@ -277,6 +278,7 @@ class EditBudget extends EditRecord
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
                             }),
                         TextInput::make('content.total')
                             ->live(onBlur: true)
@@ -343,6 +345,18 @@ class EditBudget extends EditRecord
             return true;
         } else {
             return false;
+        }
+    }
+
+    private function updateBudgetStatus(Get $get, Set $set, ?string $state)
+    {
+        $tax = $get('content.tax');
+        $discount = $get('content.discount');
+        $currentStatus = $get('status');
+        if ($currentStatus === 'pending' && ($tax != 0 or $tax != null) && ($discount != 0 or $discount != null)) {
+            return $set('status', 'on going');
+        } else {
+            return $set('status', 'pending');
         }
     }
     protected function getHeaderActions(): array
