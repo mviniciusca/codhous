@@ -13,7 +13,9 @@ class ListPartners extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label(__('New Partner'))
+                ->icon('heroicon-o-building-office'),
         ];
     }
 }

@@ -13,7 +13,9 @@ class ListCustomers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->icon('heroicon-o-user')
+                ->label(__('New Customer')),
         ];
     }
 }
