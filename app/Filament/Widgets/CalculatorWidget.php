@@ -31,7 +31,7 @@ class CalculatorWidget extends Widget implements HasForms
     {
         return $form->schema([
             Section::make(__('Budget Calculator'))
-                ->description(__('Calculate a budget in a easy way.'))
+                ->description(__('Calculate a budget price in a quick way.'))
                 ->columns(3)
                 ->collapsed()
                 ->icon('heroicon-o-calculator')
