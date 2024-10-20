@@ -7,7 +7,7 @@
 </svg>
 '])
 
-<span class="flex w-full flex-wrap items-center gap-1">
+<span class="flex flex-wrap items-center justify-start gap-1">
     <span>
         {!! $icon !!}
     </span>
@@ -22,8 +22,7 @@
         {{ __('Off') }}
     </span>
     @if($status->discovery_mode)
-    <span
-        class="animate-pulse rounded-md dark:bg-white bg-primary-500 px-3 py-1  text-xs dark:text-primary-600 text-white">
+    <span class="animate-pulse rounded-md px-3 py-1 text-xs bg-primary-500 text-white">
         {{ __('Discovery') }}
     </span>
     @endif
