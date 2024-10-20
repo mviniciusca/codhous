@@ -354,11 +354,6 @@ class EditBudget extends EditRecord
         }
     }
 
-    private function updateBudgetSelectOptions(Get $get, Set $set, ?array $state)
-    {
-
-    }
-
     private function updateBudgetStatus(Get $get, Set $set, ?string $state)
     {
         $tax = $get('content.tax');
