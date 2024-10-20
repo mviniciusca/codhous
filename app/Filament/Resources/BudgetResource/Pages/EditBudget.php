@@ -10,6 +10,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Illuminate\Support\Carbon;
+use Filament\Actions\CreateAction;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Http;
@@ -86,6 +87,7 @@ class EditBudget extends EditRecord
                                 TextInput::make('code')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->prefix('#')
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
                                     ->default('ADMIN' . rand(10000, 99999)),
@@ -368,7 +370,13 @@ class EditBudget extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            CreateAction::make('new_budget')
+                ->url(route('filament.admin.resources.budgets.create'))
+                ->icon('heroicon-o-plus'),
+            Actions\DeleteAction::make()
+                ->label(__('Trash'))
+                ->icon('heroicon-o-trash'),
+
         ];
     }
 }
