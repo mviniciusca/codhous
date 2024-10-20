@@ -63,11 +63,11 @@ class EditBudget extends EditRecord
                                         // Save the e-mail that was sent into database (is_sent == true)
                                         $mail = MailModel::create([
                                             'is_sent' => true,
-                                            'name' => env('APP_NAME'),
+                                            'name' => env('APP_NAME') ?? 'Codhous Software',
                                             'email' => $get('content.customer_email'),
                                             'phone' => $get('content.customer_phone') ?? '',
-                                            'subject' => 'New Budget Notification: ' . $get('code'),
-                                            'message' => 'Sent a new mail for the customer',
+                                            'subject' => __('Budget Notification: ') . $get('code'),
+                                            'message' => __('Notification was sent.')
                                         ]);
                                         // Notify on the sys that email was sent with success
                                         Notification::make()
