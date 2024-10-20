@@ -33,7 +33,7 @@ class CalculatorWidget extends Widget implements HasForms
             Section::make(__('Budget Calculator'))
                 ->description(__('Calculate a budget in a easy way.'))
                 ->columns(3)
-                ->collapsible()
+                ->collapsed()
                 ->icon('heroicon-o-calculator')
                 ->schema([
                     Select::make('content.product')
@@ -83,7 +83,6 @@ class CalculatorWidget extends Widget implements HasForms
                         ->dehydrated()
                         ->prefix('+' . env('CURRENCY_SUFFIX'))
                         ->numeric()
-                        ->default(0)
                         ->required()
                         ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
                         ->step(0.01)
