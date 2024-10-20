@@ -1,27 +1,29 @@
 @props([
 'icon' =>
-'<svg class="h-10 w-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-    stroke="currentColor" class="h-6 w-6">
+'<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+    class="w-10 h-10">
     <path stroke-linecap="round" stroke-linejoin="round"
-        d="M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0a3 3 0 0 0-3-3H5.25a3 3 0 0 0-3 3m16.5 0h.008v.008h-.008v-.008Zm-3 0h.008v.008h-.008v-.008Z" />
-</svg>'])
+        d="m6.115 5.19.319 1.913A6 6 0 0 0 8.11 10.36L9.75 12l-.387.775c-.217.433-.132.956.21 1.298l1.348 1.348c.21.21.329.497.329.795v1.089c0 .426.24.815.622 1.006l.153.076c.433.217.956.132 1.298-.21l.723-.723a8.7 8.7 0 0 0 2.288-4.042 1.087 1.087 0 0 0-.358-1.099l-1.33-1.108c-.251-.21-.582-.299-.905-.245l-1.17.195a1.125 1.125 0 0 1-.98-.314l-.295-.295a1.125 1.125 0 0 1 0-1.591l.13-.132a1.125 1.125 0 0 1 1.3-.21l.603.302a.809.809 0 0 0 1.086-1.086L14.25 7.5l1.256-.837a4.5 4.5 0 0 0 1.528-1.732l.146-.292M6.115 5.19A9 9 0 1 0 17.18 4.64M6.115 5.19A8.965 8.965 0 0 1 12 3c1.929 0 3.716.607 5.18 1.64" />
+</svg>
+'])
 
 <span class="flex w-full flex-wrap items-center gap-1">
-    <span>{!! $icon !!}</span>
+    <span>
+        {!! $icon !!}
+    </span>
 
     @if(!$status->maintenance_mode)
-    <span
-        class="animate-pulse rounded-md dark:bg-white bg-primary-500 px-3 py-1 text-xs leading-normal tracking-normal dark:text-primary-600 text-white">
+    <span style="background-color: rgb(49, 199, 49)" class="animate-pulse rounded-md text-xs px-3 py-1 text-white">
         {{ __('Live') }}
     </span>
     @else
-    <span
-        class="animate-pulse rounded-md dark:bg-white bg-primary-500 px-3 py-1 text-xs leading-normal tracking-normal dark:text-primary-600 text-white">
-        {{ __('Maintenance') }}
+    <span style="background-color: rgb(223, 67, 67)"
+        class="animate-pulse rounded-md px-3 tracking-wide py-1 text-xs text-white">
+        {{ __('Off') }}
     </span>
     @if($status->discovery_mode)
     <span
-        class="animate-pulse rounded-md dark:bg-white bg-primary-500 px-3 py-1 text-xs leading-normal tracking-normal dark:text-primary-600 text-white">
+        class="animate-pulse rounded-md dark:bg-white bg-primary-500 px-3 py-1  text-xs dark:text-primary-600 text-white">
         {{ __('Discovery') }}
     </span>
     @endif

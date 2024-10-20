@@ -8,7 +8,6 @@ use App\Models\Setting;
 use App\Models\Newsletter;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
-use Filament\Notifications\Collection;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
@@ -19,8 +18,9 @@ class StatsWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Application Status', '')
-                ->icon('heroicon-o-wrench-screwdriver')
+            Stat::make(__('Application Status'), '')
+                ->label(__('App Status'))
+                ->icon('heroicon-o-wifi')
                 ->value(view('components.badge', [
                     'status' => Setting::select(['discovery_mode', 'maintenance_mode'])
                         ->first()
