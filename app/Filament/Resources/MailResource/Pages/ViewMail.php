@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\MailResource\Pages;
 
 use App\Filament\Resources\MailResource;
-use DateTime;
 use Filament\Actions;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -22,7 +20,9 @@ class ViewMail extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->label(__('Trash'))
+                ->icon('heroicon-o-trash'),
         ];
     }
     public function getTitle(): Htmlable|string

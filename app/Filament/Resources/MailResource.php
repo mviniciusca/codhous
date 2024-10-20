@@ -7,7 +7,6 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Resources\Pages\Page;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
@@ -88,7 +87,8 @@ class MailResource extends Resource
             ->persistFiltersInSession()
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()->label(__('Trash')),
+                    Tables\Actions\DeleteAction::make()
+                        ->label(__('Trash')),
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
                 ])
