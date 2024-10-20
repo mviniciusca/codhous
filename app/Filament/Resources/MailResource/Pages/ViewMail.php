@@ -37,7 +37,7 @@ class ViewMail extends EditRecord
                 Section::make(__('Mail Message'))
                     ->icon('heroicon-o-envelope')
                     ->collapsible()
-                    ->columns(5)
+                    ->columns(3)
                     ->schema([
                         TextInput::make('name')
                             ->label(__('From:'))
@@ -45,13 +45,13 @@ class ViewMail extends EditRecord
                         TextInput::make('email')
                             ->label(__('Email:'))
                             ->disabled(),
-                        TextInput::make('subject')
-                            ->label(__('Subject:'))
-                            ->columnSpan(2)
-                            ->disabled(),
                         DateTimePicker::make('created_at')
                             ->label(__('Date / Hour: '))
                             ->format('d/m/y H:i:s')
+                            ->disabled(),
+                        TextInput::make('subject')
+                            ->label(__('Subject:'))
+                            ->columnSpanFull()
                             ->disabled(),
                         Textarea::make('message')
                             ->label(__('Message:'))
