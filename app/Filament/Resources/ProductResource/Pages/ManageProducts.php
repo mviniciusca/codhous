@@ -13,7 +13,9 @@ class ManageProducts extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->icon('heroicon-o-shopping-bag')
+                ->label(__('New Product')),
         ];
     }
 }
