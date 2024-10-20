@@ -12,7 +12,7 @@ use Filament\Notifications\Collection;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
-class SubscribersWidget extends BaseWidget
+class StatsWidget extends BaseWidget
 {
     protected static ?int $sort = 0;
     protected static ?string $pollingInterval = '10s';
