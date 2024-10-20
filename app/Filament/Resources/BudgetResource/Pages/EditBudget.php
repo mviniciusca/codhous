@@ -2,23 +2,29 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
+use App\Models\User;
 use Filament\Actions;
 use App\Models\Budget;
 use App\Models\Product;
 use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use App\Mail\BudgetMail;
 use Filament\Forms\Form;
 use Illuminate\Support\Carbon;
+use App\Models\Mail as MailModel;
 use Filament\Actions\CreateAction;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use App\Notifications\NotifyCustomer;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\BudgetResource;
 use Illuminate\Contracts\Support\Htmlable;
@@ -49,8 +55,24 @@ class EditBudget extends EditRecord
                                     ->icon('heroicon-o-envelope')
                                     ->label(__('Notify Mail'))
                                     ->requiresConfirmation()
-                                    ->action(function () {
-                                        //
+                                    ->action(function (Get $get, ?array $state) {
+                                        // Send e-mail for the customer
+                                        Mail::to($get('content.customer_email'))
+                                            ->send(new BudgetMail());
+                                        // Save the e-mail that was sent into database (is_sent == true)
+                                        MailModel::create([
+                                            'is_sent' => true,
+                                            'name' => env('APP_NAME'),
+                                            'email' => $get('content.customer_email'),
+                                            'phone' => $get('content.customer_phone') ?? '',
+                                            'subject' => 'New Budget Notification: ' . $get('code'),
+                                            'message' => 'Sent a new mail for the customer',
+                                        ]);
+                                        // Notify on the sys that email was sent with success
+                                        Notification::make()
+                                            ->title(__('Message Sent with Success!'))
+                                            ->success()
+                                            ->send();
                                     }),
                                 Action::make('download_pdf')
                                     ->label(__('Download PDF'))
