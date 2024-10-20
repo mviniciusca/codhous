@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 use App\Models\User;
+use App\Notifications\NewMessage;
 use Filament\Actions;
 use App\Models\Budget;
 use App\Models\Product;
@@ -60,7 +61,7 @@ class EditBudget extends EditRecord
                                         Mail::to($get('content.customer_email'))
                                             ->send(new BudgetMail());
                                         // Save the e-mail that was sent into database (is_sent == true)
-                                        MailModel::create([
+                                        $mail = MailModel::create([
                                             'is_sent' => true,
                                             'name' => env('APP_NAME'),
                                             'email' => $get('content.customer_email'),
