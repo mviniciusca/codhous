@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Mail;
 use Filament\Forms\Components\DatePicker;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Group;
