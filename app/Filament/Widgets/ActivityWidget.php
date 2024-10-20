@@ -10,6 +10,7 @@ use Filament\Tables\Actions\Action;
 
 class ActivityWidget extends BaseWidget
 {
+    protected static ?int $sort = 4;
     public function table(Table $table): Table
     {
         return $table
