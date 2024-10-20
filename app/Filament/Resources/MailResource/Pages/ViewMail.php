@@ -34,7 +34,24 @@ class ViewMail extends EditRecord
     {
         return $form
             ->schema([
+                Section::make(__('Actions'))
+                    ->description(__('Actions for this message'))
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->collapsible()
+                    ->columns(3)
+                    ->schema([
+                        Toggle::make('is_favorite')
+                            ->inline(true)
+                            ->label(__('Mark as Important')),
+                        Toggle::make('is_read')
+                            ->inline(true)
+                            ->label(__('Mark as Read')),
+                        Toggle::make('is_spam')
+                            ->inline(true)
+                            ->label(__('Tag as Spam')),
+                    ]),
                 Section::make(__('Mail Message'))
+                    ->description(__('Your mail content'))
                     ->icon('heroicon-o-envelope')
                     ->collapsible()
                     ->columns(3)
@@ -58,21 +75,6 @@ class ViewMail extends EditRecord
                             ->columnSpanFull()
                             ->rows(5)
                             ->disabled(),
-                    ]),
-                Section::make(__('Actions'))
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->collapsible()
-                    ->columns(6)
-                    ->schema([
-                        Toggle::make('is_favorite')
-                            ->inline(false)
-                            ->label(__('Mark as Important')),
-                        Toggle::make('is_read')
-                            ->inline(false)
-                            ->label(__('Mark as Read')),
-                        Toggle::make('is_spam')
-                            ->inline(false)
-                            ->label(__('Tag as Spam')),
                     ]),
             ]);
     }
