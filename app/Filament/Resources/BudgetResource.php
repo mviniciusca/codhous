@@ -251,12 +251,6 @@ class BudgetResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->headerActions([
-                CreateAction::make()
-                    ->color('primary')
-                    ->icon('heroicon-o-currency-dollar')
-                    ->label(__('New Budget')),
-            ])
             ->columns([
                 TextColumn::make('code')
                     ->searchable()
@@ -324,7 +318,6 @@ class BudgetResource extends Resource
             //
         ];
     }
-
     public static function getPages(): array
     {
         return [

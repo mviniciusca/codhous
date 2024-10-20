@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
-use App\Filament\Resources\BudgetResource;
 use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\BudgetResource;
 
 class ListBudgets extends ListRecords
 {
@@ -13,7 +14,10 @@ class ListBudgets extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            //
+            CreateAction::make('new_budget')
+                ->color('primary')
+                ->icon('heroicon-o-currency-dollar')
+                ->label(__('New Budget')),
         ];
     }
 }
