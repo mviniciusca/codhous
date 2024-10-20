@@ -264,6 +264,9 @@ class EditBudget extends EditRecord
                             ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
                             ->default(0)
                             ->step(0.01)
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->updateBudgetStatus($get, $set, $state);
+                            })
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                                 $this->updateBudgetStatus($get, $set, $state);
@@ -276,6 +279,9 @@ class EditBudget extends EditRecord
                             ->helperText(__('Applies a discount in ' . env('CURRENCY_SUFFIX')))
                             ->prefix('-' . env('CURRENCY_SUFFIX'))
                             ->step(0.01)
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->updateBudgetStatus($get, $set, $state);
+                            })
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                                 $this->updateBudgetStatus($get, $set, $state);
@@ -348,6 +354,11 @@ class EditBudget extends EditRecord
         }
     }
 
+    private function updateBudgetSelectOptions(Get $get, Set $set, ?array $state)
+    {
+
+    }
+
     private function updateBudgetStatus(Get $get, Set $set, ?string $state)
     {
         $tax = $get('content.tax');
@@ -356,7 +367,7 @@ class EditBudget extends EditRecord
         if ($currentStatus === 'pending' && ($tax != 0 or $tax != null) && ($discount != 0 or $discount != null)) {
             return $set('status', 'on going');
         } else {
-            return $set('status', 'pending');
+            return $set('status', $currentStatus);
         }
     }
     protected function getHeaderActions(): array
