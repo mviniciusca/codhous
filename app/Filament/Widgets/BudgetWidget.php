@@ -24,13 +24,13 @@ class BudgetWidget extends BaseWidget
                 Action::make('new_budget')
                     ->label(__('Budgets'))
                     ->label(__('New'))
-                    ->color('success')
+                    ->color('primary')
                     ->icon('heroicon-o-currency-dollar')
                     ->url(route('filament.admin.resources.budgets.create')),
                 Action::make('view_all')
                     ->label(__('Budgets'))
                     ->label(__('View All'))
-                    ->icon('heroicon-o-eye')
+                    ->icon('heroicon-o-arrow-up-right')
                     ->url(route('filament.admin.resources.budgets.index')),
             ])
             ->heading(__(
