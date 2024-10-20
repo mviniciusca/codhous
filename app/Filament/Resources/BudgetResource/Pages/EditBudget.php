@@ -48,6 +48,7 @@ class EditBudget extends EditRecord
                                 Action::make('send_mail')
                                     ->icon('heroicon-o-envelope')
                                     ->label(__('Notify Mail'))
+                                    ->requiresConfirmation()
                                     ->action(function () {
                                         //
                                     }),
