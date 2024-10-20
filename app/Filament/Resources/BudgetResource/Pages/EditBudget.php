@@ -354,7 +354,7 @@ class EditBudget extends EditRecord
         }
     }
 
-    private function updateBudgetStatus(Get $get, Set $set, ?string $state)
+    private function updateBudgetStatus(Get $get, Set $set, ?string $state): string
     {
         $tax = $get('content.tax');
         $discount = $get('content.discount');
