@@ -26,13 +26,14 @@ class ViewMail extends ViewRecord
                 ->color(function () {
                     return $this->toggle('is_favorite');
                 })
-                ->action(function () {
-                    return '';
-                })
+                ->disabled()
                 ->label(__('Fav')),
             Action::make('mark_spam')
                 ->icon('heroicon-o-speaker-x-mark')
-                ->color('secondary')
+                ->color(function () {
+                    return $this->toggle('is_spam');
+                })
+                ->disabled()
                 ->label(__('Spam')),
             Actions\DeleteAction::make()
                 ->label('Move')
@@ -49,7 +50,12 @@ class ViewMail extends ViewRecord
 
         if ($check) {
             if ($check[$column] == true) {
-                return 'primary';
+                switch ($column) {
+                    case 'is_spam':
+                        return 'warning';
+                    default:
+                        return 'primary';
+                }
             } else {
                 return 'secondary';
             }
