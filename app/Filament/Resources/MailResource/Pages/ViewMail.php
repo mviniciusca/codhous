@@ -50,12 +50,10 @@ class ViewMail extends ViewRecord
 
         if ($check) {
             if ($check[$column] == true) {
-                switch ($column) {
-                    case 'is_spam':
-                        return 'warning';
-                    default:
-                        return 'primary';
-                }
+                return match ($column) {
+                    'is_spam' => 'warning',
+                    default => 'primary',
+                };
             } else {
                 return 'secondary';
             }
