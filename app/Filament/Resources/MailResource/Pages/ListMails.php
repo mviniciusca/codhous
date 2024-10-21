@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\MailResource\Pages;
 
+use App\Models\Mail;
 use App\Models\User;
 use Filament\Actions;
+use App\Models\Customer;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Hidden;
@@ -30,25 +32,26 @@ class ListMails extends ListRecords
                 ->icon('heroicon-o-pencil')
                 ->color('primary')
                 ->label(__('New Mail'))
+                ->closeModalByClickingAway(false)
                 ->form([
                     Hidden::make('is_sent')
                         ->default(true),
                     TextInput::make('email')
-                        ->label('Mail To: ')
-                        ->email()
+                        ->label('To: ')
+                        ->datalist(Mail::orderBy('email')
+                            ->pluck('email', 'id'))
                         ->required()
-                        ->maxLength(255)
                         ->placeholder(__('Email address')),
                     TextInput::make('subject')
                         ->label('Subject: ')
                         ->required()
                         ->maxLength(255)
-                        ->placeholder(__('Subject')),
+                        ->placeholder(__('Subject of your email')),
                     RichEditor::make('message')
                         ->label('Message: ')
                         ->required()
                         ->maxLength(5000)
-                        ->placeholder(__('Message. Max.: 5000 characters')),
+                        ->helperText(__('Your Message. Max.: 5000 characters')),
                 ])
         ];
     }
