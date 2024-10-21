@@ -36,6 +36,8 @@ class ListMails extends ListRecords
                 ->form([
                     Hidden::make('is_sent')
                         ->default(true),
+                    Hidden::make('name')
+                        ->default(env('APP_NAME')),
                     TextInput::make('email')
                         ->label('To: ')
                         ->datalist(Mail::orderBy('email')
@@ -53,6 +55,9 @@ class ListMails extends ListRecords
                         ->maxLength(5000)
                         ->helperText(__('Your Message. Max.: 5000 characters')),
                 ])
+                ->action(function (Mail $mail, ?array $data) {
+                    return $mail->create($data);
+                })
         ];
     }
 }

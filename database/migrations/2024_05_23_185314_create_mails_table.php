@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('email');
             $table->string('name');
-            $table->string('phone');
+            $table->string('phone')->nullable();
             $table->string('subject');
             $table->text('message');
             $table->boolean('is_sent')->default(false);
