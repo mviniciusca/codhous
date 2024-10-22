@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Models\Mail;
 use Filament\Tables;
-use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -34,13 +33,6 @@ class MailResource extends Resource
         return __('Inbox');
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
     public static function table(Table $table): Table
     {
         return $table
@@ -100,8 +92,6 @@ class MailResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->label(__('Trash all Messages')),
-                    // Tables\Actions\ForceDeleteBulkAction::make(),
-                    //Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
