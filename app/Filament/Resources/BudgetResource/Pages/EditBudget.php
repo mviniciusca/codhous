@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 
+use App\BudgetStatus;
 use Filament\Actions;
 use App\Models\Budget;
 use App\Models\Product;
@@ -33,6 +34,7 @@ use Illuminate\Validation\ValidationException;
 
 class EditBudget extends EditRecord
 {
+    use BudgetStatus;
     protected static string $resource = BudgetResource::class;
 
     public function getTitle(): string|Htmlable
@@ -294,9 +296,7 @@ class EditBudget extends EditRecord
                             ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
                             ->default(0)
                             ->step(0.01)
-                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                $this->updateBudgetStatus($get, $set, $state);
-                            })
+                            ->afterStateHydrated(fn(Get $get, Set $set, ?string $state) => $this->updateBudgetStatus($get, $set, $state))
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                                 $this->updateBudgetStatus($get, $set, $state);
@@ -384,17 +384,17 @@ class EditBudget extends EditRecord
         }
     }
 
-    private function updateBudgetStatus(Get $get, Set $set, ?string $state): string
-    {
-        $tax = $get('content.tax');
-        $discount = $get('content.discount');
-        $currentStatus = $get('status');
-        if ($currentStatus === 'pending' && ($tax != 0 or $tax != null) && ($discount != 0 or $discount != null)) {
-            return $set('status', 'on going');
-        } else {
-            return $set('status', $currentStatus);
-        }
-    }
+    // private function updateBudgetStatus(Get $get, Set $set, ?string $state): string
+    // {
+    //     $tax = $get('content.tax');
+    //     $discount = $get('content.discount');
+    //     $currentStatus = $get('status');
+    //     if ($currentStatus === 'pending' && ($tax != 0 or $tax != null) && ($discount != 0 or $discount != null)) {
+    //         return $set('status', 'on going');
+    //     } else {
+    //         return $set('status', $currentStatus);
+    //     }
+    // }
     protected function getHeaderActions(): array
     {
         return [

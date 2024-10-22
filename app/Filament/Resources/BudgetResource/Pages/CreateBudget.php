@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
+use App\BudgetStatus;
 use App\Models\Product;
 use App\Models\Setting;
 use Filament\Forms\Get;
@@ -23,6 +24,7 @@ use Illuminate\Validation\ValidationException;
 
 class CreateBudget extends CreateRecord
 {
+    use BudgetStatus;
     protected static string $resource = BudgetResource::class;
 
     public function form(Form $form): Form
