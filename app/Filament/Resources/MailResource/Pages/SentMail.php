@@ -4,24 +4,16 @@ namespace App\Filament\Resources\MailResource\Pages;
 
 use App\Filament\Resources\MailResource;
 use App\Models\Mail;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\Page;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -32,7 +24,7 @@ class SentMail extends ListRecords
     protected static string $view = 'filament.resources.mail-resource.pages.sent-mail';
     public static function getNavigationLabel(): string
     {
-        return __('Sent');
+        return __('Sent Mails');
     }
 
     public static function count(): ?string
@@ -46,7 +38,7 @@ class SentMail extends ListRecords
 
     public function getTitle(): string|Htmlable
     {
-        return __('Sent');
+        return __('Sent Mails');
     }
     public function table(Table $table): Table
     {
@@ -66,21 +58,18 @@ class SentMail extends ListRecords
                     ->falseIcon('heroicon-o-inbox')
                     ->falseColor('primary'),
                 ToggleColumn::make('is_favorite')
-                    ->label(__('Important'))
+                    ->label(__('Important:'))
                     ->inline()
                     ->alignCenter()
                     ->onIcon('heroicon-s-star'),
                 TextColumn::make('name')
                     ->limit(25)
-                    ->label(__('From')),
-                TextColumn::make('email')
-                    ->limit(25)
-                    ->label(__('Email')),
+                    ->label(__('From:')),
                 TextColumn::make('subject')
                     ->limit(30)
-                    ->label(ucfirst(__('Subject'))),
+                    ->label(ucfirst(__('Subject:'))),
                 TextColumn::make('created_at')
-                    ->label(__('Received'))
+                    ->label(__('Received:'))
                     ->date('d/m/Y H:i')
             ])
             ->searchable()

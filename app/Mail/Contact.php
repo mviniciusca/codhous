@@ -16,9 +16,9 @@ class Contact extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public ?array $data)
     {
-        //
+        $this->data = $data;
     }
 
     /**
@@ -27,7 +27,7 @@ class Contact extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Contact',
+            subject: $this->data['subject'],
         );
     }
 
@@ -37,8 +37,7 @@ class Contact extends Mailable
     public function content(): Content
     {
         return new Content(
-            // view: 'view.name',
-            text: 'mail.text'
+            view: 'mail.contact',
         );
     }
 

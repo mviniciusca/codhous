@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Mail;
 
+
 use App\Mail\Contact;
 use App\Models\Mail as MailModel;
 use App\Models\User;
@@ -72,13 +73,17 @@ class Form extends Component implements HasForms
     public function create(): void
     {
         $data = $this->form->getState();
+        $user = User::first();
+
+        Mail::to($user->email)
+            ->send(new Contact($data));
+
         $mail = MailModel::create($data);
 
-        $user = User::first();
         $user->notify(new NewMessage($mail->toArray()));
 
         Notification::make()
-            ->title(__('Message Sent'))
+            ->title(__('Mail sent with success!'))
             ->success()
             ->send();
         $this->form->fill();

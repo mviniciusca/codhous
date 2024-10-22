@@ -4,10 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Models\Mail;
 use Filament\Tables;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Resources\Resource;
-use Filament\Actions\CreateAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
@@ -67,12 +68,15 @@ class MailResource extends Resource
                     ->onIcon('heroicon-s-star'),
                 TextColumn::make('name')
                     ->limit(25)
+                    ->formatStateUsing(function (?string $state) {
+                        return self::normalizeText($state);
+                    })
                     ->label(__('From')),
-                TextColumn::make('email')
-                    ->limit(25)
-                    ->label(__('Email')),
                 TextColumn::make('subject')
                     ->limit(30)
+                    ->formatStateUsing(function (?string $state) {
+                        return ucfirst($state);
+                    })
                     ->label(ucfirst(__('Subject'))),
                 TextColumn::make('created_at')
                     ->label(__('Received'))
@@ -130,5 +134,12 @@ class MailResource extends Resource
             'spam' => Pages\SpamMail::route('/spam'),
             'bin' => Pages\BinMail::route('/bin'),
         ];
+
+    }
+    public static function normalizeText($string): string
+    {
+        $words = explode(" ", $string);
+        $words = array_map('ucfirst', $words);
+        return implode(" ", $words);
     }
 }
