@@ -45,10 +45,6 @@ class ListMails extends ListRecords
                         ->label('To: ')
                         ->required()
                         ->placeholder(__('Email address')),
-                    TextInput::make('phone')
-                        ->label('To: ')
-                        ->required()
-                        ->placeholder(__('Phone Number')),
                     TextInput::make('subject')
                         ->label('Subject: ')
                         ->required()
