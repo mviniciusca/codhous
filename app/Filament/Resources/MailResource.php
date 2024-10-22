@@ -4,10 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Models\Mail;
 use Filament\Tables;
-use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
