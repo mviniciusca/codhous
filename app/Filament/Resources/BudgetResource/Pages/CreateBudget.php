@@ -52,6 +52,9 @@ class CreateBudget extends CreateRecord
                                         'done' => __('Done'),
                                         'ignored' => __('Ignored'),
                                     ])
+                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                        return $this->updateBudgetStatus($get, $set, $state);
+                                    })
                                     ->default('pending'),
                                 TextInput::make('code')
                                     ->disabled()
@@ -251,15 +254,16 @@ class CreateBudget extends CreateRecord
                             ->dehydrated()
                             ->prefix('+' . env('CURRENCY_SUFFIX'))
                             ->numeric()
-                            ->default(0)
                             ->required()
                             ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
                             ->step(0.01)
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
                             })
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
                             }),
                         TextInput::make('content.discount')
                             ->live(onBlur: true)
@@ -270,9 +274,11 @@ class CreateBudget extends CreateRecord
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
                             })
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
                             }),
                         TextInput::make('content.total')
                             ->live()
