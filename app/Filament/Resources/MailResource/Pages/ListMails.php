@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MailResource\Pages;
 
 use App\Models\Mail;
 use App\Models\User;
+use App\Mail\Message;
 use Filament\Actions;
 use App\Models\Customer;
 use Filament\Actions\Action;
@@ -12,9 +13,11 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use App\Filament\Resources\MailResource;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\RichEditor;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Mail as Mailer;
 
 class ListMails extends ListRecords
 {
@@ -40,10 +43,12 @@ class ListMails extends ListRecords
                         ->default(env('APP_NAME')),
                     TextInput::make('email')
                         ->label('To: ')
-                        ->datalist(Mail::orderBy('email')
-                            ->pluck('email', 'id'))
                         ->required()
                         ->placeholder(__('Email address')),
+                    TextInput::make('phone')
+                        ->label('To: ')
+                        ->required()
+                        ->placeholder(__('Phone Number')),
                     TextInput::make('subject')
                         ->label('Subject: ')
                         ->required()
@@ -55,8 +60,21 @@ class ListMails extends ListRecords
                         ->maxLength(5000)
                         ->helperText(__('Your Message. Max.: 5000 characters')),
                 ])
-                ->action(function (Mail $mail, ?array $data) {
-                    return $mail->create($data);
+                ->action(function (Mail $mail, ?array $data): void {
+
+                    // send the email to destiny
+                    Mailer::to($data['email'])->send(new Message($data));
+
+
+                    // save the message in database                
+                    $mail->create($data);
+
+
+                    // show a notification 
+                    Notification::make()
+                        ->success()
+                        ->title(__('Message was sent with success'))
+                        ->send();
                 })
         ];
     }
