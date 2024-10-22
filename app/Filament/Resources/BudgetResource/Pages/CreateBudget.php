@@ -215,6 +215,7 @@ class CreateBudget extends CreateRecord
                     ->schema([
                         TextInput::make('content.quantity')
                             ->live(onBlur: true)
+                            ->disabled()
                             ->dehydrated()
                             ->required()
                             ->integer()
