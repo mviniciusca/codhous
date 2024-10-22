@@ -57,16 +57,9 @@ class ListMails extends ListRecords
                         ->helperText(__('Your Message. Max.: 5000 characters')),
                 ])
                 ->action(function (Mail $mail, ?array $data): void {
-
-                    // send the email to destiny
-                    Mailer::to($data['email'])->send(new Message($data));
-
-
-                    // save the message in database                
+                    Mailer::to($data['email'])
+                        ->send(new Message($data));
                     $mail->create($data);
-
-
-                    // show a notification 
                     Notification::make()
                         ->success()
                         ->title(__('Message was sent with success'))
