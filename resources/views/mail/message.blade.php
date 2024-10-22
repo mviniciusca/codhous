@@ -26,25 +26,10 @@
         }
 
         .mail-message {
-            color: #555c66;
+            color: #35383d;
             font-size: 14px;
             line-height: 1.6;
             margin: 0;
-        }
-
-        .logo {
-            font-size: 16px;
-            width: 48px;
-            height: 48px;
-            margin-x: auto;
-            text-align: center;
-            color: rgb(33, 139, 238);
-        }
-
-        .logo-app {
-            max-width: 200px;
-            max-height: 48px;
-            height: auto;
         }
     </style>
 </head>

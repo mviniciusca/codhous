@@ -38,7 +38,7 @@ class Message extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.reply',
+            view: 'mail.message',
         );
     }
 
