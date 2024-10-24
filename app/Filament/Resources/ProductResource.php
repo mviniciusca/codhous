@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Product;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
@@ -31,7 +32,15 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                //
+                TextInput::make('name')
+                    ->required()
+                    ->maxLength(255)
+                    ->label(__('Name')),
+                TextInput::make('price')
+                    ->integer()
+                    ->required()
+                    ->maxLength(255)
+                    ->label(__('Price')),
             ]);
     }
 
