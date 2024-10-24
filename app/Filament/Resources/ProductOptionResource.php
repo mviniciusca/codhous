@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductOptionResource\Pages;
 use App\Filament\Resources\ProductOptionResource\RelationManagers;
+use App\Filament\Resources\ProductOptionResource\RelationManagers\ProductRelationManager;
 use Filament\Tables\Columns\TextColumn;
 
 class ProductOptionResource extends Resource
@@ -74,7 +75,7 @@ class ProductOptionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ProductRelationManager::class,
         ];
     }
 
