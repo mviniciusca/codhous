@@ -23,7 +23,11 @@ class ProductOptionResource extends Resource
     protected static ?string $model = ProductOption::class;
     protected static ?string $navigationGroup = 'Budget';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationParentItem = 'Products';
+    public static function getNavigationLabel(): string
+    {
+        return __('Variations & Options');
+    }
     public static function form(Form $form): Form
     {
         return $form
