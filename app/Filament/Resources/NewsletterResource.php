@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NewsletterResource\Widgets\NewsletterOverwview;
-use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables;
@@ -14,13 +13,9 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\NewsletterResource\Pages;
-use App\Filament\Resources\NewsletterResource\RelationManagers;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\View\LegacyComponents\Widget;
+
 
 class NewsletterResource extends Resource
 {

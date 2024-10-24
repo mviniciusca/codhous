@@ -195,10 +195,9 @@ class CreateBudget extends CreateRecord
                                     ->options(
                                         Setting::query()
                                             ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.fck', 'id')
-                                    )
-                                    ->dehydrated(),
+                                            ->first()->budget['fck']
+
+                                    )->dehydrated(),
                                 Select::make('content.product')
                                     ->live()
                                     ->label(__('Product'))

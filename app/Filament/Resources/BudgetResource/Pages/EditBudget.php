@@ -247,6 +247,12 @@ class EditBudget extends EditRecord
                                 TextInput::make('content.fck')
                                     ->disabled()
                                     ->dehydrated()
+                                    ->default(
+                                        Setting::query()
+                                            ->select(['budget'])
+                                            ->first()
+                                            ->budget['fck']
+                                    )
                                     ->label(__('FCK'))
                                     ->helperText(__('Feature Compression Know')),
                                 Select::make('content.product')

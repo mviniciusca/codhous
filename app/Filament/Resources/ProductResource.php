@@ -2,30 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Product;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Section;
-use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\ProductResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Models\Product;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
-    protected static ?string $navigationGroup = 'Budget';
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
-    public function getTitle(): string|Htmlable
-    {
-        return __('Products');
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function count(): ?string
     {
@@ -39,70 +31,21 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Section::make(__('Product'))
-                    ->icon('heroicon-o-shopping-bag')
-                    ->description(__('Manager your product for your Budget Tool'))
-                    ->columns(5)
-                    ->schema([
-                        Forms\Components\Toggle::make('is_active')
-                            ->default(true)
-                            ->label(__('Active'))
-                            ->helperText(__('Product status'))
-                            ->inline(false)
-                            ->required(),
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->columnSpan(2)
-                            ->label(__('Name'))
-                            ->helperText(__('Product name'))
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('price')
-                            ->required()
-                            ->columnSpan(2)
-                            ->numeric()
-                            ->prefix(env('CURRENCY_SUFFIX'))
-                            ->maxValue(42949672.95)
-                            ->label(__('Price'))
-                            ->helperText(__('Price per unity')),
-                    ])
+                //
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->striped()
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label(__('Name'))
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('price')
-                    ->label(__('Price (Unity)'))
-                    ->prefix(env('CURRENCY_SUFFIX') . ' ')
-                    ->searchable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('Active'))
-                    ->alignCenter()
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Created At'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->label(__('Updated At'))
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                //
             ])
             ->filters([
                 //
             ])
             ->actions([
-                ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ])
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -111,10 +54,19 @@ class ProductResource extends Resource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageProducts::route('/'),
+            'index' => Pages\ListProducts::route('/'),
+            'create' => Pages\CreateProduct::route('/create'),
+            'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
 }
