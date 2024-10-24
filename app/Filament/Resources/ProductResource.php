@@ -67,6 +67,8 @@ class ProductResource extends Resource
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label('Active')
+                                    ->default(true)
+                                    ->helperText(__('Activate the product'))
                                     ->inline(),
                             ])
                     ])
