@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use Filament\Tables\Columns\TextColumn;
 
 class ProductResource extends Resource
 {
@@ -47,8 +48,12 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
-                //
+                TextColumn::make('name'),
+                TextColumn::make('price')
+                    ->label(__('Price'))
+                    ->prefix(env('CURRENCY_SUFFIX') . ' '),
             ])
             ->filters([
                 //
