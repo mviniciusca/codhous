@@ -23,7 +23,15 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
+    protected static ?string $navigationParentItem = 'Budget';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Products');
+    }
+
 
     public static function count(): ?string
     {
