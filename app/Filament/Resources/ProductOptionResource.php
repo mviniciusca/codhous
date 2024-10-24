@@ -26,7 +26,7 @@ class ProductOptionResource extends Resource
     protected static ?string $navigationParentItem = 'Products';
     public static function getNavigationLabel(): string
     {
-        return __('Variations & Options');
+        return __('Options');
     }
     public static function form(Form $form): Form
     {
