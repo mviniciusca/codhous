@@ -52,8 +52,10 @@ class ProductOptionResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->sortable()
                     ->label('Option'),
                 TextColumn::make('product.name')
+                    ->sortable()
                     ->label(__('Product'))
             ])
             ->filters([
