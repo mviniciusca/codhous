@@ -8,6 +8,8 @@ use App\Models\Product;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
@@ -34,15 +36,22 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255)
-                    ->label(__('Name')),
-                TextInput::make('price')
-                    ->integer()
-                    ->required()
-                    ->maxLength(255)
-                    ->label(__('Price')),
+                Section::make(__('Product'))
+                    ->description(__('Create or edit your product.'))
+                    ->icon('heroicon-o-shopping-bag')
+                    ->schema([
+                        Toggle::make('is_active'),
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255)
+                            ->label(__('Name')),
+                        TextInput::make('price')
+                            ->integer()
+                            ->required()
+                            ->maxLength(255)
+                            ->label(__('Price')),
+                    ])
+
             ]);
     }
 
