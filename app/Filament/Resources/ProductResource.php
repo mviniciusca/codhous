@@ -57,12 +57,15 @@ class ProductResource extends Resource
                                 TextInput::make('name')
                                     ->required()
                                     ->maxLength(255)
-                                    ->label(__('Name')),
+                                    ->label(__('Name'))
+                                    ->helperText(__('Product name')),
                                 TextInput::make('price')
-                                    ->integer()
                                     ->required()
-                                    ->maxLength(255)
-                                    ->label(__('Price')),
+                                    ->numeric()
+                                    ->prefix(env('CURRENCY_SUFFIX'))
+                                    ->maxValue(42949672.95)
+                                    ->label(__('Price'))
+                                    ->helperText(__('Price per unity')),
                             ])
                     ]),
                 Group::make()
