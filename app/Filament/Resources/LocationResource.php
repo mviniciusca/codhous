@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
-
     protected static ?int $navigationSort = 2;
     protected static ?string $navigationGroup = 'Budget Tool';
     protected static ?string $navigationIcon = 'heroicon-o-map';
