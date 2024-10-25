@@ -125,9 +125,10 @@ class Budget extends Component implements HasForms
                                             ->label(__('Estimative Quantity m³'))
                                             ->numeric()
                                             ->default(3)
+                                            ->suffix('m³')
                                             ->minValue(3)
                                             ->required()
-                                            ->helperText(__('Min value is 3 (ABNT NBR 7212)')),
+                                            ->helperText(__('Min value 3. (ABNT NBR 7212)')),
                                     ]),
                             ]),
                         Fieldset::make(__('Construction Address & Location'))
