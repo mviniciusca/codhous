@@ -90,15 +90,6 @@ class Budget extends Component implements HasForms
                                 Fieldset::make(__('Construction Dimension'))
                                     ->columns(4)
                                     ->schema([
-                                        Select::make('content.fck')
-                                            ->options(
-                                                Setting::select(['budget'])
-                                                    ->get()
-                                                    ->pluck('budget.fck', 'id')
-                                            )
-                                            ->required()
-                                            ->label(__('FCK'))
-                                            ->helperText(__('Feature Compression Know')),
                                         Select::make('content.product')
                                             ->live()
                                             ->options(
@@ -114,7 +105,10 @@ class Budget extends Component implements HasForms
                                                 return $this->getOptions($get);
                                             })
                                             ->required(function (Get $get) {
-
+                                                return $this->getOptions($get)->count() > 0;
+                                            })
+                                            ->hidden(function (Get $get) {
+                                                return $this->getOptions($get)->count() == 0;
                                             })
                                             ->label(__('Option'))
                                             ->helperText(__('Product Option')),
