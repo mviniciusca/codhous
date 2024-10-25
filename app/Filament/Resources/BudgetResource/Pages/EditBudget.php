@@ -252,7 +252,11 @@ class EditBudget extends EditRecord
                                     ->dehydrated()
                                     ->label(__('Option'))
                                     ->helperText(__('Option selected'))
-                                    ->options(ProductOption::pluck('name', 'id')),
+                                    ->options(function (Get $get, $state) {
+                                        return ProductOption::where('product_id', '=', $state)
+                                            ->get()
+                                            ->pluck('name')->toArray();
+                                    }),
                             ]),
                     ]),
                 Section::make(__('Pricing'))
