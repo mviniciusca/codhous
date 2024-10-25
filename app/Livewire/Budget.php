@@ -6,10 +6,12 @@ use App\Models\User;
 use App\Models\Module;
 use App\Models\Product;
 use App\Models\Setting;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Livewire\Component;
 use Filament\Forms\Form;
 use Illuminate\Support\Str;
+use App\Models\ProductOption;
 use App\Notifications\NewBudget;
 use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Http;
@@ -97,12 +99,26 @@ class Budget extends Component implements HasForms
                                             ->label(__('FCK'))
                                             ->helperText(__('Feature Compression Know')),
                                         Select::make('content.product')
+                                            ->live()
                                             ->options(
-                                                Product::all()->pluck('name', 'id')
+                                                Product::all()
+                                                    ->pluck('name', 'id')
                                             )
                                             ->required()
                                             ->label(__('Type of Concrete'))
                                             ->helperText(__('Type of Concrete')),
+                                        Select::make('content.product_option')
+                                            ->live()
+                                            ->options(
+                                                function (Get $get, ?string $state) {
+                                                    return ProductOption::where('product_id', '=', $get('content.product'))
+                                                        ->get()
+                                                        ->pluck('name', 'id');
+                                                }
+                                            )
+                                            ->required()
+                                            ->label(__('Option'))
+                                            ->helperText(__('Product Option')),
                                         Select::make('content.area')
                                             ->label(__('Local / Area'))
                                             ->options(
