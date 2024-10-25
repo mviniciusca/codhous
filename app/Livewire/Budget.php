@@ -13,6 +13,7 @@ use Filament\Forms\Form;
 use Illuminate\Support\Str;
 use App\Models\ProductOption;
 use App\Notifications\NewBudget;
+use Illuminate\Support\Collection;
 use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Http;
 use App\Models\Budget as BudgetModel;
@@ -109,14 +110,12 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Type of Concrete')),
                                         Select::make('content.product_option')
                                             ->live()
-                                            ->options(
-                                                function (Get $get, ?string $state) {
-                                                    return ProductOption::where('product_id', '=', $get('content.product'))
-                                                        ->get()
-                                                        ->pluck('name', 'id');
-                                                }
-                                            )
-                                            ->required()
+                                            ->options(function (Get $get) {
+                                                return $this->getOptions($get);
+                                            })
+                                            ->required(function (Get $get) {
+
+                                            })
                                             ->label(__('Option'))
                                             ->helperText(__('Product Option')),
                                         Select::make('content.area')
@@ -257,4 +256,12 @@ class Budget extends Component implements HasForms
             ->budget_image;
         return $image;
     }
+
+    private function getOptions(Get $get): Collection
+    {
+        return ProductOption::where('product_id', '=', $get('content.product'))
+            ->get()
+            ->pluck('name', 'id');
+    }
+
 }
