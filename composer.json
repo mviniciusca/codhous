@@ -19,7 +19,7 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
-        "laradumps/laradumps": "^3.0",
+        "laradumps/laradumps": "^3.2",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
