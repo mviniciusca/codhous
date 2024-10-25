@@ -46,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->navigationGroups([
                 __('Budget'),
+                __('Budget Tool'),
                 __('Mail'),
                 __('Customers & Partners'),
                 __('Mailing'),
@@ -69,7 +70,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn(): string => __('Products'))
                     ->icon('heroicon-o-shopping-bag')
                     ->badge(fn(): ?string => ProductResource::getNavigationBadge())
-                    ->group(__('Budget'))
+                    ->group(__('Budget Tool'))
                     ->sort(2)
                     ->badge(fn(): ?string => ProductResource::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
@@ -83,9 +84,9 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(4),
                 NavigationItem::make('budget')
                     ->url(fn(): string => EditBudget::getUrl([Setting::first()->id]), )
-                    ->label(fn(): string => __('Budget Tool'))
+                    ->label(fn(): string => __('Design & Layout'))
                     ->icon('heroicon-o-arrow-up-right')
-                    ->group(__('Budget'))
+                    ->group(__('Budget Tool'))
                     ->sort(3),
                 /** Inbox */
                 NavigationItem::make('inbox')
