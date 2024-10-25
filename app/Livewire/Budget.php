@@ -203,6 +203,11 @@ class Budget extends Component implements HasForms
             ])
             ->statePath('data');
     }
+
+    /**
+     * Summary of create
+     * @return void
+     */
     public function create(): void
     {
         $budget = BudgetModel::create($this->form->getState());
@@ -217,6 +222,12 @@ class Budget extends Component implements HasForms
 
         $this->form->fill();
     }
+
+
+    /**
+     * Summary of render
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function render()
     {
         return view('livewire.budget', [
