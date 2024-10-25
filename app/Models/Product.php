@@ -17,7 +17,7 @@ class Product extends Model
      * Summary of productOptions
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function productOptions(): HasMany
+    public function productOption(): HasMany
     {
         return $this->hasMany(ProductOption::class);
     }
