@@ -9,6 +9,7 @@ use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Livewire\Component;
+use App\Models\Location;
 use Filament\Forms\Form;
 use Illuminate\Support\Str;
 use App\Models\ProductOption;
@@ -117,12 +118,12 @@ class Budget extends Component implements HasForms
                                             })
                                             ->label(__('Option'))
                                             ->helperText(__('Product Option')),
-                                        Select::make('content.area')
-                                            ->label(__('Local / Area'))
+                                        Select::make('content.location')
+                                            ->label(__('Location / Area'))
                                             ->options(
-                                                Setting::select(['budget'])
+                                                Location::select('name')
                                                     ->get()
-                                                    ->pluck('budget.area', 'id')
+                                                    ->pluck('name')
                                             )
                                             ->required()
                                             ->helperText(__('Local or area to be concreted')),
