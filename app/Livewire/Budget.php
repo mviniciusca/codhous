@@ -34,6 +34,11 @@ class Budget extends Component implements HasForms
     public $status;
     public $image;
     public ?bool $module;
+
+    /**
+     * Summary of mount
+     * @return void
+     */
     public function mount(): void
     {
         $this->status = $this->status();
