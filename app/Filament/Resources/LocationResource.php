@@ -17,7 +17,7 @@ class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
 
-    protected static ?string $navigationGroup = 'Budget';
+    protected static ?string $navigationGroup = 'Budget Tool';
     protected static ?string $navigationIcon = 'heroicon-o-map';
     protected static ?string $navigationParentItem = 'Products';
 

@@ -22,7 +22,7 @@ use Filament\Tables\Columns\TextColumn;
 class ProductOptionResource extends Resource
 {
     protected static ?string $model = ProductOption::class;
-    protected static ?string $navigationGroup = 'Budget';
+    protected static ?string $navigationGroup = 'Budget Tool';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationParentItem = 'Products';
     public static function getNavigationLabel(): string

@@ -36,22 +36,7 @@ class EditBudget extends EditRecord
                             ->inline()
                             ->helperText(__('Enable or disable this section. This is a global action.'))
                     ]),
-                Section::make(__('Options'))
-                    ->description(__('Change the content for your budget tool'))
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->columns(2)
-                    ->schema([
-                        TagsInput::make('budget.fck')
-                            ->label(__('FCK'))
-                            ->required()
-                            ->placeholder(__('press enter to add'))
-                            ->helperText(__('Enter the values of FCK that your company works')),
-                        TagsInput::make('budget.area')
-                            ->label(__('Local / Area'))
-                            ->placeholder(__('press enter to add'))
-                            ->required()
-                            ->helperText(__('Enter the local or area that your company works')),
-                    ]),
+
                 Section::make(__('Design'))
                     ->description(__('Change the design for your budget tool'))
                     ->icon('heroicon-o-photo')
