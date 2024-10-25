@@ -252,6 +252,11 @@ class Budget extends Component implements HasForms
         return $image;
     }
 
+    /**
+     * Summary of getOptions
+     * @param \Filament\Forms\Get $get
+     * @return \Illuminate\Support\Collection
+     */
     private function getOptions(Get $get): Collection
     {
         return ProductOption::where('product_id', '=', $get('content.product'))
