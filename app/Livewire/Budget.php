@@ -123,9 +123,7 @@ class Budget extends Component implements HasForms
                                             ->dehydrated()
                                             ->label(__('Location / Area'))
                                             ->options(
-                                                Location::select('name')
-                                                    ->get()
-                                                    ->pluck('name')
+                                                Location::all()->pluck('name', 'id')
                                             )
                                             ->required()
                                             ->helperText(__('Local or area to be concreted')),

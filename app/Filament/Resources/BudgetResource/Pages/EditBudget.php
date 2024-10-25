@@ -241,24 +241,6 @@ class EditBudget extends EditRecord
                                     ->helperText(__('Local or area to be concreted'))
                                     ->options(Location::all()
                                         ->pluck('name', 'id')),
-                                Select::make('content.product_option')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->label(__('Option'))
-                                    ->helperText(__('Feature Compression Know'))
-                                    ->options(
-                                        ProductOption::all()
-                                            ->pluck('name', 'id')
-                                    ),
-                                Select::make('content.product')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->options(
-                                        Product::all()
-                                            ->pluck('name', 'id')
-                                    )
-                                    ->label(__('Product'))
-                                    ->helperText(__('Type of Concrete'))
                             ]),
                     ]),
                 Section::make(__('Pricing'))
