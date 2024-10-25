@@ -156,12 +156,12 @@ class BudgetResource extends Resource
                                     ->afterStateHydrated(fn(Set $set, string $state) => $set('quantity', $state))
                                     ->disabled()
                                     ->dehydrated(),
-                                TextInput::make('content.area')
+                                TextInput::make('content.location')
                                     ->required()
-                                    ->label(__('Local / Area'))
-                                    ->helperText(__('Local or area to be concreted'))
                                     ->disabled()
-                                    ->dehydrated(),
+                                    ->dehydrated()
+                                    ->label(__('Location / Area'))
+                                    ->helperText(__('Local or area to be concreted')),
                                 TextInput::make('content.fck')
                                     ->required()
                                     ->label(__('FCK'))

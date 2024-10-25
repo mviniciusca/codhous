@@ -11,6 +11,7 @@ use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Mail\BudgetMail;
+use App\Models\Location;
 use Filament\Forms\Form;
 use Illuminate\Support\Carbon;
 use App\Models\Mail as MailModel;
@@ -31,6 +32,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Illuminate\Validation\ValidationException;
+use App\Models\ProductOption;
 
 class EditBudget extends EditRecord
 {
@@ -232,29 +234,22 @@ class EditBudget extends EditRecord
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                     ->afterStateUpdated(fn(Set $set, string $state) => $set('quantity', $state)),
-                                Select::make('content.area')
+                                Select::make('content.location')
                                     ->disabled()
                                     ->dehydrated()
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
-                                    ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.area', 'id')
-                                    )
-                                    ->dehydrated(),
-                                TextInput::make('content.fck')
+                                    ->options(Location::all()
+                                        ->pluck('name', 'id')),
+                                Select::make('content.product_option')
                                     ->disabled()
                                     ->dehydrated()
-                                    ->default(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->first()
-                                            ->budget['fck']
-                                    )
-                                    ->label(__('FCK'))
-                                    ->helperText(__('Feature Compression Know')),
+                                    ->label(__('Option'))
+                                    ->helperText(__('Feature Compression Know'))
+                                    ->options(
+                                        ProductOption::all()
+                                            ->pluck('name', 'id')
+                                    ),
                                 Select::make('content.product')
                                     ->disabled()
                                     ->dehydrated()

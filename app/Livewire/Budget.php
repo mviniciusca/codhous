@@ -107,6 +107,7 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Type of Concrete')),
                                         Select::make('content.product_option')
                                             ->live()
+                                            ->dehydrated()
                                             ->options(function (Get $get) {
                                                 return $this->getOptions($get);
                                             })
@@ -119,6 +120,7 @@ class Budget extends Component implements HasForms
                                             ->label(__('Option'))
                                             ->helperText(__('Product Option')),
                                         Select::make('content.location')
+                                            ->dehydrated()
                                             ->label(__('Location / Area'))
                                             ->options(
                                                 Location::select('name')
@@ -278,7 +280,7 @@ class Budget extends Component implements HasForms
     {
         return ProductOption::where('product_id', '=', $get('content.product'))
             ->get()
-            ->pluck('name', 'id');
+            ->pluck('name');
     }
 
 }
