@@ -7,8 +7,11 @@ use App\Models\Product;
 use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use App\Models\Location;
 use Filament\Forms\Form;
+use App\Models\ProductOption;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Select;
@@ -179,37 +182,38 @@ class CreateBudget extends CreateRecord
                                         $set('quantity', $state);
                                         $this->calculateTotal($get, $set);
                                     }),
-                                Select::make('content.area')
+                                Select::make('content.location')
+                                    ->dehydrated()
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
-                                    ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->get()
-                                            ->pluck('budget.area', 'id')
-                                    )
-                                    ->dehydrated(),
-                                Select::make('content.fck')
-                                    ->label(__('FCK'))
-                                    ->helperText(__('Feature Compression Know'))
-                                    ->options(
-                                        Setting::query()
-                                            ->select(['budget'])
-                                            ->first()->budget['fck']
-
-                                    )->dehydrated(),
+                                    ->options(Location::all()
+                                        ->pluck('name', 'id')),
                                 Select::make('content.product')
                                     ->live()
+                                    ->dehydrated()
                                     ->label(__('Product'))
-                                    ->helperText(__('Type of Concrete'))
-                                    ->options(Product::pluck('name', 'id'))
+                                    ->helperText(__('Product selected'))
+                                    ->options(Product::all()->pluck('name', 'id'))
                                     ->afterStateHydrated(function (Get $get, Set $set, $state) {
                                         $this->updatePrice($get, $set, $state);
                                     })
                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
                                         $this->updatePrice($get, $set, $state);
-                                    })
+                                    }),
+                                Select::make('content.product_option')
+                                    ->live()
                                     ->dehydrated()
+                                    ->label(__('Option'))
+                                    ->helperText(__('Option selected'))
+                                    ->options(function (Get $get) {
+                                        return $this->getOptions($get);
+                                    })
+                                    ->required(function (Get $get) {
+                                        return $this->getOptions($get)->count() > 0;
+                                    })
+                                    ->hidden(function (Get $get) {
+                                        return $this->getOptions($get)->count() == 0;
+                                    }),
                             ]),
                     ]),
                 Section::make(__('Pricing'))
@@ -290,6 +294,18 @@ class CreateBudget extends CreateRecord
                             ->step(0.01),
                     ]),
             ]);
+    }
+
+    /**
+     * Summary of getOptions
+     * @param \Filament\Forms\Get $get
+     * @return \Illuminate\Support\Collection
+     */
+    private function getOptions(Get $get): Collection
+    {
+        return ProductOption::where('product_id', '=', $get('content.product'))
+            ->get()
+            ->pluck('name', 'id');
     }
 
     /**
