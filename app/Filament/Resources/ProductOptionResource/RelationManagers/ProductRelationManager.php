@@ -10,6 +10,7 @@ use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Columns\ToggleColumn;
 
 class ProductRelationManager extends RelationManager
 {
@@ -31,9 +32,15 @@ class ProductRelationManager extends RelationManager
             ->heading(__('Products in this option'))
             ->description(__('Manager from here products under this option'))
             ->recordTitleAttribute('name')
+            ->striped()
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('price'),
+                ToggleColumn::make('is_active')
+                    ->label(__('Active')),
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('Name')),
+                Tables\Columns\TextColumn::make('price')
+                    ->prefix(env('CURRENCY_SUFFIX') . ' ')
+                    ->label(__('Price per Unity')),
             ])
             ->filters([
                 //
