@@ -15,8 +15,8 @@ class PostcodeFinder
      * Create a new class instance.
      */
     private ?string $postcode = null;
-    private string $apiFormatReturn = 'json';
-    private string $apiEndpoint = 'https://viacep.com.br/ws';
+    private string $apiFormatReturn;
+    private string $apiEndpoint;
     private array|Response $response;
 
     public function __construct(string $state, private Set $set, private $livewire)
@@ -24,11 +24,15 @@ class PostcodeFinder
         $this->set = $set;
         $this->livewire = $livewire;
         $this->postcode = preg_replace('/[^0-9]/', '', $state);
+        $this->apiEndpoint = env('VIACEP_API_ENDPOINT');
+        $this->apiFormatReturn = env('VIACEP_API_FORMAT');
     }
 
     private function reachEndpoint(): array|Response
     {
-        $this->response = Http::get("{$this->apiEndpoint}/{$this->postcode}/{$this->apiFormatReturn}/")
+        $this->response = Http::get("{$this->apiEndpoint}/
+        {$this->postcode}/
+        {$this->apiFormatReturn}/")
             ->throw()
             ->json();
 
