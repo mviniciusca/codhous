@@ -30,9 +30,7 @@ class PostcodeFinder
 
     private function reachEndpoint(): array|Response
     {
-        $this->response = Http::get("{$this->apiEndpoint}/
-        {$this->postcode}/
-        {$this->apiFormatReturn}/")
+        $this->response = Http::get("{$this->apiEndpoint}/{$this->postcode}/{$this->apiFormatReturn}/")
             ->throw()
             ->json();
 
