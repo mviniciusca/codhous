@@ -38,8 +38,15 @@ class ProductOptionResource extends Resource
                     ->icon('heroicon-o-tag')
                     ->columns(2)
                     ->schema([
-                        TextInput::make('name'),
+                        TextInput::make('name')
+                            ->label(__('Option / Variation'))
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText(__('Option or variation for main product')),
                         Select::make('product_id')
+                            ->required()
+                            ->label(__('Associated to'))
+                            ->helperText(__('Main  Product'))
                             ->searchable()
                             ->options(
                                 Product::get()->pluck('name', 'id'),
