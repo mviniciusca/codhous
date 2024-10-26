@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\Budget;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 use Spatie\LaravelPdf\Facades\Pdf;
+
 
 class PdfGenerator
 {
@@ -54,6 +56,22 @@ class PdfGenerator
             ->format($this->format)
             ->save($this->filePath);
 
+        $persist = Budget::query()
+            ->where('id', '=', $this->state['id'])
+            ->update([
+                'pdf_document' => $this->generateFilename(),
+            ]);
+
+        if (!$persist) {
+            return Notification::make()
+                ->title(__('Error on save the document on database.'))
+                ->warning()
+                ->send();
+        }
+        Notification::make()
+            ->title(__('Document generated with success!'))
+            ->success()
+            ->send();
         return $this->downloadPdf();
     }
 
