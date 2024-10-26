@@ -92,8 +92,11 @@ class ProductResource extends Resource
     {
         return $table
             ->striped()
+            ->searchable()
+            ->searchPlaceholder(__('Search'))
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')
+                    ->searchable(),
                 TextColumn::make('price')
                     ->label(__('Price'))
                     ->prefix(env('CURRENCY_SUFFIX') . ' '),
