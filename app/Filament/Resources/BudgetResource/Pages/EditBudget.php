@@ -15,6 +15,7 @@ use App\Models\Location;
 use Filament\Forms\Form;
 use Illuminate\Support\Str;
 use App\Models\ProductOption;
+use App\Services\PdfGenerator;
 use Illuminate\Support\Carbon;
 use App\Models\Mail as MailModel;
 use Filament\Actions\CreateAction;
@@ -87,19 +88,8 @@ class EditBudget extends EditRecord
                                         return self::checkId($get, $state);
                                     })
                                     ->action(function ($state) {
-
-                                        $filename = Str::slug($state['code'] . '-' . $state['id']) . '-' . now()->format('YmdHis') . env('PDF_TERMINATION');
-
-                                        Pdf::view('pdf.invoice', [
-                                            'state' => $state,
-                                            'product_name' => Product::select('name')
-                                                ->where('id', '=', $state['content']['product'])
-                                                ->first()
-                                        ])
-                                            ->format('a4')
-                                            ->save(storage_path(env('PDF_DOWNLOAD_PATH') . $filename));
-
-                                        return response()->download(storage_path(env('PDF_DOWNLOAD_PATH') . $filename));
+                                        $pdf = new PdfGenerator($state);
+                                        return $pdf->generate();
                                     })
                             ])
                             ->columns(4)
