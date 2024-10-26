@@ -172,8 +172,8 @@ class EditBudget extends EditRecord
                                         Action::make('search-action')
                                             ->icon('heroicon-o-magnifying-glass')
                                             ->action(function () use ($state, $livewire, $set) {
-                                                $cep = new PostcodeFinder($state, $set, $livewire);
-                                                $cep->find();
+                                                $postcode = new PostcodeFinder($state, $set, $livewire);
+                                                $postcode->find();
                                             })
                                     )
                                     ->label(__('CEP')),
