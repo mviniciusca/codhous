@@ -255,7 +255,7 @@ class EditBudget extends EditRecord
                                     ->options(function (Get $get) {
                                         return ProductOption::where('product_id', '=', $get('content.product'))
                                             ->get()
-                                            ->pluck('name');
+                                            ->pluck('name', 'id');
                                     }),
                             ]),
                     ]),
