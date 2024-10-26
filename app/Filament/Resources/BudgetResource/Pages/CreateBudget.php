@@ -4,7 +4,6 @@ namespace App\Filament\Resources\BudgetResource\Pages;
 
 use App\BudgetStatus;
 use App\Models\Product;
-use App\Models\Setting;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Location;
@@ -343,6 +342,12 @@ class CreateBudget extends CreateRecord
         $this->calculateTotal($get, $set);
     }
 
+    /**
+     * Summary of calculateTotal
+     * @param \Filament\Forms\Get $get
+     * @param \Filament\Forms\Set $set
+     * @return void
+     */
     private function calculateTotal(Get $get, Set $set): void
     {
         $quantity = floatval($get('content.quantity') ?? 0);
