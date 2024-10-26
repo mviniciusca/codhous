@@ -13,6 +13,8 @@ use Filament\Forms\Set;
 use App\Mail\BudgetMail;
 use App\Models\Location;
 use Filament\Forms\Form;
+use Illuminate\Support\Str;
+use App\Models\ProductOption;
 use Illuminate\Support\Carbon;
 use App\Models\Mail as MailModel;
 use Filament\Actions\CreateAction;
@@ -32,7 +34,6 @@ use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Illuminate\Validation\ValidationException;
-use App\Models\ProductOption;
 
 class EditBudget extends EditRecord
 {
@@ -86,6 +87,9 @@ class EditBudget extends EditRecord
                                         return self::checkId($get, $state);
                                     })
                                     ->action(function ($state) {
+
+                                        $filename = Str::slug($state['code'] . '-' . $state['id']) . '-' . now()->format('YmdHis') . env('PDF_TERMINATION');
+
                                         Pdf::view('pdf.invoice', [
                                             'state' => $state,
                                             'product_name' => Product::select('name')
@@ -93,9 +97,9 @@ class EditBudget extends EditRecord
                                                 ->first()
                                         ])
                                             ->format('a4')
-                                            ->save(storage_path('app/public/' . $state['id'] . '-invoice.pdf'));
+                                            ->save(storage_path(env('PDF_DOWNLOAD_PATH') . $filename));
 
-                                        return response()->download(storage_path('app/public/' . $state['id'] . '-invoice.pdf'));
+                                        return response()->download(storage_path(env('PDF_DOWNLOAD_PATH') . $filename));
                                     })
                             ])
                             ->columns(4)
