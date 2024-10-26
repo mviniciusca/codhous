@@ -18,11 +18,11 @@ class PostcodeFinder
     private string $apiFormatReturn;
     private string $apiEndpoint;
     private array|Response $response;
+    private string $field;
 
-    public function __construct(string $state, private Set $set, private $livewire)
+    public function __construct(string $state, private Set $set)
     {
         $this->set = $set;
-        $this->livewire = $livewire;
         $this->postcode = preg_replace('/[^0-9]/', '', $state);
         $this->apiEndpoint = env('VIACEP_API_ENDPOINT');
         $this->apiFormatReturn = env('VIACEP_API_FORMAT');
@@ -30,7 +30,7 @@ class PostcodeFinder
 
     private function reachEndpoint(): array|Response
     {
-        $this->response = Http::get("{$this->apiEndpoint}/{$this->postcode}/{$this->apiFormatReturn}/")
+        $this->response = Http::get($this->endpoint())
             ->throw()
             ->json();
 
@@ -54,9 +54,9 @@ class PostcodeFinder
     public function find()
     {
 
+
         try {
-            $this->emptyState();
-            $this->livewire->validateOnly('data.content.postcode');
+            $this->clearState();
             $this->reachEndpoint();
             return $this->setData();
         } catch (Exception $e) {
@@ -78,7 +78,7 @@ class PostcodeFinder
         return ($this->set)($key, $value);
     }
 
-    private function emptyState()
+    private function clearState()
     {
         $this->set('content.neighborhood', null);
         $this->set('content.street', null);
@@ -87,5 +87,10 @@ class PostcodeFinder
         $this->set('content.state', null);
 
         return $this;
+    }
+
+    private function endpoint(): string
+    {
+        return "{$this->apiEndpoint}/{$this->postcode}/{$this->apiFormatReturn}/";
     }
 }

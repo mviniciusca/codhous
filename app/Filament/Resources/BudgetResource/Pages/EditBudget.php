@@ -172,7 +172,8 @@ class EditBudget extends EditRecord
                                         Action::make('search-action')
                                             ->icon('heroicon-o-magnifying-glass')
                                             ->action(function () use ($state, $livewire, $set) {
-                                                $postcode = new PostcodeFinder($state, $set, $livewire);
+                                                $livewire->validateOnly('data.content.postcode');
+                                                $postcode = new PostcodeFinder($state, $set);
                                                 $postcode->find();
                                             })
                                     )
