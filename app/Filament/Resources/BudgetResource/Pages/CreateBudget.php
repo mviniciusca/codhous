@@ -184,6 +184,7 @@ class CreateBudget extends CreateRecord
                                     }),
                                 Select::make('content.location')
                                     ->dehydrated()
+                                    ->required()
                                     ->label(__('Local / Area'))
                                     ->helperText(__('Local or area to be concreted'))
                                     ->options(Location::all()
@@ -191,6 +192,7 @@ class CreateBudget extends CreateRecord
                                 Select::make('content.product')
                                     ->live()
                                     ->dehydrated()
+                                    ->required()
                                     ->label(__('Product'))
                                     ->helperText(__('Product selected'))
                                     ->options(Product::all()->pluck('name', 'id'))
