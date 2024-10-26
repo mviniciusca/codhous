@@ -276,7 +276,7 @@ class Budget extends Component implements HasForms
     {
         return ProductOption::where('product_id', '=', $get('content.product'))
             ->get()
-            ->pluck('name', 'id');
+            ->pluck('name');
     }
 
 }
