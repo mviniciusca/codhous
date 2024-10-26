@@ -8,7 +8,9 @@ use App\Models\Location;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\LocationResource\Pages;
@@ -32,7 +34,17 @@ class LocationResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Section::make(__('Location'))
+                    ->description(__('Manager your location / operational area'))
+                    ->icon('heroicon-o-map')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('name')
+                            ->label(__('Location or operational area'))
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText(__('Ex.: street, school ...')),
+                    ]),
             ]);
     }
 
