@@ -2,27 +2,26 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\SettingResource\Pages;
+use App\Models\Setting;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Tables;
-use App\Models\Setting;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
 use Filament\Resources\Pages\Page;
+use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\SettingResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\SettingResource\RelationManagers;
+use Filament\Tables\Table;
 
 class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     public static function getNavigationLabel(): string
     {
         return __('App Settings');
@@ -48,6 +47,7 @@ class SettingResource extends Resource
             Pages\EditMaintenance::class,
         ]);
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -75,7 +75,7 @@ class SettingResource extends Resource
                             ->label(__('Public Phone'))
                             ->tel()
                             ->prefixIcon('heroicon-o-phone')
-                            ->prefix('+' . env('COUNTRY_CODE'))
+                            ->prefix('+'.env('COUNTRY_CODE'))
                             ->mask('(99)9999-9999')
                             ->helperText(__('Define here the phone number for you or your Company. This is a public information.'))
                             ->maxLength(15)
@@ -106,8 +106,8 @@ class SettingResource extends Resource
                                 Toggle::make('module.budget')
                                     ->label(__('Budget Tool')),
                                 Toggle::make('module.footer')
-                                    ->label(__('Footer'))
-                            ])
+                                    ->label(__('Footer')),
+                            ]),
                     ]),
                 Section::make(__('SEO & Meta'))
                     ->description(__('Define here the search engine optimization with meta tags'))
@@ -152,12 +152,10 @@ class SettingResource extends Resource
                 //
             ])
             ->actions([
-                //  Tables\Actions\EditAction::make(),
+                //
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    // Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                //
             ]);
     }
 
@@ -168,22 +166,21 @@ class SettingResource extends Resource
         ];
     }
 
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSettings::route('/'),
-            'create' => Pages\CreateSetting::route('/create'),
-            'edit' => Pages\EditSetting::route('/{record}/edit'),
-            'edit_layout' => Pages\EditLayout::route('/{record}/edit-layout'),
-            'edit_contact' => Pages\EditContact::route('/{record}/edit-contact'),
-            'edit_navigation' => Pages\EditNavigation::route('/{record}/edit-navigation'),
-            'edit_social' => Pages\EditSocial::route('/{record}/edit-social'),
-            'edit_budget' => Pages\EditBudget::route('/{record}/edit-budget'),
-            'edit_whatsapp' => Pages\EditWhatsapp::route('/{record}/edit-whatsapp'),
-            'edit_addons' => Pages\EditAddons::route('/{record}/edit-addons'),
+            'index'            => Pages\ListSettings::route('/'),
+            'create'           => Pages\CreateSetting::route('/create'),
+            'edit'             => Pages\EditSetting::route('/{record}/edit'),
+            'edit_layout'      => Pages\EditLayout::route('/{record}/edit-layout'),
+            'edit_contact'     => Pages\EditContact::route('/{record}/edit-contact'),
+            'edit_navigation'  => Pages\EditNavigation::route('/{record}/edit-navigation'),
+            'edit_social'      => Pages\EditSocial::route('/{record}/edit-social'),
+            'edit_budget'      => Pages\EditBudget::route('/{record}/edit-budget'),
+            'edit_whatsapp'    => Pages\EditWhatsapp::route('/{record}/edit-whatsapp'),
+            'edit_addons'      => Pages\EditAddons::route('/{record}/edit-addons'),
             'edit_maintenance' => Pages\EditMaintenance::route('/{record}/edit-maintenance'),
-            'edit_company' => Pages\EditCompany::route('/{record}/edit-company'),
+            'edit_company'     => Pages\EditCompany::route('/{record}/edit-company'),
         ];
     }
 }
