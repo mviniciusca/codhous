@@ -42,8 +42,8 @@ class SendBudgetMail
         MailModel::create([
             'name'    => env('APP_NAME') ?? 'Codhous Software',
             'is_sent' => true,
-            'email'   => $this->destinyEmailField,
-            'phone'   => $this->phoneField,
+            'email'   => env('MAIL_FROM_ADDRESS'),
+            'phone'   => null,
             'subject' => $this->subject(),
             'message' => $this->message(),
         ]);

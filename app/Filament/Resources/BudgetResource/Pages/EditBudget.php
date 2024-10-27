@@ -65,7 +65,6 @@ class EditBudget extends EditRecord
                                     ->action(function (Get $get, ?array $state) {
                                         $mail = new SendBudgetMail($state,
                                             $get('content.customer_email'),
-                                            $state['content']['customer_phone'],
                                             new BudgetMail()
                                         );
                                         $mail->dispatch();
