@@ -2,35 +2,34 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Tables;
+use App\Filament\Resources\BudgetResource\Pages;
 use App\Models\Budget;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Fieldset;
+use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
-use Filament\Forms\Components\DateTimePicker;
-use App\Filament\Resources\BudgetResource\Pages;
+use Illuminate\Database\Eloquent\Model;
 
 class BudgetResource extends Resource
 {
     protected static ?string $recordTitleAttribute = 'Budget';
-    protected static ?string $model = Budget::class;
-    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static ?string $model                = Budget::class;
+    protected static ?string $navigationIcon       = 'heroicon-o-currency-dollar';
     public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
     {
         return __('Budget');
@@ -44,7 +43,7 @@ class BudgetResource extends Resource
     {
         return [
             __('Customer') => $record->content['customer_name'],
-            __('Code') => $record->code,
+            __('Code')     => $record->code,
         ];
     }
     public static function getNavigationBadge(): ?string
@@ -72,10 +71,10 @@ class BudgetResource extends Resource
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
                                     ->options([
-                                        'pending' => __('Pending'),
+                                        'pending'  => __('Pending'),
                                         'on going' => __('On Going'),
-                                        'done' => __('Done'),
-                                        'ignored' => __('Ignored'),
+                                        'done'     => __('Done'),
+                                        'ignored'  => __('Ignored'),
                                     ]),
                                 TextInput::make('code')
                                     ->label(__('Budget Code'))
@@ -240,8 +239,8 @@ class BudgetResource extends Resource
     public static function calculateTotal(Get $get, Set $set): void
     {
         $quantity = floatval($get('content.quantity') ?? 0);
-        $price = floatval($get('content.price') ?? 0);
-        $tax = floatval($get('content.tax') ?? 0);
+        $price    = floatval($get('content.price') ?? 0);
+        $tax      = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
 
         $total = $quantity * $price + $tax - $discount;
@@ -258,10 +257,10 @@ class BudgetResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'primary',
+                        'pending'  => 'primary',
                         'on going' => 'warning',
-                        'done' => 'success',
-                        'ignored' => 'danger'
+                        'done'     => 'success',
+                        'ignored'  => 'danger'
                     }),
                 TextColumn::make('content.customer_name')
                     ->sortable()
@@ -292,10 +291,10 @@ class BudgetResource extends Resource
                     ->placeholder(__('All Status'))
                     ->label(__('Status'))
                     ->options([
-                        'pending' => __('Pending'),
+                        'pending'  => __('Pending'),
                         'on going' => __('On Going'),
-                        'done' => __('Done'),
-                        'ignored' => __('Ignored'),
+                        'done'     => __('Done'),
+                        'ignored'  => __('Ignored'),
                     ])
                     ->searchable(),
             ])
@@ -320,10 +319,10 @@ class BudgetResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBudgets::route('/'),
+            'index'  => Pages\ListBudgets::route('/'),
             'create' => Pages\CreateBudget::route('/create'),
-            'edit' => Pages\EditBudget::route('/{record}/edit'),
-            'bin' => Pages\BudgetBin::route('/bin'),
+            'edit'   => Pages\EditBudget::route('/{record}/edit'),
+            'bin'    => Pages\BudgetBin::route('/bin'),
         ];
     }
 }
