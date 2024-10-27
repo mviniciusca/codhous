@@ -13,7 +13,7 @@ class SendBudgetMail
     /**
      * Create a new class instance.
      */
-    private array|string|Closure $code;
+    private string $code;
 
     public function __construct(
         private array $state,
