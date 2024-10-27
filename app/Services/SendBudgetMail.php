@@ -10,10 +10,12 @@ class SendBudgetMail
     /**
      * Create a new class instance.
      */
-
     private array $state;
+
     private string $field;
+
     private Mailable $mailable;
+
     public function __construct()
     {
         //
@@ -22,6 +24,6 @@ class SendBudgetMail
     private function send()
     {
         Mail::to($this->state[$this->field])
-    ->send($this->mailable);
+        ->send($this->mailable);
     }
 }
