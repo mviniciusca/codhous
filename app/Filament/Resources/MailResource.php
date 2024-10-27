@@ -3,8 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MailResource\Pages;
+use App\Mail\Message;
 use App\Models\Mail;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -15,6 +19,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Mail as MailFacade;
 
 class MailResource extends Resource
 {
@@ -50,11 +55,35 @@ class MailResource extends Resource
                     ->icon('heroicon-o-pencil')
                     ->color('warning')
                     ->modal(true)
+                    ->closeModalByClickingAway(false)
                     ->form([
-                        TextInput::make('email'),
+                        Hidden::make('is_sent')
+                            ->default(true),
+                        Hidden::make('name')
+                            ->default(env('APP_NAME')),
+                        TextInput::make('email')
+                            ->label('To: ')
+                            ->required()
+                            ->placeholder(__('Email address')),
+                        TextInput::make('subject')
+                            ->label('Subject: ')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder(__('Subject of your email')),
+                        RichEditor::make('message')
+                            ->label('Message: ')
+                            ->required()
+                            ->maxLength(5000)
+                            ->helperText(__('Your Message. Max.: 5000 characters')),
                     ])
-                    ->action(function () {
-                        dd('send');
+                    ->action(function (Mail $mail, ?array $data): void {
+                        MailFacade::to($data['email'])
+                            ->send(new Message($data));
+                        $mail->create($data);
+                        Notification::make()
+                            ->success()
+                            ->title(__('Message was sent with success'))
+                            ->send();
                     }),
             ])
             ->description(__('Your new messages are here.'))
