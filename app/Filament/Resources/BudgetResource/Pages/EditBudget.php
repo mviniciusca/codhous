@@ -62,7 +62,6 @@ class EditBudget extends EditRecord
                                     ->label(__('Notify Mail'))
                                     ->requiresConfirmation()
                                     ->action(function (Get $get, ?array $state) {
-                                        dd($state);
                                         // Send e-mail for the customer
                                         Mail::to($get('content.customer_email'))
                                             ->send(new BudgetMail());
