@@ -4,12 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MailResource\Pages;
 use App\Models\Mail;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -42,6 +44,19 @@ class MailResource extends Resource
     {
         return $table
             ->heading(__('Inbox'))
+            ->headerActions([
+                Action::make('compose_mail')
+                    ->label(__('New Mail'))
+                    ->icon('heroicon-o-pencil')
+                    ->color('warning')
+                    ->modal(true)
+                    ->form([
+                        TextInput::make('email'),
+                    ])
+                    ->action(function () {
+                        dd('send');
+                    }),
+            ])
             ->description(__('Your new messages are here.'))
             ->query(
                 Mail::query()
