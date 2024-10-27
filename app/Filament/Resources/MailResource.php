@@ -53,7 +53,7 @@ class MailResource extends Resource
                 Action::make('compose_mail')
                     ->label(__('New Mail'))
                     ->icon('heroicon-o-pencil')
-                    ->color('warning')
+                    ->color('primary')
                     ->modal(true)
                     ->closeModalByClickingAway(false)
                     ->form([
@@ -86,7 +86,7 @@ class MailResource extends Resource
                             ->send();
                     }),
             ])
-            ->description(__('Your new messages are here.'))
+            ->description(__('Your messages from website.'))
             ->query(
                 Mail::query()
                     ->where('is_spam', false)
@@ -94,7 +94,6 @@ class MailResource extends Resource
                     ->where('is_read', false)
             )
             ->columns([
-
                 IconColumn::make('is_favorite')
                     ->label(__(''))
                     ->inline()
