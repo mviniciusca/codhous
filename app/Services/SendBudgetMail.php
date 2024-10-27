@@ -33,7 +33,7 @@ class SendBudgetMail
 
     private function send()
     {
-        return Mail::to($this->state[$this->destinyEmailField])
+        return Mail::to($this->destinyEmailField)
             ->send($this->mailable);
     }
 
