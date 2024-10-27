@@ -62,15 +62,16 @@ class EditBudget extends EditRecord
                                     ->label(__('Notify Mail'))
                                     ->requiresConfirmation()
                                     ->action(function (Get $get, ?array $state) {
+                                        dd($state);
                                         // Send e-mail for the customer
                                         Mail::to($get('content.customer_email'))
                                             ->send(new BudgetMail());
                                         // Save the e-mail that was sent into database (is_sent == true)
                                         $mail = MailModel::create([
                                             'is_sent' => true,
-                                            'name' => env('APP_NAME') ?? 'Codhous Software',
-                                            'email' => $get('content.customer_email'),
-                                            'phone' => $get('content.customer_phone') ?? '',
+                                            'name'    => env('APP_NAME') ?? 'Codhous Software',
+                                            'email'   => $get('content.customer_email'),
+                                            'phone'   => $get('content.customer_phone') ?? '',
                                             'subject' => __('Budget Notification: ').$get('code'),
                                             'message' => __('Notification was sent.'),
                                         ]);
@@ -106,10 +107,10 @@ class EditBudget extends EditRecord
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
                                     ->options([
-                                        'pending' => __('Pending'),
+                                        'pending'  => __('Pending'),
                                         'on going' => __('On Going'),
-                                        'done' => __('Done'),
-                                        'ignored' => __('Ignored'),
+                                        'done'     => __('Done'),
+                                        'ignored'  => __('Ignored'),
                                     ])
                                     ->default('pending'),
                                 TextInput::make('code')
