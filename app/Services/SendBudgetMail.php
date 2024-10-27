@@ -22,10 +22,6 @@ class SendBudgetMail
         private Mailable $mailable)
     {
         $this->code = $this->state['code'];
-        $this->state = $state;
-        $this->mailable = $mailable;
-        $this->phoneField = $phoneField;
-        $this->destinyEmailField = $destinyEmailField;
     }
 
     public function dispatch()
