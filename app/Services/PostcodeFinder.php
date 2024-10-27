@@ -19,12 +19,14 @@ class PostcodeFinder
     private string $apiFormatReturn;
     private string $apiEndpoint;
     private array|Response $response;
-    private string $field;
+
+    private string $state;
 
     public function __construct(string $state, private Set $set)
     {
+        $this->state = $state;
         $this->set = $set;
-        $this->postcode = preg_replace('/[^0-9]/', '', $state);
+        $this->postcode = $this->postcodePattern();
         $this->apiEndpoint = env('VIACEP_API_ENDPOINT');
         $this->apiFormatReturn = env('VIACEP_API_FORMAT');
     }
@@ -90,5 +92,10 @@ class PostcodeFinder
     private function endpoint(): string
     {
         return "{$this->apiEndpoint}/{$this->postcode}/{$this->apiFormatReturn}/";
+    }
+
+    private function postcodePattern(): array|string|null
+    {
+        return preg_replace('/[^0-9]/', '', $this->state);
     }
 }
