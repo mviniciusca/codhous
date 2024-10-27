@@ -2,29 +2,33 @@
 
 namespace App\Filament\Resources\SettingResource\Pages;
 
-use Filament\Actions;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SettingResource;
+use Filament\Actions;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
 class EditWhatsapp extends EditRecord
 {
     protected static string $resource = SettingResource::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-phone';
+
     public static function getNavigationLabel(): string
     {
         return __('Whatsapp Web Chat');
     }
+
     public function getTitle(): string|Htmlable
     {
         return __('Whatsapp Web Chat Settings');
     }
+
     public function form(Form $form): Form
     {
         return $form
@@ -43,13 +47,15 @@ class EditWhatsapp extends EditRecord
                             ->label(__('Whatsapp Phone Number'))
                             ->prefixIcon('heroicon-o-phone')
                             ->required()
-                            ->prefix('+' . env('COUNTRY_CODE'))
+                            ->prefix('+'.env('COUNTRY_CODE'))
                             ->tel()
+                            ->maxLength(14)
+                            ->mask('(99)99999-9999')
                             ->helperText(__('Define here your phone number of your Whatsapp Account. Only numbers')),
                         Textarea::make('whatsapp.message')
                             ->label(__('Callout Message'))
                             ->placeholder(__('Example: I wanna a budget for your service.'))
-                            ->helperText(__('Set the callout message that your customer will send to you.'))
+                            ->helperText(__('Set the callout message that your customer will send to you from your website.'))
                             ->columnSpanFull()
                             ->rows(3),
                     ]),
@@ -64,7 +70,7 @@ class EditWhatsapp extends EditRecord
                             ->prefix('name=')
                             ->helperText(__('Ionicon\'s icon name. Default is logo-whatsapp')),
 
-                    ])
+                    ]),
             ]);
     }
 }
