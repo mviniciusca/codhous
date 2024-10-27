@@ -15,12 +15,11 @@ class PostcodeFinder
     /**
      * Create a new class instance.
      */
-    private ?string $postcode = null;
-    private string $apiFormatReturn;
-    private string $apiEndpoint;
-    private array|Response $response;
-
     private string $state;
+    private ?string $postcode;
+    private string $apiEndpoint;
+    private string $apiFormatReturn;
+    private array|Response $response;
 
     public function __construct(string $state, private Set $set)
     {
