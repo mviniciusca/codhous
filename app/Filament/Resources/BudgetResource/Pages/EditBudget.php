@@ -2,18 +2,16 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
-use App\BudgetStatus;
 use App\Filament\Resources\BudgetResource;
 use App\Mail\BudgetMail;
 use App\Models\Budget;
 use App\Models\Location;
-use App\Models\Mail as MailModel;
 use App\Models\Product;
 use App\Models\ProductOption;
-use App\Models\Setting;
 use App\Services\PdfGenerator;
 use App\Services\PostcodeFinder;
 use App\Services\SendBudgetMail;
+use App\Trait\BudgetStatus;
 use Filament\Actions;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Actions\Action;
@@ -27,15 +25,9 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-use Spatie\LaravelPdf\Facades\Pdf;
 
 class EditBudget extends EditRecord
 {

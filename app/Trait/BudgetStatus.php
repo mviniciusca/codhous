@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Trait;
 
 use Filament\Forms\Get;
 use Filament\Forms\Set;

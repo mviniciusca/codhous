@@ -2,32 +2,31 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
-use App\BudgetStatus;
-use App\Models\Product;
-use App\Services\PostcodeFinder;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use App\Models\Location;
-use Filament\Forms\Form;
-use App\Models\ProductOption;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Filament\Forms\Components\Group;
-use Illuminate\Support\Facades\Http;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\TextInput;
 use App\Filament\Resources\BudgetResource;
-use Filament\Resources\Pages\CreateRecord;
+use App\Models\Location;
+use App\Models\Product;
+use App\Models\ProductOption;
+use App\Services\PostcodeFinder;
+use App\Trait\BudgetStatus;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
-use Illuminate\Validation\ValidationException;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class CreateBudget extends CreateRecord
 {
     use BudgetStatus;
+
     protected static string $resource = BudgetResource::class;
 
     public function form(Form $form): Form
@@ -50,10 +49,10 @@ class CreateBudget extends CreateRecord
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
                                     ->options([
-                                        'pending' => __('Pending'),
+                                        'pending'  => __('Pending'),
                                         'on going' => __('On Going'),
-                                        'done' => __('Done'),
-                                        'ignored' => __('Ignored'),
+                                        'done'     => __('Done'),
+                                        'ignored'  => __('Ignored'),
                                     ])
                                     ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                         return $this->updateBudgetStatus($get, $set, $state);
@@ -69,9 +68,9 @@ class CreateBudget extends CreateRecord
                                 DateTimePicker::make('created_at')
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
-                                    ->default(fn() => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->default(fn () => Carbon::now()->format('Y-m-d H:i:s'))
                                     ->label(__('Date'))
-                                    ->helperText(__('When this budget was created'))
+                                    ->helperText(__('When this budget was created')),
                             ]),
                     ]),
                 Section::make('Budget Content')
@@ -114,8 +113,7 @@ class CreateBudget extends CreateRecord
                                     ->helperText(__('Customer postcode'))
                                     ->maxLength(9)
                                     ->suffixAction(
-                                        fn($state, Set $set, $livewire) =>
-                                        Action::make('search-action')
+                                        fn ($state, Set $set, $livewire) => Action::make('search-action')
                                             ->icon('heroicon-o-magnifying-glass')
                                             ->action(function () use ($state, $livewire, $set) {
                                                 $livewire->validateOnly('content.data.postcode');
@@ -231,7 +229,7 @@ class CreateBudget extends CreateRecord
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity (m³)'))
                             ->numeric()
-                            ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
+                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
                             ->step(0.01)
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
@@ -242,10 +240,10 @@ class CreateBudget extends CreateRecord
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
-                            ->prefix('+' . env('CURRENCY_SUFFIX'))
+                            ->prefix('+'.env('CURRENCY_SUFFIX'))
                             ->numeric()
                             ->required()
-                            ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
+                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
                             ->step(0.01)
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
@@ -259,8 +257,8 @@ class CreateBudget extends CreateRecord
                             ->live(onBlur: true)
                             ->numeric()
                             ->required()
-                            ->prefix('-' . env('CURRENCY_SUFFIX'))
-                            ->helperText(__('Applies a discount in ' . env('CURRENCY_SUFFIX')))
+                            ->prefix('-'.env('CURRENCY_SUFFIX'))
+                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
@@ -276,7 +274,7 @@ class CreateBudget extends CreateRecord
                             ->numeric()
                             ->required()
                             ->label(__('Total Price'))
-                            ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
+                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->step(0.01),
                     ]),
@@ -285,8 +283,8 @@ class CreateBudget extends CreateRecord
 
     /**
      * Summary of getOptions
-     * @param \Filament\Forms\Get $get
-     * @return \Illuminate\Support\Collection
+     * @param Get $get
+     * @return Collection
      */
     private function getOptions(Get $get): Collection
     {
@@ -297,8 +295,8 @@ class CreateBudget extends CreateRecord
 
     /**
      * Summary of getPrice
-     * @param \Filament\Forms\Get $get
-     * @param \Filament\Forms\Set $set
+     * @param Get $get
+     * @param Set $set
      * @return void
      */
     private function getPrice(Get $get, Set $set)
@@ -312,8 +310,8 @@ class CreateBudget extends CreateRecord
 
     /**
      * Summary of updatePrice
-     * @param \Filament\Forms\Get $get
-     * @param \Filament\Forms\Set $set
+     * @param Get $get
+     * @param Set $set
      * @param mixed $productId
      * @return void
      */
@@ -330,8 +328,8 @@ class CreateBudget extends CreateRecord
 
     /**
      * Summary of calculateTotal
-     * @param \Filament\Forms\Get $get
-     * @param \Filament\Forms\Set $set
+     * @param Get $get
+     * @param Set $set
      * @return void
      */
     private function calculateTotal(Get $get, Set $set): void

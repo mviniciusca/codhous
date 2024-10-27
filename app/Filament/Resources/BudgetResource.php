@@ -28,17 +28,23 @@ use Illuminate\Database\Eloquent\Model;
 class BudgetResource extends Resource
 {
     protected static ?string $recordTitleAttribute = 'Budget';
-    protected static ?string $model                = Budget::class;
-    protected static ?string $navigationIcon       = 'heroicon-o-currency-dollar';
+
+    protected static ?string $model = Budget::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
+
     public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
     {
         return __('Budget');
     }
+
     protected static ?string $navigationGroup = 'Budget';
+
     public static function getGloballySearchableAttributes(): array
     {
         return ['code', 'content'];
     }
+
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
@@ -46,9 +52,11 @@ class BudgetResource extends Resource
             __('Code')     => $record->code,
         ];
     }
+
     public static function getNavigationBadge(): ?string
     {
         $count = static::getModel()::count();
+
         return $count != 0 ? $count : null;
     }
 
@@ -84,7 +92,7 @@ class BudgetResource extends Resource
                                     ->format('d/m/Y H:i')
                                     ->label(__('Date'))
                                     ->disabled()
-                                    ->helperText(__('When this budget was created'))
+                                    ->helperText(__('When this budget was created')),
                             ]),
                     ]),
                 Section::make('Budget Content')
@@ -172,7 +180,7 @@ class BudgetResource extends Resource
                                     ->label(__('Product'))
                                     ->helperText(__('Type of Concrete'))
                                     ->disabled()
-                                    ->dehydrated()
+                                    ->dehydrated(),
                             ]),
                     ])
                     ->collapsible(),
@@ -206,7 +214,7 @@ class BudgetResource extends Resource
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
-                            ->prefix('+' . env('CURRENCY_SUFFIX'))
+                            ->prefix('+'.env('CURRENCY_SUFFIX'))
                             ->numeric()
                             ->required()
                             ->default(0)
@@ -219,7 +227,7 @@ class BudgetResource extends Resource
                             ->dehydrated()
                             ->numeric()
                             ->required()
-                            ->prefix('-' . env('CURRENCY_SUFFIX'))
+                            ->prefix('-'.env('CURRENCY_SUFFIX'))
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 self::calculateTotal($get, $set);
@@ -239,13 +247,14 @@ class BudgetResource extends Resource
     public static function calculateTotal(Get $get, Set $set): void
     {
         $quantity = floatval($get('content.quantity') ?? 0);
-        $price    = floatval($get('content.price') ?? 0);
-        $tax      = floatval($get('content.tax') ?? 0);
+        $price = floatval($get('content.price') ?? 0);
+        $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
 
         $total = $quantity * $price + $tax - $discount;
         $set('content.total', number_format($total, 2, '.', ''));
     }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -277,7 +286,7 @@ class BudgetResource extends Resource
                 IconColumn::make('is_active')
                     ->label(__('Active'))
                     ->alignCenter()
-                    ->boolean()
+                    ->boolean(),
             ])
             ->defaultSort('id', 'desc')
             ->filters([
@@ -301,7 +310,7 @@ class BudgetResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make(),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -316,6 +325,7 @@ class BudgetResource extends Resource
             //
         ];
     }
+
     public static function getPages(): array
     {
         return [

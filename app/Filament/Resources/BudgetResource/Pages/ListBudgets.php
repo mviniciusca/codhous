@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
-use Filament\Actions;
+use App\Filament\Resources\BudgetResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\BudgetResource;
 
 class ListBudgets extends ListRecords
 {

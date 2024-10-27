@@ -2,22 +2,22 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
+use App\Filament\Resources\BudgetResource;
 use App\Models\Budget;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\BudgetResource;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -25,15 +25,19 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class BudgetBin extends ListRecords
 {
     protected static string $resource = BudgetResource::class;
+
     public static function count(): ?string
     {
         $count = Budget::onlyTrashed()->count();
+
         return $count !== 0 ? $count : null;
     }
+
     public function getTitle(): string|Htmlable
     {
         return __('Trash');
     }
+
     public function table(Table $table): Table
     {
         return $table
@@ -45,11 +49,11 @@ class BudgetBin extends ListRecords
                 TextColumn::make('status')
                     ->sortable()
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'pending' => 'primary',
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending'  => 'primary',
                         'on going' => 'warning',
-                        'done' => 'success',
-                        'ignored' => 'danger'
+                        'done'     => 'success',
+                        'ignored'  => 'danger'
                     }),
                 TextColumn::make('content.customer_name')
                     ->sortable()
@@ -66,7 +70,7 @@ class BudgetBin extends ListRecords
                 IconColumn::make('is_active')
                     ->label(__('Active'))
                     ->alignCenter()
-                    ->boolean()
+                    ->boolean(),
             ])
             ->defaultSort('id', 'desc')
             ->filters([
@@ -79,10 +83,10 @@ class BudgetBin extends ListRecords
                     ->placeholder(__('All Status'))
                     ->label(__('Status'))
                     ->options([
-                        'pending' => __('Pending'),
+                        'pending'  => __('Pending'),
                         'on going' => __('On Going'),
-                        'done' => __('Done'),
-                        'ignored' => __('Ignored'),
+                        'done'     => __('Done'),
+                        'ignored'  => __('Ignored'),
                     ])
                     ->searchable(),
             ])
@@ -91,7 +95,7 @@ class BudgetBin extends ListRecords
                     DeleteAction::make(),
                     ForceDeleteAction::make(),
                     RestoreAction::make(),
-                ])
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
