@@ -100,7 +100,7 @@ class MailResource extends Resource
                     ->label(__(''))
                     ->inline()
                     ->trueIcon('heroicon-m-bookmark')
-                    ->trueColor('warning')
+                    ->trueColor('primary')
                     ->falseIcon('')
                     ->alignCenter(),
                 TextColumn::make('name')
