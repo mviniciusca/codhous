@@ -55,11 +55,13 @@ class EditWhatsapp extends EditRecord
                         Textarea::make('whatsapp.message')
                             ->label(__('Callout Message'))
                             ->placeholder(__('Example: I wanna a budget for your service.'))
-                            ->helperText(__('Set the callout message that your customer will send to you from your website.'))
+                            ->helperText(__('Set the callout message that your customer will send to you from your website. Max.: 200 characters'))
                             ->columnSpanFull()
+                            ->maxLength(200)
                             ->rows(3),
                     ]),
-                Section::make(__('Design & Layout'))->description(__('Edit your company whatsapp settings'))
+                Section::make(__('Design & Layout'))
+                    ->description(__('Edit your company whatsapp settings'))
                     ->columns(2)
                     ->icon('heroicon-o-photo')
                     ->schema([
@@ -67,7 +69,7 @@ class EditWhatsapp extends EditRecord
                             ->default('#25d366')
                             ->helperText(__('Default color: #25d366')),
                         TextInput::make('whatsapp.icon')
-                            ->prefix('name=')
+                            ->prefixIcon('heroicon-o-cube')
                             ->helperText(__('Ionicon\'s icon name. Default is logo-whatsapp')),
 
                     ]),
