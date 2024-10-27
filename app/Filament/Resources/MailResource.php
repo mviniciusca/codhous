@@ -6,6 +6,7 @@ use App\Filament\Resources\MailResource\Pages;
 use App\Mail\Message;
 use App\Models\Mail;
 use App\Services\SendMail;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
@@ -68,8 +69,21 @@ class MailResource extends Resource
                     ->form([
                         Hidden::make('is_sent')
                             ->default(true),
-                        Hidden::make('name')
-                            ->default(env('APP_NAME')),
+                        Group::make()
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label(__('From:'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->default(env('APP_NAME') ?? 'Codhous Software'),
+                                TextInput::make('sending_mail')
+                                    ->label(__('Sending E-mail:'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->disabled()
+                                    ->default(env('MAIL_FROM_ADDRESS') ?? 'Codhous Software'),
+                            ]),
                         TextInput::make('email')
                             ->label('To:')
                             ->email()
