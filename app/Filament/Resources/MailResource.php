@@ -41,6 +41,8 @@ class MailResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading(__('Inbox'))
+            ->description(__('Your new messages are here.'))
             ->query(
                 Mail::query()
                     ->where('is_spam', false)
