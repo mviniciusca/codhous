@@ -39,8 +39,9 @@ class EditSocial extends EditRecord
                     ->description(__('Manage your social network accounts'))
                     ->schema([
                         Repeater::make('social')
+                            ->itemLabel(__('Social Network'))
                             ->label(__('Social Network'))
-                            ->columns(6)
+                            ->columns(5)
                             ->schema([
                                 Toggle::make('status')
                                     ->label(__('Active'))
@@ -48,17 +49,19 @@ class EditSocial extends EditRecord
                                     ->default(true)
                                     ->inline(false),
                                 TextInput::make('social_network')
-                                    ->columnSpan(2)
                                     ->live()
+                                    ->maxLength(30)
+                                    ->columnSpan(2)
                                     ->debounce(700)
                                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('icon', Str::slug($state)))
                                     ->helperText(__('ex: Facebook'))
-                                    ->label(__('Social Network')),
+                                    ->label(__('Social Network Name')),
                                 TextInput::make('link')
                                     ->columnSpan(2)
                                     ->helperText(__('ex: https://www.facebook.com'))
-                                    ->label(__('Link')),
+                                    ->label(__('Profile URL Link')),
                                 TextInput::make('icon')
+                                    ->hidden()
                                     ->lazy()
                                     ->dehydrated()
                                     ->readonly()
