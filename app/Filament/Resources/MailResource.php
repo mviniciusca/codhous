@@ -2,23 +2,26 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\MailResource\Pages;
 use App\Models\Mail;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\MailResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MailResource extends Resource
 {
     protected static ?string $model = Mail::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
+
     protected static ?string $navigationGroup = 'Mail';
+
     public static function count(): ?string
     {
         $count = Mail::query()
@@ -26,8 +29,10 @@ class MailResource extends Resource
             ->where('is_sent', false)
             ->where('is_spam', false)
             ->count();
+
         return $count !== 0 ? $count : null;
     }
+
     public static function getNavigationLabel(): string
     {
         return __('Inbox');
@@ -43,19 +48,14 @@ class MailResource extends Resource
                     ->where('is_read', false)
             )
             ->columns([
-                IconColumn::make('is_sent')
-                    ->wrap()
+
+                IconColumn::make('is_favorite')
                     ->label(__(''))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-paper-airplane')
-                    ->trueColor('primary')
-                    ->falseIcon('heroicon-o-inbox')
-                    ->falseColor('primary'),
-                ToggleColumn::make('is_favorite')
-                    ->label(__('Important'))
                     ->inline()
-                    ->alignCenter()
-                    ->onIcon('heroicon-s-star'),
+                    ->trueIcon('heroicon-m-star')
+                    ->trueColor('warning')
+                    ->falseIcon('')
+                    ->alignCenter(),
                 TextColumn::make('name')
                     ->limit(25)
                     ->formatStateUsing(function (?string $state) {
@@ -70,7 +70,7 @@ class MailResource extends Resource
                     ->label(ucfirst(__('Subject'))),
                 TextColumn::make('created_at')
                     ->label(__('Received'))
-                    ->date('d/m/Y H:i')
+                    ->date('d/m/Y H:i'),
             ])
             ->searchable()
             ->striped()
@@ -86,7 +86,7 @@ class MailResource extends Resource
                         ->label(__('Trash')),
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -95,6 +95,7 @@ class MailResource extends Resource
                 ]),
             ]);
     }
+
     public static function getRelations(): array
     {
         return [
@@ -109,25 +110,27 @@ class MailResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMails::route('/'),
+            'index'   => Pages\ListMails::route('/'),
             'starred' => Pages\StarredMail::route('/starred'),
-            'sent' => Pages\SentMail::route('/sent'),
-            'view' => Pages\ViewMail::route('/{record}/view'),
-            'create' => Pages\CreateMail::route('/create'),
-            'fav' => Pages\FavoriteMail::route('/fav'),
-            'read' => Pages\ReadMail::route('/read'),
-            'spam' => Pages\SpamMail::route('/spam'),
-            'bin' => Pages\BinMail::route('/bin'),
+            'sent'    => Pages\SentMail::route('/sent'),
+            'view'    => Pages\ViewMail::route('/{record}/view'),
+            'create'  => Pages\CreateMail::route('/create'),
+            'fav'     => Pages\FavoriteMail::route('/fav'),
+            'read'    => Pages\ReadMail::route('/read'),
+            'spam'    => Pages\SpamMail::route('/spam'),
+            'bin'     => Pages\BinMail::route('/bin'),
         ];
-
     }
+
     public static function normalizeText($string): string
     {
-        $words = explode(" ", $string);
+        $words = explode(' ', $string);
         $words = array_map('ucfirst', $words);
-        return implode(" ", $words);
+
+        return implode(' ', $words);
     }
 }
