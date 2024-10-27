@@ -24,22 +24,22 @@ class SendBudgetMail
         $this->phoneField = $phoneField;
     }
 
+    private function dispatch()
+    {
+        $this->send();
+
+        return $this->save();
+    }
+
     private function send()
     {
-        Mail::to($this->state[$this->destinyEmailField])
+        return Mail::to($this->state[$this->destinyEmailField])
             ->send($this->mailable);
     }
 
     private function save()
     {
-        MailModel::create([
-            'name'    => env('APP_NAME') ?? 'Codhous Software',
-            'is_sent' => true,
-            'mail'    => $this->state[$this->destinyEmailField],
-            'phone'   => $this->state[$this->phoneField],
-            'subject' => $this->subject(),
-            'message' => $this->message(),
-        ]);
+        return $this->notification();
     }
 
     private function subject()
