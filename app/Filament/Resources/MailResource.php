@@ -87,7 +87,13 @@ class MailResource extends Resource
                     ->action(function (Mail $mail, ?array $data): void {
                         MailFacade::to($data['email'])
                             ->send(new Message($data));
-                        $mail->create($data);
+                        $mail->create([
+                            'is_sent' => true,
+                            'name'    => $data['name'],
+                            'email'   => env('MAIL_FROM_ADDRESS'),
+                            'subject' => $data['subject'],
+                            'message' => $data['message'],
+                        ]);
                         Notification::make()
                             ->success()
                             ->title(__('Message was sent with success'))
