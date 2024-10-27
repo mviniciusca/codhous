@@ -4,6 +4,7 @@ namespace App\Filament\Resources\BudgetResource\Pages;
 
 use App\BudgetStatus;
 use App\Models\Product;
+use App\Services\PostcodeFinder;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Location;
@@ -117,24 +118,9 @@ class CreateBudget extends CreateRecord
                                         Action::make('search-action')
                                             ->icon('heroicon-o-magnifying-glass')
                                             ->action(function () use ($state, $livewire, $set) {
-                                                $set('content.neighborhood', null);
-                                                $set('content.street', null);
-                                                $set('content.number', null);
-                                                $set('content.city', null);
-                                                $set('content.state', null);
-                                                $livewire->validateOnly('data.content.postcode');
-                                                $cepData = Http::get("https://viacep.com.br/ws/{$state}/json/")
-                                                    ->throw()
-                                                    ->json();
-                                                if (isset($cepData['erro'])) {
-                                                    throw ValidationException::withMessages([
-                                                        'data.content.postcode' => __('CEP not Found'),
-                                                    ]);
-                                                }
-                                                $set('content.neighborhood', $cepData['bairro'] ?? null);
-                                                $set('content.street', $cepData['logradouro'] ?? null);
-                                                $set('content.city', $cepData['localidade'] ?? null);
-                                                $set('content.state', $cepData['uf'] ?? null);
+                                                $livewire->validateOnly('content.data.postcode');
+                                                $postcode = new PostcodeFinder($state, $set);
+                                                $postcode->find();
                                             })
                                     )
                                     ->label(__('CEP')),
