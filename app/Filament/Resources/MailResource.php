@@ -16,6 +16,9 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -87,12 +90,6 @@ class MailResource extends Resource
                     }),
             ])
             ->description(__('Your messages from website.'))
-            ->query(
-                Mail::query()
-                    ->where('is_spam', false)
-                    ->where('is_sent', false)
-                    ->where('is_read', false)
-            )
             ->columns([
                 IconColumn::make('is_favorite')
                     ->label(__(''))
@@ -122,8 +119,32 @@ class MailResource extends Resource
             ->paginated(25)
             ->defaultSort('created_at', 'desc')
             ->filters([
-                //
-            ])
+                TernaryFilter::make('is_sent')
+                    ->label(false)
+                    ->trueLabel(__('Sent Messages'))
+                    ->falseLabel(__('Received Messages'))
+                    ->default(false),
+                TernaryFilter::make('is_favorite')
+                    ->label(false)
+                    ->trueLabel(__('Starred'))
+                    ->falseLabel(__('Not Starred'))
+                    ->default(false),
+                TernaryFilter::make('is_spam')
+                    ->label(false)
+                    ->trueLabel(__('Marked as Spam'))
+                    ->falseLabel(__('Not Spam'))
+                    ->default(false),
+                TernaryFilter::make('trashed')
+                    ->label(false)
+                    ->trueLabel(__('Trashed Messages'))
+                    ->falseLabel(__('Active Messages'))
+                    ->queries(
+                        true: fn (Builder $query) => $query->onlyTrashed(),
+                        false: fn (Builder $query) => $query->withoutTrashed(),
+                        blank: fn (Builder $query) => $query->withoutTrashed(),
+                    )
+                    ->default(false),
+            ], FiltersLayout::Modal)
             ->persistFiltersInSession()
             ->actions([
                 ActionGroup::make([
