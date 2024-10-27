@@ -155,7 +155,7 @@ class Budget extends Component implements HasForms
                                                 Action::make('search-action')
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
-                                                        $livewire->validateOnly('content.data.postcode');
+                                                        $livewire->validateOnly('data.content.postcode');
                                                         $postcode = new PostcodeFinder($state, $set);
                                                         $postcode->find();
                                                     })
