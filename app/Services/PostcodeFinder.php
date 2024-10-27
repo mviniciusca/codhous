@@ -16,15 +16,15 @@ class PostcodeFinder
      * Create a new class instance.
      */
     private string $state;
-    private ?string $postcode;
+    private string $postcode;
     private string $apiEndpoint;
     private string $apiFormatReturn;
     private array|Response $response;
 
     public function __construct(string $state, private Set $set)
     {
-        $this->state = $state;
         $this->set = $set;
+        $this->state = $state;
         $this->postcode = $this->postcodePattern();
         $this->apiEndpoint = env('VIACEP_API_ENDPOINT');
         $this->apiFormatReturn = env('VIACEP_API_FORMAT');
