@@ -57,13 +57,13 @@ class MailResource extends Resource
                     ->falseIcon('')
                     ->alignCenter(),
                 TextColumn::make('name')
-                    ->limit(25)
+                    ->limit(50)
                     ->formatStateUsing(function (?string $state) {
                         return self::normalizeText($state);
                     })
                     ->label(__('From')),
                 TextColumn::make('subject')
-                    ->limit(30)
+                    ->limit(60)
                     ->formatStateUsing(function (?string $state) {
                         return ucfirst($state);
                     })
