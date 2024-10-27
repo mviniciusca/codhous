@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MailResource\Pages;
 use App\Mail\Message;
 use App\Models\Mail;
+use App\Services\SendMail;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
@@ -71,6 +72,8 @@ class MailResource extends Resource
                             ->default(env('APP_NAME')),
                         TextInput::make('email')
                             ->label('To: ')
+                            ->email()
+                            ->maxLength(200)
                             ->required()
                             ->placeholder(__('Email address')),
                         TextInput::make('subject')
@@ -84,20 +87,9 @@ class MailResource extends Resource
                             ->maxLength(5000)
                             ->helperText(__('Your Message. Max.: 5000 characters')),
                     ])
-                    ->action(function (Mail $mail, ?array $data): void {
-                        MailFacade::to($data['email'])
-                            ->send(new Message($data));
-                        $mail->create([
-                            'is_sent' => true,
-                            'name'    => $data['name'],
-                            'email'   => env('MAIL_FROM_ADDRESS'),
-                            'subject' => $data['subject'],
-                            'message' => $data['message'],
-                        ]);
-                        Notification::make()
-                            ->success()
-                            ->title(__('Message was sent with success'))
-                            ->send();
+                    ->action(function (?array $data): void {
+                        $mail = new SendMail($data);
+                        $mail->send();
                     }),
             ])
             ->description(__('Your messages from website.'))
