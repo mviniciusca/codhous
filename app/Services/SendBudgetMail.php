@@ -21,11 +21,11 @@ class SendBudgetMail
         private string $phoneField,
         private Mailable $mailable)
     {
+        $this->code = $this->state['code'];
         $this->state = $state;
         $this->mailable = $mailable;
-        $this->destinyEmailField = $destinyEmailField;
         $this->phoneField = $phoneField;
-        $this->code = $this->state['code'];
+        $this->destinyEmailField = $destinyEmailField;
     }
 
     public function dispatch()

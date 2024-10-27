@@ -64,7 +64,7 @@ class EditBudget extends EditRecord
                                     ->requiresConfirmation()
                                     ->action(function (Get $get, ?array $state) {
                                         $mail = new SendBudgetMail($state,
-                                            $state['content']['customer_email'],
+                                            $get('content.customer_email'),
                                             $state['content']['customer_phone'],
                                             new BudgetMail()
                                         );
