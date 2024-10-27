@@ -24,7 +24,7 @@ class SendBudgetMail
         $this->phoneField = $phoneField;
     }
 
-    private function dispatch()
+    public function dispatch()
     {
         $this->send();
 
@@ -42,8 +42,8 @@ class SendBudgetMail
         MailModel::create([
             'name'    => env('APP_NAME') ?? 'Codhous Software',
             'is_sent' => true,
-            'mail'    => $this->state[$this->destinyEmailField],
-            'phone'   => $this->state[$this->phoneField],
+            'mail'    => $this->destinyEmailField,
+            'phone'   => $this->phoneField,
             'subject' => $this->subject(),
             'message' => $this->message(),
         ]);
