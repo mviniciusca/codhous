@@ -7,6 +7,7 @@ use Filament\Forms\Set;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Livewire;
+use Filament\Notifications\Notification;
 use Illuminate\Validation\ValidationException;
 
 class PostcodeFinder
@@ -35,9 +36,7 @@ class PostcodeFinder
             ->json();
 
         $this->validateResponse();
-
         return $this->response;
-
     }
 
     private function setData(): static
@@ -53,8 +52,6 @@ class PostcodeFinder
 
     public function find()
     {
-
-
         try {
             $this->clearState();
             $this->reachEndpoint();
@@ -71,6 +68,7 @@ class PostcodeFinder
                 'data.content.postcode' => __('CEP not Found'),
             ]);
         }
+
     }
 
     private function set($key, $value)
