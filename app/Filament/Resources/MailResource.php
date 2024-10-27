@@ -72,7 +72,7 @@ class MailResource extends Resource
                             ->default(env('APP_NAME')),
                         TextInput::make('email')
                             ->label('To: ')
-                            ->email()
+
                             ->maxLength(200)
                             ->required()
                             ->placeholder(__('Email address')),
