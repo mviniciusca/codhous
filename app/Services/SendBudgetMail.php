@@ -58,7 +58,7 @@ class SendBudgetMail
 
     private function message()
     {
-        return 'Budget Notification: '.$this->state['code'].'was sent via email with success.';
+        return 'The Document from Budget ID: #'.$this->state['code'].' was sent via email with success.';
     }
 
     private function notification()
