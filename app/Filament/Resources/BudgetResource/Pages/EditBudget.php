@@ -68,23 +68,6 @@ class EditBudget extends EditRecord
                                             new BudgetMail()
                                         );
                                         $mail->dispatch();
-                                        // // Send e-mail for the customer
-                                        // Mail::to($get('content.customer_email'))
-                                        //     ->send(new BudgetMail());
-                                        // // Save the e-mail that was sent into database (is_sent == true)
-                                        // $mail = MailModel::create([
-                                        //     'is_sent' => true,
-                                        //     'name'    => env('APP_NAME') ?? 'Codhous Software',
-                                        //     'email'   => $get('content.customer_email'),
-                                        //     'phone'   => $get('content.customer_phone') ?? '',
-                                        //     'subject' => __('Budget Notification: ').$get('code'),
-                                        //     'message' => __('Notification was sent.'),
-                                        // ]);
-                                        // // Notify on the sys that email was sent with success
-                                        // Notification::make()
-                                        //     ->title(__('Message Sent with Success!'))
-                                        //     ->success()
-                                        //     ->send();
                                     }),
                                 Action::make('download_pdf')
                                     ->label(__('Download PDF'))
