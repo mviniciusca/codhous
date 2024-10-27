@@ -18,7 +18,6 @@ class SendBudgetMail
     public function __construct(
         private array $state,
         private string $destinyEmailField,
-        private string $phoneField,
         private Mailable $mailable)
     {
         $this->code = $this->state['code'];
