@@ -60,7 +60,7 @@ class SendMail
         if ($this->error) {
             Notification::make()
                 ->danger()
-                ->duration(12000)
+                ->duration(10000)
                 ->title(__($message ?? __('Message was not sent. Try again!')))
                 ->send();
         } else {

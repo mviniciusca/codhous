@@ -71,8 +71,8 @@ class MailResource extends Resource
                         Hidden::make('name')
                             ->default(env('APP_NAME')),
                         TextInput::make('email')
-                            ->label('To: ')
-
+                            ->label('To:')
+                            ->email()
                             ->maxLength(200)
                             ->required()
                             ->placeholder(__('Email address')),
@@ -82,7 +82,7 @@ class MailResource extends Resource
                             ->maxLength(255)
                             ->placeholder(__('Subject of your email')),
                         RichEditor::make('message')
-                            ->label('Message: ')
+                            ->label('Message:')
                             ->required()
                             ->maxLength(5000)
                             ->helperText(__('Your Message. Max.: 5000 characters')),
