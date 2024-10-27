@@ -76,7 +76,7 @@ class MailResource extends Resource
                                     ->label(__('From:'))
                                     ->required()
                                     ->maxLength(255)
-                                    ->default(env('APP_NAME') ?? 'Codhous Software'),
+                                    ->default(env('MAIL_FROM_NAME') ?? 'Codhous Software'),
                                 TextInput::make('sending_mail')
                                     ->label(__('Sending E-mail:'))
                                     ->required()
