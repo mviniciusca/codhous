@@ -19,6 +19,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -51,6 +52,12 @@ class MailResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(
+                Mail::query()
+                    ->where('is_spam', '=', false)
+                    ->where('is_sent', '=', false)
+                    ->where('is_read', '=', false)
+            )
             ->heading(__('Inbox'))
             ->headerActions([
                 Action::make('compose_mail')
@@ -94,7 +101,7 @@ class MailResource extends Resource
                 IconColumn::make('is_favorite')
                     ->label(__(''))
                     ->inline()
-                    ->trueIcon('heroicon-m-star')
+                    ->trueIcon('heroicon-m-bookmark')
                     ->trueColor('warning')
                     ->falseIcon('')
                     ->alignCenter(),
@@ -126,24 +133,15 @@ class MailResource extends Resource
                     ->default(false),
                 TernaryFilter::make('is_favorite')
                     ->label('Important')
-                    ->trueLabel(__('Starred'))
-                    ->falseLabel(__('Not Starred'))
-                    ->default(false),
+                    ->trueLabel(__('Important'))
+                    ->falseLabel(__('Not Important')),
                 TernaryFilter::make('is_spam')
                     ->label(__('Spam'))
                     ->trueLabel(__('Marked as Spam'))
                     ->falseLabel(__('Not Spam'))
                     ->default(false),
-                TernaryFilter::make('trashed')
-                    ->label(__('Trashed'))
-                    ->trueLabel(__('Trashed Messages'))
-                    ->falseLabel(__('Active Messages'))
-                    ->queries(
-                        true: fn (Builder $query) => $query->onlyTrashed(),
-                        false: fn (Builder $query) => $query->withoutTrashed(),
-                        blank: fn (Builder $query) => $query->withoutTrashed(),
-                    )
-                    ->default(false),
+                TrashedFilter::make()
+                    ->label(__('Trashed')),
             ], FiltersLayout::Modal)
             ->persistFiltersInSession()
             ->actions([
