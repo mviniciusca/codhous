@@ -2,44 +2,44 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
-
 use App\BudgetStatus;
+use App\Filament\Resources\BudgetResource;
+use App\Mail\BudgetMail;
+use App\Models\Budget;
+use App\Models\Location;
+use App\Models\Mail as MailModel;
+use App\Models\Product;
+use App\Models\ProductOption;
+use App\Models\Setting;
+use App\Services\PdfGenerator;
 use App\Services\PostcodeFinder;
 use Filament\Actions;
-use App\Models\Budget;
-use App\Models\Product;
-use App\Models\Setting;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use App\Mail\BudgetMail;
-use App\Models\Location;
-use Filament\Forms\Form;
-use Illuminate\Support\Str;
-use App\Models\ProductOption;
-use App\Services\PdfGenerator;
-use Illuminate\Support\Carbon;
-use App\Models\Mail as MailModel;
 use Filament\Actions\CreateAction;
-use Spatie\LaravelPdf\Facades\Pdf;
-use Filament\Forms\Components\Group;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
-use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\BudgetResource;
-use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class EditBudget extends EditRecord
 {
     use BudgetStatus;
+
     protected static string $resource = BudgetResource::class;
 
     public function getTitle(): string|Htmlable
@@ -71,8 +71,8 @@ class EditBudget extends EditRecord
                                             'name' => env('APP_NAME') ?? 'Codhous Software',
                                             'email' => $get('content.customer_email'),
                                             'phone' => $get('content.customer_phone') ?? '',
-                                            'subject' => __('Budget Notification: ') . $get('code'),
-                                            'message' => __('Notification was sent.')
+                                            'subject' => __('Budget Notification: ').$get('code'),
+                                            'message' => __('Notification was sent.'),
                                         ]);
                                         // Notify on the sys that email was sent with success
                                         Notification::make()
@@ -90,8 +90,9 @@ class EditBudget extends EditRecord
                                     })
                                     ->action(function ($state) {
                                         $pdf = new PdfGenerator($state);
+
                                         return $pdf->generate();
-                                    })
+                                    }),
                             ])
                             ->columns(4)
                             ->description(__('Organize your budget report'))
@@ -117,15 +118,15 @@ class EditBudget extends EditRecord
                                     ->prefix('#')
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
-                                    ->default('ADMIN' . rand(10000, 99999)),
+                                    ->default('ADMIN'.rand(10000, 99999)),
                                 DateTimePicker::make('created_at')
                                     ->disabled()
                                     ->dehydrated()
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
-                                    ->default(fn() => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->default(fn () => Carbon::now()->format('Y-m-d H:i:s'))
                                     ->label(__('Date'))
-                                    ->helperText(__('When this budget was created'))
+                                    ->helperText(__('When this budget was created')),
                             ]),
                     ]),
                 Section::make('Budget Content')
@@ -168,8 +169,7 @@ class EditBudget extends EditRecord
                                     ->helperText(__('Customer postcode'))
                                     ->maxLength(9)
                                     ->suffixAction(
-                                        fn($state, Set $set, $livewire) =>
-                                        Action::make('search-action')
+                                        fn ($state, Set $set, $livewire) => Action::make('search-action')
                                             ->icon('heroicon-o-magnifying-glass')
                                             ->action(function () use ($state, $livewire, $set) {
                                                 $livewire->validateOnly('data.content.postcode');
@@ -213,7 +213,7 @@ class EditBudget extends EditRecord
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateUpdated(fn(Set $set, string $state) => $set('quantity', $state)),
+                                    ->afterStateUpdated(fn (Set $set, string $state) => $set('quantity', $state)),
                                 Select::make('content.location')
                                     ->disabled()
                                     ->dehydrated()
@@ -259,7 +259,7 @@ class EditBudget extends EditRecord
                             ->live(onBlur: true)
                             ->disabled()
                             ->dehydrated()
-                            ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
+                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
                             ->afterStateHydrated(function (Get $get, Set $set) {
                                 $this->getPrice($get, $set);
                             })
@@ -269,13 +269,13 @@ class EditBudget extends EditRecord
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
-                            ->prefix('+' . env('CURRENCY_SUFFIX'))
+                            ->prefix('+'.env('CURRENCY_SUFFIX'))
                             ->numeric()
                             ->required()
-                            ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
+                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
                             ->default(0)
                             ->step(0.01)
-                            ->afterStateHydrated(fn(Get $get, Set $set, ?string $state) => $this->updateBudgetStatus($get, $set, $state))
+                            ->afterStateHydrated(fn (Get $get, Set $set, ?string $state) => $this->updateBudgetStatus($get, $set, $state))
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                                 $this->updateBudgetStatus($get, $set, $state);
@@ -285,8 +285,8 @@ class EditBudget extends EditRecord
                             ->dehydrated()
                             ->numeric()
                             ->required()
-                            ->helperText(__('Applies a discount in ' . env('CURRENCY_SUFFIX')))
-                            ->prefix('-' . env('CURRENCY_SUFFIX'))
+                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
+                            ->prefix('-'.env('CURRENCY_SUFFIX'))
                             ->step(0.01)
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->updateBudgetStatus($get, $set, $state);
@@ -301,17 +301,17 @@ class EditBudget extends EditRecord
                             ->disabled()
                             ->numeric()
                             ->required()
-                            ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
+                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->step(0.01),
-                    ])
+                    ]),
             ]);
     }
 
     /**
      * Summary of calculateTotal
-     * @param \Filament\Forms\Get $get
-     * @param \Filament\Forms\Set $set
+     * @param Get $get
+     * @param Set $set
      * @return void
      */
     private function calculateTotal(Get $get, Set $set): void
@@ -327,8 +327,8 @@ class EditBudget extends EditRecord
 
     /**
      * Summary of getPrice
-     * @param \Filament\Forms\Get $get
-     * @param \Filament\Forms\Set $set
+     * @param Get $get
+     * @param Set $set
      * @return void
      */
     private function getPrice(Get $get, Set $set)
@@ -342,7 +342,7 @@ class EditBudget extends EditRecord
 
     /**
      * Summary of checkId
-     * @param \Filament\Forms\Get $get
+     * @param Get $get
      * @param mixed $state
      * @return bool
      */
@@ -363,6 +363,10 @@ class EditBudget extends EditRecord
         }
     }
 
+    /**
+     * Summary of getHeaderActions
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [
