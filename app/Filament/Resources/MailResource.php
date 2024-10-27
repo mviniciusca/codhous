@@ -55,8 +55,6 @@ class MailResource extends Resource
             ->query(
                 Mail::query()
                     ->where('is_spam', '=', false)
-                    ->where('is_sent', '=', false)
-                    ->where('is_read', '=', false)
             )
             ->heading(__('Inbox'))
             ->headerActions([
