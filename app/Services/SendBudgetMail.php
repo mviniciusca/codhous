@@ -58,14 +58,7 @@ class SendBudgetMail
 
     private function message()
     {
-        $message = 'Hello!';
-        $message .= 'The document with Budget ID: #';
-        $message .= $this->code;
-        $message .= ' was sent to customer email: ';
-        $message .= $this->destinyEmailField;
-        $message .= ' with success!';
-
-        return $message;
+        return "Hello! The document with Budget ID: #{$this->code} was sent to customer email: {$this->destinyEmailField} with success!";
     }
 
     private function notification()
