@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Mail as MailModel;
+use Closure;
 use Filament\Notifications\Notification;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
@@ -12,6 +13,8 @@ class SendBudgetMail
     /**
      * Create a new class instance.
      */
+    private array|string|Closure $code;
+
     public function __construct(
         private array $state,
         private string $destinyEmailField,
@@ -22,6 +25,7 @@ class SendBudgetMail
         $this->mailable = $mailable;
         $this->destinyEmailField = $destinyEmailField;
         $this->phoneField = $phoneField;
+        $this->code = $this->state['code'];
     }
 
     public function dispatch()
@@ -53,12 +57,19 @@ class SendBudgetMail
 
     private function subject()
     {
-        return 'Budget Notification: '.$this->state['code'];
+        return "Budget Notification: {$this->code}";
     }
 
     private function message()
     {
-        return 'The Document from Budget ID: #'.$this->state['code'].' was sent via email with success.';
+        $message = 'Hello!';
+        $message .= 'The document with Budget ID: #';
+        $message .= $this->code;
+        $message .= ' was sent to customer email: ';
+        $message .= $this->destinyEmailField;
+        $message .= ' with success!';
+
+        return $message;
     }
 
     private function notification()
