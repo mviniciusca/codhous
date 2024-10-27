@@ -24,8 +24,14 @@ class SendMail
 
     private function createMail()
     {
-        Mail::to($this->data['email'])
-            ->send(new Message($this->data));
+        try {
+            Mail::to($this->data['email'])
+                ->send(new Message($this->data));
+        } catch (Exception $e) {
+            $this->error = true;
+
+            return $this->validation(__('Error on sending: ').$e->getMessage());
+        }
 
         return $this;
     }
