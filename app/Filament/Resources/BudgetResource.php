@@ -153,7 +153,7 @@ class BudgetResource extends Resource
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateHydrated(fn(Set $set, string $state) => $set('quantity', $state))
+                                    ->afterStateHydrated(fn (Set $set, string $state) => $set('quantity', $state))
                                     ->disabled()
                                     ->dehydrated(),
                                 TextInput::make('content.location')
@@ -257,7 +257,7 @@ class BudgetResource extends Resource
                 TextColumn::make('status')
                     ->sortable()
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'pending' => 'primary',
                         'on going' => 'warning',
                         'done' => 'success',
