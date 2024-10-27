@@ -39,6 +39,15 @@ class SendBudgetMail
 
     private function save()
     {
+        MailModel::create([
+            'name'    => env('APP_NAME') ?? 'Codhous Software',
+            'is_sent' => true,
+            'mail'    => $this->state[$this->destinyEmailField],
+            'phone'   => $this->state[$this->phoneField],
+            'subject' => $this->subject(),
+            'message' => $this->message(),
+        ]);
+
         return $this->notification();
     }
 
