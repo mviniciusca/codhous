@@ -16,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
@@ -135,7 +136,7 @@ class MailResource extends Resource
             ])
             ->searchable()
             ->recordClasses(fn (Mail $record) => match ($record->is_read) {
-                1       => 'opacity-30',
+                1       => 'opacity-50 dark:opacity-30 decoration-dashed line-through',
                 default => null,
             })
             ->paginated(25)

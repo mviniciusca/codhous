@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\MailResource\Pages;
 
+use App\Filament\Resources\MailResource;
 use App\Models\Mail;
 use Filament\Actions;
-use Filament\Forms\Get;
 use Filament\Actions\Action;
-use Filament\Infolists\Infolist;
-use Illuminate\Support\HtmlString;
-use App\Filament\Resources\MailResource;
-use Filament\Resources\Pages\ViewRecord;
+use Filament\Forms\Get;
 use Filament\Infolists\Components\Section;
-use Illuminate\Contracts\Support\Htmlable;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HtmlString;
 
 class ViewMail extends ViewRecord
 {
@@ -41,9 +41,19 @@ class ViewMail extends ViewRecord
         ];
     }
 
+    public function mount(int|string $record): void
+    {
+        parent::mount($record);
+
+        if (! $this->record->is_read) {
+            $this->record->update([
+                'is_read' => 1,
+            ]);
+        }
+    }
+
     public function toggle(?string $column)
     {
-
         $check = Mail::select($column)
             ->where('id', '=', request()->route('record'))
             ->first([$column]);
@@ -52,13 +62,14 @@ class ViewMail extends ViewRecord
             if ($check[$column] == true) {
                 return match ($column) {
                     'is_spam' => 'warning',
-                    default => 'primary',
+                    default   => 'primary',
                 };
             } else {
                 return 'secondary';
             }
         }
     }
+
     public function getTitle(): Htmlable|string
     {
         return __('Mail');
@@ -85,8 +96,7 @@ class ViewMail extends ViewRecord
                         TextEntry::make('message')
                             ->columnSpanFull()
                             ->label(new HtmlString(__('<strong>Message:</strong>'))),
-                    ])
+                    ]),
             ]);
     }
-
 }
