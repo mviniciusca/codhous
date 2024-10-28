@@ -164,7 +164,7 @@ class MailResource extends Resource
                 TrashedFilter::make()
                     ->indicator(__('Trashed'))
                     ->label(__('Trashed')),
-            ], FiltersLayout::Modal)
+            ], FiltersLayout::BelowContent)
             ->persistFiltersInSession()
             ->actions([
                 ActionGroup::make([
