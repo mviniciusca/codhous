@@ -143,14 +143,20 @@ class MailResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 TernaryFilter::make('is_sent')
-                    ->label('Messages')
-                    ->trueLabel(__('Sent Messages'))
-                    ->falseLabel(__('Received Messages'))
+                    ->label(__('Messages'))
+                    ->trueLabel(__('Sent'))
+                    ->falseLabel(__('Received'))
                     ->default(false),
                 TernaryFilter::make('is_favorite')
-                    ->label('Important')
+                    ->label(__('Important'))
                     ->trueLabel(__('Important'))
                     ->falseLabel(__('Not Important')),
+                TernaryFilter::make('is_read')
+                    ->label(__('Status'))
+                    ->indicator(__('Status'))
+                    ->default(false)
+                    ->trueLabel(__('Read Messages'))
+                    ->falseLabel(__('Not Read')),
                 TernaryFilter::make('is_spam')
                     ->label(__('Spam'))
                     ->trueLabel(__('Marked as Spam'))
