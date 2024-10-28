@@ -75,6 +75,7 @@ class MailResource extends Resource
                                 TextInput::make('name')
                                     ->label(__('From:'))
                                     ->required()
+                                    ->placeholder(__('Your name or Company name'))
                                     ->maxLength(255)
                                     ->default(env('MAIL_FROM_NAME') ?? 'Codhous Software'),
                                 TextInput::make('sending_mail')
