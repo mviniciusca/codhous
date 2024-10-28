@@ -134,7 +134,10 @@ class MailResource extends Resource
                     ->date('d/m/Y H:i'),
             ])
             ->searchable()
-            ->striped()
+            ->recordClasses(fn (Mail $record) => match ($record->is_read) {
+                1       => 'opacity-50',
+                default => null,
+            })
             ->paginated(25)
             ->defaultSort('created_at', 'desc')
             ->filters([
