@@ -357,8 +357,8 @@ class EditBudget extends EditRecord
                 ->url(route('filament.admin.resources.budgets.create'))
                 ->icon('heroicon-o-currency-dollar'),
             Actions\DeleteAction::make()
-                ->color('gray')
-                ->label(__(false))
+                ->color('danger')
+                ->label(__('Delete'))
                 ->icon('heroicon-o-trash'),
 
         ];
