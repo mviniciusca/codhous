@@ -59,10 +59,6 @@ class MailResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(
-                Mail::query()
-                    ->where('is_spam', '=', false)
-            )
             ->heading(__('Inbox'))
             ->headerActions([
                 Action::make('compose_mail')
@@ -144,11 +140,13 @@ class MailResource extends Resource
             ->filters([
                 TernaryFilter::make('is_sent')
                     ->label(__('Messages'))
+                    ->indicator(__('Messages'))
                     ->trueLabel(__('Sent'))
                     ->falseLabel(__('Received'))
                     ->default(false),
                 TernaryFilter::make('is_favorite')
                     ->label(__('Important'))
+                    ->indicator(__('Important'))
                     ->trueLabel(__('Important'))
                     ->falseLabel(__('Not Important')),
                 TernaryFilter::make('is_read')
@@ -159,10 +157,12 @@ class MailResource extends Resource
                     ->falseLabel(__('Not Read')),
                 TernaryFilter::make('is_spam')
                     ->label(__('Spam'))
+                    ->indicator(__('Spam'))
                     ->trueLabel(__('Marked as Spam'))
                     ->falseLabel(__('Not Spam'))
                     ->default(false),
                 TrashedFilter::make()
+                    ->indicator(__('Trashed'))
                     ->label(__('Trashed')),
             ], FiltersLayout::Modal)
             ->persistFiltersInSession()
