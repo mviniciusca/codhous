@@ -135,7 +135,7 @@ class MailResource extends Resource
             ])
             ->searchable()
             ->recordClasses(fn (Mail $record) => match ($record->is_read) {
-                1       => 'opacity-50',
+                1       => 'opacity-30',
                 default => null,
             })
             ->paginated(25)
