@@ -6,12 +6,6 @@ use App\Filament\Resources\BudgetResource;
 use App\Filament\Resources\BudgetResource\Pages\BudgetBin;
 use App\Filament\Resources\CustomerResource;
 use App\Filament\Resources\CustomerResource\Pages\CustomerBin;
-use App\Filament\Resources\MailResource;
-use App\Filament\Resources\MailResource\Pages\BinMail;
-use App\Filament\Resources\MailResource\Pages\FavoriteMail;
-use App\Filament\Resources\MailResource\Pages\ReadMail;
-use App\Filament\Resources\MailResource\Pages\SentMail;
-use App\Filament\Resources\MailResource\Pages\SpamMail;
 use App\Filament\Resources\NewsletterResource\Pages\SubscriberBin;
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\SettingResource\Pages\EditBudget;
@@ -75,14 +69,14 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(2)
                     ->badge(fn (): ?string => ProductResource::count())
                     ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.products.index')),
-                NavigationItem::make('budget_bin')
-                    ->label(fn (): string => __('Trash'))
-                    ->url(fn (): string => BudgetBin::getUrl())
-                    ->badge(fn (): ?string => BudgetBin::count())
-                    ->icon('heroicon-o-trash')
-                    ->group(__('Budget'))
-                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
-                    ->sort(4),
+                // NavigationItem::make('budget_bin')
+                //     ->label(fn (): string => __('Trash'))
+                //     ->url(fn (): string => BudgetBin::getUrl())
+                //     ->badge(fn (): ?string => BudgetBin::count())
+                //     ->icon('heroicon-o-trash')
+                //     ->group(__('Budget'))
+                //     ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.budgets.bin'))
+                //     ->sort(4),
                 NavigationItem::make('budget')
                     ->url(fn (): string => EditBudget::getUrl([Setting::first()->id]), )
                     ->label(fn (): string => __('Design & Layout'))
