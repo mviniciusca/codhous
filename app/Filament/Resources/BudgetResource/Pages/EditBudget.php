@@ -53,6 +53,7 @@ class EditBudget extends EditRecord
                                 Action::make('send_mail')
                                     ->icon('heroicon-o-envelope')
                                     ->label(__('Notify Mail'))
+                                    ->color('success')
                                     ->requiresConfirmation()
                                     ->action(function (Get $get, ?array $state) {
                                         $mail = new SendBudgetMail($state,
@@ -63,7 +64,13 @@ class EditBudget extends EditRecord
                                     }),
                                 Action::make('download_pdf')
                                     ->label(__('Download PDF'))
-                                    ->color('warning')
+                                    ->color(function (Get $get, ?array $state) {
+                                        if (self::checkId($get, $state)) {
+                                            return 'gray';
+                                        } else {
+                                            return 'warning';
+                                        }
+                                    })
                                     ->icon('heroicon-o-arrow-down-tray')
                                     ->requiresConfirmation()
                                     ->disabled(function (Get $get, ?array $state) {

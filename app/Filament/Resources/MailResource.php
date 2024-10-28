@@ -111,6 +111,14 @@ class MailResource extends Resource
             ])
             ->description(__('Your messages from website.'))
             ->columns([
+                IconColumn::make('is_sent')
+                    ->label(__(''))
+                    ->inline()
+                    ->falseIcon('heroicon-m-arrow-down-tray')
+                    ->falseColor('primary')
+                    ->trueIcon('heroicon-m-arrow-up-tray')
+                    ->trueColor('gray')
+                    ->alignCenter(),
                 IconColumn::make('is_favorite')
                     ->label(__(''))
                     ->inline()
@@ -156,7 +164,6 @@ class MailResource extends Resource
                 TernaryFilter::make('is_read')
                     ->label(__('Status'))
                     ->indicator(__('Status'))
-                    ->default(false)
                     ->trueLabel(__('Read Messages'))
                     ->falseLabel(__('Not Read')),
                 TernaryFilter::make('is_spam')
