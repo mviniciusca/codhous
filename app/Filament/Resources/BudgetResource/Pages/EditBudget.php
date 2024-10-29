@@ -366,7 +366,7 @@ class EditBudget extends EditRecord
                 ->icon('heroicon-o-currency-dollar'),
             Actions\DeleteAction::make()
                 ->color('danger')
-                ->label(__('Delete'))
+                ->label(__(false))
                 ->icon('heroicon-o-trash'),
 
         ];

@@ -323,7 +323,7 @@ class BudgetResource extends Resource
                         'ignored'  => __('Ignored'),
                     ])
                     ->searchable(),
-            ], FiltersLayout::BelowContent)
+            ], FiltersLayout::AboveContent)
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make(),
