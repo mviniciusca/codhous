@@ -216,13 +216,13 @@ class EditBudget extends EditRecord
                                     ->helperText(__('Product selected'))
                                     ->options(Product::all()->pluck('name', 'id')),
                                 Select::make('content.product_option')
+                                    ->live()
                                     ->disabled()
                                     ->dehydrated()
                                     ->label(__('Option'))
                                     ->helperText(__('Option selected'))
-                                    ->options(function (Get $get) {
+                                    ->options(function (Get $get, ?string $state) {
                                         return ProductOption::where('product_id', '=', $get('content.product'))
-                                            ->get()
                                             ->pluck('name', 'id');
                                     }),
                             ]),
