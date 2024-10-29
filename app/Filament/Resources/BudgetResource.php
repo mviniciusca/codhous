@@ -19,6 +19,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -320,9 +321,9 @@ class BudgetResource extends Resource
                         'on going' => __('On Going'),
                         'done'     => __('Done'),
                         'ignored'  => __('Ignored'),
-                    ], )
+                    ])
                     ->searchable(),
-            ])
+            ], FiltersLayout::BelowContent)
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make(),
