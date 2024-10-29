@@ -244,6 +244,12 @@ class BudgetResource extends Resource
             ]);
     }
 
+    /**
+     * Summary of calculateTotal
+     * @param Get $get
+     * @param Set $set
+     * @return void
+     */
     public static function calculateTotal(Get $get, Set $set): void
     {
         $quantity = floatval($get('content.quantity') ?? 0);
@@ -255,6 +261,11 @@ class BudgetResource extends Resource
         $set('content.total', number_format($total, 2, '.', ''));
     }
 
+    /**
+     * Summary of table
+     * @param Table $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -309,7 +320,7 @@ class BudgetResource extends Resource
                         'on going' => __('On Going'),
                         'done'     => __('Done'),
                         'ignored'  => __('Ignored'),
-                    ])
+                    ], )
                     ->searchable(),
             ])
             ->actions([
@@ -322,13 +333,6 @@ class BudgetResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array
