@@ -258,6 +258,11 @@ class BudgetResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordClasses(fn (Budget $record) => match ($record->status) {
+                'ignored' => 'opacity-30 dark:opacity-30 hover:opacity-100 dark:hover:opacity-100',
+                'done'    => 'opacity-50 dark:opacity-50 hover:opacity-100 dark:hover:opacity-100',
+                default   => null,
+            })
             ->columns([
                 TextColumn::make('code')
                     ->searchable()
