@@ -18,29 +18,29 @@ class BudgetFactory extends Factory
     {
         return [
             'created_at' => $this->faker->dateTimeBetween(date('2024-01-01')),
-            'code' => $this->faker->numerify('####'),
-            'is_active' => $this->faker->boolean(),
-            'status' => $this->faker->randomElement([
+            'code'       => $this->faker->numerify('####'),
+            'is_active'  => $this->faker->boolean(),
+            'status'     => $this->faker->randomElement([
                 'on going',
                 'pending',
                 'ignored',
-                'done'
+                'done',
             ]),
             'content' => [
-                'quantity' => $this->faker->randomElement([5, 10, 15, 20]),
-                'product' => $this->faker->randomElement([1, 2, 3, 4, 5]),
+                'quantity'       => $this->faker->randomElement([5, 10, 15, 20]),
+                'product'        => $this->faker->randomElement([1, 2, 3, 4, 5]),
                 'product_option' => $this->faker->randomElement([1, 2, 3]),
-                'location' => $this->faker->randomElement([1, 2, 3]),
-                'postcode' => $this->faker->numerify('2####-###'),
-                'customer_name' => $this->faker->name(),
+                'location'       => $this->faker->randomElement([1, 2, 3]),
+                'postcode'       => $this->faker->numerify('2####-###'),
+                'customer_name'  => $this->faker->name(),
                 'customer_email' => $this->faker->email(),
                 'customer_phone' => $this->faker->phoneNumber(),
-                'street' => $this->faker->streetAddress(),
-                'number' => $this->faker->randomNumber(),
-                'city' => $this->faker->city(),
-                'neighborhood' => $this->faker->city(),
-                'state' => $this->faker->countryCode(),
-            ]
+                'street'         => $this->faker->streetAddress(),
+                'number'         => $this->faker->randomNumber(),
+                'city'           => $this->faker->city(),
+                'neighborhood'   => $this->faker->city(),
+                'state'          => $this->faker->countryCode(),
+            ],
         ];
     }
 }

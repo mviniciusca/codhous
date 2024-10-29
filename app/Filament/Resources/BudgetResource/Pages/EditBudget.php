@@ -277,6 +277,7 @@ class EditBudget extends EditRecord
                             ->prefix('-'.env('CURRENCY_SUFFIX'))
                             ->step(0.01)
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
                                 $this->updateBudgetStatus($get, $set, $state);
                             })
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
