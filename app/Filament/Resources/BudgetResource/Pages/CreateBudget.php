@@ -54,8 +54,9 @@ class CreateBudget extends CreateRecord
                                         'done'     => __('Done'),
                                         'ignored'  => __('Ignored'),
                                     ])
-                                    ->afterStateUpdated(fn (Get $get, Set $set, ?string $state): string => $this->updateBudgetStatus($get, $set, $state)
-                                    )
+                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                        return $this->updateBudgetStatus($get, $set, $state);
+                                    })
                                     ->default('pending'),
                                 TextInput::make('code')
                                     ->disabled()
@@ -154,14 +155,17 @@ class CreateBudget extends CreateRecord
                             ->schema([
                                 TextInput::make('content.quantity')
                                     ->live()
+                                    ->debounce(500)
                                     ->integer()
                                     ->required()
                                     ->minValue(3)
-                                    ->maxLength(10)
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateUpdated(fn (Set $set, Get $get, $state): string => $this->updatePrice($get, $set, $state)),
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        $set('quantity', $state);
+                                        $this->calculateTotal($get, $set);
+                                    }),
                                 Select::make('content.location')
                                     ->dehydrated()
                                     ->required()
@@ -176,16 +180,26 @@ class CreateBudget extends CreateRecord
                                     ->label(__('Product'))
                                     ->helperText(__('Product selected'))
                                     ->options(Product::all()->pluck('name', 'id'))
-                                    ->afterStateHydrated(fn (Get $get, Set $set, ?string $state):  string => $this->updatePrice($get, $set, $state))
-                                    ->afterStateUpdated(fn (Get $get, Set $set, ?string $state): string => $this->updatePrice($get, $set, $state)),
+                                    ->afterStateHydrated(function (Get $get, Set $set, $state) {
+                                        $this->updatePrice($get, $set, $state);
+                                    })
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        $this->updatePrice($get, $set, $state);
+                                    }),
                                 Select::make('content.product_option')
                                     ->live()
                                     ->dehydrated()
                                     ->label(__('Option'))
                                     ->helperText(__('Option selected'))
-                                    ->options(fn (Get $get): Collection => $this->getOptions($get))
-                                    ->required(fn (Get $get): bool => $this->getOptions($get)->count() > 0)
-                                    ->hidden(fn (Get $get): bool => $this->getOptions($get)->count() == 0),
+                                    ->options(function (Get $get) {
+                                        return $this->getOptions($get);
+                                    })
+                                    ->required(function (Get $get) {
+                                        return $this->getOptions($get)->count() > 0;
+                                    })
+                                    ->hidden(function (Get $get) {
+                                        return $this->getOptions($get)->count() == 0;
+                                    }),
                             ]),
                     ]),
                 Section::make(__('Pricing'))
@@ -202,10 +216,10 @@ class CreateBudget extends CreateRecord
                             ->minValue(3)
                             ->suffix('m³')
                             ->helperText(__('Quantity of items'))
-                            ->afterStateHydrated(function (Get $get, Set $set) {
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                             })
-                            ->afterStateUpdated(function (Get $get, Set $set) {
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 $this->calculateTotal($get, $set);
                             })
                             ->numeric(),
@@ -300,17 +314,17 @@ class CreateBudget extends CreateRecord
      * @param Get $get
      * @param Set $set
      * @param mixed $productId
-     * @return string
+     * @return void
      */
-    private function updatePrice(Get $get, Set $set, $productId):string
+    private function updatePrice(Get $get, Set $set, $productId): void
     {
-        $price = 0;
         if ($productId) {
             $price = Product::where('id', $productId)->value('price') ?? 0;
+        } else {
+            $price = 0;
         }
         $set('content.price', $price);
-
-        return $this->calculateTotal($get, $set) ?? 0;
+        $this->calculateTotal($get, $set);
     }
 
     /**
