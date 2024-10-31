@@ -216,12 +216,8 @@ class CreateBudget extends CreateRecord
                             ->numeric()
                             ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
                             ->step(0.01)
-                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                            })
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                            }),
+                            ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
+                            ->afterStateUpdated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set)),
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
