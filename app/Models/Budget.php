@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Setting;
+use App\Models\BudgetHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Budget extends Model
@@ -29,5 +27,6 @@ class Budget extends Model
 
     public function budgetHistory()
     {
+        return $this->hasOne(BudgetHistory::class);
     }
 }
