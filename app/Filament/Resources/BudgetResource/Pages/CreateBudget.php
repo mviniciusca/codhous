@@ -66,7 +66,7 @@ class CreateBudget extends CreateRecord
                                 DateTimePicker::make('created_at')
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
-                                    ->default(fn () => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->default(fn (): string => Carbon::now()->format('Y-m-d H:i:s'))
                                     ->label(__('Date'))
                                     ->helperText(__('When this budget was created')),
                             ]),
