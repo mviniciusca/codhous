@@ -13,6 +13,7 @@ class Budget extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
     protected $guarded = [];
 
     /**
@@ -24,5 +25,9 @@ class Budget extends Model
         return [
             'content' => 'array',
         ];
+    }
+
+    public function budgetHistory()
+    {
     }
 }

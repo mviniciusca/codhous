@@ -310,7 +310,9 @@ class EditBudget extends EditRecord
                                     ]),
                             ]),
                         Tab::make(__('History & Access Report'))
-                            ->schema([]),
+                            ->schema([
+
+                            ]),
                     ]),
             ]);
     }
