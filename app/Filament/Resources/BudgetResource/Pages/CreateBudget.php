@@ -54,9 +54,7 @@ class CreateBudget extends CreateRecord
                                         'done'     => __('Done'),
                                         'ignored'  => __('Ignored'),
                                     ])
-                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                        return $this->updateBudgetStatus($get, $set, $state);
-                                    })
+                                    ->afterStateUpdated(fn (Get $get, Set $set, $state): string => $this->updateBudgetStatus($get, $set, $state))
                                     ->default('pending'),
                                 TextInput::make('code')
                                     ->disabled()
