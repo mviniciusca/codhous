@@ -52,8 +52,17 @@ class EditBudget extends EditRecord
                             ->headerActions([
                                 Action::make('send_mail')
                                     ->icon('heroicon-o-envelope')
-                                    ->label(__('Notify Mail'))
-                                    ->color('success')
+                                    ->label(__('Notify Email'))
+                                    ->disabled(function (Get $get, ?array $state) {
+                                        return self::checkId($get, $state);
+                                    })
+                                    ->color(function (Get $get, ?array $state) {
+                                        if (self::checkId($get, $state)) {
+                                            return 'gray';
+                                        } else {
+                                            return 'success';
+                                        }
+                                    })
                                     ->requiresConfirmation()
                                     ->action(function (Get $get, ?array $state) {
                                         $mail = new SendBudgetMail($state,
