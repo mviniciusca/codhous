@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use Exception;
+use Filament\Forms\Components\Livewire;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
-use Filament\Forms\Components\Livewire;
-use Filament\Notifications\Notification;
 use Illuminate\Validation\ValidationException;
 
 class PostcodeFinder
@@ -16,9 +16,13 @@ class PostcodeFinder
      * Create a new class instance.
      */
     private string $state;
+
     private string $postcode;
+
     private string $apiEndpoint;
+
     private string $apiFormatReturn;
+
     private array|Response $response;
 
     public function __construct(string $state, private Set $set)
@@ -37,14 +41,15 @@ class PostcodeFinder
             ->json();
 
         $this->validateResponse();
+
         return $this->response;
     }
 
     private function setData(): static
     {
-
         $this->set('content.neighborhood', $this->response['bairro'] ?? null);
         $this->set('content.street', $this->response['logradouro'] ?? null);
+        $this->set('content.address', $this->response['logradouro'] ?? null);
         $this->set('content.city', $this->response['localidade'] ?? null);
         $this->set('content.state', $this->response['uf'] ?? null);
 
@@ -56,6 +61,7 @@ class PostcodeFinder
         try {
             $this->clearState();
             $this->reachEndpoint();
+
             return $this->setData();
         } catch (Exception $e) {
             $this->validateResponse();
@@ -69,7 +75,6 @@ class PostcodeFinder
                 'data.content.postcode' => __('CEP not Found'),
             ]);
         }
-
     }
 
     private function set($key, $value)

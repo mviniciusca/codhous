@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use App\Models\Setting;
+use App\Services\PostcodeFinder;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Group;
@@ -94,31 +95,16 @@ class PartnerResource extends Resource
                                         fn ($state, $set, $livewire) => Action::make('search-action')
                                             ->icon('heroicon-o-magnifying-glass')
                                             ->action(function () use ($state, $livewire, $set) {
-                                                $set('content.neighborhood', null);
-                                                $set('content.address', null);
-                                                $set('content.number', null);
-                                                $set('content.city', null);
-                                                $set('content.state', null);
-                                                $livewire->validateOnly('data.content.postcode');
-                                                $cepData = Http::get("https://viacep.com.br/ws/{$state}/json/")
-                                                    ->throw()
-                                                    ->json();
-                                                if (isset($cepData['erro'])) {
-                                                    throw ValidationException::withMessages([
-                                                        'data.postcode' => __('CEP not Found'),
-                                                    ]);
-                                                }
-                                                $set('content.neighborhood', $cepData['bairro'] ?? null);
-                                                $set('content.address', $cepData['logradouro'] ?? null);
-                                                $set('content.city', $cepData['localidade'] ?? null);
-                                                $set('content.state', $cepData['uf'] ?? null);
+                                                $livewire->validateOnly('content.data.postcode');
+                                                $postcode = new PostcodeFinder($state, $set);
+                                                $postcode->find();
                                             })
                                     ),
                                 Forms\Components\TextInput::make('content.address')
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('Address'))
+                                    ->label(__('Street'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.number')
                                     ->label(__('Number'))
