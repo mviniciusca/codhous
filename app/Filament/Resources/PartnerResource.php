@@ -85,7 +85,7 @@ class PartnerResource extends Resource
                                 Forms\Components\TextInput::make('postcode')
                                     ->required()
                                     ->minLength(9)
-                                    ->mask('99999-999')
+                                    ->mask('99999-9999')
                                     ->placeholder('22022-000')
                                     ->maxLength(9)
                                     ->helperText(__('Postcode'))
