@@ -43,7 +43,6 @@ class EditBudget extends EditRecord
     public function form(Form $form): Form
     {
         return $form
-
             ->schema([
                 Group::make()
                     ->columnSpanFull()
