@@ -2,36 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
+use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use App\Models\Setting;
-use Filament\Forms\Set;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\Group;
-use Illuminate\Support\Facades\Http;
-use Filament\Forms\Components\Section;
-use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Form;
+use Filament\Forms\Set;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Filament\Resources\PartnerResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PartnerResource\RelationManagers;
 
 class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
+
     protected static ?string $navigationGroup = 'Customers & Partners';
+
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
+
     public static function getNavigationBadge(): ?string
     {
         $count = static::getModel()::count();
+
         return $count != 0 ? $count : null;
     }
 
@@ -61,7 +61,7 @@ class PartnerResource extends Resource
                                     ->required()
                                     ->label(__('Company'))
                                     ->lazy()
-                                    ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state)))
+                                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state)))
                                     ->maxLength(255),
                                 Forms\Components\Hidden::make('slug')
                                     ->required()
@@ -91,8 +91,7 @@ class PartnerResource extends Resource
                                     ->required()
                                     ->label(__('Postcode'))
                                     ->suffixAction(
-                                        fn($state, $set, $livewire) =>
-                                        Action::make('search-action')
+                                        fn ($state, $set, $livewire) => Action::make('search-action')
                                             ->icon('heroicon-o-magnifying-glass')
                                             ->action(function () use ($state, $livewire, $set) {
                                                 $set('content.neighborhood', null);
@@ -217,9 +216,9 @@ class PartnerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPartners::route('/'),
+            'index'  => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
-            'edit' => Pages\EditPartner::route('/{record}/edit'),
+            'edit'   => Pages\EditPartner::route('/{record}/edit'),
         ];
     }
 }
