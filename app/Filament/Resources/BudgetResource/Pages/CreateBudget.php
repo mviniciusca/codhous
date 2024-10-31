@@ -204,12 +204,8 @@ class CreateBudget extends CreateRecord
                             ->minValue(3)
                             ->suffix('m³')
                             ->helperText(__('Quantity of items'))
-                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                            })
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                            })
+                            ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
+                            ->afterStateUpdated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
                             ->numeric(),
                         TextInput::make('content.price')
                             ->live()
