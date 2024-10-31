@@ -185,15 +185,9 @@ class CreateBudget extends CreateRecord
                                     ->dehydrated()
                                     ->label(__('Option'))
                                     ->helperText(__('Option selected'))
-                                    ->options(function (Get $get) {
-                                        return $this->getOptions($get);
-                                    })
-                                    ->required(function (Get $get) {
-                                        return $this->getOptions($get)->count() > 0;
-                                    })
-                                    ->hidden(function (Get $get) {
-                                        return $this->getOptions($get)->count() == 0;
-                                    }),
+                                    ->options(fn (Get $get): Collection => $this->getOptions($get))
+                                    ->required(fn (Get $get): bool => $this->getOptions($get)->count() > 0)
+                                    ->hidden(fn (Get $get): bool => $this->getOptions($get)->count() == 0),
                             ]),
                     ]),
                 Section::make(__('Pricing'))
