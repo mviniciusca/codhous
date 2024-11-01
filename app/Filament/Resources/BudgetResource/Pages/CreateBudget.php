@@ -3,11 +3,14 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 use App\Filament\Resources\BudgetResource;
+use App\Models\Budget;
+use App\Models\BudgetHistory;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductOption;
 use App\Services\PostcodeFinder;
 use App\Trait\BudgetStatus;
+use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -22,6 +25,7 @@ use Filament\Forms\Set;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class CreateBudget extends CreateRecord
 {
@@ -251,6 +255,12 @@ class CreateBudget extends CreateRecord
                             }),
                         TextInput::make('content.total')
                             ->live()
+                            ->suffixAction(function () {
+                                Action::make('register')
+                                    ->action(function () {
+                                        $this->saveAction();
+                                    });
+                            })
                             ->readonly()
                             ->numeric()
                             ->required()
@@ -259,7 +269,19 @@ class CreateBudget extends CreateRecord
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->step(0.01),
                     ]),
-            ]);
+            ])
+            ->statePath('data');
+    }
+
+    protected function afterCreate()
+    {
+        BudgetHistory::create([
+            'budget_id' => Budget::latest('created_at')->first()->id,
+            'user_id'   => Auth::user()->id,
+            'action'    => 'create',
+        ]);
+
+        return $this;
     }
 
     /**
@@ -322,5 +344,14 @@ class CreateBudget extends CreateRecord
 
         $total = $quantity * $price + $tax - $discount;
         $set('content.total', number_format($total, 2, '.', ''));
+    }
+
+    protected function afterSave(): void
+    {
+        BudgetHistory::create([
+            'user_id'   => 1,
+            'budget_id' => 1,
+            'action'    => 'create',
+        ]);
     }
 }
