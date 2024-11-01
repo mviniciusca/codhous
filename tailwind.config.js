@@ -9,6 +9,8 @@ export default {
         "./resources/views/components/filament-fabricator/**/*.blade.php",
         "./resources/**/*.js",
         "./resources/**/*.vue",
+        "./node_modules/flowbite/**/*.js"
+
     ],
     safelist: [
         'bg-contain', 'bg-cover', 'bg-auto', 'bg-scroll', 'bg-fixed', 'bg-center', 'bg-top',
@@ -36,6 +38,7 @@ export default {
     plugins: [
         require('@tailwindcss/typography'),
         require('@tailwindcss/forms'),
+        require('flowbite/plugin')
     ],
 }
 

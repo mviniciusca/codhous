@@ -25,6 +25,8 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\View;
+use Filament\Forms\Components\ViewField;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -322,9 +324,17 @@ class EditBudget extends EditRecord
                             ->label(__('History'))
                             ->icon('heroicon-o-bell')
                             ->schema([
-                                //
+                                ViewField::make('')
+                                    ->view('budget.history-view', [
+                                        'data' => BudgetHistory::
+                                            where('budget_id', '=', $this->getRecord()->id)
+                                                ->with(['user', 'budget'])
+                                                ->take(5)
+                                                ->orderByDesc('created_at')
+                                                ->get(),
+                                    ]),
                             ]),
-                    ]),
+                    ])->activeTab(2),
             ]);
     }
 
