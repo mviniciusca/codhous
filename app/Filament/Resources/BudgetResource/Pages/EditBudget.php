@@ -312,7 +312,7 @@ class EditBudget extends EditRecord
                             ]),
                         Tab::make(__('History & Access Report'))
                             ->schema([
-                                View::make('budget.form.show-history'),
+                                View::make('livewire.budget-history-table'),
                             ]),
                     ]),
             ]);
