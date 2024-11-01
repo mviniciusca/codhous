@@ -5,6 +5,7 @@ namespace App\Filament\Resources\BudgetResource\Pages;
 use App\Filament\Resources\BudgetResource;
 use App\Mail\BudgetMail;
 use App\Models\Budget;
+use App\Models\BudgetHistory;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductOption;
@@ -31,6 +32,7 @@ use Filament\Forms\Set;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class EditBudget extends EditRecord
 {
@@ -315,7 +317,18 @@ class EditBudget extends EditRecord
                                 View::make('components.budget.show-history'),
                             ]),
                     ]),
-            ]);
+            ])->statePath('data');
+    }
+
+    protected function afterSave()
+    {
+        BudgetHistory::create([
+            'budget_id' => $this->record->id,
+            'user_id'   => Auth::user()->id,
+            'action'    => 'update',
+        ]);
+
+        return $this;
     }
 
     /**

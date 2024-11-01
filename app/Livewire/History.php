@@ -21,6 +21,7 @@ class History extends Component implements HasForms, HasTable
         return $table
             ->query(BudgetHistory::query()
                 ->select()
+                ->where('budget_id', '=', request()->segment(3))
                 ->with(['budget', 'user'])
                 ->take(5)
             )

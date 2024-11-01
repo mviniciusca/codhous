@@ -345,13 +345,4 @@ class CreateBudget extends CreateRecord
         $total = $quantity * $price + $tax - $discount;
         $set('content.total', number_format($total, 2, '.', ''));
     }
-
-    protected function afterSave(): void
-    {
-        BudgetHistory::create([
-            'user_id'   => 1,
-            'budget_id' => 1,
-            'action'    => 'create',
-        ]);
-    }
 }
