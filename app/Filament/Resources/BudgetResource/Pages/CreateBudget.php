@@ -269,8 +269,7 @@ class CreateBudget extends CreateRecord
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->step(0.01),
                     ]),
-            ])
-            ->statePath('data');
+            ]);
     }
 
     protected function afterCreate()

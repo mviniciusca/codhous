@@ -25,7 +25,6 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\View;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -52,7 +51,9 @@ class EditBudget extends EditRecord
                 Tabs::make('Tabs')
                     ->columnSpanFull()
                     ->tabs([
-                        Tab::make(__('Budget Details'))
+                        Tab::make('tab1')
+                            ->id('tab-one')
+                            ->label(__('Details'))
                             ->icon('heroicon-o-currency-dollar')
                             ->schema([
                                 Group::make()
@@ -316,13 +317,15 @@ class EditBudget extends EditRecord
                                             ->step(0.01),
                                     ]),
                             ]),
-                        Tab::make(__('History & Access Report'))
+                        Tab::make('history')
+                            ->id('app')
+                            ->label(__('History'))
                             ->icon('heroicon-o-bell')
                             ->schema([
-                                View::make('budget.form.history'),
+                                //
                             ]),
-                    ])->activeTab(1),
-            ])->statePath('data');
+                    ]),
+            ]);
     }
 
     protected function afterSave()
