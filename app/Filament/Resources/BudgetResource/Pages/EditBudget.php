@@ -24,6 +24,7 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\View;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -311,7 +312,7 @@ class EditBudget extends EditRecord
                             ]),
                         Tab::make(__('History & Access Report'))
                             ->schema([
-
+                                View::make('budget.form.show-history'),
                             ]),
                     ]),
             ]);
