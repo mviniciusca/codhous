@@ -53,6 +53,7 @@ class EditBudget extends EditRecord
                     ->columnSpanFull()
                     ->tabs([
                         Tab::make(__('Budget Details'))
+                            ->icon('heroicon-o-currency-dollar')
                             ->schema([
                                 Group::make()
                                     ->schema([
@@ -280,7 +281,10 @@ class EditBudget extends EditRecord
                                             ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
                                             ->default(0)
                                             ->step(0.01)
-                                            ->afterStateHydrated(fn (Get $get, Set $set, ?string $state) => $this->updateBudgetStatus($get, $set, $state))
+                                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                                $this->calculateTotal($get, $set);
+                                                $this->updateBudgetStatus($get, $set, $state);
+                                            })
                                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                                 $this->calculateTotal($get, $set);
                                                 $this->updateBudgetStatus($get, $set, $state);
@@ -313,22 +317,21 @@ class EditBudget extends EditRecord
                                     ]),
                             ]),
                         Tab::make(__('History & Access Report'))
+                            ->icon('heroicon-o-bell')
                             ->schema([
-                                View::make('components.budget.show-history'),
+                                View::make('budget.form.history'),
                             ]),
-                    ]),
+                    ])->activeTab(1),
             ])->statePath('data');
     }
 
     protected function afterSave()
     {
         BudgetHistory::create([
-            'budget_id' => $this->record->id,
+            'budget_id' => $this->data['id'],
             'user_id'   => Auth::user()->id,
             'action'    => 'update',
         ]);
-
-        return $this;
     }
 
     /**

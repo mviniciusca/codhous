@@ -280,8 +280,6 @@ class CreateBudget extends CreateRecord
             'user_id'   => Auth::user()->id,
             'action'    => 'create',
         ]);
-
-        return $this;
     }
 
     /**

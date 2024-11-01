@@ -23,7 +23,8 @@ class History extends Component implements HasForms, HasTable
                 ->select()
                 ->where('budget_id', '=', request()->segment(3))
                 ->with(['budget', 'user'])
-                ->take(5)
+                ->orderByDesc('id')
+                ->take(25)
             )
 
             ->columns([
