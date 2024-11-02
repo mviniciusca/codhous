@@ -152,7 +152,7 @@ class CreateBudget extends CreateRecord
                 Section::make(__('Shopping Bag'))
                     ->description(__('Products in the shopping bag.'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->columns(4)
+                    ->columns(5)
                     ->schema([
                         TextInput::make('content.quantity')
                             ->live()
@@ -194,6 +194,18 @@ class CreateBudget extends CreateRecord
                             ->required(fn (Get $get): bool => $this->getOptions($get)->count() > 0)
                             ->hidden(fn (Get $get): bool => $this->getOptions($get)->count() == 0)
                             ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
+                        TextInput::make('content.price')
+                            ->live(onBlur: true)
+                            ->disabled()
+                            ->dehydrated()
+                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                $this->getPrice($get, $set);
+                            })
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->label(__('Price per Unity'))
+                            ->suffix('m³')
+                            ->required(),
 
                     ]),
                 Section::make(__('Pricing Calculator'))
