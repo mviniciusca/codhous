@@ -325,13 +325,14 @@ class EditBudget extends EditRecord
                             ->icon('heroicon-o-bell')
                             ->schema([
                                 ViewField::make(false)
-                                    ->disabled(true)
+                                    ->disabled()
+                                    ->default(null)
                                     ->required(false)
                                     ->view('budget.history-view', [
                                         'data' => BudgetHistory::
                                             where('budget_id', '=', $this->getRecord()->id)
                                                 ->with(['user', 'budget'])
-                                                ->take(1)
+                                                ->take(10)
                                                 ->orderByDesc('created_at')
                                                 ->get(),
                                     ]),
