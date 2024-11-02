@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BudgetResource\Pages;
+use App\Filament\Resources\BudgetResource\RelationManagers\BudgetHistoryRelationManager;
 use App\Models\Budget;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -243,6 +244,13 @@ class BudgetResource extends Resource
                             ->step(0.01),
                     ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            BudgetHistoryRelationManager::class,
+        ];
     }
 
     /**
