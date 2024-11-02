@@ -23,8 +23,10 @@ class BudgetHistoryRelationManager extends RelationManager
             ->defaultSort('created_at', 'desc')
             ->recordTitleAttribute('id')
             ->columns([
-                TextColumn::make('user.name'),
+                TextColumn::make('user.name')
+                    ->label(__('Agent Name')),
                 TextColumn::make('action')
+                    ->label(__('Action'))
                     ->badge()
                     ->color(function ($state) {
                         return match ($state) {
@@ -35,6 +37,7 @@ class BudgetHistoryRelationManager extends RelationManager
                         };
                     }),
                 TextColumn::make('created_at')
+                    ->label(__('When'))
                     ->alignEnd()
                     ->date('d/m/Y H:i'),
 
