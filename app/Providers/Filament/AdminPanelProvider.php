@@ -99,6 +99,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary'   => Color::Indigo,
                 'secondary' => Color::Stone,
                 'tertiary'  => Color::Purple,
+                'warning'   => Color::Orange,
                 'info'      => Color::Sky,
                 'danger'    => Color::Red,
                 'success'   => Color::Teal,
