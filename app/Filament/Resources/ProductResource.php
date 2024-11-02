@@ -2,23 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Product;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Section;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ProductResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Filament\Resources\ProductResource\RelationManagers\ProductOptionRelationManager;
+use App\Models\Product;
+use Filament\Forms;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductResource extends Resource
 {
@@ -33,12 +33,12 @@ class ProductResource extends Resource
         return __('Products');
     }
 
-
     public static function count(): ?string
     {
         $count = Product::query()
             ->where('is_active', true)
             ->count();
+
         return $count !== 0 ? $count : null;
     }
 
@@ -60,14 +60,7 @@ class ProductResource extends Resource
                                     ->maxLength(255)
                                     ->label(__('Name'))
                                     ->helperText(__('Product name')),
-                                TextInput::make('price')
-                                    ->required()
-                                    ->numeric()
-                                    ->prefix(env('CURRENCY_SUFFIX'))
-                                    ->maxValue(42949672.95)
-                                    ->label(__('Price'))
-                                    ->helperText(__('Price per unity')),
-                            ])
+                            ]),
                     ]),
                 Group::make()
                     ->columnSpan(2)
@@ -82,8 +75,8 @@ class ProductResource extends Resource
                                     ->default(true)
                                     ->helperText(__('Activate the product'))
                                     ->inline(),
-                            ])
-                    ])
+                            ]),
+                    ]),
 
             ]);
     }
@@ -96,10 +89,12 @@ class ProductResource extends Resource
             ->searchPlaceholder(__('Search'))
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Product'))
                     ->searchable(),
-                TextColumn::make('price')
-                    ->label(__('Price'))
-                    ->prefix(env('CURRENCY_SUFFIX') . ' '),
+                IconColumn::make('is_active')
+                    ->boolean()
+                    ->alignCenter()
+                    ->label(__('Status')),
             ])
             ->filters([
                 //
@@ -108,7 +103,7 @@ class ProductResource extends Resource
                 ActionGroup::make([
                     Tables\Actions\EditAction::make()
                         ->label(__('Edit Product')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -128,9 +123,9 @@ class ProductResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
+            'index'  => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'edit'   => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
 }

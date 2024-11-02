@@ -18,7 +18,6 @@ class ProductFactory extends Factory
     {
         return [
             'name'      => $this->faker->unique()->company(),
-            'price'     => number_format($this->faker->randomFloat(2, 1, 1000), 2),
             'is_active' => true,
         ];
     }
