@@ -15,7 +15,7 @@ class ListBudgets extends ListRecords
     {
         return [
             CreateAction::make('new_budget')
-                ->color('fourth')
+                ->color('primary')
                 ->icon('heroicon-o-currency-dollar')
                 ->label(__('New Budget')),
             Action::make('view_trash')
