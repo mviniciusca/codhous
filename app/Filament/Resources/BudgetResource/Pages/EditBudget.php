@@ -60,7 +60,7 @@ class EditBudget extends EditRecord
                                         if (self::checkId($get, $state)) {
                                             return 'gray';
                                         } else {
-                                            return 'secondary';
+                                            return 'primary';
                                         }
                                     })
                                     ->requiresConfirmation()
@@ -77,7 +77,7 @@ class EditBudget extends EditRecord
                                         if (self::checkId($get, $state)) {
                                             return 'gray';
                                         } else {
-                                            return 'secondary';
+                                            return 'primary';
                                         }
                                     })
                                     ->icon('heroicon-o-arrow-down-tray')
