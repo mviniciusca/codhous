@@ -17,7 +17,7 @@ class BudgetHistoryFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'action' => 'create',
         ];
     }
 }
