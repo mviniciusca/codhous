@@ -15,16 +15,6 @@ class BudgetHistoryRelationManager extends RelationManager
 {
     protected static string $relationship = 'budgetHistory';
 
-    public function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('id')
-                    ->required()
-                    ->maxLength(255),
-            ]);
-    }
-
     public function table(Table $table): Table
     {
         return $table
@@ -45,23 +35,9 @@ class BudgetHistoryRelationManager extends RelationManager
                         };
                     }),
                 TextColumn::make('created_at')
+                    ->alignEnd()
                     ->date('d/m/Y H:i'),
 
-            ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                // Tables\Actions\CreateAction::make(),
-            ])
-            ->actions([
-                // Tables\Actions\EditAction::make(),
-                // Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    // Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }
