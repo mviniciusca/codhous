@@ -15,6 +15,7 @@ use App\Services\SendBudgetMail;
 use App\Trait\BudgetStatus;
 use Filament\Actions;
 use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -391,11 +392,24 @@ class EditBudget extends EditRecord
                 ->color('primary')
                 ->url(route('filament.admin.resources.budgets.create'))
                 ->icon('heroicon-o-currency-dollar'),
-            Actions\DeleteAction::make()
-                ->color('danger')
-                ->label(__(false))
-                ->icon('heroicon-o-trash'),
 
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getSaveFormAction(),
+            $this->getDeleteFormAction(),
+
+        ];
+    }
+
+    protected function getDeleteFormAction(): DeleteAction
+    {
+        return DeleteAction::make('delete')
+            ->requiresConfirmation()
+            ->icon('heroicon-o-trash')
+            ->label(__('Delete'));
     }
 }
