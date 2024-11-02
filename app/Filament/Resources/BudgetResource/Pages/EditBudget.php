@@ -223,8 +223,8 @@ class EditBudget extends EditRecord
                         Select::make('content.product')
                             ->disabled()
                             ->dehydrated()
-                            ->label(__('Service'))
-                            ->helperText(__('Service selected'))
+                            ->label(__('Product'))
+                            ->helperText(__('Product selected'))
                             ->options(Product::all()->pluck('name', 'id')),
                         Select::make('content.product_option')
                             ->live()

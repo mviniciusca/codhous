@@ -155,12 +155,11 @@ class CreateBudget extends CreateRecord
                     ->columns(5)
                     ->schema([
                         TextInput::make('content.quantity')
-                            ->live()
-                            ->debounce(500)
+                            ->live(true)
                             ->integer()
                             ->required()
                             ->minValue(3)
-                            ->label(__('Quantity m³'))
+                            ->label(__('Quantity'))
                             ->suffix(__('m³'))
                             ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                             ->afterStateUpdated(function (Get $get, Set $set, $state) {
