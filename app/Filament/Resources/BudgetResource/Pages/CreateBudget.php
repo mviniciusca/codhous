@@ -150,8 +150,9 @@ class CreateBudget extends CreateRecord
                             ->label(__('UF')),
                     ]),
                 Section::make(__('Shopping Bag'))
+                    ->description(__('Products in the shopping bag.'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->columns(4)
+                    ->columns(5)
                     ->schema([
                         TextInput::make('content.quantity')
                             ->live()

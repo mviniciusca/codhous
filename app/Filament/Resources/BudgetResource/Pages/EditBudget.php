@@ -202,8 +202,8 @@ class EditBudget extends EditRecord
 
                     ]),
                 Section::make(__('Shopping Bag'))
-                    ->icon('heroicon-o-shopping-bag')
                     ->description(__('Products in the shopping bag.'))
+                    ->icon('heroicon-o-shopping-bag')
                     ->columns(5)
                     ->schema([
                         TextInput::make('content.quantity')
