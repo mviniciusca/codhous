@@ -82,22 +82,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-user')
                     ->group(__('Customers & Partners'))
                     ->sort(1),
-                // NavigationItem::make('customer_bin')
-                //     ->label(fn (): string => __('Trash'))
-                //     ->url(fn (): string => CustomerBin::getUrl())
-                //     ->badge(fn (): ?string => CustomerBin::count())
-                //     ->icon('heroicon-o-trash')
-                //     ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.customers.bin'))
-                //     ->group(__('Customers & Partners'))
-                //     ->sort(2),
-                /** Mailing List */
-                // NavigationItem::make('subscriber_bin')
-                //     ->label(fn (): string => __('Trash'))
-                //     ->url(fn (): string => SubscriberBin::getUrl())
-                //     ->badge(fn (): ?string => SubscriberBin::count())
-                //     ->icon('heroicon-o-trash')
-                //     ->group(__('Mailing'))
-                //     ->sort(2),
+
                 // /** App Setting */
                 NavigationItem::make('settings')
                     ->label(fn (): string => __('App Settings'))
