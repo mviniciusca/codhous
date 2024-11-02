@@ -17,7 +17,7 @@ class ProductOptionFactory extends Factory
      */
     public function definition(): array
     {
-        $name = $this->faker->city();
+        $name = $this->faker->unique()->city();
 
         return [
             'name'  => $name,
