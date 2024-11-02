@@ -196,9 +196,9 @@ class CreateBudget extends CreateRecord
                             ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
 
                     ]),
-                Section::make(__('Pricing'))
+                Section::make(__('Pricing Calculator'))
                     ->icon('heroicon-o-currency-dollar')
-                    ->description(__('Pricing Definition & Total Cost'))
+                    ->description(__('Pricing Definition & Total Cost.'))
                     ->columns(5)
                     ->schema([
                         TextInput::make('content.quantity')
