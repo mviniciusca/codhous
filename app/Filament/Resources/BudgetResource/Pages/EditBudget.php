@@ -50,293 +50,268 @@ class EditBudget extends EditRecord
     {
         return $form
             ->schema([
-                Tabs::make('Tabs')
+                Group::make()
                     ->columnSpanFull()
-                    ->tabs([
-                        Tab::make('tab1')
-                            ->id('tab-one')
-                            ->label(__('Details'))
-                            ->icon('heroicon-o-currency-dollar')
+                    ->schema([
+                        Section::make(__('Budget Overview'))
+                            ->headerActions([
+                                Action::make('send_mail')
+                                    ->icon('heroicon-o-envelope')
+                                    ->label(__('Notify Email'))
+                                    ->disabled(function (Get $get, ?array $state) {
+                                        return self::checkId($get, $state);
+                                    })
+                                    ->color(function (Get $get, ?array $state) {
+                                        if (self::checkId($get, $state)) {
+                                            return 'gray';
+                                        } else {
+                                            return 'success';
+                                        }
+                                    })
+                                    ->requiresConfirmation()
+                                    ->action(function (Get $get, ?array $state) {
+                                        $mail = new SendBudgetMail($state,
+                                            $get('content.customer_email'),
+                                            new BudgetMail()
+                                        );
+                                        $mail->dispatch();
+                                    }),
+                                Action::make('download_pdf')
+                                    ->label(__('Download PDF'))
+                                    ->color(function (Get $get, ?array $state) {
+                                        if (self::checkId($get, $state)) {
+                                            return 'gray';
+                                        } else {
+                                            return 'warning';
+                                        }
+                                    })
+                                    ->icon('heroicon-o-arrow-down-tray')
+                                    ->requiresConfirmation()
+                                    ->disabled(function (Get $get, ?array $state) {
+                                        return self::checkId($get, $state);
+                                    })
+                                    ->action(function ($state) {
+                                        $pdf = new PdfGenerator($state);
+
+                                        return $pdf->generate();
+                                    }),
+                            ])
+                            ->columns(4)
+                            ->description(__('Organize your budget report'))
+                            ->icon('heroicon-o-document')
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->helperText(__('Enable or disable this budget from the dashboard view'))
+                                    ->label(__('Active'))
+                                    ->default(true)
+                                    ->inline(),
+                                Select::make('status')
+                                    ->helperText(__('Set the budget status'))
+                                    ->options([
+                                        'pending'  => __('Pending'),
+                                        'on going' => __('On Going'),
+                                        'done'     => __('Done'),
+                                        'ignored'  => __('Ignored'),
+                                    ])
+                                    ->default('pending'),
+                                TextInput::make('code')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->prefix('#')
+                                    ->label(__('Budget Code'))
+                                    ->helperText(__('Use this code to search'))
+                                    ->default('ADMIN'.rand(10000, 99999)),
+                                DateTimePicker::make('created_at')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->format('Y-m-d H:i:s')
+                                    ->displayFormat('d/m/Y H:i')
+                                    ->default(fn () => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->label(__('Date'))
+                                    ->helperText(__('When this budget was created')),
+                            ]),
+                    ]),
+                Section::make('Budget Content')
+                    ->description(__('Here is the content from your budget'))
+                    ->icon('heroicon-o-shopping-bag')
+                    ->schema([
+                        Fieldset::make(__('Customer Information'))
+                            ->columns(3)
                             ->schema([
                                 Group::make()
+                                    ->columns(3)
+                                    ->columnSpanFull()
                                     ->schema([
-                                        Section::make(__('Budget Overview'))
-                                            ->headerActions([
-                                                Action::make('send_mail')
-                                                    ->icon('heroicon-o-envelope')
-                                                    ->label(__('Notify Email'))
-                                                    ->disabled(function (Get $get, ?array $state) {
-                                                        return self::checkId($get, $state);
-                                                    })
-                                                    ->color(function (Get $get, ?array $state) {
-                                                        if (self::checkId($get, $state)) {
-                                                            return 'gray';
-                                                        } else {
-                                                            return 'success';
-                                                        }
-                                                    })
-                                                    ->requiresConfirmation()
-                                                    ->action(function (Get $get, ?array $state) {
-                                                        $mail = new SendBudgetMail($state,
-                                                            $get('content.customer_email'),
-                                                            new BudgetMail()
-                                                        );
-                                                        $mail->dispatch();
-                                                    }),
-                                                Action::make('download_pdf')
-                                                    ->label(__('Download PDF'))
-                                                    ->color(function (Get $get, ?array $state) {
-                                                        if (self::checkId($get, $state)) {
-                                                            return 'gray';
-                                                        } else {
-                                                            return 'warning';
-                                                        }
-                                                    })
-                                                    ->icon('heroicon-o-arrow-down-tray')
-                                                    ->requiresConfirmation()
-                                                    ->disabled(function (Get $get, ?array $state) {
-                                                        return self::checkId($get, $state);
-                                                    })
-                                                    ->action(function ($state) {
-                                                        $pdf = new PdfGenerator($state);
-
-                                                        return $pdf->generate();
-                                                    }),
-                                            ])
-                                            ->columns(4)
-                                            ->description(__('Organize your budget report'))
-                                            ->icon('heroicon-o-document')
-                                            ->schema([
-                                                Toggle::make('is_active')
-                                                    ->helperText(__('Enable or disable this budget from the dashboard view'))
-                                                    ->label(__('Active'))
-                                                    ->default(true)
-                                                    ->inline(),
-                                                Select::make('status')
-                                                    ->helperText(__('Set the budget status'))
-                                                    ->options([
-                                                        'pending'  => __('Pending'),
-                                                        'on going' => __('On Going'),
-                                                        'done'     => __('Done'),
-                                                        'ignored'  => __('Ignored'),
-                                                    ])
-                                                    ->default('pending'),
-                                                TextInput::make('code')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->prefix('#')
-                                                    ->label(__('Budget Code'))
-                                                    ->helperText(__('Use this code to search'))
-                                                    ->default('ADMIN'.rand(10000, 99999)),
-                                                DateTimePicker::make('created_at')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->format('Y-m-d H:i:s')
-                                                    ->displayFormat('d/m/Y H:i')
-                                                    ->default(fn () => Carbon::now()->format('Y-m-d H:i:s'))
-                                                    ->label(__('Date'))
-                                                    ->helperText(__('When this budget was created')),
-                                            ]),
+                                        TextInput::make('content.customer_name')
+                                            ->dehydrated()
+                                            ->required()
+                                            ->helperText(__('Customer name'))
+                                            ->default('Admin')
+                                            ->label(__('Customer Name')),
+                                        TextInput::make('content.customer_email')
+                                            ->dehydrated()
+                                            ->email()
+                                            ->required()
+                                            ->helperText(__('Customer email address'))
+                                            ->label(__('Email')),
+                                        TextInput::make('content.customer_phone')
+                                            ->required()
+                                            ->helperText(__('Phone Number'))
+                                            ->tel()
+                                            ->mask('(99)99999-9999')
+                                            ->placeholder(_('(xx) XXXX-XXXX'))
+                                            ->helperText(__('Customer phone number'))
+                                            ->label(__('Phone')),
                                     ]),
-                                Section::make('Budget Content')
-                                    ->description(__('Here is the content from your budget'))
-                                    ->icon('heroicon-o-shopping-bag')
-                                    ->schema([
-                                        Fieldset::make(__('Customer Information'))
-                                            ->columns(3)
-                                            ->schema([
-                                                Group::make()
-                                                    ->columns(3)
-                                                    ->columnSpanFull()
-                                                    ->schema([
-                                                        TextInput::make('content.customer_name')
-                                                            ->dehydrated()
-                                                            ->required()
-                                                            ->helperText(__('Customer name'))
-                                                            ->default('Admin')
-                                                            ->label(__('Customer Name')),
-                                                        TextInput::make('content.customer_email')
-                                                            ->dehydrated()
-                                                            ->email()
-                                                            ->required()
-                                                            ->helperText(__('Customer email address'))
-                                                            ->label(__('Email')),
-                                                        TextInput::make('content.customer_phone')
-                                                            ->required()
-                                                            ->helperText(__('Phone Number'))
-                                                            ->tel()
-                                                            ->mask('(99)99999-9999')
-                                                            ->placeholder(_('(xx) XXXX-XXXX'))
-                                                            ->helperText(__('Customer phone number'))
-                                                            ->label(__('Phone')),
-                                                    ]),
-                                                TextInput::make('content.postcode')
-                                                    ->required()
-                                                    ->minLength(9)
-                                                    ->mask('99999-999')
-                                                    ->placeholder('22022-000')
-                                                    ->helperText(__('Customer postcode'))
-                                                    ->maxLength(9)
-                                                    ->suffixAction(
-                                                        fn ($state, Set $set, $livewire) => Action::make('search-action')
-                                                            ->icon('heroicon-o-magnifying-glass')
-                                                            ->action(function () use ($state, $livewire, $set) {
-                                                                $livewire->validateOnly('data.content.postcode');
-                                                                $postcode = new PostcodeFinder($state, $set);
-                                                                $postcode->find();
-                                                            })
-                                                    )
-                                                    ->label(__('CEP')),
-                                                TextInput::make('content.street')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->required()
-                                                    ->helperText(__('Customer street.'))
-                                                    ->label(__('Street')),
-                                                TextInput::make('content.number')
-                                                    ->dehydrated()
-                                                    ->helperText(__('Customer street number. Optional'))
-                                                    ->label(__('Number')),
-                                                TextInput::make('content.city')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->helperText(__('Customer city.'))
-                                                    ->label(__('City')),
-                                                TextInput::make('content.neighborhood')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->helperText(__('Customer neighborhood.'))
-                                                    ->label(__('Neighborhood')),
-                                                TextInput::make('content.state')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->helperText(__('Customer UF.'))
-                                                    ->label(__('State')),
-                                            ]),
-                                        Fieldset::make('Construction Components')
-                                            ->columns(4)
-                                            ->schema([
-                                                TextInput::make('content.quantity')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->label(__('Quantity m³'))
-                                                    ->suffix(__('m³'))
-                                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                                    ->afterStateUpdated(fn (Set $set, string $state) => $set('quantity', $state)),
-                                                Select::make('content.location')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->label(__('Local / Area'))
-                                                    ->helperText(__('Local or area to be concreted'))
-                                                    ->options(Location::all()
-                                                        ->pluck('name', 'id')),
-                                                Select::make('content.product')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->label(__('Product'))
-                                                    ->helperText(__('Product selected'))
-                                                    ->options(Product::all()->pluck('name', 'id')),
-                                                Select::make('content.product_option')
-                                                    ->live()
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->label(__('Option'))
-                                                    ->helperText(__('Option selected'))
-                                                    ->options(function (Get $get, ?string $state) {
-                                                        return ProductOption::where('product_id', '=', $get('content.product'))
-                                                            ->pluck('name', 'id');
-                                                    }),
-                                            ]),
-                                    ]),
-                                Section::make(__('Pricing'))
-                                    ->icon('heroicon-o-currency-dollar')
-                                    ->description(__('Pricing Definition & Total Cost'))
-                                    ->columns(5)
-                                    ->schema([
-                                        TextInput::make('content.quantity')
-                                            ->live(onBlur: true)
-                                            ->disabled()
-                                            ->dehydrated()
-                                            ->required()
-                                            ->helperText(__('Quantity of items'))
-                                            ->suffix('m³')
-                                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                                $this->calculateTotal($get, $set);
+                                TextInput::make('content.postcode')
+                                    ->required()
+                                    ->minLength(9)
+                                    ->mask('99999-999')
+                                    ->placeholder('22022-000')
+                                    ->helperText(__('Customer postcode'))
+                                    ->maxLength(9)
+                                    ->suffixAction(
+                                        fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                            ->icon('heroicon-o-magnifying-glass')
+                                            ->action(function () use ($state, $livewire, $set) {
+                                                $livewire->validateOnly('data.content.postcode');
+                                                $postcode = new PostcodeFinder($state, $set);
+                                                $postcode->find();
                                             })
-                                            ->numeric(),
-                                        TextInput::make('content.price')
-                                            ->live(onBlur: true)
-                                            ->disabled()
-                                            ->dehydrated()
-                                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
-                                            ->afterStateHydrated(function (Get $get, Set $set) {
-                                                $this->getPrice($get, $set);
-                                            })
-                                            ->prefix(env('CURRENCY_SUFFIX'))
-                                            ->label(__('Price per Unity (m³)'))
-                                            ->required(),
-                                        TextInput::make('content.tax')
-                                            ->live(onBlur: true)
-                                            ->dehydrated()
-                                            ->prefix('+'.env('CURRENCY_SUFFIX'))
-                                            ->numeric()
-                                            ->required()
-                                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
-                                            ->default(0)
-                                            ->step(0.01)
-                                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                                $this->calculateTotal($get, $set);
-                                                $this->updateBudgetStatus($get, $set, $state);
-                                            })
-                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                                $this->calculateTotal($get, $set);
-                                                $this->updateBudgetStatus($get, $set, $state);
-                                            }),
-                                        TextInput::make('content.discount')
-                                            ->live(onBlur: true)
-                                            ->dehydrated()
-                                            ->numeric()
-                                            ->required()
-                                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
-                                            ->prefix('-'.env('CURRENCY_SUFFIX'))
-                                            ->step(0.01)
-                                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                                $this->calculateTotal($get, $set);
-                                                $this->updateBudgetStatus($get, $set, $state);
-                                            })
-                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                                $this->calculateTotal($get, $set);
-                                                $this->updateBudgetStatus($get, $set, $state);
-                                            }),
-                                        TextInput::make('content.total')
-                                            ->live(onBlur: true)
-                                            ->dehydrated()
-                                            ->disabled()
-                                            ->numeric()
-                                            ->required()
-                                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
-                                            ->prefix(env('CURRENCY_SUFFIX'))
-                                            ->step(0.01),
-                                    ]),
+                                    )
+                                    ->label(__('CEP')),
+                                TextInput::make('content.street')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->required()
+                                    ->helperText(__('Customer street.'))
+                                    ->label(__('Street')),
+                                TextInput::make('content.number')
+                                    ->dehydrated()
+                                    ->helperText(__('Customer street number. Optional'))
+                                    ->label(__('Number')),
+                                TextInput::make('content.city')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->helperText(__('Customer city.'))
+                                    ->label(__('City')),
+                                TextInput::make('content.neighborhood')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->helperText(__('Customer neighborhood.'))
+                                    ->label(__('Neighborhood')),
+                                TextInput::make('content.state')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->helperText(__('Customer UF.'))
+                                    ->label(__('State')),
                             ]),
-                        // Tab::make(false)
-                        //     ->id('app')
-                        //     ->label(__('History'))
-                        //     ->icon('heroicon-o-bell')
-                        //     ->schema([
-                        //         ViewField::make(false)
-                        //             ->disabled()
-                        //             ->required(false)
-                        //             ->view('budget.history-view', [
-                        //                 'data' => BudgetHistory::
-                        //                     where('budget_id', '=', $this->getRecord()->id)
-                        //                         ->with(['user', 'budget'])
-                        //                         ->take(10)
-                        //                         ->orderByDesc('created_at')
-                        //                         ->get(),
-                        //             ]),
-                        //     ]),
-                    ])->activeTab(1),
+                        Fieldset::make('Construction Components')
+                            ->columns(4)
+                            ->schema([
+                                TextInput::make('content.quantity')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->label(__('Quantity m³'))
+                                    ->suffix(__('m³'))
+                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                    ->afterStateUpdated(fn (Set $set, string $state) => $set('quantity', $state)),
+                                Select::make('content.location')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->label(__('Local / Area'))
+                                    ->helperText(__('Local or area to be concreted'))
+                                    ->options(Location::all()
+                                        ->pluck('name', 'id')),
+                                Select::make('content.product')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->label(__('Product'))
+                                    ->helperText(__('Product selected'))
+                                    ->options(Product::all()->pluck('name', 'id')),
+                                Select::make('content.product_option')
+                                    ->live()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->label(__('Option'))
+                                    ->helperText(__('Option selected'))
+                                    ->options(function (Get $get, ?string $state) {
+                                        return ProductOption::where('product_id', '=', $get('content.product'))
+                                            ->pluck('name', 'id');
+                                    }),
+                            ]),
+                    ]),
+                Section::make(__('Pricing'))
+                    ->icon('heroicon-o-currency-dollar')
+                    ->description(__('Pricing Definition & Total Cost'))
+                    ->columns(5)
+                    ->schema([
+                        TextInput::make('content.quantity')
+                            ->live(onBlur: true)
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->helperText(__('Quantity of items'))
+                            ->suffix('m³')
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                            })
+                            ->numeric(),
+                        TextInput::make('content.price')
+                            ->live(onBlur: true)
+                            ->disabled()
+                            ->dehydrated()
+                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                $this->getPrice($get, $set);
+                            })
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->label(__('Price per Unity (m³)'))
+                            ->required(),
+                        TextInput::make('content.tax')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->prefix('+'.env('CURRENCY_SUFFIX'))
+                            ->numeric()
+                            ->required()
+                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
+                            ->default(0)
+                            ->step(0.01)
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
+                            })
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
+                            }),
+                        TextInput::make('content.discount')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->numeric()
+                            ->required()
+                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
+                            ->prefix('-'.env('CURRENCY_SUFFIX'))
+                            ->step(0.01)
+                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
+                            })
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                $this->calculateTotal($get, $set);
+                                $this->updateBudgetStatus($get, $set, $state);
+                            }),
+                        TextInput::make('content.total')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->disabled()
+                            ->numeric()
+                            ->required()
+                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->step(0.01),
+                    ]),
+
             ]);
     }
 
