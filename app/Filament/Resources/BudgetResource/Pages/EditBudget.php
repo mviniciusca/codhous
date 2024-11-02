@@ -52,8 +52,8 @@ class EditBudget extends EditRecord
                             ->headerActions([
                                 Action::make('send_whatsapp')
                                     ->icon('heroicon-o-phone')
-                                    ->label(__('Notify Whatsapp'))
-                                    ->color('success')
+                                    ->label(__('Whatsapp'))
+                                    ->color('primary')
                                     ->action(function () {
                                     }),
                                 Action::make('send_mail')
