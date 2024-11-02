@@ -78,6 +78,7 @@ class CreateBudget extends CreateRecord
                     ->description(__('This section contains information about the customer.'))
                     ->icon('heroicon-o-user')
                     ->columns(3)
+                    ->collapsible()
                     ->schema([Group::make()
                         ->columns(3)
                         ->columnSpanFull()
@@ -148,7 +149,8 @@ class CreateBudget extends CreateRecord
                             ->helperText(__('Customer UF.'))
                             ->label(__('UF')),
                     ]),
-                Fieldset::make('Construction Components')
+                Section::make(__('Shopping Bag'))
+                    ->icon('heroicon-o-shopping-bag')
                     ->columns(4)
                     ->schema([
                         TextInput::make('content.quantity')
