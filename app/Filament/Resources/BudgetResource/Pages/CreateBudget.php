@@ -180,9 +180,7 @@ class CreateBudget extends CreateRecord
                                     ->required()
                                     ->label(__('Product'))
                                     ->helperText(__('Product selected'))
-                                    ->options(Product::all()->pluck('name', 'id'))
-                                    ->afterStateHydrated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state))
-                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
+                                    ->options(Product::all()->pluck('name', 'id')),
                                 Select::make('content.product_option')
                                     ->live()
                                     ->dehydrated()
@@ -190,7 +188,9 @@ class CreateBudget extends CreateRecord
                                     ->helperText(__('Option selected'))
                                     ->options(fn (Get $get): Collection => $this->getOptions($get))
                                     ->required(fn (Get $get): bool => $this->getOptions($get)->count() > 0)
-                                    ->hidden(fn (Get $get): bool => $this->getOptions($get)->count() == 0),
+                                    ->hidden(fn (Get $get): bool => $this->getOptions($get)->count() == 0)
+                                    ->afterStateHydrated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state))
+                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
                             ]),
                     ]),
                 Section::make(__('Pricing'))
@@ -300,8 +300,8 @@ class CreateBudget extends CreateRecord
      */
     private function getPrice(Get $get, Set $set)
     {
-        $id = $get('content.product');
-        $price = Product::select(['price'])
+        $id = $get('content.product_option');
+        $price = ProductOption::select(['price'])
             ->where('id', '=', $id)
             ->first();
         $set('content.price', $price->price ?? 0);
@@ -317,7 +317,8 @@ class CreateBudget extends CreateRecord
     private function updatePrice(Get $get, Set $set, $productId): void
     {
         if ($productId) {
-            $price = Product::where('id', $productId)->value('price') ?? 0;
+            $price = ProductOption::where('id', $productId)
+                ->value('price') ?? 0;
         } else {
             $price = 0;
         }
