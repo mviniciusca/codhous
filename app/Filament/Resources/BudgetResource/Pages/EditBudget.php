@@ -319,25 +319,24 @@ class EditBudget extends EditRecord
                                             ->step(0.01),
                                     ]),
                             ]),
-                        Tab::make(false)
-                            ->id('app')
-                            ->label(__('History'))
-                            ->icon('heroicon-o-bell')
-                            ->schema([
-                                ViewField::make(false)
-                                    ->disabled()
-                                    ->default(null)
-                                    ->required(false)
-                                    ->view('budget.history-view', [
-                                        'data' => BudgetHistory::
-                                            where('budget_id', '=', $this->getRecord()->id)
-                                                ->with(['user', 'budget'])
-                                                ->take(10)
-                                                ->orderByDesc('created_at')
-                                                ->get(),
-                                    ]),
-                            ]),
-                    ])->activeTab(2),
+                        // Tab::make(false)
+                        //     ->id('app')
+                        //     ->label(__('History'))
+                        //     ->icon('heroicon-o-bell')
+                        //     ->schema([
+                        //         ViewField::make(false)
+                        //             ->disabled()
+                        //             ->required(false)
+                        //             ->view('budget.history-view', [
+                        //                 'data' => BudgetHistory::
+                        //                     where('budget_id', '=', $this->getRecord()->id)
+                        //                         ->with(['user', 'budget'])
+                        //                         ->take(10)
+                        //                         ->orderByDesc('created_at')
+                        //                         ->get(),
+                        //             ]),
+                        //     ]),
+                    ])->activeTab(1),
             ]);
     }
 
