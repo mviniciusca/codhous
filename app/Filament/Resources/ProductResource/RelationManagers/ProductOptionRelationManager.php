@@ -7,6 +7,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -35,20 +37,31 @@ class ProductOptionRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->striped()
+            ->heading(__('Product Options'))
+            ->description(__('Variations for this product'))
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('price'),
+                TextColumn::make('name')
+                    ->label(__('Name')),
+                TextColumn::make('price')
+                    ->label(__('Price per Unity'))
+                    ->alignEnd()
+                    ->prefix(env('CURRENCY_SUFFIX').' '),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->label(__('New Option'))
+                    ->icon('heroicon-o-plus'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
