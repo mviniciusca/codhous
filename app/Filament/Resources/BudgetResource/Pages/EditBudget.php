@@ -357,8 +357,8 @@ class EditBudget extends EditRecord
      */
     private function getPrice(Get $get, Set $set)
     {
-        $id = $get('content.product');
-        $price = Product::select(['price'])
+        $id = $get('content.product_option');
+        $price = ProductOption::select(['price'])
             ->where('id', '=', $id)
             ->first();
         $set('content.price', $price->price ?? 0);
