@@ -180,7 +180,11 @@ class CreateBudget extends CreateRecord
                                     ->required()
                                     ->label(__('Product'))
                                     ->helperText(__('Product selected'))
-                                    ->options(Product::all()->pluck('name', 'id')),
+                                    ->options(Product::all()->pluck('name', 'id'))
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        $set('content.product_option', null);
+                                        $set('content.price', null);
+                                    }),
                                 Select::make('content.product_option')
                                     ->live()
                                     ->dehydrated()
@@ -189,7 +193,6 @@ class CreateBudget extends CreateRecord
                                     ->options(fn (Get $get): Collection => $this->getOptions($get))
                                     ->required(fn (Get $get): bool => $this->getOptions($get)->count() > 0)
                                     ->hidden(fn (Get $get): bool => $this->getOptions($get)->count() == 0)
-                                    ->afterStateHydrated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state))
                                     ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
                             ]),
                     ]),
