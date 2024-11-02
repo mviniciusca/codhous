@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -18,9 +19,16 @@ class ProductOptionRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                TextInput::make('price')
+                    ->required()
+                    ->numeric()
+                    ->prefix(env('CURRENCY_SUFFIX'))
+                    ->maxValue(42949672.95)
+                    ->label(__('Price'))
+                    ->helperText(__('Price per unity')),
             ]);
     }
 

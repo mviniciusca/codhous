@@ -3,14 +3,15 @@
 namespace App\Filament\Resources\ProductOptionResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Tables;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Columns\ToggleColumn;
 
 class ProductRelationManager extends RelationManager
 {
@@ -20,7 +21,7 @@ class ProductRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
@@ -40,7 +41,7 @@ class ProductRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Name')),
                 Tables\Columns\TextColumn::make('price')
-                    ->prefix(env('CURRENCY_SUFFIX') . ' ')
+                    ->prefix(env('CURRENCY_SUFFIX').' ')
                     ->label(__('Price per Unity')),
             ])
             ->filters([
@@ -54,7 +55,7 @@ class ProductRelationManager extends RelationManager
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make()
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
