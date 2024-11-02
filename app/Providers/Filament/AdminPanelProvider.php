@@ -98,10 +98,10 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary'   => Color::Indigo,
                 'secondary' => Color::Stone,
-                'info'      => Color::Blue,
+                'tertiary'  => Color::Purple,
+                'info'      => Color::Sky,
                 'danger'    => Color::Red,
-                'success'   => Color::Green,
-                'tertiary'  => Color::Rose,
+                'success'   => Color::Teal,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
