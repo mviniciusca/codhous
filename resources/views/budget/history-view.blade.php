@@ -1,3 +1,4 @@
+@props(['data'])
 <div>
-    {{ $data }}
+    <livewire:budget.history-table :data="$data" />
 </div>

@@ -319,17 +319,19 @@ class EditBudget extends EditRecord
                                             ->step(0.01),
                                     ]),
                             ]),
-                        Tab::make('history')
+                        Tab::make(false)
                             ->id('app')
                             ->label(__('History'))
                             ->icon('heroicon-o-bell')
                             ->schema([
-                                ViewField::make('')
+                                ViewField::make(false)
+                                    ->disabled(true)
+                                    ->required(false)
                                     ->view('budget.history-view', [
                                         'data' => BudgetHistory::
                                             where('budget_id', '=', $this->getRecord()->id)
                                                 ->with(['user', 'budget'])
-                                                ->take(5)
+                                                ->take(1)
                                                 ->orderByDesc('created_at')
                                                 ->get(),
                                     ]),
