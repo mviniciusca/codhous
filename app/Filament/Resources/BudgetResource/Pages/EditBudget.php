@@ -210,14 +210,14 @@ class EditBudget extends EditRecord
                 Section::make(__('Shopping Bag'))
                     ->icon('heroicon-o-shopping-bag')
                     ->description(__('Products in the shopping bag.'))
-                    ->columns(4)
+                    ->columns(5)
                     ->schema([
                         TextInput::make('content.quantity')
                             ->disabled()
                             ->dehydrated()
-                            ->label(__('Quantity m³'))
+                            ->label(__('Quantity'))
                             ->suffix(__('m³'))
-                            ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                            ->helperText(__('Quantity of items'))
                             ->afterStateUpdated(fn (Set $set, string $state) => $set('quantity', $state)),
                         Select::make('content.location')
                             ->disabled()
@@ -242,8 +242,20 @@ class EditBudget extends EditRecord
                                 return ProductOption::where('product_id', '=', $get('content.product'))
                                     ->pluck('name', 'id');
                             }),
+                        TextInput::make('content.price')
+                            ->live(onBlur: true)
+                            ->disabled()
+                            ->dehydrated()
+                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                $this->getPrice($get, $set);
+                            })
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->label(__('Price per Unity'))
+                            ->suffix('m³')
+                            ->required(),
                     ]),
-                Section::make(__('Pricing'))
+                Section::make(__('Pricing Calculator'))
                     ->icon('heroicon-o-currency-dollar')
                     ->description(__('Pricing Definition & Total Cost.'))
                     ->columns(5)
@@ -268,7 +280,7 @@ class EditBudget extends EditRecord
                                 $this->getPrice($get, $set);
                             })
                             ->prefix(env('CURRENCY_SUFFIX'))
-                            ->label(__('Price per Unity (m³)'))
+                            ->label(__('Price per Unity'))
                             ->required(),
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
