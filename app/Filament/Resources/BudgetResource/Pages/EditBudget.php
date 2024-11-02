@@ -108,6 +108,7 @@ class EditBudget extends EditRecord
                                     ->inline(),
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
+                                    ->prefixIcon('heroicon-o-tag')
                                     ->options([
                                         'pending'  => __('Pending'),
                                         'on going' => __('On Going'),
@@ -126,6 +127,7 @@ class EditBudget extends EditRecord
                                     ->disabled()
                                     ->dehydrated()
                                     ->format('Y-m-d H:i:s')
+                                    ->prefixIcon('heroicon-o-calendar')
                                     ->displayFormat('d/m/Y H:i')
                                     ->default(fn () => Carbon::now()->format('Y-m-d H:i:s'))
                                     ->label(__('Date'))
@@ -145,6 +147,7 @@ class EditBudget extends EditRecord
                                 TextInput::make('content.customer_name')
                                     ->dehydrated()
                                     ->required()
+                                    ->prefixIcon('heroicon-o-user')
                                     ->helperText(__('Customer name'))
                                     ->default('Admin')
                                     ->label(__('Customer Name')),
@@ -152,11 +155,13 @@ class EditBudget extends EditRecord
                                     ->dehydrated()
                                     ->email()
                                     ->required()
+                                    ->prefixIcon('heroicon-o-envelope')
                                     ->helperText(__('Customer email address'))
                                     ->label(__('Email')),
                                 TextInput::make('content.customer_phone')
                                     ->required()
                                     ->helperText(__('Phone Number'))
+                                    ->prefixIcon('heroicon-o-phone')
                                     ->tel()
                                     ->mask('(99)99999-9999')
                                     ->placeholder(_('(xx) XXXX-XXXX'))
@@ -167,6 +172,7 @@ class EditBudget extends EditRecord
                             ->required()
                             ->minLength(9)
                             ->mask('99999-999')
+                            ->prefixIcon('heroicon-o-map')
                             ->placeholder('22022-000')
                             ->helperText(__('Customer postcode'))
                             ->maxLength(9)
@@ -184,25 +190,30 @@ class EditBudget extends EditRecord
                             ->disabled()
                             ->dehydrated()
                             ->required()
+                            ->prefixIcon('heroicon-o-map')
                             ->helperText(__('Customer street.'))
                             ->label(__('Street')),
                         TextInput::make('content.number')
                             ->dehydrated()
+                            ->prefixIcon('heroicon-o-map')
                             ->helperText(__('Customer street number. Optional'))
                             ->label(__('Number')),
                         TextInput::make('content.city')
                             ->disabled()
                             ->dehydrated()
+                            ->prefixIcon('heroicon-o-map')
                             ->helperText(__('Customer city.'))
                             ->label(__('City')),
                         TextInput::make('content.neighborhood')
                             ->disabled()
                             ->dehydrated()
+                            ->prefixIcon('heroicon-o-map')
                             ->helperText(__('Customer neighborhood.'))
                             ->label(__('Neighborhood')),
                         TextInput::make('content.state')
                             ->disabled()
                             ->dehydrated()
+                            ->prefixIcon('heroicon-o-map')
                             ->helperText(__('Customer UF.'))
                             ->label(__('State')),
 
