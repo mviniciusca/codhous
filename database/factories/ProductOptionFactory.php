@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductOption>
@@ -16,8 +17,12 @@ class ProductOptionFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->city();
+
         return [
-            'name' => $this->faker->city()
+            'name'  => $name,
+            'slug'  => Str::slug($name),
+            'price' => fake()->randomFloat(2, 300, 1000),
         ];
     }
 }
