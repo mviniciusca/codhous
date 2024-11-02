@@ -132,115 +132,116 @@ class EditBudget extends EditRecord
                                     ->helperText(__('When this budget was created')),
                             ]),
                     ]),
-                Section::make('Budget Content')
+                Section::make('Customer Information')
                     ->description(__('Here is the content from your budget'))
-                    ->icon('heroicon-o-shopping-bag')
+                    ->icon('heroicon-o-user')
+                    ->collapsible()
+                    ->columns(3)
                     ->schema([
-                        Fieldset::make(__('Customer Information'))
+                        Group::make()
                             ->columns(3)
+                            ->columnSpanFull()
                             ->schema([
-                                Group::make()
-                                    ->columns(3)
-                                    ->columnSpanFull()
-                                    ->schema([
-                                        TextInput::make('content.customer_name')
-                                            ->dehydrated()
-                                            ->required()
-                                            ->helperText(__('Customer name'))
-                                            ->default('Admin')
-                                            ->label(__('Customer Name')),
-                                        TextInput::make('content.customer_email')
-                                            ->dehydrated()
-                                            ->email()
-                                            ->required()
-                                            ->helperText(__('Customer email address'))
-                                            ->label(__('Email')),
-                                        TextInput::make('content.customer_phone')
-                                            ->required()
-                                            ->helperText(__('Phone Number'))
-                                            ->tel()
-                                            ->mask('(99)99999-9999')
-                                            ->placeholder(_('(xx) XXXX-XXXX'))
-                                            ->helperText(__('Customer phone number'))
-                                            ->label(__('Phone')),
-                                    ]),
-                                TextInput::make('content.postcode')
-                                    ->required()
-                                    ->minLength(9)
-                                    ->mask('99999-999')
-                                    ->placeholder('22022-000')
-                                    ->helperText(__('Customer postcode'))
-                                    ->maxLength(9)
-                                    ->suffixAction(
-                                        fn ($state, Set $set, $livewire) => Action::make('search-action')
-                                            ->icon('heroicon-o-magnifying-glass')
-                                            ->action(function () use ($state, $livewire, $set) {
-                                                $livewire->validateOnly('data.content.postcode');
-                                                $postcode = new PostcodeFinder($state, $set);
-                                                $postcode->find();
-                                            })
-                                    )
-                                    ->label(__('CEP')),
-                                TextInput::make('content.street')
-                                    ->disabled()
+                                TextInput::make('content.customer_name')
                                     ->dehydrated()
                                     ->required()
-                                    ->helperText(__('Customer street.'))
-                                    ->label(__('Street')),
-                                TextInput::make('content.number')
+                                    ->helperText(__('Customer name'))
+                                    ->default('Admin')
+                                    ->label(__('Customer Name')),
+                                TextInput::make('content.customer_email')
                                     ->dehydrated()
-                                    ->helperText(__('Customer street number. Optional'))
-                                    ->label(__('Number')),
-                                TextInput::make('content.city')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->helperText(__('Customer city.'))
-                                    ->label(__('City')),
-                                TextInput::make('content.neighborhood')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->helperText(__('Customer neighborhood.'))
-                                    ->label(__('Neighborhood')),
-                                TextInput::make('content.state')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->helperText(__('Customer UF.'))
-                                    ->label(__('State')),
+                                    ->email()
+                                    ->required()
+                                    ->helperText(__('Customer email address'))
+                                    ->label(__('Email')),
+                                TextInput::make('content.customer_phone')
+                                    ->required()
+                                    ->helperText(__('Phone Number'))
+                                    ->tel()
+                                    ->mask('(99)99999-9999')
+                                    ->placeholder(_('(xx) XXXX-XXXX'))
+                                    ->helperText(__('Customer phone number'))
+                                    ->label(__('Phone')),
                             ]),
-                        Fieldset::make('Construction Components')
-                            ->columns(4)
-                            ->schema([
-                                TextInput::make('content.quantity')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->label(__('Quantity m³'))
-                                    ->suffix(__('m³'))
-                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateUpdated(fn (Set $set, string $state) => $set('quantity', $state)),
-                                Select::make('content.location')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->label(__('Local / Area'))
-                                    ->helperText(__('Local or area to be concreted'))
-                                    ->options(Location::all()
-                                        ->pluck('name', 'id')),
-                                Select::make('content.product')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->label(__('Product'))
-                                    ->helperText(__('Product selected'))
-                                    ->options(Product::all()->pluck('name', 'id')),
-                                Select::make('content.product_option')
-                                    ->live()
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->label(__('Option'))
-                                    ->helperText(__('Option selected'))
-                                    ->options(function (Get $get, ?string $state) {
-                                        return ProductOption::where('product_id', '=', $get('content.product'))
-                                            ->pluck('name', 'id');
-                                    }),
-                            ]),
+                        TextInput::make('content.postcode')
+                            ->required()
+                            ->minLength(9)
+                            ->mask('99999-999')
+                            ->placeholder('22022-000')
+                            ->helperText(__('Customer postcode'))
+                            ->maxLength(9)
+                            ->suffixAction(
+                                fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                    ->icon('heroicon-o-magnifying-glass')
+                                    ->action(function () use ($state, $livewire, $set) {
+                                        $livewire->validateOnly('data.content.postcode');
+                                        $postcode = new PostcodeFinder($state, $set);
+                                        $postcode->find();
+                                    })
+                            )
+                            ->label(__('CEP')),
+                        TextInput::make('content.street')
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->helperText(__('Customer street.'))
+                            ->label(__('Street')),
+                        TextInput::make('content.number')
+                            ->dehydrated()
+                            ->helperText(__('Customer street number. Optional'))
+                            ->label(__('Number')),
+                        TextInput::make('content.city')
+                            ->disabled()
+                            ->dehydrated()
+                            ->helperText(__('Customer city.'))
+                            ->label(__('City')),
+                        TextInput::make('content.neighborhood')
+                            ->disabled()
+                            ->dehydrated()
+                            ->helperText(__('Customer neighborhood.'))
+                            ->label(__('Neighborhood')),
+                        TextInput::make('content.state')
+                            ->disabled()
+                            ->dehydrated()
+                            ->helperText(__('Customer UF.'))
+                            ->label(__('State')),
+
+                    ]),
+                Section::make(__('Shopping Bag'))
+                    ->icon('heroicon-o-shopping-bag')
+                    ->description(__('Pricing Definition & Total Cost'))
+                    ->columns(4)
+                    ->schema([
+                        TextInput::make('content.quantity')
+                            ->disabled()
+                            ->dehydrated()
+                            ->label(__('Quantity m³'))
+                            ->suffix(__('m³'))
+                            ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                            ->afterStateUpdated(fn (Set $set, string $state) => $set('quantity', $state)),
+                        Select::make('content.location')
+                            ->disabled()
+                            ->dehydrated()
+                            ->label(__('Local / Area'))
+                            ->helperText(__('Local or area to be concreted'))
+                            ->options(Location::all()
+                                ->pluck('name', 'id')),
+                        Select::make('content.product')
+                            ->disabled()
+                            ->dehydrated()
+                            ->label(__('Product'))
+                            ->helperText(__('Product selected'))
+                            ->options(Product::all()->pluck('name', 'id')),
+                        Select::make('content.product_option')
+                            ->live()
+                            ->disabled()
+                            ->dehydrated()
+                            ->label(__('Option'))
+                            ->helperText(__('Option selected'))
+                            ->options(function (Get $get, ?string $state) {
+                                return ProductOption::where('product_id', '=', $get('content.product'))
+                                    ->pluck('name', 'id');
+                            }),
                     ]),
                 Section::make(__('Pricing'))
                     ->icon('heroicon-o-currency-dollar')
