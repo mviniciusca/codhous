@@ -133,7 +133,7 @@ class EditBudget extends EditRecord
                             ]),
                     ]),
                 Section::make('Customer Information')
-                    ->description(__('Here is the content from your budget'))
+                    ->description(__('This section contains information about the customer.'))
                     ->icon('heroicon-o-user')
                     ->collapsible()
                     ->columns(3)
@@ -209,7 +209,7 @@ class EditBudget extends EditRecord
                     ]),
                 Section::make(__('Shopping Bag'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->description(__('Pricing Definition & Total Cost'))
+                    ->description(__('Products in the shopping bag.'))
                     ->columns(4)
                     ->schema([
                         TextInput::make('content.quantity')
@@ -245,7 +245,7 @@ class EditBudget extends EditRecord
                     ]),
                 Section::make(__('Pricing'))
                     ->icon('heroicon-o-currency-dollar')
-                    ->description(__('Pricing Definition & Total Cost'))
+                    ->description(__('Pricing Definition & Total Cost.'))
                     ->columns(5)
                     ->schema([
                         TextInput::make('content.quantity')
