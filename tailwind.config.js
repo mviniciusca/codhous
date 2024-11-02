@@ -26,6 +26,7 @@ export default {
             primary: colors.zinc,
             secondary: colors.indigo,
             tertiary: colors.rose,
+            fourth: colors.cyan,
             gray: colors.zinc,
             white: colors.white,
             info: colors.indigo,
