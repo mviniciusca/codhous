@@ -70,6 +70,8 @@ class CreateBudget extends CreateRecord
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
                                     ->default(fn (): string => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->required()
+                                    ->disabled()
                                     ->prefixIcon('heroicon-o-calendar')
                                     ->label(__('Date'))
                                     ->helperText(__('When this budget was created')),
