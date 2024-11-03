@@ -50,6 +50,7 @@ class CreateBudget extends CreateRecord
                                     ->inline(),
                                 Select::make('status')
                                     ->helperText(__('Set the budget status'))
+                                    ->prefixIcon('heroicon-o-tag')
                                     ->options([
                                         'pending'  => __('Pending'),
                                         'on going' => __('On Going'),
@@ -69,6 +70,7 @@ class CreateBudget extends CreateRecord
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
                                     ->default(fn (): string => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->prefixIcon('heroicon-o-calendar')
                                     ->label(__('Date'))
                                     ->helperText(__('When this budget was created')),
                             ]),
@@ -181,6 +183,7 @@ class CreateBudget extends CreateRecord
                             ->label(__('Local / Area'))
                             ->helperText(__('Local or area to be concreted'))
                             ->searchable()
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->options(Location::all()
                                 ->pluck('name', 'id')),
                         Select::make('content.product')
@@ -189,6 +192,7 @@ class CreateBudget extends CreateRecord
                             ->required()
                             ->columnSpan(2)
                             ->searchable()
+                            ->prefixIcon('heroicon-o-shopping-cart')
                             ->label(__('Product'))
                             ->helperText(__('Product selected'))
                             ->options(Product::all()->pluck('name', 'id'))
@@ -200,6 +204,7 @@ class CreateBudget extends CreateRecord
                             ->live()
                             ->dehydrated()
                             ->searchable()
+                            ->prefixIcon('heroicon-o-shopping-bag')
                             ->columnSpan(2)
                             ->label(__('Option'))
                             ->helperText(__('Option selected'))
