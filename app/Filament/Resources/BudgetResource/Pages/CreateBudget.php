@@ -86,20 +86,23 @@ class CreateBudget extends CreateRecord
                                 ->dehydrated()
                                 ->default('' ?? env('APP_NAME'))
                                 ->required()
+                                ->prefixIcon('heroicon-o-user')
                                 ->helperText(__('Customer name'))
                                 ->label(__('Customer Name')),
                             TextInput::make('content.customer_email')
                                 ->dehydrated()
                                 ->email()
                                 ->required()
+                                ->prefixIcon('heroicon-o-envelope')
                                 ->helperText(__('Customer email address'))
                                 ->label(__('Email')),
                             TextInput::make('content.customer_phone')
                                 ->required()
                                 ->helperText(__('Phone Number'))
                                 ->tel()
+                                ->prefixIcon('heroicon-o-phone')
                                 ->mask('(99)99999-9999')
-                                ->placeholder(_('(xx) XXXX-XXXX'))
+                                ->placeholder(_('(--) ---- ----'))
                                 ->helperText(__('Customer phone number'))
                                 ->label(__('Phone')),
                         ]),
@@ -107,6 +110,7 @@ class CreateBudget extends CreateRecord
                             ->required()
                             ->minLength(9)
                             ->mask('99999-999')
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->placeholder('22022-000')
                             ->helperText(__('Customer postcode'))
                             ->maxLength(9)
@@ -124,27 +128,32 @@ class CreateBudget extends CreateRecord
                             ->disabled()
                             ->dehydrated()
                             ->required()
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer street.'))
                             ->label(__('Street')),
                         TextInput::make('content.number')
                             ->dehydrated()
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer street number. Optional'))
                             ->label(__('Number')),
                         TextInput::make('content.city')
                             ->disabled()
                             ->dehydrated()
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer city.'))
                             ->label(__('City')),
                         TextInput::make('content.neighborhood')
                             ->disabled()
                             ->dehydrated()
                             ->required()
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer neighborhood.'))
                             ->label(__('Neighborhood')),
                         TextInput::make('content.state')
                             ->disabled()
                             ->dehydrated()
                             ->required()
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer UF.'))
                             ->label(__('UF')),
                     ]),
