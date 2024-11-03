@@ -111,7 +111,7 @@ class CreateBudget extends CreateRecord
                             ->minLength(9)
                             ->mask('99999-999')
                             ->prefixIcon('heroicon-o-map-pin')
-                            ->placeholder('22022-000')
+                            ->placeholder('----- ---')
                             ->helperText(__('Customer postcode'))
                             ->maxLength(9)
                             ->suffixAction(
