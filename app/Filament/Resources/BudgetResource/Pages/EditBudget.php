@@ -219,7 +219,7 @@ class EditBudget extends EditRecord
                     ->schema([
                         TextInput::make('content.quantity')
                             ->disabled()
-                            ->prefixIcon('heroicon-o-hashtag')
+                            ->suffix(__('m³'))
                             ->dehydrated()
                             ->label(__('Quantity'))
                             ->helperText(__('Quantity of items'))

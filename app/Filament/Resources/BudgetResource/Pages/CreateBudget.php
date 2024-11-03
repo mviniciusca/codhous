@@ -160,7 +160,7 @@ class CreateBudget extends CreateRecord
                 Section::make(__('Shopping Bag'))
                     ->description(__('Products in the shopping bag.'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->columns(5)
+                    ->columns(8)
                     ->schema([
                         TextInput::make('content.quantity')
                             ->live(true)
@@ -177,14 +177,18 @@ class CreateBudget extends CreateRecord
                         Select::make('content.location')
                             ->dehydrated()
                             ->required()
+                            ->columnSpan(2)
                             ->label(__('Local / Area'))
                             ->helperText(__('Local or area to be concreted'))
+                            ->searchable()
                             ->options(Location::all()
                                 ->pluck('name', 'id')),
                         Select::make('content.product')
                             ->live()
                             ->dehydrated()
                             ->required()
+                            ->columnSpan(2)
+                            ->searchable()
                             ->label(__('Product'))
                             ->helperText(__('Product selected'))
                             ->options(Product::all()->pluck('name', 'id'))
@@ -195,6 +199,8 @@ class CreateBudget extends CreateRecord
                         Select::make('content.product_option')
                             ->live()
                             ->dehydrated()
+                            ->searchable()
+                            ->columnSpan(2)
                             ->label(__('Option'))
                             ->helperText(__('Option selected'))
                             ->options(fn (Get $get): Collection => $this->getOptions($get))
@@ -211,7 +217,6 @@ class CreateBudget extends CreateRecord
                             })
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity'))
-                            ->suffix('m³')
                             ->required(),
 
                     ]),
