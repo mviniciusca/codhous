@@ -158,7 +158,7 @@ class EditBudget extends EditRecord
                                     ->prefixIcon('heroicon-o-phone')
                                     ->tel()
                                     ->mask('(99)99999-9999')
-                                    ->placeholder(_('(xx) XXXX-XXXX'))
+                                    ->placeholder(_('(--) ---- ----'))
                                     ->helperText(__('Customer phone number'))
                                     ->label(__('Phone')),
                             ]),
@@ -167,7 +167,7 @@ class EditBudget extends EditRecord
                             ->minLength(9)
                             ->mask('99999-999')
                             ->prefixIcon('heroicon-o-map-pin')
-                            ->placeholder('22022-000')
+                            ->placeholder('----- ---')
                             ->helperText(__('Customer postcode'))
                             ->maxLength(9)
                             ->suffixAction(
