@@ -172,7 +172,7 @@ class EditBudget extends EditRecord
                             ->required()
                             ->minLength(9)
                             ->mask('99999-999')
-                            ->prefixIcon('heroicon-o-map')
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->placeholder('22022-000')
                             ->helperText(__('Customer postcode'))
                             ->maxLength(9)
@@ -190,30 +190,30 @@ class EditBudget extends EditRecord
                             ->disabled()
                             ->dehydrated()
                             ->required()
-                            ->prefixIcon('heroicon-o-map')
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer street.'))
                             ->label(__('Street')),
                         TextInput::make('content.number')
                             ->dehydrated()
-                            ->prefixIcon('heroicon-o-map')
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer street number. Optional'))
                             ->label(__('Number')),
                         TextInput::make('content.city')
                             ->disabled()
                             ->dehydrated()
-                            ->prefixIcon('heroicon-o-map')
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer city.'))
                             ->label(__('City')),
                         TextInput::make('content.neighborhood')
                             ->disabled()
                             ->dehydrated()
-                            ->prefixIcon('heroicon-o-map')
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer neighborhood.'))
                             ->label(__('Neighborhood')),
                         TextInput::make('content.state')
                             ->disabled()
                             ->dehydrated()
-                            ->prefixIcon('heroicon-o-map')
+                            ->prefixIcon('heroicon-o-map-pin')
                             ->helperText(__('Customer UF.'))
                             ->label(__('State')),
 
@@ -221,25 +221,29 @@ class EditBudget extends EditRecord
                 Section::make(__('Shopping Bag'))
                     ->description(__('Products in the shopping bag.'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->columns(5)
+                    ->columns(8)
                     ->schema([
                         TextInput::make('content.quantity')
                             ->disabled()
+                            ->prefixIcon('heroicon-o-hashtag')
                             ->dehydrated()
                             ->label(__('Quantity'))
-                            ->suffix(__('m³'))
                             ->helperText(__('Quantity of items'))
                             ->afterStateUpdated(fn (Set $set, string $state) => $set('quantity', $state)),
                         Select::make('content.location')
                             ->disabled()
                             ->dehydrated()
                             ->label(__('Local / Area'))
+                            ->prefixIcon('heroicon-o-map-pin')
+                            ->columnSpan(2)
                             ->helperText(__('Local or area to be concreted'))
                             ->options(Location::all()
                                 ->pluck('name', 'id')),
                         Select::make('content.product')
                             ->disabled()
                             ->dehydrated()
+                            ->columnSpan(2)
+                            ->prefixIcon('heroicon-o-shopping-cart')
                             ->label(__('Product'))
                             ->helperText(__('Product selected'))
                             ->options(Product::all()->pluck('name', 'id')),
@@ -247,6 +251,8 @@ class EditBudget extends EditRecord
                             ->live()
                             ->disabled()
                             ->dehydrated()
+                            ->prefixIcon('heroicon-o-shopping-bag')
+                            ->columnSpan(2)
                             ->label(__('Option'))
                             ->helperText(__('Option selected'))
                             ->options(function (Get $get, ?string $state) {
@@ -263,7 +269,6 @@ class EditBudget extends EditRecord
                             })
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity'))
-                            ->suffix('m³')
                             ->required(),
                     ]),
                 Section::make(__('Pricing Calculator'))
