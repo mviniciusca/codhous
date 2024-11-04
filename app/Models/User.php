@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\BudgetHistory;
+use App\Models\UserSetting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -49,5 +50,10 @@ class User extends Authenticatable
     public function budgetHistory()
     {
         return $this->hasMany(BudgetHistory::class);
+    }
+
+    public function userSetting()
+    {
+        return $this->hasOne(UserSetting::class);
     }
 }

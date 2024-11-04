@@ -16,8 +16,6 @@ return new class extends Migration {
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->boolean('is_active')->default(true);
             $table->enum('role', ['admin', 'team']);
-            $table->string('name');
-            $table->string('email');
             $table->string('picture')->nullable();
             $table->timestamps();
         });
