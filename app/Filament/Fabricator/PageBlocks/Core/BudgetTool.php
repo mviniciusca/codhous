@@ -2,7 +2,6 @@
 
 namespace App\Filament\Fabricator\PageBlocks\Core;
 
-use App\Models\Setting;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
@@ -21,10 +20,11 @@ class BudgetTool extends PageBlock
                     ->icon('heroicon-o-shopping-bag')
                     ->collapsed()
                     ->schema([
-                        Hidden::make('id')
-                    ])
+                        Hidden::make('id'),
+                    ]),
             ]);
     }
+
     public static function mutateData(array $data): array
     {
         return $data;
