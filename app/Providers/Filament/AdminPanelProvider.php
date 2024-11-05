@@ -8,6 +8,7 @@ use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\SettingResource\Pages\EditBudget;
 use App\Filament\Resources\SettingResource\Pages\EditSetting;
 use App\Models\Setting;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -92,6 +93,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(1),
             ])
             ->plugins([
+                FilamentShieldPlugin::make(),
                 FilamentFabricatorPlugin::make(),
             ])
             ->login()
