@@ -35,7 +35,7 @@ class Newsletter extends PageBlock
                                     ->maxLength(100),
                                 TextInput::make('subtitle')
                                     ->label(__('Subtitle (Optional)'))
-                                    ->helperText(__('of header content. Max.: 100 characters'))
+                                    ->helperText(__('of header content. Max.: 100 characters.'))
                                     ->maxLength(100),
                                 TextInput::make('info')
                                     ->label(__('Info (Optional)'))
