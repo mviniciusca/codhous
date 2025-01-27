@@ -2,25 +2,26 @@
 
 namespace Database\Seeders;
 
-use App\Models\Budget;
-use App\Models\BudgetHistory;
-use App\Models\CompanySetting;
-use App\Models\Contact;
-use App\Models\Customer;
-use App\Models\Layout;
-use App\Models\Location;
 use App\Models\Mail;
+use App\Models\User;
+use App\Models\Budget;
+use App\Models\Layout;
 use App\Models\Module;
-use App\Models\Navigation;
-use App\Models\Newsletter;
+use App\Models\Contact;
 use App\Models\Partner;
 use App\Models\Product;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\ProductOption;
 use App\Models\Setting;
-use App\Models\User;
+use App\Models\Customer;
+use App\Models\Location;
+use App\Models\Navigation;
+use App\Models\Newsletter;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\BudgetHistory;
+use App\Models\ProductOption;
+use App\Models\CompanySetting;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -29,10 +30,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $role = Role::create(['name' => 'super_admin']);
         $user = User::factory()->create([
             'name'  => 'Codhous Software',
             'email' => 'codhous@codhous.app',
         ]);
+
+        $user->assignRole($role);
+
+
 
         Setting::factory()
             ->has(Contact::factory())
