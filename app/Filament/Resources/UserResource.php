@@ -29,8 +29,10 @@ class UserResource extends Resource
                 Section::make(__('User Details'))
                     ->columns(2)
                     ->schema([
-                        TextInput::make('name'),
-                        TextInput::make('email'),
+                        TextInput::make('name')
+                            ->required(),
+                        TextInput::make('email')
+                            ->required(),
                     ]),
                 Section::make(__('User Details'))
                     ->columns(2)
@@ -38,10 +40,12 @@ class UserResource extends Resource
                         TextInput::make('password')
                             ->password()
                             ->currentPassword()
+                            ->required()
                             ->revealable(),
                         TextInput::make('password_confirmation')
                             ->password()
                             ->same('password')
+                            ->required()
                             ->revealable(),
                     ]),
             ]);
