@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Product;
+use App\Models\ProductOption;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
@@ -131,7 +132,7 @@ class CalculatorWidget extends Widget implements HasForms
     private function updatePrice(Get $get, Set $set, $productId): void
     {
         if ($productId) {
-            $price = Product::where('id', $productId)->value('price') ?? 0;
+            $price = ProductOption::where('product_id', $productId)->value('price') ?? 0;
         } else {
             $price = 0;
         }
