@@ -39,8 +39,6 @@ class DatabaseSeeder extends Seeder
 
         $user->assignRole($role);
 
-
-
         Setting::factory()
             ->has(Contact::factory())
             ->has(Module::factory())
