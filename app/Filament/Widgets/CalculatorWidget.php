@@ -4,23 +4,27 @@ namespace App\Filament\Widgets;
 
 use App\Models\Product;
 use App\Models\ProductOption;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Filament\Forms\Form;
-use Filament\Widgets\Widget;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
+use Filament\Widgets\Widget;
 
 class CalculatorWidget extends Widget implements HasForms
 {
     use InteractsWithForms;
+
     protected static string $view = 'filament.widgets.calculator-widget';
+
     protected int|string|array $columnSpan = 'full';
+
     protected static ?int $sort = 1;
+
     public ?array $data = [];
 
     public function mount(): void
@@ -34,7 +38,6 @@ class CalculatorWidget extends Widget implements HasForms
             Section::make(__('Budget Calculator'))
                 ->description(__('Calculate a budget price in a quick way.'))
                 ->columns(3)
-                ->collapsed()
                 ->icon('heroicon-o-calculator')
                 ->schema([
                     Select::make('content.product')
@@ -71,7 +74,7 @@ class CalculatorWidget extends Widget implements HasForms
                         ->prefix(env('CURRENCY_SUFFIX'))
                         ->label(__('Price per Unity (m³)'))
                         ->numeric()
-                        ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
+                        ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
                         ->step(0.01)
                         ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                             $this->calculateTotal($get, $set);
@@ -82,10 +85,10 @@ class CalculatorWidget extends Widget implements HasForms
                     TextInput::make('content.tax')
                         ->live(onBlur: true)
                         ->dehydrated()
-                        ->prefix('+' . env('CURRENCY_SUFFIX'))
+                        ->prefix('+'.env('CURRENCY_SUFFIX'))
                         ->numeric()
                         ->required()
-                        ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
+                        ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
                         ->step(0.01)
                         ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                             $this->calculateTotal($get, $set);
@@ -97,8 +100,8 @@ class CalculatorWidget extends Widget implements HasForms
                         ->live(onBlur: true)
                         ->numeric()
                         ->required()
-                        ->prefix('-' . env('CURRENCY_SUFFIX'))
-                        ->helperText(__('Applies a discount in ' . env('CURRENCY_SUFFIX')))
+                        ->prefix('-'.env('CURRENCY_SUFFIX'))
+                        ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
                         ->step(0.01)
                         ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                             $this->calculateTotal($get, $set);
@@ -112,13 +115,12 @@ class CalculatorWidget extends Widget implements HasForms
                         ->numeric()
                         ->required()
                         ->label(__('Total Price'))
-                        ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
+                        ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
                         ->prefix(env('CURRENCY_SUFFIX'))
                         ->step(0.01),
                 ]),
         ])
             ->statePath('data');
-
     }
 
     private function getPrice(Get $get, Set $set)
@@ -129,6 +131,7 @@ class CalculatorWidget extends Widget implements HasForms
             ->first();
         $set('content.price', $price->price ?? 0);
     }
+
     private function updatePrice(Get $get, Set $set, $productId): void
     {
         if ($productId) {
