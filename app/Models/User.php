@@ -52,9 +52,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(BudgetHistory::class);
     }
-
-    public function userSetting()
-    {
-        return $this->hasOne(UserSetting::class);
-    }
 }
