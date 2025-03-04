@@ -38,7 +38,7 @@ Built with **Laravel** and **Filament**.
 
 4. Run migrations:
    ```bash
-   php artisan migrate
+   php artisan migrate --seed
    ```
 
 5. Start development server:
