@@ -45,6 +45,7 @@ class CalculatorWidget extends Widget implements HasForms
                         ->label(__('Product'))
                         ->helperText(__('Type of Concrete'))
                         ->options(Product::pluck('name', 'id'))
+                        ->required()
                         ->afterStateHydrated(function (Get $get, Set $set, $state) {
                             $this->updatePrice($get, $set, $state);
                         })
@@ -71,7 +72,7 @@ class CalculatorWidget extends Widget implements HasForms
                         ->live()
                         ->disabled()
                         ->dehydrated()
-                        ->prefix(env('CURRENCY_SUFFIX'))
+                        ->prefix(env('CURRENCY_SUFFIX', 'R$'))
                         ->label(__('Price per Unity (m³)'))
                         ->numeric()
                         ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
@@ -85,7 +86,7 @@ class CalculatorWidget extends Widget implements HasForms
                     TextInput::make('content.tax')
                         ->live(onBlur: true)
                         ->dehydrated()
-                        ->prefix('+'.env('CURRENCY_SUFFIX'))
+                        ->prefix('+'.env('CURRENCY_SUFFIX', 'R$'))
                         ->numeric()
                         ->required()
                         ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
@@ -100,7 +101,7 @@ class CalculatorWidget extends Widget implements HasForms
                         ->live(onBlur: true)
                         ->numeric()
                         ->required()
-                        ->prefix('-'.env('CURRENCY_SUFFIX'))
+                        ->prefix('-'.env('CURRENCY_SUFFIX', 'R$'))
                         ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
                         ->step(0.01)
                         ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
@@ -116,7 +117,7 @@ class CalculatorWidget extends Widget implements HasForms
                         ->required()
                         ->label(__('Total Price'))
                         ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
-                        ->prefix(env('CURRENCY_SUFFIX'))
+                        ->prefix(env('CURRENCY_SUFFIX', 'R$'))
                         ->step(0.01),
                 ]),
         ])
