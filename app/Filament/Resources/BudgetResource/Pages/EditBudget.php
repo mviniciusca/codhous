@@ -53,18 +53,15 @@ class EditBudget extends EditRecord
                                 Action::make('send_mail')
                                     ->icon('heroicon-o-envelope')
                                     ->label(__('Notify Email'))
-                                    ->disabled(function (Get $get, ?array $state) {
+                                    ->outlined()
+                                    ->disabled(function (Get $get, ?array $state): bool {
                                         return self::checkId($get, $state);
                                     })
-                                    ->color(function (Get $get, ?array $state) {
-                                        if (self::checkId($get, $state)) {
-                                            return 'gray';
-                                        } else {
-                                            return 'primary';
-                                        }
+                                    ->color(function (Get $get, ?array $state): string {
+                                        return self::checkId($get, $state) ? 'gray' : 'orange';
                                     })
                                     ->requiresConfirmation()
-                                    ->action(function (Get $get, ?array $state) {
+                                    ->action(function (Get $get, ?array $state): void {
                                         $mail = new SendBudgetMail($state,
                                             $get('content.customer_email'),
                                             new BudgetMail()
@@ -73,19 +70,16 @@ class EditBudget extends EditRecord
                                     }),
                                 Action::make('download_pdf')
                                     ->label(__('Download PDF'))
-                                    ->color(function (Get $get, ?array $state) {
-                                        if (self::checkId($get, $state)) {
-                                            return 'gray';
-                                        } else {
-                                            return 'primary';
-                                        }
+                                    ->outlined()
+                                    ->color(function (Get $get, ?array $state): string {
+                                        return self::checkId($get, $state) ? 'gray' : 'info';
                                     })
                                     ->icon('heroicon-o-arrow-down-tray')
                                     ->requiresConfirmation()
-                                    ->disabled(function (Get $get, ?array $state) {
+                                    ->disabled(function (Get $get, ?array $state): bool {
                                         return self::checkId($get, $state);
                                     })
-                                    ->action(function ($state) {
+                                    ->action(function ($state): mixed {
                                         $pdf = new PdfGenerator($state);
 
                                         return $pdf->generate();
@@ -123,7 +117,7 @@ class EditBudget extends EditRecord
                                     ->format('Y-m-d H:i:s')
                                     ->prefixIcon('heroicon-o-calendar')
                                     ->displayFormat('d/m/Y H:i')
-                                    ->default(fn () => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->default(fn (): string => Carbon::now()->format('Y-m-d H:i:s'))
                                     ->label(__('Date'))
                                     ->helperText(__('When this budget was created')),
                             ]),
@@ -171,7 +165,7 @@ class EditBudget extends EditRecord
                             ->helperText(__('Customer postcode'))
                             ->maxLength(9)
                             ->suffixAction(
-                                fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                fn ($state, Set $set, $livewire): Action => Action::make('search-action')
                                     ->icon('heroicon-o-magnifying-glass')
                                     ->action(function () use ($state, $livewire, $set) {
                                         $livewire->validateOnly('data.content.postcode');
