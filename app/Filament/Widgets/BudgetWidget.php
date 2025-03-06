@@ -2,22 +2,22 @@
 
 namespace App\Filament\Widgets;
 
-
 use App\Models\Budget;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class BudgetWidget extends BaseWidget
 {
     protected static ?int $sort = 4;
+
     public function table(Table $table): Table
     {
         return $table
             ->defaultSort('created_at', 'desc')
             ->recordUrl(
-                fn(Budget $record): string => route('filament.admin.resources.budgets.edit', ['record' => $record]),
+                fn (Budget $record): string => route('filament.admin.resources.budgets.edit', ['record' => $record]),
             )
             ->description(__('New and pending budgets'))
             ->headerActions([
@@ -34,11 +34,11 @@ class BudgetWidget extends BaseWidget
                     ->url(route('filament.admin.resources.budgets.index')),
             ])
             ->heading(__(
-                'Budget (' .
+                'Budget ('.
                 Budget::where('status', '=', 'pending')
                     ->where('is_active', '=', true)
                     ->count()
-            ) . ')')
+            ).')')
             ->query(
                 Budget::query()
                     ->select()

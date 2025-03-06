@@ -4,15 +4,16 @@ namespace App\Filament\Widgets;
 
 use App\Models\Module;
 use App\Models\Setting;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class CoreWidget extends BaseWidget
 {
     // protected int|string|array $columnSpan = 'full';
     protected static ?int $sort = 7;
+
     public function table(Table $table): Table
     {
         return $table
@@ -20,7 +21,7 @@ class CoreWidget extends BaseWidget
             ->headerActions([
                 Action::make('settings')
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->url(route('filament.admin.resources.settings.edit', Setting::first()->id))
+                    ->url(route('filament.admin.resources.settings.edit', Setting::first()->id)),
             ])
             ->description(__('Manage your app modules here.'))
             ->query(Module::query()

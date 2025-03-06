@@ -4,29 +4,32 @@ namespace App\Filament\Widgets;
 
 use App\Models\Mail;
 use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class MailWidget extends BaseWidget
 {
     protected static ?int $sort = 5;
+
     public Mail $mail;
+
     protected static ?string $model = Mail::class;
+
     //protected int|string|array $columnSpan = 'full';
     public function table(Table $table): Table
     {
         return $table
             ->recordUrl(
-                fn(Mail $record): string => route('filament.admin.resources.mails.view', ['record' => $record]),
+                fn (Mail $record): string => route('filament.admin.resources.mails.view', ['record' => $record]),
             )
             ->description(__('Quick view in your unread messages here.'))
             ->query(
@@ -81,14 +84,14 @@ class MailWidget extends BaseWidget
                 Action::make('edit')
                     ->label(__('Inbox'))
                     ->icon('heroicon-o-envelope')
-                    ->url(route('filament.admin.resources.mails.index'))
+                    ->url(route('filament.admin.resources.mails.index')),
             ])
-            ->heading(__('Inbox (' .
+            ->heading(__('Inbox ('.
                 Mail::where('is_read', false)
                     ->where('is_sent', false)
                     ->where('is_spam', false)
                     ->withoutTrashed()
-                    ->count()) . ')')
+                    ->count()).')')
             ->striped()
             ->paginated(false);
     }

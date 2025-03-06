@@ -10,6 +10,7 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
+use Illuminate\Support\Collection;
 
 class StatsWidget extends BaseWidget
 {
@@ -20,6 +21,8 @@ class StatsWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
+
+            /** Application Stats */
             Stat::make(__('Application Status'), '')
                 ->label(__('Website Status'))
                 ->icon('heroicon-o-wifi')
@@ -33,6 +36,7 @@ class StatsWidget extends BaseWidget
                     __('Maintenance Mode is Active') : __('Application is Live'))
                 ->color('primary'),
 
+            /**Mail Stats */
             Stat::make('Mailing List', Newsletter::withoutTrashed()->count())
                 ->icon('heroicon-o-envelope')
                 ->chart($this->chartData(Newsletter::class)->toArray())
@@ -41,6 +45,7 @@ class StatsWidget extends BaseWidget
                 ->url(route('filament.admin.resources.subscribers.index'))
                 ->descriptionIcon('heroicon-m-inbox-stack'),
 
+            /** Budget Stats */
             Stat::make(__('Budgets'), Budget::withoutTrashed()->count())
                 ->icon('heroicon-o-currency-dollar')
                 ->color('primary')
@@ -49,6 +54,7 @@ class StatsWidget extends BaseWidget
                 ->url(route('filament.admin.resources.budgets.index'))
                 ->descriptionIcon('heroicon-m-wallet'),
 
+            /** Customer Stats */
             Stat::make(__('Customers'), Customer::withoutTrashed()->count())
                 ->icon('heroicon-o-user')
                 ->color('primary')
@@ -60,14 +66,16 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Summary of chartData
-     * @return \Filament\Notifications\Collection
+     * Get the chart data for the given model.
+     *
+     * @param string $model
+     * @return Collection
      */
-    public function chartData($model)
+    public function chartData($model): Collection
     {
         $data = Trend::model($model)
             ->between(
-                start: now()->startOfYear(),
+                start: now()->endOfYear(),
                 end: now(),
             )
             ->perMonth()

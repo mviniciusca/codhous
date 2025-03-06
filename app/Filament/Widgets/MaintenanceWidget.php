@@ -3,14 +3,15 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Setting;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class MaintenanceWidget extends BaseWidget
 {
     protected static ?int $sort = 6;
+
     public function table(Table $table): Table
     {
         return $table
@@ -27,7 +28,7 @@ class MaintenanceWidget extends BaseWidget
                     ->label(__('Security'))
                     ->icon('heroicon-o-shield-check')
                     ->color('primary')
-                    ->url(route('filament.admin.resources.settings.edit_maintenance', Setting::first()->id))
+                    ->url(route('filament.admin.resources.settings.edit_maintenance', Setting::first()->id)),
             ])
             ->columns([
                 ToggleColumn::make('maintenance_mode')

@@ -3,14 +3,15 @@
 namespace App\Filament\Widgets;
 
 use App\Models\ActivityLog;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables\Actions\Action;
 
 class ActivityWidget extends BaseWidget
 {
     protected static ?int $sort = 11;
+
     public function table(Table $table): Table
     {
         return $table
@@ -21,7 +22,7 @@ class ActivityWidget extends BaseWidget
                     ->color('primary')
                     ->label(__('View All'))
                     ->icon('heroicon-o-arrow-up-right')
-                    ->url(route('filament.admin.resources.activity-logs.index'))
+                    ->url(route('filament.admin.resources.activity-logs.index')),
             ])
             ->query(
                 ActivityLog::query()
