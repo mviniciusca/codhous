@@ -99,7 +99,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->font('Poppins')
             ->colors([
-                'primary'   => Color::Blue,
+                'primary'   => Color::Indigo,
                 'secondary' => Color::Stone,
                 'success'   => Color::Green,
                 'danger'    => Color::Red,

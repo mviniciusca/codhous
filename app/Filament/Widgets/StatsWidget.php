@@ -36,15 +36,6 @@ class StatsWidget extends BaseWidget
                     __('Maintenance Mode is Active') : __('Application is Live'))
                 ->color('primary'),
 
-            /**Mail Stats */
-            Stat::make('Mailing List', Newsletter::withoutTrashed()->count())
-                ->icon('heroicon-o-envelope')
-                ->chart($this->chartData(Newsletter::class)->toArray())
-                ->color('primary')
-                ->description(__('Your Subscribers'))
-                ->url(route('filament.admin.resources.subscribers.index'))
-                ->descriptionIcon('heroicon-m-inbox-stack'),
-
             /** Budget Stats */
             Stat::make(__('Budgets'), Budget::withoutTrashed()->count())
                 ->icon('heroicon-o-currency-dollar')
@@ -62,6 +53,16 @@ class StatsWidget extends BaseWidget
                 ->url(route('filament.admin.resources.customers.index'))
                 ->description(__('Total of Customers'))
                 ->descriptionIcon('heroicon-m-user'),
+
+            /**Mail Stats */
+            Stat::make('Mailing List', Newsletter::withoutTrashed()->count())
+                ->icon('heroicon-o-envelope')
+                ->chart($this->chartData(Newsletter::class)->toArray())
+                ->color('primary')
+                ->description(__('Your Subscribers'))
+                ->url(route('filament.admin.resources.subscribers.index'))
+                ->descriptionIcon('heroicon-m-inbox-stack'),
+
         ];
     }
 
