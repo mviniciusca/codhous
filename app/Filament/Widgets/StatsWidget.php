@@ -75,7 +75,7 @@ class StatsWidget extends BaseWidget
     {
         $data = Trend::model($model)
             ->between(
-                start: now()->endOfYear(),
+                start: now()->startOfYear(),
                 end: now(),
             )
             ->perMonth()
