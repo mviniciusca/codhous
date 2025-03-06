@@ -251,7 +251,7 @@ class EditBudget extends EditRecord
                             ->live(onBlur: true)
                             ->disabled()
                             ->dehydrated()
-                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                            ->helperText(__('Price in '.env('CURRENCY_SUFFIX')))
                             ->afterStateHydrated(function (Get $get, Set $set) {
                                 $this->getPrice($get, $set);
                             })
