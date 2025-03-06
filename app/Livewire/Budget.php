@@ -2,39 +2,41 @@
 
 namespace App\Livewire;
 
-use App\Models\User;
+use App\Models\Budget as BudgetModel;
+use App\Models\Location;
 use App\Models\Module;
 use App\Models\Product;
-use App\Models\Setting;
-use App\Services\PostcodeFinder;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Livewire\Component;
-use App\Models\Location;
-use Filament\Forms\Form;
-use Illuminate\Support\Str;
 use App\Models\ProductOption;
+use App\Models\Setting;
+use App\Models\User;
 use App\Notifications\NewBudget;
-use Illuminate\Support\Collection;
+use App\Services\PostcodeFinder;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
-use Illuminate\Support\Facades\Http;
-use App\Models\Budget as BudgetModel;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
-use Filament\Forms\Components\Actions\Action;
-use Illuminate\Validation\ValidationException;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Livewire\Component;
 
 class Budget extends Component implements HasForms
 {
     use InteractsWithForms;
+
     public ?array $data = [];
+
     public $status;
+
     public $image;
+
     public ?bool $module;
 
     /**
@@ -60,8 +62,8 @@ class Budget extends Component implements HasForms
 
     /**
      * Summary of form
-     * @param \Filament\Forms\Form $form
-     * @return \Filament\Forms\Form
+     * @param Form $form
+     * @return Form
      */
     public function form(Form $form): Form
     {
@@ -151,8 +153,7 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Postcode for your construction'))
                                             ->label(__('Construction Address Postcode'))
                                             ->suffixAction(
-                                                fn($state, Set $set, $livewire) =>
-                                                Action::make('search-action')
+                                                fn ($state, Set $set, $livewire) => Action::make('search-action')
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $livewire->validateOnly('data.content.postcode');
@@ -213,7 +214,6 @@ class Budget extends Component implements HasForms
         $this->form->fill();
     }
 
-
     /**
      * Summary of render
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
@@ -225,7 +225,6 @@ class Budget extends Component implements HasForms
         ]);
     }
 
-
     /**
      * Summary of status
      * @return bool
@@ -236,9 +235,9 @@ class Budget extends Component implements HasForms
             ->select(['budget_is_active'])
             ->first()
             ->budget_is_active;
+
         return $status;
     }
-
 
     /**
      * Summary of image
@@ -250,13 +249,14 @@ class Budget extends Component implements HasForms
             ->select(['budget_image'])
             ->first()
             ->budget_image;
+
         return $image;
     }
 
     /**
      * Summary of getOptions
-     * @param \Filament\Forms\Get $get
-     * @return \Illuminate\Support\Collection
+     * @param Get $get
+     * @return Collection
      */
     private function getOptions(Get $get): Collection
     {
@@ -264,5 +264,4 @@ class Budget extends Component implements HasForms
             ->get()
             ->pluck('name', 'id');
     }
-
 }
