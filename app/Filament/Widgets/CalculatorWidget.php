@@ -12,7 +12,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Widgets\Widget;
 
 class CalculatorWidget extends Widget implements HasForms
@@ -124,7 +123,13 @@ class CalculatorWidget extends Widget implements HasForms
             ->statePath('data');
     }
 
-    private function getPrice(Get $get, Set $set)
+    /**
+     * Get the price of the product.
+     * @param Get $get
+     * @param Set $set
+     * @return void
+     */
+    private function getPrice(Get $get, Set $set): void
     {
         $id = $get('content.product');
         $price = Product::select(['price'])
@@ -133,6 +138,13 @@ class CalculatorWidget extends Widget implements HasForms
         $set('content.price', $price->price ?? 0);
     }
 
+    /**
+     * Update the price of the product.
+     * @param Get $get
+     * @param Set $set
+     * @param mixed $productId
+     * @return void
+     */
     private function updatePrice(Get $get, Set $set, $productId): void
     {
         if ($productId) {
@@ -144,6 +156,12 @@ class CalculatorWidget extends Widget implements HasForms
         $this->calculateTotal($get, $set);
     }
 
+    /**
+     * Calculate the total price of the product.
+     * @param Get $get
+     * @param Set $set
+     * @return void
+     */
     private function calculateTotal(Get $get, Set $set): void
     {
         $quantity = floatval($get('content.quantity') ?? 0);

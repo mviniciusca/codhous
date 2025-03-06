@@ -97,14 +97,14 @@ class AdminPanelProvider extends PanelProvider
                 FilamentFabricatorPlugin::make(),
             ])
             ->login()
+            ->font('Poppins')
             ->colors([
-                'primary'   => Color::Indigo,
+                'primary'   => Color::Blue,
                 'secondary' => Color::Stone,
-                'tertiary'  => Color::Purple,
-                'warning'   => Color::Orange,
-                'info'      => Color::Sky,
+                'success'   => Color::Green,
                 'danger'    => Color::Red,
-                'success'   => Color::Teal,
+                'warning'   => Color::Yellow,
+                'info'      => Color::Blue,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

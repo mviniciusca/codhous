@@ -14,25 +14,18 @@ export default {
     ],
     safelist: [
         'bg-contain', 'bg-cover', 'bg-auto', 'bg-scroll', 'bg-fixed', 'bg-center', 'bg-top',
-        'bg-left', 'bg-right', 'bg-repeat-x', 'bg-repeat-y',
-        'bg-repeat', 'bg-no-repeat', 'order-1', 'order-2', 'order-3', 'opacity-30', 'opacity-50', 'opacity-90',
+        'bg-left', 'bg-right', 'bg-repeat-x', 'bg-repeat-y', 'bg-repeat', 'bg-no-repeat', 'order-1',
+        'order-2', 'order-3', 'opacity-30', 'opacity-50', 'opacity-90',
     ],
     darkMode: 'class',
     theme: {
         fontFamily: {
-            sans: ['"Inter", sans-serif']
+            sans: ['Inter', 'sans-serif'],
         },
         colors: {
             primary: colors.zinc,
             secondary: colors.indigo,
             tertiary: colors.rose,
-            fourth: colors.cyan,
-            gray: colors.zinc,
-            white: colors.white,
-            info: colors.indigo,
-            green: colors.green,
-            danger: colors.red,
-            warning: colors.orange,
         },
         extend: {},
     },
