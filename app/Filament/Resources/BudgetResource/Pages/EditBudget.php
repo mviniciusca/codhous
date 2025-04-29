@@ -28,6 +28,7 @@ use Filament\Forms\Set;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class EditBudget extends EditRecord
@@ -212,130 +213,150 @@ class EditBudget extends EditRecord
                             ->label(__('State')),
 
                     ]),
-                Section::make(__('Shopping Bag'))
-                    ->description(__('Products in the shopping bag.'))
+                Section::make('Budget Content')
+                    ->description(__('Here is the content from your budget'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->columns(8)
                     ->schema([
-                        TextInput::make('content.quantity')
-                            ->disabled()
-                            ->suffix(__('m³'))
-                            ->dehydrated()
-                            ->label(__('Quantity'))
-                            ->helperText(__('Quantity of items'))
-                            ->afterStateUpdated(fn (Set $set, string $state) => $set('quantity', $state)),
-                        Select::make('content.location')
-                            ->disabled()
-                            ->dehydrated()
-                            ->label(__('Local / Area'))
-                            ->prefixIcon('heroicon-o-map-pin')
-                            ->columnSpan(2)
-                            ->helperText(__('Local or area to be concreted'))
-                            ->options(Location::all()
-                                ->pluck('name', 'id')),
-                        Select::make('content.product')
-                            ->disabled()
-                            ->dehydrated()
-                            ->columnSpan(2)
-                            ->prefixIcon('heroicon-o-shopping-cart')
-                            ->label(__('Product'))
-                            ->helperText(__('Product selected'))
-                            ->options(Product::all()->pluck('name', 'id')),
-                        Select::make('content.product_option')
-                            ->live()
-                            ->disabled()
-                            ->dehydrated()
-                            ->prefixIcon('heroicon-o-shopping-bag')
-                            ->columnSpan(2)
-                            ->label(__('Option'))
-                            ->helperText(__('Option selected'))
-                            ->options(function (Get $get, ?string $state) {
-                                return ProductOption::where('product_id', '=', $get('content.product'))
-                                    ->pluck('name', 'id');
-                            }),
-                        TextInput::make('content.price')
-                            ->live(onBlur: true)
-                            ->disabled()
-                            ->dehydrated()
-                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
-                            ->afterStateHydrated(function (Get $get, Set $set) {
-                                $this->getPrice($get, $set);
+                        \Filament\Forms\Components\Repeater::make('content.products')
+                            ->label(__('Product List'))
+                            ->schema([
+                                TextInput::make('quantity')
+                                    ->live(true)
+                                    ->integer()
+                                    ->required()
+                                    ->minValue(3)
+                                    ->label(__('Quantity'))
+                                    ->suffix(__('m³'))
+                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        self::calculateTotal($get, $set);
+                                    }),
+                                Select::make('location')
+                                    ->dehydrated()
+                                    ->required()
+                                    ->columnSpan(2)
+                                    ->label(__('Local / Area'))
+                                    ->helperText(__('Local or area to be concreted'))
+                                    ->searchable()
+                                    ->prefixIcon('heroicon-o-map-pin')
+                                    ->options(Location::all()
+                                        ->pluck('name', 'id')),
+                                Select::make('product')
+                                    ->live()
+                                    ->dehydrated()
+                                    ->required()
+                                    ->columnSpan(2)
+                                    ->searchable()
+                                    ->prefixIcon('heroicon-o-shopping-cart')
+                                    ->label(__('Product'))
+                                    ->helperText(__('Product selected'))
+                                    ->options(Product::all()->pluck('name', 'id'))
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        $set('product_option', null);
+                                        $set('price', null);
+                                    }),
+                                Select::make('product_option')
+                                    ->live()
+                                    ->dehydrated()
+                                    ->searchable()
+                                    ->prefixIcon('heroicon-o-shopping-bag')
+                                    ->columnSpan(2)
+                                    ->label(__('Option'))
+                                    ->helperText(__('Option selected'))
+                                    ->options(fn (Get $get): Collection => self::getOptions($get))
+                                    ->required(fn (Get $get): bool => self::getOptions($get)->count() > 0)
+                                    ->hidden(fn (Get $get): bool => self::getOptions($get)->count() == 0)
+                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => self::updatePrice($get, $set, $state)),
+                                TextInput::make('price')
+                                    ->live(onBlur: true)
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                                    ->afterStateHydrated(function (Get $get, Set $set) {
+                                        self::getPrice($get, $set);
+                                    })
+                                    ->prefix(env('CURRENCY_SUFFIX'))
+                                    ->label(__('Price per Unity'))
+                                    ->required(),
+                                TextInput::make('subtotal')
+                                    ->live()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->prefix(env('CURRENCY_SUFFIX'))
+                                    ->label(__('Subtotal'))
+                                    ->helperText(__('Product quantity x price'))
+                                    ->afterStateHydrated(fn (Get $get, Set $set) => self::calculateItemSubtotal($get, $set)),
+                            ])
+                            ->columns(4)
+                            ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null
+                            )
+                            ->addActionLabel(__('Add Product'))
+                            ->collapsible()
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                self::calculateTotal($get, $set);
                             })
-                            ->prefix(env('CURRENCY_SUFFIX'))
-                            ->label(__('Price per Unity'))
-                            ->required(),
+                            ->reorderable()
+                            ->defaultItems(1)
+                            ->columnSpanFull(),
                     ]),
-                Section::make(__('Pricing Calculator'))
+                Section::make(__('Pricing'))
                     ->icon('heroicon-o-currency-dollar')
-                    ->description(__('Pricing Definition & Total Cost.'))
+                    ->description(__('Pricing Definition & Total Cost'))
+                    ->collapsible()
                     ->columns(5)
                     ->schema([
                         TextInput::make('content.quantity')
                             ->live(onBlur: true)
                             ->disabled()
                             ->dehydrated()
+                            ->readonly()
                             ->required()
-                            ->helperText(__('Quantity of items'))
                             ->suffix('m³')
+                            ->label(__('Total Quantity'))
+                            ->helperText(__('Total quantity for all products'))
                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                            })
-                            ->numeric(),
-                        TextInput::make('content.price')
-                            ->live(onBlur: true)
-                            ->disabled()
-                            ->dehydrated()
-                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
-                            ->afterStateHydrated(function (Get $get, Set $set) {
-                                $this->getPrice($get, $set);
-                            })
-                            ->prefix(env('CURRENCY_SUFFIX'))
-                            ->label(__('Price per Unity'))
-                            ->required(),
+                                self::calculateTotal($get, $set);
+                            }),
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->prefix('+'.env('CURRENCY_SUFFIX'))
                             ->numeric()
                             ->required()
-                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
                             ->default(0)
+                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
                             ->step(0.01)
-                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                                $this->updateBudgetStatus($get, $set, $state);
-                            })
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                                $this->updateBudgetStatus($get, $set, $state);
+                                self::calculateTotal($get, $set);
                             }),
                         TextInput::make('content.discount')
                             ->live(onBlur: true)
                             ->dehydrated()
                             ->numeric()
                             ->required()
-                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
+                            ->default(0)
                             ->prefix('-'.env('CURRENCY_SUFFIX'))
+                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
                             ->step(0.01)
-                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                                $this->updateBudgetStatus($get, $set, $state);
-                            })
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                $this->calculateTotal($get, $set);
-                                $this->updateBudgetStatus($get, $set, $state);
+                                self::calculateTotal($get, $set);
                             }),
                         TextInput::make('content.total')
-                            ->live(onBlur: true)
-                            ->dehydrated()
                             ->disabled()
-                            ->numeric()
+                            ->dehydrated()
                             ->required()
-                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
                             ->prefix(env('CURRENCY_SUFFIX'))
-                            ->step(0.01),
+                            ->label(__('Total Price'))
+                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
+                            ->suffixAction(function () {
+                                return Action::make('calculator')
+                                    ->icon('heroicon-o-calculator')
+                                    ->color('gray')
+                                    ->disabled()
+                                    ->visible(true)
+                                    ->action(fn () => self::generateCode($this->data));
+                            }),
                     ]),
-
             ]);
     }
 
@@ -354,15 +375,62 @@ class EditBudget extends EditRecord
      * @param Set $set
      * @return void
      */
-    private function calculateTotal(Get $get, Set $set): void
+    private static function calculateTotal(Get $get, Set $set): void
     {
-        $quantity = floatval($get('content.quantity') ?? 0);
-        $price = floatval($get('content.price') ?? 0);
+        $products = $get('content.products') ?? [];
+        $subtotal = 0;
+        $quantity = 0;
+
+        // Calcular subtotais de cada produto
+        foreach ($products as $index => $product) {
+            $productQuantity = floatval($product['quantity'] ?? 0);
+            $productPrice = floatval($product['price'] ?? 0);
+            $itemSubtotal = $productQuantity * $productPrice;
+
+            // Atualizar subtotal do item
+            $set("content.products.{$index}.subtotal", number_format($itemSubtotal, 2, '.', ''));
+
+            // Somar ao total geral
+            $subtotal += $itemSubtotal;
+            $quantity += $productQuantity;
+        }
+
+        // Atualizar total de todos os produtos
+        $set('content.quantity', $quantity);
+
+        // Aplicar taxas e descontos
         $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
 
-        $total = $quantity * $price + $tax - $discount;
+        $total = $subtotal + $tax - $discount;
         $set('content.total', number_format($total, 2, '.', ''));
+    }
+
+    /**
+     * Summary de calculateItemSubtotal
+     * @param Get $get
+     * @param Set $set
+     * @return void
+     */
+    private static function calculateItemSubtotal(Get $get, Set $set): void
+    {
+        $quantity = floatval($get('quantity') ?? 0);
+        $price = floatval($get('price') ?? 0);
+        $subtotal = $quantity * $price;
+        $set('subtotal', number_format($subtotal, 2, '.', ''));
+    }
+
+    /**
+     * Summary of getOptions
+     * @param Get $get
+     * @return Collection
+     */
+    private static function getOptions(Get $get): Collection
+    {
+        // Corrigir o caminho para obter o ID do produto
+        return ProductOption::where('product_id', '=', $get('product'))
+            ->get()
+            ->pluck('name', 'id');
     }
 
     /**
@@ -371,13 +439,32 @@ class EditBudget extends EditRecord
      * @param Set $set
      * @return void
      */
-    private function getPrice(Get $get, Set $set)
+    private static function getPrice(Get $get, Set $set): void
     {
-        $id = $get('content.product_option');
+        $id = $get('product_option');
         $price = ProductOption::select(['price'])
             ->where('id', '=', $id)
             ->first();
-        $set('content.price', $price->price ?? 0);
+        $set('price', $price->price ?? 0);
+    }
+
+    /**
+     * Summary of updatePrice
+     * @param Get $get
+     * @param Set $set
+     * @param mixed $productId
+     * @return void
+     */
+    private static function updatePrice(Get $get, Set $set, $productId): void
+    {
+        if ($productId) {
+            $price = ProductOption::where('id', $productId)
+                ->value('price') ?? 0;
+        } else {
+            $price = 0;
+        }
+        $set('price', $price);
+        self::calculateTotal($get, $set);
     }
 
     /**

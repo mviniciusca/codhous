@@ -2,39 +2,43 @@
 
 namespace App\Livewire;
 
-use App\Models\User;
+use App\Models\Budget as BudgetModel;
+use App\Models\Location;
 use App\Models\Module;
 use App\Models\Product;
-use App\Models\Setting;
-use App\Services\PostcodeFinder;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Livewire\Component;
-use App\Models\Location;
-use Filament\Forms\Form;
-use Illuminate\Support\Str;
 use App\Models\ProductOption;
+use App\Models\Setting;
+use App\Models\User;
 use App\Notifications\NewBudget;
-use Illuminate\Support\Collection;
+use App\Services\PostcodeFinder;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
-use Illuminate\Support\Facades\Http;
-use App\Models\Budget as BudgetModel;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
-use Filament\Forms\Components\Actions\Action;
-use Illuminate\Validation\ValidationException;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class Budget extends Component implements HasForms
 {
     use InteractsWithForms;
+
     public ?array $data = [];
+
     public $status;
+
     public $image;
+
     public ?bool $module;
 
     /**
@@ -60,8 +64,8 @@ class Budget extends Component implements HasForms
 
     /**
      * Summary of form
-     * @param \Filament\Forms\Form $form
-     * @return \Filament\Forms\Form
+     * @param Form $form
+     * @return Form
      */
     public function form(Form $form): Form
     {
@@ -97,43 +101,53 @@ class Budget extends Component implements HasForms
                                 Fieldset::make(__('Construction Dimension'))
                                     ->columns(4)
                                     ->schema([
-                                        Select::make('content.product')
-                                            ->live()
-                                            ->options(
-                                                Product::all()
-                                                    ->pluck('name', 'id')
+                                        \Filament\Forms\Components\Repeater::make('content.products')
+                                            ->label(__('Product List'))
+                                            ->schema([
+                                                TextInput::make('quantity')
+                                                    ->live(true)
+                                                    ->integer()
+                                                    ->required()
+                                                    ->minValue(3)
+                                                    ->label(__('Quantity'))
+                                                    ->suffix(__('m³'))
+                                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                                        $this->calculateTotal($get, $set);
+                                                    }),
+                                                Select::make('product')
+                                                    ->live()
+                                                    ->dehydrated()
+                                                    ->required()
+                                                    ->label(__('Product'))
+                                                    ->helperText(__('Product selected'))
+                                                    ->options(Product::all()->pluck('name', 'id'))
+                                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                                        $set('product_option', null);
+                                                    }),
+                                                Select::make('product_option')
+                                                    ->live()
+                                                    ->dehydrated()
+                                                    ->label(__('Option'))
+                                                    ->helperText(__('Option selected'))
+                                                    ->options(fn (Get $get): Collection => $this->getProductOptions($get))
+                                                    ->required(fn (Get $get): bool => $this->getProductOptions($get)->count() > 0)
+                                                    ->hidden(fn (Get $get): bool => $this->getProductOptions($get)->count() == 0),
+                                                Select::make('location')
+                                                    ->dehydrated()
+                                                    ->required()
+                                                    ->label(__('Local / Area'))
+                                                    ->helperText(__('Local or area to be concreted'))
+                                                    ->options(Location::all()
+                                                        ->pluck('name', 'id')),
+                                            ])
+                                            ->columns(2)
+                                            ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null
                                             )
-                                            ->required()
-                                            ->label(__('Type of Concrete'))
-                                            ->helperText(__('Type of Concrete')),
-                                        Select::make('content.product_option')
-                                            ->live()
-                                            ->options(function (Get $get) {
-                                                return $this->getOptions($get);
-                                            })
-                                            ->required(function (Get $get) {
-                                                return $this->getOptions($get)->count() > 0;
-                                            })
-                                            ->hidden(function (Get $get) {
-                                                return $this->getOptions($get)->count() == 0;
-                                            })
-                                            ->label(__('Option'))
-                                            ->helperText(__('Product Option')),
-                                        Select::make('content.location')
-                                            ->label(__('Location / Area'))
-                                            ->options(
-                                                Location::all()->pluck('name', 'id')
-                                            )
-                                            ->required()
-                                            ->helperText(__('Local or area to be concreted')),
-                                        TextInput::make('content.quantity')
-                                            ->label(__('Estimative Quantity m³'))
-                                            ->numeric()
-                                            ->default(3)
-                                            ->suffix('m³')
-                                            ->minValue(3)
-                                            ->required()
-                                            ->helperText(__('Min value 3. (ABNT NBR 7212)')),
+                                            ->addActionLabel(__('Add Product'))
+                                            ->collapsible()
+                                            ->reorderable()
+                                            ->defaultItems(1),
                                     ]),
                             ]),
                         Fieldset::make(__('Construction Address & Location'))
@@ -151,8 +165,7 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Postcode for your construction'))
                                             ->label(__('Construction Address Postcode'))
                                             ->suffixAction(
-                                                fn($state, Set $set, $livewire) =>
-                                                Action::make('search-action')
+                                                fn ($state, Set $set, $livewire) => Action::make('search-action')
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $livewire->validateOnly('data.content.postcode');
@@ -213,7 +226,6 @@ class Budget extends Component implements HasForms
         $this->form->fill();
     }
 
-
     /**
      * Summary of render
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
@@ -225,7 +237,6 @@ class Budget extends Component implements HasForms
         ]);
     }
 
-
     /**
      * Summary of status
      * @return bool
@@ -236,9 +247,9 @@ class Budget extends Component implements HasForms
             ->select(['budget_is_active'])
             ->first()
             ->budget_is_active;
+
         return $status;
     }
-
 
     /**
      * Summary of image
@@ -250,19 +261,40 @@ class Budget extends Component implements HasForms
             ->select(['budget_image'])
             ->first()
             ->budget_image;
+
         return $image;
     }
 
     /**
-     * Summary of getOptions
-     * @param \Filament\Forms\Get $get
-     * @return \Illuminate\Support\Collection
+     * Summary of getProductOptions
+     * @param Get $get
+     * @return Collection
      */
-    private function getOptions(Get $get): Collection
+    private function getProductOptions(Get $get): Collection
     {
-        return ProductOption::where('product_id', '=', $get('content.product'))
+        return ProductOption::where('product_id', '=', $get('product'))
             ->get()
             ->pluck('name', 'id');
     }
 
+    /**
+     * Summary of calculateTotal
+     * @param Get $get
+     * @param Set $set
+     * @return void
+     */
+    private function calculateTotal(Get $get, Set $set): void
+    {
+        $products = $get('content.products') ?? [];
+        $quantity = 0;
+
+        // Calcular a quantidade total
+        foreach ($products as $product) {
+            $productQuantity = floatval($product['quantity'] ?? 0);
+            $quantity += $productQuantity;
+        }
+
+        // Atualizar quantidade total
+        $set('content.quantity', $quantity);
+    }
 }
