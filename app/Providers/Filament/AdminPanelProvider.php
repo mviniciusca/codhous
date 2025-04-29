@@ -33,7 +33,6 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->viteTheme('resources/css/filament/admin/theme.css')
             ->breadcrumbs(false)
             ->id('admin')
             ->path('admin')
