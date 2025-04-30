@@ -24,16 +24,13 @@ class BudgetPdfController extends Controller
             // Find the PDF with the given token
             $pdf = BudgetPdf::where('download_token', $token)
                 ->where('is_active', true)
-                ->where('token_expires_at', '>', now())
+                ->where('token_expires_at', '>', now())  // Verifica expiração do token
                 ->first();
 
             if (! $pdf) {
                 Log::warning('Invalid or expired token', ['token' => $token]);
-                abort(404, 'Link inválido ou expirado');
+                abort(404, 'Link inválido ou expirado. Por favor, gere um novo link.');
             }
-
-            // Increment the download count
-            $pdf->incrementDownloadCount();
 
             // Get the full path to the file
             $filePath = $pdf->getFullPath();
@@ -60,6 +57,9 @@ class BudgetPdfController extends Controller
                     'filename'       => $pdf->filename,
                 ])
                 ->log('Downloaded PDF document for budget #'.$budget->code);
+
+            // Increment download counter
+            $pdf->incrementDownloadCount();
 
             Log::info('PDF download successful', [
                 'token'          => $token,

@@ -165,10 +165,10 @@ class BudgetPdfService
      * Generate a shareable link for the budget PDF
      *
      * @param Budget|int $budget Budget model or ID
-     * @param int $expirationMinutes Minutes until the link expires
+     * @param int $expirationMinutes Minutes until URL expires (default: 4320 - 72 hours)
      * @return string|null The shareable link or null if generation failed
      */
-    public function generateShareableLink($budget, int $expirationMinutes = 1440): ?string
+    public function generateShareableLink($budget, int $expirationMinutes = 4320): ?string
     {
         try {
             // Get the budget model if an ID was passed
@@ -187,7 +187,6 @@ class BudgetPdfService
         } catch (\Exception $e) {
             Log::error('Error generating shareable link: '.$e->getMessage(), [
                 'budget_id' => $budget->id ?? null,
-                'trace'     => $e->getTraceAsString(),
             ]);
 
             return null;

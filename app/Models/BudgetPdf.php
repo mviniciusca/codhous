@@ -50,10 +50,10 @@ class BudgetPdf extends Model
     /**
      * Generate a unique download token for this PDF
      *
-     * @param int $expirationMinutes Minutes until token expires (default: 1440 - 24 hours)
+     * @param int $expirationMinutes Minutes until token expires (default: 4320 - 72 hours)
      * @return string The generated token
      */
-    public function generateDownloadToken(int $expirationMinutes = 1440): string
+    public function generateDownloadToken(int $expirationMinutes = 4320): string
     {
         $token = Str::random(64);
         $expiresAt = now()->addMinutes($expirationMinutes);
@@ -69,10 +69,10 @@ class BudgetPdf extends Model
     /**
      * Generate a download URL for this PDF
      *
-     * @param int $expirationMinutes Minutes until URL expires (default: 1440 - 24 hours)
+     * @param int $expirationMinutes Minutes until URL expires (default: 4320 - 72 hours)
      * @return string The download URL
      */
-    public function getDownloadUrl(int $expirationMinutes = 1440): string
+    public function getDownloadUrl(int $expirationMinutes = 4320): string
     {
         // Generate a fresh token if needed
         if (empty($this->download_token) || $this->token_expires_at === null || $this->token_expires_at->isPast()) {

@@ -106,7 +106,16 @@ class EditBudget extends EditRecord
                                 FormAction::make('generate_link')
                                     ->label(__('Generate Share Link'))
                                     ->icon('heroicon-o-link')
-                                    ->color('success')
+                                    ->color(function () {
+                                        $budget = Budget::with(['pdfs'])->findOrFail($this->record->id);
+
+                                        return $budget->latestPdf() ? 'success' : 'gray';
+                                    })
+                                    ->outlined(function () {
+                                        $budget = Budget::with(['pdfs'])->findOrFail($this->record->id);
+
+                                        return ! $budget->latestPdf();
+                                    })
                                     ->action(function (Get $get, Set $set) {
                                         $budget = Budget::with(['products'])->findOrFail($this->record->id);
                                         $budget->refresh();
