@@ -13,7 +13,7 @@
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
             font-size: 72px;
-            color: rgba(229, 231, 235, 0.3);
+            color: rgba(229, 231, 235, 0.2);
             pointer-events: none;
             z-index: -1;
             white-space: nowrap;
@@ -30,9 +30,9 @@
     <!-- Marca d'água -->
     <div class="watermark">{{ $company->trade_name ?? env('APP_NAME','Concrete') }}</div>
 
-    <div class="max-w-[210mm] mx-auto px-6 py-4">
+    <div class="w-full mx-auto px-8 py-6">
         <!-- Header Section -->
-        <div class="border-b pb-4">
+        <div class="pb-4">
             <div class="flex justify-between items-start gap-4">
                 <!-- Logo -->
                 @if(isset($layout) && $layout->logo)
@@ -66,7 +66,6 @@
                         $company->address['number'] }}</p>
                     <p class="text-gray-600 leading-tight">{{ $company->address['neighborhood'] }} - {{
                         $company->address['city'] }}/{{ $company->address['state'] }}</p>
-                    <p class="text-gray-600 leading-tight">CNPJ: {{ $company->cnpj }}</p>
                     <p class="text-gray-600 leading-tight">{{ $company->phone }}</p>
                     <p class="text-gray-600 leading-tight">{{ $company->email }}</p>
                 </div>
@@ -89,16 +88,16 @@
         <!-- Products Table -->
         <div class="mt-4">
             <p class="font-medium mb-2 text-sm">PRODUTOS E SERVIÇOS</p>
-            <table class="w-full">
+            <table class="w-full text-[10px]">
                 <thead>
                     <tr class="border-b border-gray-200">
-                        <th class="py-2 text-left font-medium text-gray-600 w-[5%]">#</th>
-                        <th class="py-2 text-left font-medium text-gray-600 w-[30%]">Produto</th>
-                        <th class="py-2 text-left font-medium text-gray-600 w-[20%]">Opção</th>
-                        <th class="py-2 text-left font-medium text-gray-600 w-[15%]">Local</th>
-                        <th class="py-2 text-left font-medium text-gray-600 w-[10%]">Quant.</th>
-                        <th class="py-2 text-left font-medium text-gray-600 w-[10%]">Preço Un.</th>
-                        <th class="py-2 text-right font-medium text-gray-600 w-[10%]">Subtotal</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[5%]">#</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[30%]">Produto</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[20%]">Opção</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[15%]">Local</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[10%]">Quant.</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[10%]">Preço Un.</th>
+                        <th class="py-1.5 text-right font-medium text-gray-600 w-[10%]">Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -132,21 +131,21 @@
                     $location = \App\Models\Location::find($product['location'] ?? 0);
                     @endphp
                     <tr class="border-b border-gray-100">
-                        <td class="py-2">{{ $index + 1 }}</td>
-                        <td class="py-2">{{ $productName }}</td>
-                        <td class="py-2">{{ $productOption ? $productOption->name : '-' }}</td>
-                        <td class="py-2">{{ $location ? $location->name : '-' }}</td>
-                        <td class="py-2">{{ $product['quantity'] ?? 0 }} m³</td>
-                        <td class="py-2">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($product['price'] ??
+                        <td class="py-1.5">{{ $index + 1 }}</td>
+                        <td class="py-1.5">{{ $productName }}</td>
+                        <td class="py-1.5">{{ $productOption ? $productOption->name : '-' }}</td>
+                        <td class="py-1.5">{{ $location ? $location->name : '-' }}</td>
+                        <td class="py-1.5">{{ $product['quantity'] ?? 0 }} m³</td>
+                        <td class="py-1.5">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($product['price'] ??
                             0),2,',','.') }}</td>
-                        <td class="py-2 text-right">{{ env('CURRENCY_SUFFIX','R$') }} {{
+                        <td class="py-1.5 text-right">{{ env('CURRENCY_SUFFIX','R$') }} {{
                             number_format(($product['subtotal'] ?? 0),2,',','.') }}</td>
                     </tr>
                     @endforeach
 
                     @if($totalItems == 0)
                     <tr>
-                        <td colspan="7" class="py-2 text-center text-gray-500">Nenhum produto encontrado</td>
+                        <td colspan="7" class="py-1.5 text-center text-gray-500">Nenhum produto encontrado</td>
                     </tr>
                     @endif
                 </tbody>
@@ -156,7 +155,7 @@
         <!-- Summary and Totals - Two Columns -->
         <div class="mt-6 grid grid-cols-2 gap-6">
             <!-- Left Column - Notes -->
-            <div class="text-xs space-y-2">
+            <div class="text-[10px] space-y-2">
                 <div class="bg-gray-50 p-3 rounded">
                     <p class="font-medium mb-1">Observações:</p>
                     <ol class="pl-4 space-y-1 list-decimal text-gray-600">
@@ -167,15 +166,6 @@
                         <li>{{ $company->budget_information }}</li>
                         @endif
                     </ol>
-                </div>
-                <!-- Signatures -->
-                <div class="mt-6 grid grid-cols-2 gap-12">
-                    <div class="text-center">
-                        <div class="border-t border-gray-300 pt-2">{{ $company->trade_name }}</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="border-t border-gray-300 pt-2">Cliente</div>
-                    </div>
                 </div>
             </div>
 
@@ -205,8 +195,22 @@
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="mt-6 pt-4 border-t text-xs text-center text-gray-500">
+        <!-- Footer with Signatures -->
+        <div class="mt-12 mb-4">
+            <!-- Signatures -->
+            <div class="grid grid-cols-2 gap-12 w-4/5 mx-auto mt-24">
+                <div class="text-center">
+                    <div class="border-t border-gray-300 pt-2">{{ $company->trade_name }}</div>
+                    <div class="text-xs text-gray-500 mt-1">CNPJ: {{ $company->cnpj }}</div>
+                </div>
+                <div class="text-center">
+                    <div class="border-t border-gray-300 pt-2">Cliente</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright Footer -->
+        <div class="mt-6 pt-4 text-xs text-center text-gray-500">
             &copy; {{ date('Y') }} {{ $company->trade_name }}. Todos os direitos reservados.
         </div>
     </div>
