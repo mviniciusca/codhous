@@ -40,6 +40,8 @@ class StatsWidget extends BaseWidget
             $this->makeMaintenanceModeStat(),
             // Budget statistics
             $this->makeBudgetStat(),
+            // Total budgets
+            $this->makeTotalValueStat(),
             // Email list
             $this->makeNewsletterStat(),
 
@@ -51,9 +53,6 @@ class StatsWidget extends BaseWidget
 
             // Ongoing budgets
             $this->makeOngoingBudgetsStat(),
-
-            // Total budgets
-            $this->makeTotalValueStat(),
 
         ];
     }
