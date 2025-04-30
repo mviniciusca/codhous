@@ -54,7 +54,7 @@ class EditBudget extends EditRecord
                     ->schema([
                         Section::make(__('Budget Overview'))
                             ->headerActions([
-                                FormAction::make('send_mail')
+                                FormAction::make('notify_email')
                                     ->icon('heroicon-o-envelope')
                                     ->label(__('Notify Email'))
                                     ->disabled(function (Get $get, ?array $state) {
@@ -78,22 +78,74 @@ class EditBudget extends EditRecord
                                     }),
                                 FormAction::make('download_pdf')
                                     ->label(__('Download PDF'))
-                                    ->color(function (Get $get, ?array $state) {
-                                        if (self::checkId($get, $state)) {
-                                            return 'gray';
-                                        } else {
-                                            return 'primary';
-                                        }
-                                    })
-                                    ->icon('heroicon-o-arrow-down-tray')
+                                    ->icon('heroicon-o-document-arrow-down')
+                                    ->color('warning')
                                     ->requiresConfirmation()
-                                    ->disabled(function (Get $get, ?array $state) {
-                                        return self::checkId($get, $state);
-                                    })
-                                    ->action(function ($state) {
-                                        $pdf = new PdfGenerator($state);
+                                    ->modalHeading(__('Download PDF'))
+                                    ->modalDescription(__('Are you sure you want to download this budget as PDF?'))
+                                    ->modalSubmitActionLabel(__('Yes, download'))
+                                    ->action(function () {
+                                        $budget = Budget::with(['products'])->findOrFail($this->record->id);
+                                        $pdfService = new BudgetPdfService();
+                                        $pdfModel = $pdfService->generatePdf($budget, true);
 
-                                        return $pdf->generate();
+                                        if ($pdfModel && $pdfModel->fileExists()) {
+                                            return response()->download(
+                                                $pdfModel->getFullPath(),
+                                                'Budget_'.$budget->code.'.pdf',
+                                                ['Content-Type' => 'application/pdf']
+                                            );
+                                        } else {
+                                            Notification::make()
+                                                ->title(__('Error generating PDF'))
+                                                ->body(__('Could not generate PDF file. Please try again.'))
+                                                ->danger()
+                                                ->send();
+                                        }
+                                    }),
+                                FormAction::make('generate_link')
+                                    ->label(__('Generate Share Link'))
+                                    ->icon('heroicon-o-link')
+                                    ->color('success')
+                                    ->action(function () {
+                                        $budget = Budget::with(['products'])->findOrFail($this->record->id);
+                                        $budget->refresh();
+
+                                        $pdfService = new BudgetPdfService();
+                                        $pdfModel = $pdfService->generatePdf($budget, true);
+
+                                        if ($pdfModel) {
+                                            $url = $pdfModel->getDownloadUrl();
+
+                                            Notification::make()
+                                                ->title(__('Download link generated!'))
+                                                ->body(__('Share this link with the customer:'))
+                                                ->actions([
+                                                    \Filament\Notifications\Actions\Action::make('copy')
+                                                        ->label(__('Copy Link'))
+                                                        ->icon('heroicon-o-clipboard')
+                                                        ->color('primary')
+                                                        ->close()
+                                                        ->extraAttributes([
+                                                            'x-on:click' => 'navigator.clipboard.writeText("'.$url.'"); $dispatch("notification", {message: "'.addslashes(__('Link copied to clipboard!')).'", icon: "heroicon-o-clipboard-check", iconColor: "success", timeout: 3000})',
+                                                        ]),
+                                                    \Filament\Notifications\Actions\Action::make('open')
+                                                        ->label(__('Open'))
+                                                        ->icon('heroicon-o-arrow-top-right-on-square')
+                                                        ->url($url)
+                                                        ->openUrlInNewTab()
+                                                        ->close(),
+                                                ])
+                                                ->success()
+                                                ->persistent()
+                                                ->send();
+                                        } else {
+                                            Notification::make()
+                                                ->title(__('Error generating link'))
+                                                ->body(__('Could not generate download link. Please check logs.'))
+                                                ->danger()
+                                                ->send();
+                                        }
                                     }),
                             ])
                             ->columns(4)
@@ -825,71 +877,6 @@ class EditBudget extends EditRecord
         return [
             $this->getSaveFormAction(),
             $this->getDeleteFormAction(),
-            Action::make('generate_link')
-                ->label(__('Generate Share Link'))
-                ->icon('heroicon-o-link')
-                ->color('success')
-                ->action(function () {
-                    // Ensure we have the complete budget data
-                    $budget = Budget::with(['products'])->findOrFail($this->record->id);
-
-                    // Prepare the data to match the form state
-                    $budget->refresh();
-
-                    // Log data for debugging
-                    \Illuminate\Support\Facades\Log::info('Generating link for budget', [
-                        'budget_id'    => $budget->id,
-                        'content'      => $budget->content,
-                        'has_products' => isset($budget->content['products']) && ! empty($budget->content['products']),
-                    ]);
-
-                    // Create new PDF service
-                    $pdfService = new BudgetPdfService();
-
-                    // Generate PDF with forced regeneration to ensure fresh data
-                    $pdfModel = $pdfService->generatePdf($budget, true);
-
-                    if ($pdfModel) {
-                        $url = $pdfModel->getDownloadUrl();
-
-                        // Show success notification with the link
-                        Notification::make()
-                            ->title(__('Download link generated!'))
-                            ->body(__('Share this link with the customer:'))
-                            ->actions([
-                                \Filament\Notifications\Actions\Action::make('copy')
-                                    ->label(__('Copy Link'))
-                                    ->icon('heroicon-o-clipboard')
-                                    ->color('primary')
-                                    ->close()
-                                    ->extraAttributes([
-                                        'x-on:click' => 'navigator.clipboard.writeText("'.$url.'"); $dispatch("notification", {message: "'.addslashes(__('Link copied to clipboard!')).'", icon: "heroicon-o-clipboard-check", iconColor: "success", timeout: 3000})',
-                                    ]),
-                                \Filament\Notifications\Actions\Action::make('open')
-                                    ->label(__('Open'))
-                                    ->icon('heroicon-o-arrow-top-right-on-square')
-                                    ->url($url)
-                                    ->openUrlInNewTab()
-                                    ->close(),
-                            ])
-                            ->success()
-                            ->persistent()
-                            ->send();
-
-                        // Log successful link generation
-                        \Illuminate\Support\Facades\Log::info('Budget PDF link generated', [
-                            'budget_id' => $budget->id,
-                            'url'       => $url,
-                        ]);
-                    } else {
-                        // Show error notification
-                        Notification::make()
-                            ->title(__('Error generating link'))
-                            ->body(__('Could not generate download link. Please check logs.'))
-                            ->danger()
-                            ->send();
-                    }
-                }),
         ];
     }
 
