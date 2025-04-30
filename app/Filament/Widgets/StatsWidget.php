@@ -156,7 +156,10 @@ class StatsWidget extends BaseWidget
     protected function makeTotalValueStat(): Stat
     {
         // Get budgets that have the content.total field defined
-        $budgets = Budget::withoutTrashed()->get();
+        $budgets = Budget::where('status', '=', 'done')
+            ->where('is_active', '=', true)
+            ->withoutTrashed()
+            ->get();
         $totalValue = 0;
 
         foreach ($budgets as $budget) {
@@ -169,7 +172,7 @@ class StatsWidget extends BaseWidget
 
         return Stat::make(__('Total Budget Value'), $currencySuffix.' '.number_format($totalValue, 2, '.', ','))
             ->icon('heroicon-o-banknotes')
-            ->description(__('Sum of all budgets'))
+            ->description(__('Sum of all budgets completed'))
             ->descriptionIcon('heroicon-m-calculator')
             ->color('success');
     }
