@@ -135,37 +135,78 @@
             border-top: 1px dotted #000;
             margin: 10px 0;
         }
+
+        /* Marca d'água */
+        .watermark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .watermark-text {
+            color: rgba(200, 200, 200, 0.2);
+            font-size: 120px;
+            font-weight: bold;
+            transform: rotate(-45deg);
+            white-space: nowrap;
+            user-select: none;
+        }
     </style>
 </head>
 
 <body>
+    <!-- Marca d'água -->
+    <div class="watermark">
+        <div class="watermark-text">CODHOUS</div>
+    </div>
+
     <div class="container">
         <div class="header">
-            <div class="company-name">{{ env('APP_NAME') }}</div>
-            <div class="company-details">
-                Rua Rio de Janeiro, 25 - Rio de Janeiro, RJ • CNPJ: 54012200000441/4000<br>
-                Tel: (21) 966134366 • Email: sac@codhous.app
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="width: 60%; text-align: left;">
+                    <div class="company-name">{{ env('APP_NAME') }}</div>
+                    <div class="company-details">
+                        Rua Rio de Janeiro, 25 - Rio de Janeiro, RJ • CNPJ: 54012200000441/4000<br>
+                        Tel: (21) 966134366 • Email: sac@codhous.app
+                    </div>
+                </div>
+                <div style="width: 38%; text-align: right;">
+                    <div class="document-title">Orçamento Nº {{ $state['code'] }}</div>
+                    <div style="font-size: 8pt; margin-top: 4px;">
+                        Data: {{ date('d/m/Y H:i', strtotime($state['created_at'])) }}
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="document-title">Orçamento Nº {{ $state['code'] }}</div>
-        <div style="text-align: right; font-size: 8pt; margin-bottom: 8px;">
-            Data: {{ date('d/m/Y H:i', strtotime($state['created_at'])) }}
         </div>
 
         <div class="customer-section">
-            <div class="section-title">Dados do Cliente</div>
-            <div class="customer-info"><strong>Nome:</strong> {{ $state['content'][0]['customer_name'] ?? 'N/A' }}</div>
-            <div class="customer-info"><strong>Endereço:</strong> {{ isset($state['content'][0]['street']) ?
-                $state['content'][0]['street'] . ', ' . $state['content'][0]['number'] : 'N/A' }}</div>
-            <div class="customer-info"><strong>Bairro:</strong> {{ $state['content'][0]['neighborhood'] ?? 'N/A' }}
-            </div>
-            <div class="customer-info"><strong>Cidade/UF:</strong> {{ ($state['content'][0]['city'] ?? '') . ' - ' .
-                ($state['content'][0]['state'] ?? '') }}</div>
-            <div class="customer-info"><strong>CEP:</strong> {{ $state['content'][0]['postcode'] ?? 'N/A' }}</div>
-            <div class="customer-info"><strong>Email:</strong> {{ $state['content'][0]['customer_email'] ?? 'N/A' }}
-            </div>
-            <div class="customer-info"><strong>Telefone:</strong> {{ $state['content'][0]['customer_phone'] ?? 'N/A' }}
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 48%;">
+                    <div class="customer-info"><strong>Nome:</strong> {{ $state['content'][0]['customer_name'] ?? 'N/A'
+                        }}</div>
+                    <div class="customer-info"><strong>Endereço:</strong> {{ isset($state['content'][0]['street']) ?
+                        $state['content'][0]['street'] . ', ' . $state['content'][0]['number'] : 'N/A' }}</div>
+                    <div class="customer-info"><strong>Bairro:</strong> {{ $state['content'][0]['neighborhood'] ?? 'N/A'
+                        }}</div>
+                    <div class="customer-info"><strong>Cidade/UF:</strong> {{ ($state['content'][0]['city'] ?? '') . ' -
+                        ' .
+                        ($state['content'][0]['state'] ?? '') }}</div>
+                </div>
+                <div style="width: 48%;">
+                    <div class="customer-info"><strong>CEP:</strong> {{ $state['content'][0]['postcode'] ?? 'N/A' }}
+                    </div>
+                    <div class="customer-info"><strong>Email:</strong> {{ $state['content'][0]['customer_email'] ??
+                        'N/A' }}</div>
+                    <div class="customer-info"><strong>Telefone:</strong> {{ $state['content'][0]['customer_phone'] ??
+                        'N/A' }}</div>
+                </div>
             </div>
         </div>
 
