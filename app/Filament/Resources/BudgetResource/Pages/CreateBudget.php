@@ -31,6 +31,79 @@ class CreateBudget extends CreateRecord
 
     protected static string $resource = BudgetResource::class;
 
+    // Propriedade para controlar a aba ativa
+    public $activeTab = 'customer_information';
+
+    // Propriedade para armazenar os produtos do carrinho
+    public $cartProducts = [];
+
+    public function mount(): void
+    {
+        // Verificar se há parâmetros na URL
+        if (request()->has('activeTab')) {
+            $this->activeTab = request('activeTab');
+        }
+
+        // Verificar se há produtos na URL
+        if (request()->has('products')) {
+            try {
+                $productsJson = base64_decode(request('products'));
+                $products = json_decode($productsJson, true);
+
+                if (is_array($products)) {
+                    // Transformar os produtos do carrinho para o formato esperado pelo orçamento
+                    $formattedProducts = [];
+                    foreach ($products as $product) {
+                        $formattedProducts[] = [
+                            'product'        => $product['product_id'],
+                            'product_option' => $product['product_option_id'],
+                            'quantity'       => $product['quantity'],
+                            'price'          => $product['price'],
+                            'subtotal'       => $product['subtotal'],
+                            // Adicionar o campo location como primeiro ID disponível
+                            'location' => Location::first()->id ?? 1,
+                        ];
+                    }
+                    $this->cartProducts = $formattedProducts;
+                }
+            } catch (\Exception $e) {
+                // Em caso de erro no processamento, apenas continua sem os produtos
+                \Illuminate\Support\Facades\Log::error('Erro ao processar produtos do carrinho: '.$e->getMessage());
+            }
+        }
+
+        parent::mount();
+
+        // Após a montagem do formulário, preencher com os produtos do carrinho
+        if (! empty($this->cartProducts)) {
+            $this->fillFormWithCartProducts();
+        }
+    }
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        // Se temos produtos do carrinho e ainda não foram adicionados ao formulário
+        if (! empty($this->cartProducts) && empty($data['content']['products'])) {
+            $data['content']['products'] = $this->cartProducts;
+            // Calcular o total baseado nos produtos
+            $quantity = 0;
+            $subtotal = 0;
+            foreach ($this->cartProducts as $product) {
+                $quantity += floatval($product['quantity'] ?? 0);
+                $subtotal += floatval($product['subtotal'] ?? 0);
+            }
+
+            $data['content']['quantity'] = $quantity;
+            // Incluir impostos e descontos no cálculo total
+            $tax = floatval($data['content']['tax'] ?? 0);
+            $discount = floatval($data['content']['discount'] ?? 0);
+            $total = $subtotal + $tax - $discount;
+            $data['content']['total'] = number_format($total, 2, '.', '');
+        }
+
+        return $data;
+    }
+
     public function form(Form $form): Form
     {
         return $form
@@ -489,5 +562,82 @@ class CreateBudget extends CreateRecord
         $price = floatval($get('price') ?? 0);
         $subtotal = $quantity * $price;
         $set('subtotal', number_format($subtotal, 2, '.', ''));
+    }
+
+    /**
+     * Preenche o formulário com os produtos do carrinho
+     */
+    private function fillFormWithCartProducts(): void
+    {
+        // Verificamos se já temos acesso ao form
+        if ($this->form && ! empty($this->cartProducts)) {
+            try {
+                // Remover o item padrão que o repeater cria automaticamente
+                $currentData = $this->form->getRawState();
+                if (! isset($currentData['content'])) {
+                    $currentData['content'] = [];
+                }
+
+                // Preencher o formulário com os produtos do carrinho
+                $currentData['content']['products'] = $this->cartProducts;
+
+                // Calcular totais
+                $quantity = 0;
+                $subtotal = 0;
+                foreach ($this->cartProducts as $product) {
+                    $quantity += floatval($product['quantity']);
+                    $subtotal += floatval($product['subtotal']);
+                }
+
+                // Atualizar totais
+                $currentData['content']['quantity'] = $quantity;
+                $currentData['content']['total'] = number_format($subtotal, 2, '.', '');
+
+                // Preencher o formulário com os novos dados
+                $this->form->fill($currentData);
+
+                // Registrar para debug
+                \Illuminate\Support\Facades\Log::info('Formulário preenchido com produtos do carrinho', [
+                    'productsCount' => count($this->cartProducts),
+                    'totalQuantity' => $quantity,
+                    'totalValue'    => $subtotal,
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Erro ao preencher formulário com produtos: '.$e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Método executado antes de preencher o formulário
+     * Usado para configurar scripts personalizados para abrir a aba correta
+     */
+    protected function beforeFill(): void
+    {
+        // Adicione um script para navegar automaticamente para a aba "Shopping Bag" quando necessário
+        $this->js = <<<'JS'
+            document.addEventListener('DOMContentLoaded', function() {
+                // Verificar se estamos na página de criação de orçamento
+                if (window.location.href.includes('budgets/create')) {
+                    // Verificar se há o parâmetro activeTab=shopping_bag na URL
+                    const params = new URLSearchParams(window.location.search);
+                    const activeTab = params.get('activeTab');
+
+                    if (activeTab === 'shopping_bag') {
+                        // Pequeno atraso para garantir que o Filament já renderizou as abas
+                        setTimeout(function() {
+                            // Encontrar e clicar na aba "Shopping Bag"
+                            const shoppingBagTab = Array.from(document.querySelectorAll('button')).find(
+                                button => button.textContent.includes('Shopping Bag')
+                            );
+
+                            if (shoppingBagTab) {
+                                shoppingBagTab.click();
+                            }
+                        }, 500);
+                    }
+                }
+            });
+        JS;
     }
 }
