@@ -117,6 +117,7 @@ class StatsWidget extends BaseWidget
     {
         $pendingBudgets = Budget::withoutTrashed()
             ->where('status', '=', 'pending')
+            ->where('is_active', '=', true)
             ->count();
         $allBudgets = Budget::withoutTrashed()->count();
         $percentage = $allBudgets > 0 ? round(($pendingBudgets / $allBudgets) * 100) : 0;
@@ -136,6 +137,7 @@ class StatsWidget extends BaseWidget
     {
         $ongoingBudgets = Budget::withoutTrashed()
             ->where('status', '=', 'on going')
+            ->where('is_active', '=', true)
             ->count();
         $allBudgets = Budget::withoutTrashed()->count();
         $percentage = $allBudgets > 0 ? round(($ongoingBudgets / $allBudgets) * 100) : 0;
