@@ -627,9 +627,9 @@ class EditBudget extends EditRecord
                                                     ]),
                                             ])
                                             ->disabled(true)
-                                            ->disableItemCreation()
-                                            ->disableItemDeletion()
-                                            ->disableItemMovement()
+                                            ->addable(false)
+                                            ->deletable(false)
+                                            ->reorderable(false)
                                             ->columnSpanFull()
                                             ->collapsible()
                                             ->collapsed() // Agora todos os cards iniciam colapsados
