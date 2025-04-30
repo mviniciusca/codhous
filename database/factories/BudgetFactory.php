@@ -17,6 +17,12 @@ class BudgetFactory extends Factory
      */
     public function definition(): array
     {
+        $product_id = $this->faker->randomElement([1, 2, 3, 4, 5]);
+        $product_option_id = $this->faker->numberBetween(1, 15);
+        $quantity = $this->faker->randomElement([5, 10, 15, 20]);
+        $price = $this->faker->randomFloat(2, 100, 1000);
+        $subtotal = $quantity * $price;
+
         return [
             'created_at' => $this->faker->dateTimeBetween(date('2024-01-01')),
             'code'       => $this->faker->numerify('####'),
@@ -28,9 +34,9 @@ class BudgetFactory extends Factory
                 'done',
             ]),
             'content' => [
-                'quantity'       => (string) $this->faker->randomElement([5, 10, 15, 20]),
-                'product'        => (string) $this->faker->randomElement([1]),
-                'product_option' => (string) $this->faker->randomElement([2]),
+                'quantity'       => (string) $quantity,
+                'product'        => (string) $product_id,
+                'product_option' => (string) $product_option_id,
                 'location'       => (string) $this->faker->randomElement([1, 2, 3]),
                 'postcode'       => $this->faker->numerify('22###-###'),
                 'customer_name'  => $this->faker->name(),
@@ -42,9 +48,19 @@ class BudgetFactory extends Factory
                 'neighborhood'   => $this->faker->city(),
                 'state'          => $this->faker->countryCode(),
                 'tax'            => (string) $this->faker->randomElement([10, 15, 20]),
-                'price'          => (string) $this->faker->randomFloat(2, 100, 1000),
-                'total'          => (string) $this->faker->randomFloat(2, 1000, 5000),
+                'price'          => (string) $price,
+                'total'          => (string) $subtotal,
                 'discount'       => (string) $this->faker->randomElement([5, 10, 15]),
+                'products'       => [
+                    [
+                        'product'        => $product_id,
+                        'product_option' => $product_option_id,
+                        'location'       => $this->faker->randomElement([1, 2, 3]),
+                        'quantity'       => $quantity,
+                        'price'          => $price,
+                        'subtotal'       => $subtotal,
+                    ],
+                ],
             ],
         ];
     }

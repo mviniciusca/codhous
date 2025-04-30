@@ -29,4 +29,15 @@ class Budget extends Model
     {
         return $this->hasOne(BudgetHistory::class);
     }
+
+    /**
+     * Products relationship
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'budget_product')
+            ->withPivot(['quantity', 'price', 'subtotal', 'product_option_id', 'location_id'])
+            ->withTimestamps();
+    }
 }

@@ -339,10 +339,55 @@ class CreateBudget extends CreateRecord
             ]);
     }
 
-    protected function afterCreate()
+    /**
+     * Método para salvar os dados do orçamento e produtos relacionados
+     */
+    protected function handleRecordCreation(array $data): Budget
     {
+        // Extrair produtos para processamento posterior
+        $products = $data['content']['products'] ?? [];
+
+        // Criar o orçamento primeiro usando o método padrão
+        $budget = Budget::create($data);
+
+        // Adicionar produtos no relacionamento muitos-para-muitos
+        if (! empty($products)) {
+            foreach ($products as $product) {
+                if (isset($product['product']) && isset($product['quantity'])) {
+                    $budget->products()->attach($product['product'], [
+                        'product_option_id' => $product['product_option'] ?? null,
+                        'location_id'       => $product['location'] ?? null,
+                        'quantity'          => $product['quantity'] ?? 0,
+                        'price'             => $product['price'] ?? 0,
+                        'subtotal'          => $product['subtotal'] ?? 0,
+                    ]);
+                }
+            }
+
+            // Atualizar os totais no campo content se necessário
+            $totalQuantity = $budget->products()->sum('quantity');
+            $subtotal = $budget->products()->sum('subtotal');
+
+            $tax = floatval($data['content']['tax'] ?? 0);
+            $discount = floatval($data['content']['discount'] ?? 0);
+            $total = $subtotal + $tax - $discount;
+
+            $content = $budget->content;
+            $content['quantity'] = $totalQuantity;
+            $content['total'] = number_format($total, 2, '.', '');
+
+            // Atualizar o orçamento com os valores atualizados
+            $budget->update(['content' => $content]);
+        }
+
+        return $budget;
+    }
+
+    protected function afterCreate(): void
+    {
+        // Registrar na história do orçamento
         BudgetHistory::create([
-            'budget_id' => Budget::latest('created_at')->first()->id,
+            'budget_id' => $this->record->id,
             'user_id'   => Auth::user()->id,
             'action'    => 'create',
         ]);

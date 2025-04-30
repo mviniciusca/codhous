@@ -255,7 +255,13 @@ class EditBudget extends EditRecord
                                                     ->options(fn (Get $get): Collection => self::getOptions($get))
                                                     ->required(fn (Get $get): bool => self::getOptions($get)->count() > 0)
                                                     ->hidden(fn (Get $get): bool => self::getOptions($get)->count() == 0)
-                                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => self::updatePrice($get, $set, $state)),
+                                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => self::updatePrice($get, $set, $state))
+                                                    ->afterStateHydrated(function (Get $get, Set $set, $state) {
+                                                        // Garantir que o price seja carregado corretamente
+                                                        if ($state && $get('product')) {
+                                                            self::updatePrice($get, $set, $state);
+                                                        }
+                                                    }),
                                             ]),
                                         Group::make()
                                             ->columnSpanFull()
@@ -317,6 +323,18 @@ class EditBudget extends EditRecord
                                     ->collapsible()
                                     ->afterStateUpdated(function (Get $get, Set $set) {
                                         self::calculateTotal($get, $set);
+                                    })
+                                    ->afterStateHydrated(function (Get $get, Set $set, ?array $state) {
+                                        // Garantir que o repeater tem os dados quando carregado
+                                        if ($get('id')) {
+                                            // Buscar o orçamento completo com todos os dados
+                                            $budget = Budget::findOrFail($get('id'));
+                                            if (isset($budget->content['products']) && ! empty($budget->content['products'])) {
+                                                // Garantir que estamos definindo os produtos independentemente do estado atual
+                                                $set('content.products', $budget->content['products']);
+                                                self::calculateTotal($get, $set);
+                                            }
+                                        }
                                     })
                                     ->reorderable()
                                     ->defaultItems(1)
@@ -533,13 +551,125 @@ class EditBudget extends EditRecord
             ]);
     }
 
-    protected function afterSave()
+    /**
+     * Mount the component
+     *
+     * @return void
+     */
+    public function mount($record): void
     {
+        parent::mount($record);
+
+        // Carregar os produtos do relacionamento para o formulário
+        $budget = Budget::with('products')->findOrFail($record);
+
+        // Verificar se há produtos na tabela pivot
+        if ($budget->products->count() > 0) {
+            $productItems = [];
+
+            foreach ($budget->products as $product) {
+                // Buscar o nome da opção de produto para garantir que seja exibido corretamente
+                $productOption = ProductOption::find($product->pivot->product_option_id);
+
+                $productItems[] = [
+                    'product'        => $product->id,
+                    'product_option' => $product->pivot->product_option_id,
+                    'location'       => $product->pivot->location_id,
+                    'quantity'       => $product->pivot->quantity,
+                    'price'          => $product->pivot->price,
+                    'subtotal'       => $product->pivot->subtotal,
+                ];
+            }
+
+            // Definir produtos no campo content
+            $this->data['content']['products'] = $productItems;
+
+            // Recalcular totais
+            $totalQuantity = $budget->products->sum('pivot.quantity');
+            $subtotal = $budget->products->sum('pivot.subtotal');
+            $tax = $this->data['content']['tax'] ?? 0;
+            $discount = $this->data['content']['discount'] ?? 0;
+
+            $this->data['content']['quantity'] = $totalQuantity;
+            $this->data['content']['total'] = number_format($subtotal + floatval($tax) - floatval($discount), 2, '.', '');
+        }
+    }
+
+    /**
+     * Summary of save
+     * @param bool $shouldRedirect
+     * @param bool $shouldSendSavedNotification
+     * @return void
+     */
+    public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
+    {
+        // Armazenar os produtos para atualizar depois
+        $products = $this->data['content']['products'] ?? [];
+
+        // Chamar o método original de salvamento
+        parent::save($shouldRedirect, $shouldSendSavedNotification);
+
+        // Se temos produtos, atualizar o relacionamento
+        if (! empty($products)) {
+            $budget = Budget::findOrFail($this->record->id);
+
+            // Limpar os produtos existentes
+            $budget->products()->detach();
+
+            // Adicionar os novos produtos
+            foreach ($products as $product) {
+                if (isset($product['product']) && isset($product['quantity'])) {
+                    $budget->products()->attach($product['product'], [
+                        'product_option_id' => $product['product_option'] ?? null,
+                        'location_id'       => $product['location'] ?? null,
+                        'quantity'          => $product['quantity'] ?? 0,
+                        'price'             => $product['price'] ?? 0,
+                        'subtotal'          => $product['subtotal'] ?? 0,
+                    ]);
+                }
+            }
+
+            // Atualizar os totais no campo content
+            $totalQuantity = $budget->products()->sum('quantity');
+            $subtotal = $budget->products()->sum('subtotal');
+
+            $tax = floatval($this->data['content']['tax'] ?? 0);
+            $discount = floatval($this->data['content']['discount'] ?? 0);
+            $total = $subtotal + $tax - $discount;
+
+            $content = $budget->content;
+            $content['quantity'] = $totalQuantity;
+            $content['total'] = number_format($total, 2, '.', '');
+
+            // Atualizar o orçamento com os novos valores
+            $budget->update(['content' => $content]);
+        }
+
+        // Registrar na história do orçamento
         BudgetHistory::create([
-            'budget_id' => $this->data['id'],
+            'budget_id' => $this->record->id,
             'user_id'   => Auth::user()->id,
             'action'    => 'update',
         ]);
+    }
+
+    protected function afterSave()
+    {
+        // Garantir que os produtos não sejam perdidos durante o salvamento
+        if (! isset($this->data['content']['products']) || empty($this->data['content']['products'])) {
+            // Se os produtos estiverem vazios após o salvamento, recuperá-los do banco de dados
+            $budget = Budget::findOrFail($this->data['id']);
+
+            if (isset($budget->content['products']) && ! empty($budget->content['products'])) {
+                // Atualizar o orçamento com os produtos originais
+                $this->data['content']['products'] = $budget->content['products'];
+
+                // Salvar novamente para garantir que os produtos sejam mantidos
+                Budget::findOrFail($this->data['id'])->update([
+                    'content' => $this->data['content'],
+                ]);
+            }
+        }
     }
 
     /**
@@ -600,8 +730,15 @@ class EditBudget extends EditRecord
      */
     private static function getOptions(Get $get): Collection
     {
-        // Corrigir o caminho para obter o ID do produto
-        return ProductOption::where('product_id', '=', $get('product'))
+        $productId = $get('product');
+
+        // Se não tiver um produto selecionado, retornar uma coleção vazia
+        if (! $productId) {
+            return collect();
+        }
+
+        // Buscar todas as opções do produto selecionado
+        return ProductOption::where('product_id', '=', $productId)
             ->get()
             ->pluck('name', 'id');
     }
@@ -694,5 +831,62 @@ class EditBudget extends EditRecord
             ->requiresConfirmation()
             ->icon('heroicon-o-trash')
             ->label(__('Delete'));
+    }
+
+    /**
+     * Summary of mutateFormDataBeforeFill
+     * @param array $data
+     * @return array
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        // Verificar se já existe um array de produtos
+        if (! isset($data['content']['products']) || empty($data['content']['products'])) {
+            // Criar um array de produtos com base nos dados individuais
+            if (isset($data['content']['product']) && isset($data['content']['product_option'])) {
+                $data['content']['products'] = [
+                    [
+                        'product'        => $data['content']['product'],
+                        'product_option' => $data['content']['product_option'],
+                        'quantity'       => $data['content']['quantity'] ?? 0,
+                        'location'       => $data['content']['location'] ?? null,
+                        'price'          => $data['content']['price'] ?? 0,
+                        'subtotal'       => ($data['content']['quantity'] ?? 0) * ($data['content']['price'] ?? 0),
+                    ],
+                ];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Summary of mutateFormDataBeforeSave
+     * @param array $data
+     * @return array
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Garantir que os produtos não sejam perdidos
+        if (isset($data['content']['products']) && ! empty($data['content']['products'])) {
+            // Mantenha o array de produtos intacto
+            // E assegure que os valores individuais também estejam atualizados para compatibilidade
+            $firstProduct = $data['content']['products'][0] ?? null;
+
+            if ($firstProduct) {
+                $data['content']['product'] = $firstProduct['product'] ?? $data['content']['product'] ?? null;
+                $data['content']['product_option'] = $firstProduct['product_option'] ?? $data['content']['product_option'] ?? null;
+                // Não sobrescreva a quantidade total com a quantidade do primeiro produto
+                // porque a quantidade total é calculada a partir de todos os produtos
+            }
+        } elseif (isset($data['id'])) {
+            // Se os produtos desapareceram, recupere do banco de dados
+            $budget = Budget::findOrFail($data['id']);
+            if (isset($budget->content['products']) && ! empty($budget->content['products'])) {
+                $data['content']['products'] = $budget->content['products'];
+            }
+        }
+
+        return $data;
     }
 }
