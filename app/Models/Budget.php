@@ -40,4 +40,24 @@ class Budget extends Model
             ->withPivot(['quantity', 'price', 'subtotal', 'product_option_id', 'location_id'])
             ->withTimestamps();
     }
+
+    /**
+     * Get the PDF files associated with the budget
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pdfs()
+    {
+        return $this->hasMany(BudgetPdf::class);
+    }
+
+    /**
+     * Get the latest PDF file for this budget
+     *
+     * @return BudgetPdf|null
+     */
+    public function latestPdf()
+    {
+        return $this->pdfs()->latest()->first();
+    }
 }

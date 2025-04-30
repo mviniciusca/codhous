@@ -9,13 +9,15 @@ use App\Models\BudgetHistory;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductOption;
+use App\Services\BudgetPdfService;
 use App\Services\PdfGenerator;
 use App\Services\PostcodeFinder;
 use App\Services\SendBudgetMail;
 use App\Trait\BudgetStatus;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\DeleteAction;  // For form actions
+use Filament\Forms\Components\Actions\Action as FormAction; // For component actions
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
@@ -25,6 +27,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Carbon;
@@ -51,7 +54,7 @@ class EditBudget extends EditRecord
                     ->schema([
                         Section::make(__('Budget Overview'))
                             ->headerActions([
-                                Action::make('send_mail')
+                                FormAction::make('send_mail')
                                     ->icon('heroicon-o-envelope')
                                     ->label(__('Notify Email'))
                                     ->disabled(function (Get $get, ?array $state) {
@@ -73,7 +76,7 @@ class EditBudget extends EditRecord
                                         );
                                         $mail->dispatch();
                                     }),
-                                Action::make('download_pdf')
+                                FormAction::make('download_pdf')
                                     ->label(__('Download PDF'))
                                     ->color(function (Get $get, ?array $state) {
                                         if (self::checkId($get, $state)) {
@@ -177,7 +180,7 @@ class EditBudget extends EditRecord
                                             ->helperText(__('Customer postcode'))
                                             ->maxLength(9)
                                             ->suffixAction(
-                                                fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                                fn ($state, Set $set, $livewire) => FormAction::make('search-action')
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $livewire->validateOnly('data.content.postcode');
@@ -394,7 +397,7 @@ class EditBudget extends EditRecord
                                                     ->label(__('Total Price'))
                                                     ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
                                                     ->suffixAction(function () {
-                                                        return Action::make('calculator')
+                                                        return FormAction::make('calculator')
                                                             ->icon('heroicon-o-calculator')
                                                             ->color('gray')
                                                             ->disabled()
@@ -822,7 +825,71 @@ class EditBudget extends EditRecord
         return [
             $this->getSaveFormAction(),
             $this->getDeleteFormAction(),
+            Action::make('generate_link')
+                ->label(__('Generate Share Link'))
+                ->icon('heroicon-o-link')
+                ->color('success')
+                ->action(function () {
+                    // Ensure we have the complete budget data
+                    $budget = Budget::with(['products'])->findOrFail($this->record->id);
 
+                    // Prepare the data to match the form state
+                    $budget->refresh();
+
+                    // Log data for debugging
+                    \Illuminate\Support\Facades\Log::info('Generating link for budget', [
+                        'budget_id'    => $budget->id,
+                        'content'      => $budget->content,
+                        'has_products' => isset($budget->content['products']) && ! empty($budget->content['products']),
+                    ]);
+
+                    // Create new PDF service
+                    $pdfService = new BudgetPdfService();
+
+                    // Generate PDF with forced regeneration to ensure fresh data
+                    $pdfModel = $pdfService->generatePdf($budget, true);
+
+                    if ($pdfModel) {
+                        $url = $pdfModel->getDownloadUrl();
+
+                        // Show success notification with the link
+                        Notification::make()
+                            ->title(__('Download link generated!'))
+                            ->body(__('Share this link with the customer:'))
+                            ->actions([
+                                \Filament\Notifications\Actions\Action::make('copy')
+                                    ->label(__('Copy Link'))
+                                    ->icon('heroicon-o-clipboard')
+                                    ->color('primary')
+                                    ->close()
+                                    ->extraAttributes([
+                                        'x-on:click' => 'navigator.clipboard.writeText("'.$url.'"); $dispatch("notification", {message: "'.addslashes(__('Link copied to clipboard!')).'", icon: "heroicon-o-clipboard-check", iconColor: "success", timeout: 3000})',
+                                    ]),
+                                \Filament\Notifications\Actions\Action::make('open')
+                                    ->label(__('Open'))
+                                    ->icon('heroicon-o-arrow-top-right-on-square')
+                                    ->url($url)
+                                    ->openUrlInNewTab()
+                                    ->close(),
+                            ])
+                            ->success()
+                            ->persistent()
+                            ->send();
+
+                        // Log successful link generation
+                        \Illuminate\Support\Facades\Log::info('Budget PDF link generated', [
+                            'budget_id' => $budget->id,
+                            'url'       => $url,
+                        ]);
+                    } else {
+                        // Show error notification
+                        Notification::make()
+                            ->title(__('Error generating link'))
+                            ->body(__('Could not generate download link. Please check logs.'))
+                            ->danger()
+                            ->send();
+                    }
+                }),
         ];
     }
 

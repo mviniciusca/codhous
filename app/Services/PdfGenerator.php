@@ -41,9 +41,10 @@ class PdfGenerator
 
     /**
      * Summary of generate
-     * @return mixed|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @param bool $download Whether to download the PDF or just generate it
+     * @return mixed|\Symfony\Component\HttpFoundation\BinaryFileResponse|null
      */
-    public function generate()
+    public function generate(bool $download = true)
     {
         $this->filePath = $this->savePath();
 
@@ -88,20 +89,28 @@ class PdfGenerator
                     ->send();
             }
 
-            Notification::make()
-                ->title(__('Document generated with success!'))
-                ->success()
-                ->send();
+            // Only show notification and return download response if download is true
+            if ($download) {
+                Notification::make()
+                    ->title(__('Document generated with success!'))
+                    ->success()
+                    ->send();
 
-            return $this->downloadPdf();
+                return $this->downloadPdf();
+            }
+
+            // Otherwise just return true to indicate success
+            return true;
         } catch (\Exception $e) {
             Log::error('PDF Generation Error: '.$e->getMessage());
             Log::error('PDF Generation Error Stack: '.$e->getTraceAsString());
 
-            Notification::make()
-                ->title(__('Error generating PDF: ').$e->getMessage())
-                ->danger()
-                ->send();
+            if ($download) {
+                Notification::make()
+                    ->title(__('Error generating PDF: ').$e->getMessage())
+                    ->danger()
+                    ->send();
+            }
 
             return null;
         }

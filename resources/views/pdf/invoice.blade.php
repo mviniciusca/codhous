@@ -1,327 +1,324 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
 <head>
-    <title>Nota Fiscal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-        rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento {{ $state['code'] ?? '' }}</title>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            font-size: 9pt;
-            line-height: 1.2;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
 
         .container {
-            width: 100%;
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 10px;
         }
 
         .header {
-            border-bottom: 1px solid #000;
-            padding-bottom: 8px;
-            margin-bottom: 10px;
             text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #444;
+            margin-bottom: 20px;
         }
 
-        .company-name {
-            font-size: 14pt;
-            font-weight: bold;
-            margin-bottom: 2px;
+        .logo {
+            max-width: 200px;
+            margin-bottom: 10px;
         }
 
         .company-details {
-            font-size: 8pt;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
 
         .document-title {
-            font-size: 11pt;
+            font-size: 22px;
             font-weight: bold;
-            text-align: center;
-            margin: 8px 0;
-            text-transform: uppercase;
+            margin-bottom: 5px;
+            color: #333;
         }
 
-        .customer-section {
-            border: 1px solid #000;
-            padding: 5px;
-            margin-bottom: 10px;
-            font-size: 8pt;
+        .document-subtitle {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #555;
         }
 
-        .section-title {
-            font-weight: bold;
-            font-size: 9pt;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-
-        .customer-info {
-            margin-bottom: 2px;
-        }
-
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-            font-size: 8pt;
-        }
-
-        .items-table th,
-        .items-table td {
-            border: 1px solid #000;
-            padding: 4px;
-            text-align: left;
-        }
-
-        .items-table th {
-            background-color: #f0f0f0;
-            font-size: 8pt;
-            font-weight: bold;
-        }
-
-        .totals-section {
-            text-align: right;
-            margin-top: 5px;
-            border-top: 1px dashed #000;
-            padding-top: 5px;
-            font-size: 8pt;
-        }
-
-        .total-line {
+        .info-section {
             display: flex;
-            justify-content: flex-end;
-            margin-bottom: 2px;
+            justify-content: space-between;
+            margin-bottom: 30px;
         }
 
-        .total-label {
-            font-weight: normal;
-            margin-right: 15px;
+        .info-box {
+            width: 48%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
         }
 
-        .total-value {
-            width: 100px;
-            text-align: right;
-        }
-
-        .grand-total {
+        .info-title {
+            font-size: 16px;
             font-weight: bold;
-            font-size: 10pt;
-            margin-top: 5px;
-            border-top: 1px solid #000;
-            padding-top: 2px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
         }
 
-        .footer {
-            margin-top: 15px;
-            padding-top: 5px;
-            border-top: 1px solid #000;
-            font-size: 7pt;
-            text-align: center;
-        }
-
-        .legal-text {
-            font-size: 7pt;
+        .info-content p {
             margin: 5px 0;
         }
 
-        .dotted-line {
-            border-top: 1px dotted #000;
-            margin: 10px 0;
-        }
-
-        /* Marca d'água */
-        .watermark {
-            position: fixed;
-            top: 0;
-            left: 0;
+        table {
             width: 100%;
-            height: 100%;
-            z-index: -1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none;
+            border-collapse: collapse;
+            margin: 20px 0;
         }
 
-        .watermark-text {
-            color: rgba(200, 200, 200, 0.2);
-            font-size: 120px;
+        table th,
+        table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f2f2f2;
             font-weight: bold;
-            transform: rotate(-45deg);
-            white-space: nowrap;
-            user-select: none;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .totals-section {
+            margin: 20px 0;
+            text-align: right;
+        }
+
+        .totals-table {
+            width: 40%;
+            margin-left: auto;
+        }
+
+        .totals-table td {
+            padding: 5px 10px;
+        }
+
+        .totals-table .total-row {
+            font-weight: bold;
+            font-size: 16px;
+            border-top: 2px solid #444;
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .note-box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .signature-section {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature-box {
+            width: 45%;
+            text-align: center;
+        }
+
+        .signature-line {
+            margin-top: 50px;
+            border-top: 1px solid #000;
+            padding-top: 5px;
         }
     </style>
 </head>
 
 <body>
-    <!-- Marca d'água -->
-    <div class="watermark">
-        <div class="watermark-text">CODHOUS</div>
-    </div>
-
     <div class="container">
         <div class="header">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="width: 60%; text-align: left;">
-                    <div class="company-name">{{ env('APP_NAME') }}</div>
-                    <div class="company-details">
-                        Rua Rio de Janeiro, 25 - Rio de Janeiro, RJ • CNPJ: 54012200000441/4000<br>
-                        Tel: (21) 966134366 • Email: sac@codhous.app
-                    </div>
+            <div class="document-title">ORÇAMENTO #{{ $state['code'] ?? 'N/A' }}</div>
+            <div class="document-subtitle">Data de emissão: {{ date('d/m/Y', strtotime($state['created_at'] ?? now()))
+                }}</div>
+            <div class="company-details">
+                <strong>{{ env('APP_NAME', 'Concrete') }}</strong><br>
+                Rua Rio de Janeiro, 25 - Rio de Janeiro, RJ<br>
+                CNPJ: 54.012.200/0001-41<br>
+                Tel: (21) 96613-4366 | E-mail: sac@codhous.app<br>
+                www.codhous.app
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="info-box">
+                <div class="info-title">DADOS DO CLIENTE</div>
+                <div class="info-content">
+                    <p><strong>Nome:</strong> {{ $state['content'][0]['customer_name'] ?? 'N/A' }}</p>
+                    <p><strong>E-mail:</strong> {{ $state['content'][0]['customer_email'] ?? 'N/A' }}</p>
+                    <p><strong>Telefone:</strong> {{ $state['content'][0]['customer_phone'] ?? 'N/A' }}</p>
+                    @if(isset($state['content'][0]['street']))
+                    <p>
+                        <strong>Endereço:</strong><br>
+                        {{ $state['content'][0]['street'] ?? '' }}
+                        {{ isset($state['content'][0]['number']) ? ', ' . $state['content'][0]['number'] : '' }}<br>
+                        {{ $state['content'][0]['neighborhood'] ?? '' }} -
+                        {{ $state['content'][0]['city'] ?? '' }}/{{ $state['content'][0]['state'] ?? '' }}<br>
+                        CEP: {{ $state['content'][0]['postcode'] ?? '' }}
+                    </p>
+                    @endif
                 </div>
-                <div style="width: 38%; text-align: right;">
-                    <div class="document-title">Orçamento Nº {{ $state['code'] }}</div>
-                    <div style="font-size: 8pt; margin-top: 4px;">
-                        Data: {{ date('d/m/Y H:i', strtotime($state['created_at'])) }}
-                    </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-title">DADOS DO ORÇAMENTO</div>
+                <div class="info-content">
+                    <p><strong>Número:</strong> #{{ $state['code'] ?? 'N/A' }}</p>
+                    <p><strong>Data:</strong> {{ date('d/m/Y', strtotime($state['created_at'] ?? now())) }}</p>
+                    <p><strong>Status:</strong> {{ ucfirst($state['status'] ?? 'Pendente') }}</p>
+                    <p><strong>Validade:</strong> 15 dias ({{ date('d/m/Y', strtotime('+15 days',
+                        strtotime($state['created_at'] ?? now()))) }})</p>
                 </div>
             </div>
         </div>
 
-        <div class="customer-section">
-            <div style="display: flex; justify-content: space-between;">
-                <div style="width: 48%;">
-                    <div class="customer-info"><strong>Nome:</strong> {{ $state['content'][0]['customer_name'] ?? 'N/A'
-                        }}</div>
-                    <div class="customer-info"><strong>Endereço:</strong> {{ isset($state['content'][0]['street']) ?
-                        $state['content'][0]['street'] . ', ' . $state['content'][0]['number'] : 'N/A' }}</div>
-                    <div class="customer-info"><strong>Bairro:</strong> {{ $state['content'][0]['neighborhood'] ?? 'N/A'
-                        }}</div>
-                    <div class="customer-info"><strong>Cidade/UF:</strong> {{ ($state['content'][0]['city'] ?? '') . ' -
-                        ' .
-                        ($state['content'][0]['state'] ?? '') }}</div>
-                </div>
-                <div style="width: 48%;">
-                    <div class="customer-info"><strong>CEP:</strong> {{ $state['content'][0]['postcode'] ?? 'N/A' }}
-                    </div>
-                    <div class="customer-info"><strong>Email:</strong> {{ $state['content'][0]['customer_email'] ??
-                        'N/A' }}</div>
-                    <div class="customer-info"><strong>Telefone:</strong> {{ $state['content'][0]['customer_phone'] ??
-                        'N/A' }}</div>
-                </div>
-            </div>
-        </div>
-
-        <table class="items-table">
+        <h2>PRODUTOS E SERVIÇOS</h2>
+        <table>
             <thead>
                 <tr>
-                    <th style="width: 40%;">Descrição</th>
-                    <th style="width: 15%;">Qtd</th>
-                    <th style="width: 20%;">Preço Unit.</th>
-                    <th style="width: 25%;">Total</th>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 30%">Produto</th>
+                    <th style="width: 20%">Opção</th>
+                    <th style="width: 15%">Local</th>
+                    <th style="width: 10%">Quant.</th>
+                    <th style="width: 10%">Preço Un.</th>
+                    <th style="width: 10%">Subtotal</th>
                 </tr>
             </thead>
             <tbody>
                 @php
-                $subtotal = 0;
-                $productList = [];
+                $products = $state['content'][0]['products'] ?? [];
+                $productsList = [];
+                $totalItems = 0;
 
-                // Função recursiva para encontrar todos os produtos na estrutura aninhada
-                function findProducts($array, &$products) {
-                if (!is_array($array)) return;
-
-                // Se este item tem um 'product', é um produto válido
-                if (isset($array['product'])) {
-                $products[] = $array;
-                return;
-                }
-
-                // Caso contrário, procurar recursivamente em todos os elementos
-                foreach ($array as $item) {
-                if (is_array($item)) {
-                findProducts($item, $products);
+                // Extract products from nested structure if needed
+                if (isset($products[0]) && is_array($products[0]) && !isset($products[0]['product'])) {
+                foreach ($products as $productGroup) {
+                if (is_array($productGroup) && isset($productGroup[0])) {
+                foreach ($productGroup as $p) {
+                if (is_array($p) && isset($p['product'])) {
+                $productsList[] = $p;
+                $totalItems++;
                 }
                 }
                 }
-
-                // Buscar produtos na estrutura de conteúdo
-                if (isset($state['content'][0]['products'])) {
-                findProducts($state['content'][0]['products'], $productList);
                 }
-
-                // Calcular subtotal
-                foreach ($productList as $product) {
-                $subtotal += (float)($product['subtotal'] ?? 0);
+                } else {
+                $productsList = $products;
+                $totalItems = count($productsList);
                 }
                 @endphp
 
-                @if(count($productList) > 0)
-                @foreach($productList as $product)
+                @foreach($productsList as $index => $product)
                 @php
-                $productModel = \App\Models\Product::find($product['product']);
-                $productOption = isset($product['product_option']) ?
-                \App\Models\ProductOption::find($product['product_option']) : null;
-                $location = isset($product['location']) ? \App\Models\Location::find($product['location']) : null;
+                $productObj = \App\Models\Product::find($product['product'] ?? 0);
+                $productName = $productObj ? $productObj->name : ($product_name->name ?? 'Produto');
+                $productOption = \App\Models\ProductOption::find($product['product_option'] ?? 0);
+                $location = \App\Models\Location::find($product['location'] ?? 0);
                 @endphp
                 <tr>
-                    <td>
-                        {{ $productModel->name ?? 'Produto' }}
-                        @if($productOption)
-                        <br><small>Opção: {{ $productOption->name }}</small>
-                        @endif
-                        @if($location)
-                        <br><small>Local: {{ $location->name }}</small>
-                        @endif
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $productName }}</td>
+                    <td>{{ $productOption ? $productOption->name : '-' }}</td>
+                    <td>{{ $location ? $location->name : '-' }}</td>
+                    <td>{{ $product['quantity'] ?? 0 }} m³</td>
+                    <td>{{ env('CURRENCY_SUFFIX', 'R$') }} {{ number_format(($product['price'] ?? 0), 2, ',', '.') }}
                     </td>
-                    <td>{{ $product['quantity'] ?? '0' }}m³</td>
-                    <td>{{ env('CURRENCY_SUFFIX').' '.($product['price'] ?? '0') }}</td>
-                    <td>{{ env('CURRENCY_SUFFIX').' '.($product['subtotal'] ?? '0') }}</td>
+                    <td>{{ env('CURRENCY_SUFFIX', 'R$') }} {{ number_format(($product['subtotal'] ?? 0), 2, ',', '.') }}
+                    </td>
                 </tr>
                 @endforeach
-                @else
+
+                @if($totalItems == 0)
                 <tr>
-                    <td colspan="4" style="text-align: center;">Nenhum produto encontrado</td>
+                    <td colspan="7" style="text-align: center;">Nenhum produto encontrado</td>
                 </tr>
                 @endif
-
-                <tr>
-                    <td colspan="4" style="height: 20px; border-bottom: 1px dashed #000;"></td>
-                </tr>
             </tbody>
         </table>
 
         <div class="totals-section">
-            <div class="total-line">
-                <div class="total-label">Subtotal:</div>
-                <div class="total-value">{{ env('CURRENCY_SUFFIX').' '.($subtotal ?? '0') }}</div>
-            </div>
-            <div class="total-line">
-                <div class="total-label">Taxa ({{ $state['content'][0]['tax'] ?? '0' }}%):</div>
-                <div class="total-value">{{ env('CURRENCY_SUFFIX').' '. ($state['content'][0]['tax'] ?? '0') }}</div>
-            </div>
-            <div class="total-line">
-                <div class="total-label">Desconto ({{ $state['content'][0]['discount'] ?? '0' }}%):</div>
-                <div class="total-value">{{ env('CURRENCY_SUFFIX').' '. ($state['content'][0]['discount'] ?? '0') }}
-                </div>
-            </div>
-            <div class="total-line grand-total">
-                <div class="total-label">TOTAL:</div>
-                <div class="total-value">{{ env('CURRENCY_SUFFIX').' '.($state['content'][0]['total'] ?? '0') }}</div>
-            </div>
+            <table class="totals-table">
+                <tr>
+                    <td><strong>Quantidade Total:</strong></td>
+                    <td>{{ $state['content'][0]['quantity'] ?? 0 }} m³</td>
+                </tr>
+                @php
+                $subtotal = 0;
+                foreach($productsList as $product) {
+                $subtotal += floatval($product['subtotal'] ?? 0);
+                }
+                @endphp
+                <tr>
+                    <td><strong>Subtotal:</strong></td>
+                    <td>{{ env('CURRENCY_SUFFIX', 'R$') }} {{ number_format($subtotal, 2, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Taxa Adicional:</strong></td>
+                    <td>{{ env('CURRENCY_SUFFIX', 'R$') }} {{ number_format(($state['content'][0]['tax'] ?? 0), 2, ',',
+                        '.') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Desconto:</strong></td>
+                    <td>-{{ env('CURRENCY_SUFFIX', 'R$') }} {{ number_format(($state['content'][0]['discount'] ?? 0), 2,
+                        ',', '.') }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>TOTAL:</strong></td>
+                    <td>{{ env('CURRENCY_SUFFIX', 'R$') }} {{ number_format(($state['content'][0]['total'] ?? 0), 2,
+                        ',', '.') }}</td>
+                </tr>
+            </table>
         </div>
 
-        <div class="dotted-line"></div>
-
-        <div style="font-size: 7pt; margin-bottom: 10px;">
-            <strong>Forma de Pagamento:</strong> A combinar
+        <div class="note-box">
+            <strong>Observações:</strong>
+            <ol>
+                <li>Este documento é apenas um orçamento e não possui valor fiscal.</li>
+                <li>Orçamento válido por 15 dias a partir da data de emissão.</li>
+                <li>Forma de pagamento a combinar.</li>
+                <li>Prazo de entrega a combinar após a confirmação do pedido.</li>
+            </ol>
         </div>
 
-        <div class="legal-text">
-            Este documento é apenas um orçamento e não possui valor fiscal.<br>
-            Orçamento válido por 15 dias a partir da data de emissão.
+        <div class="signature-section">
+            <div class="signature-box">
+                <div class="signature-line">{{ env('APP_NAME', 'Concrete') }}</div>
+            </div>
+            <div class="signature-box">
+                <div class="signature-line">Cliente</div>
+            </div>
         </div>
 
         <div class="footer">
-            {{ env('APP_NAME') }} • {{ date('d/m/Y') }}<br>
-            www.codhous.app
+            <p>&copy; {{ date('Y') }} {{ env('APP_NAME', 'Concrete') }}. Todos os direitos reservados.</p>
         </div>
     </div>
 </body>
