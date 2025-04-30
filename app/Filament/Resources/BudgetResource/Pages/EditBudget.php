@@ -66,9 +66,10 @@ class EditBudget extends EditRecord
                                     })
                                     ->requiresConfirmation()
                                     ->action(function (Get $get, ?array $state) {
-                                        $mail = new SendBudgetMail($state,
+                                        $mail = new SendBudgetMail(
+                                            $state,
                                             $get('content.customer_email'),
-                                            new BudgetMail()
+                                            new BudgetMail($state)
                                         );
                                         $mail->dispatch();
                                     }),
