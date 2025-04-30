@@ -69,9 +69,13 @@ class PdfGenerator
                 'content_has_0'    => isset($state['content'][0]),
             ]);
 
+            // Buscar o layout
+            $layout = \App\Models\Layout::first();
+
             Pdf::view('pdf.invoice', [
                 'state'        => $state,
                 'product_name' => $productName,
+                'layout'       => $layout,
             ])
                 ->format($this->format)
                 ->save($this->filePath);

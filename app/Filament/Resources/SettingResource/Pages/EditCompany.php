@@ -143,6 +143,11 @@ class EditCompany extends EditRecord
                                         }
                                     })
                             ),
+                        TextInput::make('address.street')
+                            ->maxLength(255)
+                            ->helperText(__('Company Street'))
+                            ->required()
+                            ->label(__('Street')),
                         TextInput::make('address.number')
                             ->maxLength(255)
                             ->helperText(__('Company Street Number (optional)'))
