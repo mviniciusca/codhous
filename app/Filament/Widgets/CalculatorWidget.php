@@ -52,21 +52,44 @@ class CalculatorWidget extends Widget implements HasForms
         $productId = $this->data['content']['product'] ?? null;
         $productOptionId = $this->data['content']['product_option'] ?? null;
         $quantity = floatval($this->data['content']['quantity'] ?? 3);
+        $price = floatval($this->data['content']['price'] ?? 0);
 
+        // Verificar se temos um produto selecionado
         if (! $productId) {
+            $this->dispatch('notify', [
+                'style'   => 'danger',
+                'message' => 'Selecione um produto para adicionar ao carrinho.',
+            ]);
+
+            return;
+        }
+
+        // Verificar se o produto tem variações disponíveis
+        $hasOptions = ProductOption::where('product_id', $productId)->count() > 0;
+
+        // Se o produto tem variações, mas nenhuma foi selecionada
+        if ($hasOptions && ! $productOptionId) {
+            $this->dispatch('notify', [
+                'style'   => 'danger',
+                'message' => 'É necessário selecionar uma variação do produto.',
+            ]);
+
+            return;
+        }
+
+        // Verificar se o preço é maior que zero
+        if ($price <= 0) {
+            $this->dispatch('notify', [
+                'style'   => 'danger',
+                'message' => 'Não é possível adicionar produto com preço R$ 0,00. Verifique a configuração do produto.',
+            ]);
+
             return;
         }
 
         // Obter informações do produto e opção
         $product = Product::find($productId);
         $productOption = $productOptionId ? ProductOption::find($productOptionId) : null;
-
-        $price = 0;
-        if ($productOption) {
-            $price = $productOption->price;
-        } elseif ($product) {
-            $price = $product->price ?? 0;
-        }
 
         // Verificar se este produto+variação já existe no carrinho
         $existingItemIndex = $this->findProductInCart($productId, $productOptionId);
@@ -103,6 +126,12 @@ class CalculatorWidget extends Widget implements HasForms
                 'total'          => 0,
             ],
         ]);
+
+        // Notificar o usuário que o produto foi adicionado com sucesso
+        $this->dispatch('notify', [
+            'style'   => 'success',
+            'message' => 'Produto adicionado ao carrinho!',
+        ]);
     }
 
     public function removeFromCart($index)
@@ -118,6 +147,21 @@ class CalculatorWidget extends Widget implements HasForms
     {
         $this->cart = [];
         $this->cartTotal = 0;
+
+        // Atualizar o campo de total do carrinho na interface
+        $this->dispatch('notify', [
+            'style'   => 'success',
+            'message' => 'Carrinho limpo com sucesso!',
+        ]);
+
+        // Também manter as taxas e descontos, apenas zerar os produtos e o total
+        $this->form->fill([
+            'content' => [
+                'tax'        => $this->data['content']['tax'] ?? 0,
+                'discount'   => $this->data['content']['discount'] ?? 0,
+                'cart_total' => '0.00',
+            ],
+        ]);
     }
 
     private function calculateCartTotal()
@@ -144,7 +188,7 @@ class CalculatorWidget extends Widget implements HasForms
                     ->icon('heroicon-o-calculator')
                     ->columnSpan(1)
                     ->schema([
-                        Grid::make(2)
+                        Grid::make(4) // Alterado para 4 colunas em vez de 2
                             ->schema([
                                 Select::make('content.product')
                                     ->live()
@@ -160,7 +204,7 @@ class CalculatorWidget extends Widget implements HasForms
                                     })
                                     ->required()
                                     ->dehydrated()
-                                    ->columnSpan(1),
+                                    ->columnSpan(2), // Ocupa 2 de 4 colunas
 
                                 Select::make('content.product_option')
                                     ->live()
@@ -199,7 +243,7 @@ class CalculatorWidget extends Widget implements HasForms
                                         }
                                     })
                                     ->dehydrated()
-                                    ->columnSpan(1),
+                                    ->columnSpan(2), // Ocupa 2 de 4 colunas
 
                                 TextInput::make('content.quantity')
                                     ->live(onBlur: true)
@@ -209,23 +253,23 @@ class CalculatorWidget extends Widget implements HasForms
                                     ->minValue(3)
                                     ->default(3)
                                     ->suffix('m³')
-                                    ->helperText(__('Mínimo 3'))
+                                    ->placeholder('3')
                                     ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                         $this->calculateTotal($get, $set);
                                     })
                                     ->numeric()
-                                    ->columnSpan(1),
+                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
 
                                 TextInput::make('content.price')
                                     ->live()
                                     ->disabled()
                                     ->dehydrated()
                                     ->prefix(env('CURRENCY_SUFFIX'))
-                                    ->label(__('Preço Unitário'))
+                                    ->label(__('Preço'))
+                                    ->placeholder('0.00')
                                     ->numeric()
-                                    ->helperText(__('Por m³'))
                                     ->step(0.01)
-                                    ->columnSpan(1),
+                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
 
                                 TextInput::make('content.tax')
                                     ->live(onBlur: true)
@@ -235,13 +279,13 @@ class CalculatorWidget extends Widget implements HasForms
                                     ->numeric()
                                     ->required()
                                     ->default(0)
-                                    ->helperText(__('Taxas adicionais'))
+                                    ->placeholder('0.00')
                                     ->step(0.01)
                                     ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                         $this->calculateTotal($get, $set);
                                         $this->calculateCartTotal();
                                     })
-                                    ->columnSpan(1),
+                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
 
                                 TextInput::make('content.discount')
                                     ->live(onBlur: true)
@@ -250,33 +294,35 @@ class CalculatorWidget extends Widget implements HasForms
                                     ->default(0)
                                     ->prefix('-'.env('CURRENCY_SUFFIX'))
                                     ->label(__('Desconto'))
-                                    ->helperText(__('Aplicar desconto'))
+                                    ->placeholder('0.00')
                                     ->step(0.01)
                                     ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                         $this->calculateTotal($get, $set);
                                         $this->calculateCartTotal();
                                     })
-                                    ->columnSpan(1),
+                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
+
+                                TextInput::make('content.total')
+                                    ->live()
+                                    ->readonly()
+                                    ->numeric()
+                                    ->required()
+                                    ->label(__('Preço Total'))
+                                    ->placeholder('0.00')
+                                    ->prefix(env('CURRENCY_SUFFIX'))
+                                    ->step(0.01)
+                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
+
+                                \Filament\Forms\Components\Actions::make([
+                                    Action::make('addToCart')
+                                        ->label(__('Adicionar ao Carrinho'))
+                                        ->icon('heroicon-m-shopping-cart')
+                                        ->color('primary')
+                                        ->disabled(fn (Get $get): bool => ! $get('content.product'))
+                                        ->action(fn () => $this->addToCart()),
+                                ])
+                                    ->columnSpan(4), // Ocupa toda a linha
                             ]),
-
-                        TextInput::make('content.total')
-                            ->live()
-                            ->readonly()
-                            ->numeric()
-                            ->required()
-                            ->label(__('Preço Total'))
-                            ->helperText(__('Valor total do item'))
-                            ->prefix(env('CURRENCY_SUFFIX'))
-                            ->step(0.01),
-
-                        \Filament\Forms\Components\Actions::make([
-                            Action::make('addToCart')
-                                ->label(__('Adicionar ao Carrinho'))
-                                ->icon('heroicon-m-shopping-cart')
-                                ->color('primary')
-                                ->disabled(fn (Get $get): bool => ! $get('content.product'))
-                                ->action(fn () => $this->addToCart()),
-                        ]),
                     ]),
 
                 Section::make(__('Carrinho'))
@@ -291,6 +337,8 @@ class CalculatorWidget extends Widget implements HasForms
                             ->label(__('Total do Carrinho'))
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->disabled()
+                            ->extraInputAttributes(['style' => 'width: 120px;'])
+                            ->placeholder('0.00')
                             ->afterStateHydrated(function (Get $get, Set $set) {
                                 $set('cart_total', number_format($this->cartTotal, 2, '.', ''));
                             })
