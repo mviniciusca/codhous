@@ -28,7 +28,7 @@
 
 <body class="bg-white text-xs leading-relaxed">
     <!-- Marca d'água -->
-    <div class="watermark">{{ env('APP_NAME','Concrete') }}</div>
+    <div class="watermark">{{ $company->trade_name ?? env('APP_NAME','Concrete') }}</div>
 
     <div class="max-w-[210mm] mx-auto px-6 py-4">
         <!-- Header Section -->
@@ -61,12 +61,14 @@
             <!-- Two Column Layout for Company and Client Info -->
             <div class="mt-4 grid grid-cols-2 gap-6">
                 <div class="space-y-1">
-                    <p class="text-lg font-medium text-gray-900">{{ env('APP_NAME','Concrete') }}</p>
-                    <p class="text-gray-600 leading-tight">Rua Rio de Janeiro, 25</p>
-                    <p class="text-gray-600 leading-tight">Rio de Janeiro, RJ</p>
-                    <p class="text-gray-600 leading-tight">CNPJ: 54.012.200/0001-41</p>
-                    <p class="text-gray-600 leading-tight">(21) 96613-4366</p>
-                    <p class="text-gray-600 leading-tight">sac@codhous.app</p>
+                    <p class="text-lg font-medium text-gray-900">{{ $company->trade_name }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $company->address['street'] }}, {{
+                        $company->address['number'] }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $company->address['neighborhood'] }} - {{
+                        $company->address['city'] }}/{{ $company->address['state'] }}</p>
+                    <p class="text-gray-600 leading-tight">CNPJ: {{ $company->cnpj }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $company->phone }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $company->email }}</p>
                 </div>
                 <div class="space-y-1">
                     <p class="text-gray-900 leading-tight">{{ $state['content'][0]['customer_name'] ?? 'N/A' }}</p>
@@ -161,13 +163,15 @@
                         <li>Este documento é apenas um orçamento e não possui valor fiscal.</li>
                         <li>Orçamento válido por 15 dias a partir da data de emissão.</li>
                         <li>Forma de pagamento a combinar.</li>
-                        <li>Prazo de entrega a combinar após a confirmação do pedido.</li>
+                        @if($company->budget_information)
+                        <li>{{ $company->budget_information }}</li>
+                        @endif
                     </ol>
                 </div>
                 <!-- Signatures -->
                 <div class="mt-6 grid grid-cols-2 gap-12">
                     <div class="text-center">
-                        <div class="border-t border-gray-300 pt-2">{{ env('APP_NAME','Concrete') }}</div>
+                        <div class="border-t border-gray-300 pt-2">{{ $company->trade_name }}</div>
                     </div>
                     <div class="text-center">
                         <div class="border-t border-gray-300 pt-2">Cliente</div>
@@ -203,7 +207,7 @@
 
         <!-- Footer -->
         <div class="mt-6 pt-4 border-t text-xs text-center text-gray-500">
-            &copy; {{ date('Y') }} {{ env('APP_NAME','Concrete') }}. Todos os direitos reservados.
+            &copy; {{ date('Y') }} {{ $company->trade_name }}. Todos os direitos reservados.
         </div>
     </div>
 </body>

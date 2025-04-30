@@ -61,6 +61,11 @@ class PdfGenerator
                 $state['content'] = [$state['content']];
             }
 
+            // Buscar informações da empresa
+            $setting = \App\Models\Setting::with('companySetting', 'layout')->first();
+            $company = $setting->companySetting;
+            $layout = $setting->layout;
+
             // Log para depuração
             Log::info('PDF Generation - State Structure:', [
                 'state'            => json_encode($state),
@@ -69,13 +74,11 @@ class PdfGenerator
                 'content_has_0'    => isset($state['content'][0]),
             ]);
 
-            // Buscar o layout
-            $layout = \App\Models\Layout::first();
-
             Pdf::view('pdf.invoice', [
                 'state'        => $state,
                 'product_name' => $productName,
                 'layout'       => $layout,
+                'company'      => $company,
             ])
                 ->format($this->format)
                 ->save($this->filePath);
