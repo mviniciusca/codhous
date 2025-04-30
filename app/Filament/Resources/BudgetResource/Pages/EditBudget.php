@@ -129,234 +129,335 @@ class EditBudget extends EditRecord
                                     ->helperText(__('When this budget was created')),
                             ]),
                     ]),
-                Section::make('Customer Information')
-                    ->description(__('This section contains information about the customer.'))
-                    ->icon('heroicon-o-user')
-                    ->collapsible()
-                    ->columns(3)
-                    ->schema([
-                        Group::make()
-                            ->columns(3)
-                            ->columnSpanFull()
+                \Filament\Forms\Components\Tabs::make('budget_tabs')
+                    ->tabs([
+                        \Filament\Forms\Components\Tabs\Tab::make('customer_information')
+                            ->label(__('Customer Information'))
+                            ->icon('heroicon-o-user')
                             ->schema([
-                                TextInput::make('content.customer_name')
-                                    ->dehydrated()
-                                    ->required()
-                                    ->prefixIcon('heroicon-o-user')
-                                    ->helperText(__('Customer name'))
-                                    ->default('Admin')
-                                    ->label(__('Customer Name')),
-                                TextInput::make('content.customer_email')
-                                    ->dehydrated()
-                                    ->email()
-                                    ->required()
-                                    ->prefixIcon('heroicon-o-envelope')
-                                    ->helperText(__('Customer email address'))
-                                    ->label(__('Email')),
-                                TextInput::make('content.customer_phone')
-                                    ->required()
-                                    ->helperText(__('Phone Number'))
-                                    ->prefixIcon('heroicon-o-phone')
-                                    ->tel()
-                                    ->mask('(99)99999-9999')
-                                    ->placeholder(_('(--) ---- ----'))
-                                    ->helperText(__('Customer phone number'))
-                                    ->label(__('Phone')),
+                                Group::make()
+                                    ->columns(3)
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        TextInput::make('content.customer_name')
+                                            ->dehydrated()
+                                            ->required()
+                                            ->prefixIcon('heroicon-o-user')
+                                            ->helperText(__('Customer name'))
+                                            ->default('Admin')
+                                            ->label(__('Customer Name')),
+                                        TextInput::make('content.customer_email')
+                                            ->dehydrated()
+                                            ->email()
+                                            ->required()
+                                            ->prefixIcon('heroicon-o-envelope')
+                                            ->helperText(__('Customer email address'))
+                                            ->label(__('Email')),
+                                        TextInput::make('content.customer_phone')
+                                            ->required()
+                                            ->helperText(__('Phone Number'))
+                                            ->prefixIcon('heroicon-o-phone')
+                                            ->tel()
+                                            ->mask('(99)99999-9999')
+                                            ->placeholder(_('(--) ---- ----'))
+                                            ->helperText(__('Customer phone number'))
+                                            ->label(__('Phone')),
+                                    ]),
+                                Group::make()
+                                    ->columns(3)
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        TextInput::make('content.postcode')
+                                            ->required()
+                                            ->minLength(9)
+                                            ->mask('99999-999')
+                                            ->prefixIcon('heroicon-o-map-pin')
+                                            ->placeholder('----- ---')
+                                            ->helperText(__('Customer postcode'))
+                                            ->maxLength(9)
+                                            ->suffixAction(
+                                                fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                                    ->icon('heroicon-o-magnifying-glass')
+                                                    ->action(function () use ($state, $livewire, $set) {
+                                                        $livewire->validateOnly('data.content.postcode');
+                                                        $postcode = new PostcodeFinder($state, $set);
+                                                        $postcode->find();
+                                                    })
+                                            )
+                                            ->label(__('CEP')),
+                                        TextInput::make('content.street')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->required()
+                                            ->prefixIcon('heroicon-o-map-pin')
+                                            ->helperText(__('Customer street.'))
+                                            ->label(__('Street')),
+                                        TextInput::make('content.number')
+                                            ->dehydrated()
+                                            ->prefixIcon('heroicon-o-map-pin')
+                                            ->helperText(__('Customer street number. Optional'))
+                                            ->label(__('Number')),
+                                        TextInput::make('content.city')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->prefixIcon('heroicon-o-map-pin')
+                                            ->helperText(__('Customer city.'))
+                                            ->label(__('City')),
+                                        TextInput::make('content.neighborhood')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->prefixIcon('heroicon-o-map-pin')
+                                            ->helperText(__('Customer neighborhood.'))
+                                            ->label(__('Neighborhood')),
+                                        TextInput::make('content.state')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->prefixIcon('heroicon-o-map-pin')
+                                            ->helperText(__('Customer UF.'))
+                                            ->label(__('State')),
+                                    ]),
                             ]),
-                        TextInput::make('content.postcode')
-                            ->required()
-                            ->minLength(9)
-                            ->mask('99999-999')
-                            ->prefixIcon('heroicon-o-map-pin')
-                            ->placeholder('----- ---')
-                            ->helperText(__('Customer postcode'))
-                            ->maxLength(9)
-                            ->suffixAction(
-                                fn ($state, Set $set, $livewire) => Action::make('search-action')
-                                    ->icon('heroicon-o-magnifying-glass')
-                                    ->action(function () use ($state, $livewire, $set) {
-                                        $livewire->validateOnly('data.content.postcode');
-                                        $postcode = new PostcodeFinder($state, $set);
-                                        $postcode->find();
-                                    })
-                            )
-                            ->label(__('CEP')),
-                        TextInput::make('content.street')
-                            ->disabled()
-                            ->dehydrated()
-                            ->required()
-                            ->prefixIcon('heroicon-o-map-pin')
-                            ->helperText(__('Customer street.'))
-                            ->label(__('Street')),
-                        TextInput::make('content.number')
-                            ->dehydrated()
-                            ->prefixIcon('heroicon-o-map-pin')
-                            ->helperText(__('Customer street number. Optional'))
-                            ->label(__('Number')),
-                        TextInput::make('content.city')
-                            ->disabled()
-                            ->dehydrated()
-                            ->prefixIcon('heroicon-o-map-pin')
-                            ->helperText(__('Customer city.'))
-                            ->label(__('City')),
-                        TextInput::make('content.neighborhood')
-                            ->disabled()
-                            ->dehydrated()
-                            ->prefixIcon('heroicon-o-map-pin')
-                            ->helperText(__('Customer neighborhood.'))
-                            ->label(__('Neighborhood')),
-                        TextInput::make('content.state')
-                            ->disabled()
-                            ->dehydrated()
-                            ->prefixIcon('heroicon-o-map-pin')
-                            ->helperText(__('Customer UF.'))
-                            ->label(__('State')),
 
-                    ]),
-                Section::make('Budget Content')
-                    ->description(__('Here is the content from your budget'))
-                    ->icon('heroicon-o-shopping-bag')
-                    ->schema([
-                        \Filament\Forms\Components\Repeater::make('content.products')
-                            ->label(__('Product List'))
+                        \Filament\Forms\Components\Tabs\Tab::make('budget_content')
+                            ->label(__('Budget Content'))
+                            ->icon('heroicon-o-shopping-bag')
                             ->schema([
-                                TextInput::make('quantity')
-                                    ->live(true)
-                                    ->integer()
-                                    ->required()
-                                    ->minValue(3)
-                                    ->label(__('Quantity'))
-                                    ->suffix(__('m³'))
-                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        self::calculateTotal($get, $set);
-                                    }),
-                                Select::make('location')
-                                    ->dehydrated()
-                                    ->required()
-                                    ->columnSpan(2)
-                                    ->label(__('Local / Area'))
-                                    ->helperText(__('Local or area to be concreted'))
-                                    ->searchable()
-                                    ->prefixIcon('heroicon-o-map-pin')
-                                    ->options(Location::all()
-                                        ->pluck('name', 'id')),
-                                Select::make('product')
-                                    ->live()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->columnSpan(2)
-                                    ->searchable()
-                                    ->prefixIcon('heroicon-o-shopping-cart')
-                                    ->label(__('Product'))
-                                    ->helperText(__('Product selected'))
-                                    ->options(Product::all()->pluck('name', 'id'))
+                                \Filament\Forms\Components\Repeater::make('content.products')
+                                    ->label(__('Product List'))
+                                    ->schema([
+                                        TextInput::make('quantity')
+                                            ->live(true)
+                                            ->integer()
+                                            ->required()
+                                            ->minValue(3)
+                                            ->label(__('Quantity'))
+                                            ->suffix(__('m³'))
+                                            ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                            ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                                self::calculateTotal($get, $set);
+                                            }),
+                                        Select::make('location')
+                                            ->dehydrated()
+                                            ->required()
+                                            ->columnSpan(2)
+                                            ->label(__('Local / Area'))
+                                            ->helperText(__('Local or area to be concreted'))
+                                            ->searchable()
+                                            ->prefixIcon('heroicon-o-map-pin')
+                                            ->options(Location::all()
+                                                ->pluck('name', 'id')),
+                                        Select::make('product')
+                                            ->live()
+                                            ->dehydrated()
+                                            ->required()
+                                            ->columnSpan(2)
+                                            ->searchable()
+                                            ->prefixIcon('heroicon-o-shopping-cart')
+                                            ->label(__('Product'))
+                                            ->helperText(__('Product selected'))
+                                            ->options(Product::all()->pluck('name', 'id'))
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                $set('product_option', null);
+                                                $set('price', null);
+                                            }),
+                                        Select::make('product_option')
+                                            ->live()
+                                            ->dehydrated()
+                                            ->searchable()
+                                            ->prefixIcon('heroicon-o-shopping-bag')
+                                            ->columnSpan(2)
+                                            ->label(__('Option'))
+                                            ->helperText(__('Option selected'))
+                                            ->options(fn (Get $get): Collection => self::getOptions($get))
+                                            ->required(fn (Get $get): bool => self::getOptions($get)->count() > 0)
+                                            ->hidden(fn (Get $get): bool => self::getOptions($get)->count() == 0)
+                                            ->afterStateUpdated(fn (Get $get, Set $set, $state) => self::updatePrice($get, $set, $state)),
+                                        TextInput::make('price')
+                                            ->live(onBlur: true)
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                                self::getPrice($get, $set);
+                                            })
+                                            ->prefix(env('CURRENCY_SUFFIX'))
+                                            ->label(__('Price per Unity'))
+                                            ->required(),
+                                        TextInput::make('subtotal')
+                                            ->live()
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->prefix(env('CURRENCY_SUFFIX'))
+                                            ->label(__('Subtotal'))
+                                            ->helperText(__('Product quantity x price'))
+                                            ->afterStateHydrated(fn (Get $get, Set $set) => self::calculateItemSubtotal($get, $set)),
+                                    ])
+                                    ->columns(4)
+                                    ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null
+                                    )
+                                    ->addActionLabel(__('Add Product'))
+                                    ->collapsible()
                                     ->afterStateUpdated(function (Get $get, Set $set) {
-                                        $set('product_option', null);
-                                        $set('price', null);
-                                    }),
-                                Select::make('product_option')
-                                    ->live()
-                                    ->dehydrated()
-                                    ->searchable()
-                                    ->prefixIcon('heroicon-o-shopping-bag')
-                                    ->columnSpan(2)
-                                    ->label(__('Option'))
-                                    ->helperText(__('Option selected'))
-                                    ->options(fn (Get $get): Collection => self::getOptions($get))
-                                    ->required(fn (Get $get): bool => self::getOptions($get)->count() > 0)
-                                    ->hidden(fn (Get $get): bool => self::getOptions($get)->count() == 0)
-                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => self::updatePrice($get, $set, $state)),
-                                TextInput::make('price')
-                                    ->live(onBlur: true)
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
-                                    ->afterStateHydrated(function (Get $get, Set $set) {
-                                        self::getPrice($get, $set);
+                                        self::calculateTotal($get, $set);
                                     })
-                                    ->prefix(env('CURRENCY_SUFFIX'))
-                                    ->label(__('Price per Unity'))
-                                    ->required(),
-                                TextInput::make('subtotal')
-                                    ->live()
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->prefix(env('CURRENCY_SUFFIX'))
-                                    ->label(__('Subtotal'))
-                                    ->helperText(__('Product quantity x price'))
-                                    ->afterStateHydrated(fn (Get $get, Set $set) => self::calculateItemSubtotal($get, $set)),
-                            ])
-                            ->columns(4)
-                            ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null
-                            )
-                            ->addActionLabel(__('Add Product'))
-                            ->collapsible()
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                self::calculateTotal($get, $set);
-                            })
-                            ->reorderable()
-                            ->defaultItems(1)
-                            ->columnSpanFull(),
-                    ]),
-                Section::make(__('Pricing'))
-                    ->icon('heroicon-o-currency-dollar')
-                    ->description(__('Pricing Definition & Total Cost'))
-                    ->collapsible()
-                    ->columns(5)
-                    ->schema([
-                        TextInput::make('content.quantity')
-                            ->live(onBlur: true)
-                            ->disabled()
-                            ->dehydrated()
-                            ->readonly()
-                            ->required()
-                            ->suffix('m³')
-                            ->label(__('Total Quantity'))
-                            ->helperText(__('Total quantity for all products'))
-                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                self::calculateTotal($get, $set);
-                            }),
-                        TextInput::make('content.tax')
-                            ->live(onBlur: true)
-                            ->dehydrated()
-                            ->prefix('+'.env('CURRENCY_SUFFIX'))
-                            ->numeric()
-                            ->required()
-                            ->default(0)
-                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
-                            ->step(0.01)
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                self::calculateTotal($get, $set);
-                            }),
-                        TextInput::make('content.discount')
-                            ->live(onBlur: true)
-                            ->dehydrated()
-                            ->numeric()
-                            ->required()
-                            ->default(0)
-                            ->prefix('-'.env('CURRENCY_SUFFIX'))
-                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
-                            ->step(0.01)
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                self::calculateTotal($get, $set);
-                            }),
-                        TextInput::make('content.total')
-                            ->disabled()
-                            ->dehydrated()
-                            ->required()
-                            ->prefix(env('CURRENCY_SUFFIX'))
-                            ->label(__('Total Price'))
-                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
-                            ->suffixAction(function () {
-                                return Action::make('calculator')
-                                    ->icon('heroicon-o-calculator')
-                                    ->color('gray')
-                                    ->disabled()
-                                    ->visible(true)
-                                    ->action(fn () => self::generateCode($this->data));
-                            }),
-                    ]),
+                                    ->reorderable()
+                                    ->defaultItems(1)
+                                    ->columnSpanFull(),
+                            ]),
+
+                        \Filament\Forms\Components\Tabs\Tab::make('pricing')
+                            ->label(__('Pricing'))
+                            ->icon('heroicon-o-currency-dollar')
+                            ->schema([
+                                Group::make()
+                                    ->columns(5)
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        TextInput::make('content.quantity')
+                                            ->live(onBlur: true)
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->readonly()
+                                            ->required()
+                                            ->suffix('m³')
+                                            ->label(__('Total Quantity'))
+                                            ->helperText(__('Total quantity for all products'))
+                                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                                self::calculateTotal($get, $set);
+                                            }),
+                                        TextInput::make('content.tax')
+                                            ->live(onBlur: true)
+                                            ->dehydrated()
+                                            ->prefix('+'.env('CURRENCY_SUFFIX'))
+                                            ->numeric()
+                                            ->required()
+                                            ->default(0)
+                                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
+                                            ->step(0.01)
+                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                                self::calculateTotal($get, $set);
+                                            }),
+                                        TextInput::make('content.discount')
+                                            ->live(onBlur: true)
+                                            ->dehydrated()
+                                            ->numeric()
+                                            ->required()
+                                            ->default(0)
+                                            ->prefix('-'.env('CURRENCY_SUFFIX'))
+                                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
+                                            ->step(0.01)
+                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                                self::calculateTotal($get, $set);
+                                            }),
+                                        TextInput::make('content.total')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->required()
+                                            ->prefix(env('CURRENCY_SUFFIX'))
+                                            ->label(__('Total Price'))
+                                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
+                                            ->suffixAction(function () {
+                                                return Action::make('calculator')
+                                                    ->icon('heroicon-o-calculator')
+                                                    ->color('gray')
+                                                    ->disabled()
+                                                    ->visible(true)
+                                                    ->action(fn () => self::generateCode($this->data));
+                                            }),
+                                    ]),
+                            ]),
+
+                        \Filament\Forms\Components\Tabs\Tab::make('resume')
+                            ->label(__('Resume'))
+                            ->icon('heroicon-o-document-text')
+                            ->schema([
+                                Section::make(__('Budget Summary'))
+                                    ->description(__('Detailed view of all ordered products'))
+                                    ->schema([
+                                        \Filament\Forms\Components\Placeholder::make('customer_info')
+                                            ->label(__('Customer Information'))
+                                            ->content(fn (Get $get): string => __('Name: ').$get('content.customer_name').'<br>'.
+                                                __('Email: ').$get('content.customer_email').'<br>'.
+                                                __('Phone: ').$get('content.customer_phone').'<br>'.
+                                                __('Address: ').$get('content.street').', '.$get('content.number').' - '.
+                                                $get('content.neighborhood').', '.$get('content.city').'/'.$get('content.state')
+                                            )
+                                            ->extraAttributes(['class' => 'prose max-w-none'])
+                                            ->columnSpanFull(),
+
+                                        \Filament\Forms\Components\Placeholder::make('order_details')
+                                            ->label(__('Order Details'))
+                                            ->content(function (Get $get): string {
+                                                $products = $get('content.products') ?? [];
+                                                $html = '<table class="min-w-full border border-gray-300">
+                                                    <thead class="bg-gray-100">
+                                                        <tr>
+                                                            <th class="px-4 py-2 border">'.__('Product').'</th>
+                                                            <th class="px-4 py-2 border">'.__('Option').'</th>
+                                                            <th class="px-4 py-2 border">'.__('Location').'</th>
+                                                            <th class="px-4 py-2 border">'.__('Quantity').'</th>
+                                                            <th class="px-4 py-2 border">'.__('Unit Price').'</th>
+                                                            <th class="px-4 py-2 border">'.__('Subtotal').'</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>';
+
+                                                if (empty($products)) {
+                                                    $html .= '<tr><td colspan="6" class="px-4 py-2 border text-center">'.__('No products added').'</td></tr>';
+                                                } else {
+                                                    foreach ($products as $product) {
+                                                        $productName = isset($product['product']) ? Product::find($product['product'])?->name : '-';
+                                                        $optionName = isset($product['product_option']) ? ProductOption::find($product['product_option'])?->name : '-';
+                                                        $locationName = isset($product['location']) ? Location::find($product['location'])?->name : '-';
+
+                                                        $html .= '<tr>
+                                                            <td class="px-4 py-2 border">'.$productName.'</td>
+                                                            <td class="px-4 py-2 border">'.$optionName.'</td>
+                                                            <td class="px-4 py-2 border">'.$locationName.'</td>
+                                                            <td class="px-4 py-2 border text-right">'.($product['quantity'] ?? '-').' m³</td>
+                                                            <td class="px-4 py-2 border text-right">'.env('CURRENCY_SUFFIX').' '.number_format(($product['price'] ?? 0), 2, ',', '.').'</td>
+                                                            <td class="px-4 py-2 border text-right">'.env('CURRENCY_SUFFIX').' '.number_format(($product['subtotal'] ?? 0), 2, ',', '.').'</td>
+                                                        </tr>';
+                                                    }
+                                                }
+
+                                                $totalQuantity = $get('content.quantity') ?? 0;
+                                                $tax = $get('content.tax') ?? 0;
+                                                $discount = $get('content.discount') ?? 0;
+                                                $total = $get('content.total') ?? 0;
+
+                                                $html .= '</tbody>
+                                                    <tfoot>
+                                                        <tr class="bg-gray-50">
+                                                            <td colspan="3" class="px-4 py-2 border text-right font-bold">'.__('Total Quantity:').'</td>
+                                                            <td class="px-4 py-2 border text-right">'.$totalQuantity.' m³</td>
+                                                            <td class="px-4 py-2 border text-right font-bold">'.__('Subtotal:').'</td>
+                                                            <td class="px-4 py-2 border text-right">'.env('CURRENCY_SUFFIX').' '.number_format(floatval($total) - floatval($tax) + floatval($discount), 2, ',', '.').'</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5" class="px-4 py-2 border text-right font-bold">'.__('Tax:').'</td>
+                                                            <td class="px-4 py-2 border text-right">'.env('CURRENCY_SUFFIX').' '.number_format(floatval($tax), 2, ',', '.').'</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5" class="px-4 py-2 border text-right font-bold">'.__('Discount:').'</td>
+                                                            <td class="px-4 py-2 border text-right">- '.env('CURRENCY_SUFFIX').' '.number_format(floatval($discount), 2, ',', '.').'</td>
+                                                        </tr>
+                                                        <tr class="bg-gray-100">
+                                                            <td colspan="5" class="px-4 py-2 border text-right font-bold">'.__('Total:').'</td>
+                                                            <td class="px-4 py-2 border text-right font-bold">'.env('CURRENCY_SUFFIX').' '.number_format(floatval($total), 2, ',', '.').'</td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>';
+
+                                                return $html;
+                                            })
+                                            ->extraAttributes(['class' => 'prose max-w-none'])
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
