@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Budget;
 use App\Models\Product;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Spatie\LaravelPdf\Facades\Pdf;
 
@@ -60,7 +61,7 @@ class PdfGenerator
             }
 
             // Log para depuração
-            \Log::info('PDF Generation - State Structure:', [
+            Log::info('PDF Generation - State Structure:', [
                 'state'            => json_encode($state),
                 'content_exists'   => isset($state['content']),
                 'content_is_array' => isset($state['content']) ? is_array($state['content']) : false,
@@ -94,8 +95,8 @@ class PdfGenerator
 
             return $this->downloadPdf();
         } catch (\Exception $e) {
-            \Log::error('PDF Generation Error: '.$e->getMessage());
-            \Log::error('PDF Generation Error Stack: '.$e->getTraceAsString());
+            Log::error('PDF Generation Error: '.$e->getMessage());
+            Log::error('PDF Generation Error Stack: '.$e->getTraceAsString());
 
             Notification::make()
                 ->title(__('Error generating PDF: ').$e->getMessage())
@@ -271,7 +272,7 @@ class PdfGenerator
                     ->first();
             }
         } catch (\Exception $e) {
-            \Log::error('Error getting product name: '.$e->getMessage());
+            Log::error('Error getting product name: '.$e->getMessage());
 
             // Falhar silenciosamente se a estrutura não for como esperado
             return null;
