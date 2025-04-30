@@ -51,6 +51,16 @@ class BudgetPdfController extends Controller
             // Get the budget for context
             $budget = $pdf->budget;
 
+            // Record the download activity
+            activity()
+                ->performedOn($budget)
+                ->withProperties([
+                    'token'          => $token,
+                    'download_count' => $pdf->download_count,
+                    'filename'       => $pdf->filename,
+                ])
+                ->log('Downloaded PDF document for budget #'.$budget->code);
+
             Log::info('PDF download successful', [
                 'token'          => $token,
                 'budget_id'      => $pdf->budget_id,

@@ -7,6 +7,7 @@ use App\Models\BudgetPdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Models\Activity;
 
 class BudgetPdfService
 {
@@ -101,6 +102,16 @@ class BudgetPdfService
 
             // Generate a download token
             $budgetPdf->generateDownloadToken();
+
+            // Record the activity
+            activity()
+                ->performedOn($budget)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'filename' => $filename,
+                    'path'     => $relativePath,
+                ])
+                ->log('Generated PDF document for budget #'.$budget->code);
 
             return $budgetPdf;
         } catch (\Exception $e) {

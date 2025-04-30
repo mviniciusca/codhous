@@ -10,10 +10,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Spatie\Activitylog\Models\Activity;
 
 class BudgetHistoryRelationManager extends RelationManager
 {
-    protected static string $relationship = 'budgetHistory';
+    protected static string $relationship = 'activities';
 
     public function table(Table $table): Table
     {
@@ -21,26 +22,24 @@ class BudgetHistoryRelationManager extends RelationManager
             ->heading(__('Activity History'))
             ->description(__('Latest registers of activity in this document'))
             ->defaultSort('created_at', 'desc')
-            ->recordTitleAttribute('id')
             ->columns([
-                TextColumn::make('user.name')
-                    ->label(__('Agent Name')),
-                TextColumn::make('action')
-                    ->label(__('Action'))
-                    ->badge()
-                    ->color(function ($state) {
-                        return match ($state) {
-                            'update' => 'primary',
-                            'create' => 'success',
-                            'delete' => 'danger',
-                            default  => 'primary',
-                        };
-                    }),
+                TextColumn::make('causer.name')
+                    ->label(__('Agent Name'))
+                    ->default('System'),
+
+                TextColumn::make('description')
+                    ->label(__('Action')),
+
                 TextColumn::make('created_at')
                     ->label(__('When'))
                     ->alignEnd()
-                    ->date('d/m/Y H:i'),
+                    ->dateTime('d/m/Y H:i'),
 
+                TextColumn::make('properties')
+                    ->label(__('Details'))
+                    ->listWithLineBreaks()
+                    ->visible(fn ($record): bool => ! empty($record->properties))
+                    ->color('gray'),
             ]);
     }
 }

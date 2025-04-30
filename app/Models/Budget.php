@@ -2,22 +2,20 @@
 
 namespace App\Models;
 
-use App\Models\BudgetHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Budget extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $guarded = [];
 
-    /**
-     * Cast
-     * @return array
-     */
     protected function casts(): array
     {
         return [
@@ -25,15 +23,19 @@ class Budget extends Model
         ];
     }
 
-    public function budgetHistory()
+    public function getActivitylogOptions(): LogOptions
     {
-        return $this->hasOne(BudgetHistory::class);
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 
-    /**
-     * Products relationship
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
+    public function activities()
+    {
+        return $this->morphMany(\Spatie\Activitylog\Models\Activity::class, 'subject');
+    }
+
     public function products()
     {
         return $this->belongsToMany(Product::class, 'budget_product')
@@ -41,21 +43,11 @@ class Budget extends Model
             ->withTimestamps();
     }
 
-    /**
-     * Get the PDF files associated with the budget
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function pdfs()
     {
         return $this->hasMany(BudgetPdf::class);
     }
 
-    /**
-     * Get the latest PDF file for this budget
-     *
-     * @return BudgetPdf|null
-     */
     public function latestPdf()
     {
         return $this->pdfs()->latest()->first();
