@@ -54,7 +54,7 @@ class CalculatorWidget extends Widget implements HasForms
         $quantity = floatval($this->data['content']['quantity'] ?? 3);
         $price = floatval($this->data['content']['price'] ?? 0);
 
-        // Verificar se temos um produto selecionado
+        // Check if we have a selected product
         if (! $productId) {
             $this->dispatch('notify', [
                 'style'   => 'danger',
@@ -64,10 +64,10 @@ class CalculatorWidget extends Widget implements HasForms
             return;
         }
 
-        // Verificar se o produto tem variações disponíveis
+        // Check if the product has available variations
         $hasOptions = ProductOption::where('product_id', $productId)->count() > 0;
 
-        // Se o produto tem variações, mas nenhuma foi selecionada
+        // If the product has variations, but none was selected
         if ($hasOptions && ! $productOptionId) {
             $this->dispatch('notify', [
                 'style'   => 'danger',
@@ -77,7 +77,7 @@ class CalculatorWidget extends Widget implements HasForms
             return;
         }
 
-        // Verificar se o preço é maior que zero
+        // Check if the price is greater than zero
         if ($price <= 0) {
             $this->dispatch('notify', [
                 'style'   => 'danger',
@@ -87,19 +87,19 @@ class CalculatorWidget extends Widget implements HasForms
             return;
         }
 
-        // Obter informações do produto e opção
+        // Get product and option information
         $product = Product::find($productId);
         $productOption = $productOptionId ? ProductOption::find($productOptionId) : null;
 
-        // Verificar se este produto+variação já existe no carrinho
+        // Check if this product+variation already exists in the cart
         $existingItemIndex = $this->findProductInCart($productId, $productOptionId);
 
         if ($existingItemIndex !== false) {
-            // Se já existe, apenas incrementa a quantidade e recalcula o subtotal
+            // If it already exists, just increment the quantity and recalculate the subtotal
             $this->cart[$existingItemIndex]['quantity'] += $quantity;
             $this->cart[$existingItemIndex]['subtotal'] = $this->cart[$existingItemIndex]['quantity'] * $this->cart[$existingItemIndex]['price'];
         } else {
-            // Se não existe, adiciona como novo item
+            // If it doesn't exist, add as a new item
             $this->cart[] = [
                 'product_id'          => $productId,
                 'product_name'        => $product ? $product->name : 'Produto',
@@ -111,10 +111,10 @@ class CalculatorWidget extends Widget implements HasForms
             ];
         }
 
-        // Recalcular o total do carrinho
+        // Recalculate the cart total
         $this->calculateCartTotal();
 
-        // Limpar o formulário para um novo produto
+        // Clear the form for a new product
         $this->form->fill([
             'content' => [
                 'product'        => null,
@@ -127,7 +127,7 @@ class CalculatorWidget extends Widget implements HasForms
             ],
         ]);
 
-        // Notificar o usuário que o produto foi adicionado com sucesso
+        // Notify the user that the product was successfully added
         $this->dispatch('notify', [
             'style'   => 'success',
             'message' => 'Produto adicionado ao carrinho!',
@@ -138,7 +138,7 @@ class CalculatorWidget extends Widget implements HasForms
     {
         if (isset($this->cart[$index])) {
             unset($this->cart[$index]);
-            $this->cart = array_values($this->cart); // Reindexar o array
+            $this->cart = array_values($this->cart); // Reindex the array
             $this->calculateCartTotal();
         }
     }
@@ -148,13 +148,13 @@ class CalculatorWidget extends Widget implements HasForms
         $this->cart = [];
         $this->cartTotal = 0;
 
-        // Atualizar o campo de total do carrinho na interface
+        // Update the cart total field in the interface
         $this->dispatch('notify', [
             'style'   => 'success',
             'message' => 'Carrinho limpo com sucesso!',
         ]);
 
-        // Também manter as taxas e descontos, apenas zerar os produtos e o total
+        // Also keep taxes and discounts, just reset products and total
         $this->form->fill([
             'content' => [
                 'tax'        => $this->data['content']['tax'] ?? 0,
@@ -171,12 +171,12 @@ class CalculatorWidget extends Widget implements HasForms
             $this->cartTotal += floatval($item['subtotal']);
         }
 
-        // Aplicar impostos e descontos
+        // Apply taxes and discounts
         $tax = floatval($this->data['content']['tax'] ?? 0);
         $discount = floatval($this->data['content']['discount'] ?? 0);
 
         $this->cartTotal = $this->cartTotal + $tax - $discount;
-        $this->cartTotal = max(0, $this->cartTotal); // Garantir que não seja negativo
+        $this->cartTotal = max(0, $this->cartTotal); // Ensure it's not negative
     }
 
     public function form(Form $form): Form
@@ -188,7 +188,7 @@ class CalculatorWidget extends Widget implements HasForms
                 ->columnSpanFull()
                 ->schema([
                     Grid::make(2)->schema([
-                        // Grupo da Calculadora (Esquerda)
+                        // Calculator Group (Left)
                         Section::make(__('Calculadora'))
                             ->icon('heroicon-o-calculator')
                             ->collapsible()
@@ -205,7 +205,7 @@ class CalculatorWidget extends Widget implements HasForms
                                                 $this->updatePrice($get, $set, $state);
                                             })
                                             ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                                $set('content.product_option', null); // Reset da opção ao mudar o produto
+                                                $set('content.product_option', null); // Reset option when changing product
                                                 $this->updatePrice($get, $set, $state);
                                             })
                                             ->required()
@@ -331,7 +331,7 @@ class CalculatorWidget extends Widget implements HasForms
                                     ]),
                             ]),
 
-                        // Grupo do Orçamento (Direita) - Nome alterado de "Carrinho de Compras" para "Itens do Orçamento"
+                        // Budget Group (Right) - Name changed from "Shopping Cart" to "Budget Items"
                         Section::make(__('Itens do Orçamento'))
                             ->icon('heroicon-o-document-text')
                             ->collapsible()
@@ -364,15 +364,15 @@ class CalculatorWidget extends Widget implements HasForms
                                         ->icon('heroicon-m-document-text')
                                         ->color('success')
                                         ->url(function () {
-                                            // Verificar se há produtos no carrinho
+                                            // Check if there are products in the cart
                                             if (empty($this->cart)) {
                                                 return route('filament.admin.resources.budgets.create');
                                             }
 
-                                            // Transformar o carrinho em um formato compatível com o orçamento
+                                            // Transform the cart into a format compatible with the budget
                                             $productsJson = json_encode($this->cart);
 
-                                            // Gerar URL com os produtos do carrinho como parâmetros e indicação para abrir a aba Shopping Bag
+                                            // Generate URL with cart products as parameters and indication to open the Shopping Bag tab
                                             return route('filament.admin.resources.budgets.create', [
                                                 'activeTab' => 'shopping_bag',
                                                 'products'  => base64_encode($productsJson),
@@ -393,13 +393,13 @@ class CalculatorWidget extends Widget implements HasForms
             $productOptionId = $get('content.product_option');
 
             if ($productOptionId) {
-                // Se tiver uma opção de produto selecionada, usa o preço da opção
+                // If a product option is selected, use the option price
                 $price = ProductOption::find($productOptionId)->price ?? 0;
             } else {
-                // Se não tiver opção, tenta pegar o preço da primeira opção
+                // If no option, try to get the price of the first option
                 $price = ProductOption::where('product_id', $productId)->value('price');
 
-                // Se não tiver opções, tenta pegar o preço diretamente do produto
+                // If there are no options, try to get the price directly from the product
                 if ($price === null) {
                     $product = Product::find($productId);
                     $price = $product ? $product->price : 0;
@@ -420,23 +420,23 @@ class CalculatorWidget extends Widget implements HasForms
         $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
 
-        // Garantindo que os valores não sejam negativos
+        // Ensuring values are not negative
         $quantity = max(3, $quantity);
         $tax = max(0, $tax);
         $discount = max(0, $discount);
 
         $total = ($quantity * $price) + $tax - $discount;
-        $total = max(0, $total); // Garantindo que o total não seja negativo
+        $total = max(0, $total); // Ensuring the total is not negative
 
         $set('content.total', number_format($total, 2, '.', ''));
     }
 
     /**
-     * Encontra um produto+variação no carrinho e retorna seu índice
+     * Finds a product+variation in the cart and returns its index
      *
-     * @param int $productId ID do produto
-     * @param int|null $productOptionId ID da variação do produto
-     * @return int|false Índice do item no carrinho ou false se não encontrado
+     * @param int $productId Product ID
+     * @param int|null $productOptionId Product variation ID
+     * @return int|false Index of the item in the cart or false if not found
      */
     private function findProductInCart($productId, $productOptionId)
     {

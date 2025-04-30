@@ -22,44 +22,44 @@ class StatsWidget extends BaseWidget
 
     protected static bool $isLazy = false;
 
-    // Define o número de colunas como um array com configurações específicas para cada tamanho de tela
+    // Define the number of columns as an array with specific configurations for each screen size
     protected int|string|array $columns = [
-        'default' => 1, // Em telas muito pequenas, exibe 1 card por linha
-        'sm'      => 1,      // Em telas pequenas, exibe 1 card por linha
-        'md'      => 2,      // Em telas médias, exibe 2 cards por linha (4 por linha no total)
-        'lg'      => 2,      // Em telas grandes, exibe 2 cards por linha
-        'xl'      => 2,      // Em telas extra grandes, exibe 2 cards por linha
-        '2xl'     => 2,     // Em telas 2xl, exibe 2 cards por linha
+        'default' => 1, // On very small screens, display 1 card per row
+        'sm'      => 1, // On small screens, display 1 card per row
+        'md'      => 2, // On medium screens, display 2 cards per row (4 per row in total)
+        'lg'      => 2, // On large screens, display 2 cards per row
+        'xl'      => 2, // On extra large screens, display 2 cards per row
+        '2xl'     => 2, // On 2xl screens, display 2 cards per row
     ];
 
     protected function getStats(): array
     {
         return [
 
-            // Status de manutenção
+            // Maintenance status
             $this->makeMaintenanceModeStat(),
-            // Estatísticas de orçamentos
+            // Budget statistics
             $this->makeBudgetStat(),
-            // Lista de E-mails
+            // Email list
             $this->makeNewsletterStat(),
 
-            // Estatísticas de clientes
+            // Customer statistics
             $this->makeCustomerStat(),
 
-            // Orçamentos pendentes
+            // Pending budgets
             $this->makePendingBudgetsStat(),
 
-            // Orçamentos em andamento
+            // Ongoing budgets
             $this->makeOngoingBudgetsStat(),
 
-            // Total em orçamentos
+            // Total budgets
             $this->makeTotalValueStat(),
 
         ];
     }
 
     /**
-     * Cria o widget de estatística de newsletter
+     * Creates the newsletter statistics widget
      * @return Stat
      */
     protected function makeNewsletterStat(): Stat
@@ -76,7 +76,7 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Cria o widget de estatística de orçamentos
+     * Creates the budget statistics widget
      * @return Stat
      */
     protected function makeBudgetStat(): Stat
@@ -93,7 +93,7 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Cria o widget de estatística de clientes
+     * Creates the customer statistics widget
      * @return Stat
      */
     protected function makeCustomerStat(): Stat
@@ -110,7 +110,7 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Cria o widget de estatística de orçamentos pendentes
+     * Creates the pending budgets statistics widget
      * @return Stat
      */
     protected function makePendingBudgetsStat(): Stat
@@ -130,7 +130,7 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Cria o widget de estatística de orçamentos em andamento
+     * Creates the ongoing budgets statistics widget
      * @return Stat
      */
     protected function makeOngoingBudgetsStat(): Stat
@@ -150,12 +150,12 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Cria o widget de estatística de valor total de orçamentos
+     * Creates the total budget value statistics widget
      * @return Stat
      */
     protected function makeTotalValueStat(): Stat
     {
-        // Obter os orçamentos que têm o campo content.total definido
+        // Get budgets that have the content.total field defined
         $budgets = Budget::withoutTrashed()->get();
         $totalValue = 0;
 
@@ -175,22 +175,22 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Cria o widget de estatística para mensagens/e-mails
+     * Creates the messages/emails statistics widget
      * @return Stat
      */
     protected function makeMailStat(): Stat
     {
-        // Contar e-mails não lidos (recebidos e não marcados como spam)
+        // Count unread emails (received and not marked as spam)
         $unreadMails = Mail::withoutTrashed()
             ->where('is_read', false)
             ->where('is_sent', false)
             ->where('is_spam', false)
             ->count();
 
-        // Total de e-mails no sistema
+        // Total emails in the system
         $totalMails = Mail::withoutTrashed()->count();
 
-        // Calcular a porcentagem de não lidos
+        // Calculate the percentage of unread
         $percentage = $totalMails > 0 ? round(($unreadMails / $totalMails) * 100) : 0;
 
         return Stat::make(__('Unread Messages'), $unreadMails)
@@ -201,12 +201,12 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Cria o widget de estatística do modo de manutenção
+     * Creates the maintenance mode statistics widget
      * @return Stat
      */
     protected function makeMaintenanceModeStat(): Stat
     {
-        // Obter o status atual do modo de manutenção
+        // Get the current maintenance mode status
         $setting = Setting::select(['maintenance_mode', 'discovery_mode'])->first();
         $maintenanceMode = $setting ? $setting->maintenance_mode : false;
         $discoveryMode = $setting ? $setting->discovery_mode : false;
@@ -227,13 +227,13 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Obtém a tendência mensal para um modelo
+     * Gets the monthly trend for a model
      * @param string $model
      * @return array
      */
     protected function getMonthlyTrend(string $model): array
     {
-        // Dados da tendência dos últimos 6 meses
+        // Trend data for the last 6 months
         $data = Trend::model($model)
             ->between(
                 start: now()->subMonths(6)->startOfMonth(),
@@ -242,12 +242,12 @@ class StatsWidget extends BaseWidget
             ->perMonth()
             ->count();
 
-        // Calcular a diferença percentual em relação ao mês anterior
+        // Calculate the percentage difference relative to the previous month
         $values = $data->map(fn (TrendValue $value) => $value->aggregate);
         $latestMonth = $values->last();
         $previousMonth = $values->count() > 1 ? $values[$values->count() - 2] : 0;
 
-        // Evitar divisão por zero
+        // Avoid division by zero
         if ($previousMonth == 0) {
             $difference = $latestMonth > 0 ? 100 : 0;
         } else {
@@ -261,7 +261,7 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Retorna o texto comparativo com base na diferença percentual
+     * Returns the comparison text based on the percentage difference
      * @param int $difference
      * @param string $itemLabel
      * @return string
@@ -278,7 +278,7 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Retorna o ícone com base na tendência
+     * Returns the icon based on the trend
      * @param int $difference
      * @return string
      */
@@ -294,7 +294,7 @@ class StatsWidget extends BaseWidget
     }
 
     /**
-     * Retorna a cor com base na tendência
+     * Returns the color based on the trend
      * @param int $difference
      * @return string
      */
