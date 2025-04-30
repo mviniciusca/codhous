@@ -31,6 +31,8 @@ class CreateBudget extends CreateRecord
 
     protected static string $resource = BudgetResource::class;
 
+    protected string $js = '';
+
     // Propriedade para controlar a aba ativa
     public $activeTab = 'customer_information';
 
