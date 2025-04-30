@@ -2,10 +2,11 @@
 
 namespace App\Mail;
 
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -14,12 +15,14 @@ class BudgetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    protected $companySetting;
+
     /**
      * Create a new message instance.
      */
     public function __construct(public array $budgetData = [], public ?string $pdfPath = null)
     {
-        //
+        $this->companySetting = Setting::first()->companySetting;
     }
 
     /**
@@ -73,7 +76,8 @@ class BudgetMail extends Mailable
     {
         return $this->view('mail.budget')
             ->with([
-                'budget' => $this->budgetData,
+                'budget'  => $this->budgetData,
+                'company' => $this->companySetting,
             ]);
     }
 }
