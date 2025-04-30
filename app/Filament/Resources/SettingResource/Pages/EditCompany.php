@@ -82,16 +82,16 @@ class EditCompany extends EditRecord
                             ->placeholder('----- ---')
                             ->live(true)
                             ->suffixAction(
-                                fn ($state, Set $set) => Action::make('search-cep')
+                                fn ($state, Set $set, $livewire) => Action::make('search-cep')
                                     ->icon('heroicon-o-magnifying-glass')
                                     ->tooltip(__('Search address by postcode'))
-                                    ->action(function () use ($state, $set) {
+                                    ->action(function () use ($state, $livewire, $set) {
                                         try {
                                             if (empty($state)) {
                                                 throw new \Exception('CEP inválido');
                                             }
 
-                                            // Limpar máscara e obter apenas números
+                                            // Formatar CEP removendo caracteres não numéricos
                                             $cep = preg_replace('/[^0-9]/', '', $state);
 
                                             // Verificar se o CEP tem 8 dígitos
@@ -101,6 +101,8 @@ class EditCompany extends EditRecord
 
                                             // Fazer a requisição à API do ViaCEP
                                             $response = \Illuminate\Support\Facades\Http::get("https://viacep.com.br/ws/{$cep}/json/");
+
+                                            \Illuminate\Support\Facades\Log::debug("Resposta da API para CEP {$cep}:", $response->json());
 
                                             // Verificar se a requisição foi bem-sucedida
                                             if (! $response->successful()) {
@@ -121,12 +123,17 @@ class EditCompany extends EditRecord
                                             $set('address.city', $data['localidade'] ?? '');
                                             $set('address.state', $data['uf'] ?? '');
 
+                                            // Adicionar log para debug
+                                            \Illuminate\Support\Facades\Log::debug('Campos atualizados com sucesso');
+
                                             // Notificação de sucesso
                                             \Filament\Notifications\Notification::make()
                                                 ->title('CEP encontrado!')
                                                 ->success()
                                                 ->send();
                                         } catch (\Exception $e) {
+                                            \Illuminate\Support\Facades\Log::error('Erro ao buscar CEP: '.$e->getMessage());
+
                                             // Em caso de erro, exibir notificação
                                             \Filament\Notifications\Notification::make()
                                                 ->title('Erro')

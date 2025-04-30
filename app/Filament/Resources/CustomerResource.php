@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Models\Customer;
+use App\Services\AddressFinder;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Section;
@@ -80,47 +81,27 @@ class CustomerResource extends Resource
                             ->mask('99999-999')
                             ->prefixIcon('heroicon-o-map-pin')
                             ->placeholder('----- ---')
-                            ->live(true)
                             ->maxLength(255)
                             ->suffixAction(
-                                fn ($state, Set $set) => Action::make('search-cep')
+                                fn ($state, Set $set, $livewire) => Action::make('search-cep')
                                     ->icon('heroicon-o-magnifying-glass')
                                     ->tooltip(__('Search address by postcode'))
-                                    ->action(function () use ($state, $set) {
+                                    ->action(function () use ($state, $livewire, $set) {
                                         try {
-                                            if (empty($state)) {
-                                                throw new \Exception('CEP inválido');
-                                            }
+                                            // Validar o formato do CEP antes de fazer a busca
+                                            $livewire->validateOnly('data.postcode');
 
-                                            // Limpar máscara e obter apenas números
-                                            $cep = preg_replace('/[^0-9]/', '', $state);
+                                            // Criar mapeamento de campos da API para campos do formulário
+                                            $fieldMap = [
+                                                'logradouro' => 'address.street',
+                                                'bairro'     => 'address.neighborhood',
+                                                'localidade' => 'address.city',
+                                                'uf'         => 'address.state',
+                                            ];
 
-                                            // Verificar se o CEP tem 8 dígitos
-                                            if (strlen($cep) !== 8) {
-                                                throw new \Exception('CEP deve ter 8 dígitos');
-                                            }
-
-                                            // Fazer a requisição à API do ViaCEP
-                                            $response = Http::get("https://viacep.com.br/ws/{$cep}/json/");
-
-                                            // Verificar se a requisição foi bem-sucedida
-                                            if (! $response->successful()) {
-                                                throw new \Exception('Erro ao buscar CEP: '.$response->status());
-                                            }
-
-                                            // Obter os dados da resposta
-                                            $data = $response->json();
-
-                                            // Verificar se o CEP foi encontrado
-                                            if (isset($data['erro']) && $data['erro'] === true) {
-                                                throw new \Exception('CEP não encontrado');
-                                            }
-
-                                            // Preencher os campos com os dados retornados
-                                            $set('address.street', $data['logradouro'] ?? '');
-                                            $set('address.neighborhood', $data['bairro'] ?? '');
-                                            $set('address.city', $data['localidade'] ?? '');
-                                            $set('address.state', $data['uf'] ?? '');
+                                            // Instanciar e executar a busca de CEP
+                                            $finder = new AddressFinder($state, $set, $fieldMap, 'data.postcode');
+                                            $finder->find();
 
                                             // Notificação de sucesso
                                             \Filament\Notifications\Notification::make()
