@@ -182,199 +182,207 @@ class CalculatorWidget extends Widget implements HasForms
     public function form(Form $form): Form
     {
         return $form->schema([
-            Grid::make(2)->schema([
-                Section::make(__('Calculadora de Orçamento'))
-                    ->description(__('Adicione produtos ao carrinho para gerar um orçamento rápido.'))
-                    ->icon('heroicon-o-calculator')
-                    ->columnSpan(1)
-                    ->schema([
-                        Grid::make(4) // Alterado para 4 colunas em vez de 2
+            Section::make(__('Calculadora de Orçamento & Itens'))
+                ->description(__('Adicione produtos ao orçamento para gerar uma cotação rápida.'))
+                ->icon('heroicon-o-calculator')
+                ->columnSpanFull()
+                ->schema([
+                    Grid::make(2)->schema([
+                        // Grupo da Calculadora (Esquerda)
+                        Section::make(__('Calculadora'))
+                            ->icon('heroicon-o-calculator')
+                            ->collapsible()
+                            ->columnSpan(1)
                             ->schema([
-                                Select::make('content.product')
-                                    ->live()
-                                    ->label(__('Produto'))
-                                    ->helperText(__('Tipo de Concreto'))
-                                    ->options(Product::where('is_active', true)->pluck('name', 'id'))
-                                    ->afterStateHydrated(function (Get $get, Set $set, $state) {
-                                        $this->updatePrice($get, $set, $state);
-                                    })
-                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        $set('content.product_option', null); // Reset da opção ao mudar o produto
-                                        $this->updatePrice($get, $set, $state);
-                                    })
-                                    ->required()
-                                    ->dehydrated()
-                                    ->columnSpan(2), // Ocupa 2 de 4 colunas
+                                Grid::make(4)
+                                    ->schema([
+                                        Select::make('content.product')
+                                            ->live()
+                                            ->label(__('Produto'))
+                                            ->helperText(__('Tipo de Concreto'))
+                                            ->options(Product::where('is_active', true)->pluck('name', 'id'))
+                                            ->afterStateHydrated(function (Get $get, Set $set, $state) {
+                                                $this->updatePrice($get, $set, $state);
+                                            })
+                                            ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                                $set('content.product_option', null); // Reset da opção ao mudar o produto
+                                                $this->updatePrice($get, $set, $state);
+                                            })
+                                            ->required()
+                                            ->dehydrated()
+                                            ->columnSpan(2),
 
-                                Select::make('content.product_option')
-                                    ->live()
-                                    ->label(__('Variação'))
-                                    ->helperText(__('Escolha uma variação'))
-                                    ->options(function (Get $get) {
-                                        $productId = $get('content.product');
-                                        if (! $productId) {
-                                            return [];
-                                        }
+                                        Select::make('content.product_option')
+                                            ->live()
+                                            ->label(__('Variação'))
+                                            ->helperText(__('Escolha uma variação'))
+                                            ->options(function (Get $get) {
+                                                $productId = $get('content.product');
+                                                if (! $productId) {
+                                                    return [];
+                                                }
 
-                                        return ProductOption::where('product_id', $productId)
-                                            ->pluck('name', 'id');
-                                    })
-                                    ->hidden(function (Get $get) {
-                                        $productId = $get('content.product');
-                                        if (! $productId) {
-                                            return true;
-                                        }
+                                                return ProductOption::where('product_id', $productId)
+                                                    ->pluck('name', 'id');
+                                            })
+                                            ->hidden(function (Get $get) {
+                                                $productId = $get('content.product');
+                                                if (! $productId) {
+                                                    return true;
+                                                }
 
-                                        return ProductOption::where('product_id', $productId)->count() === 0;
-                                    })
-                                    ->required(function (Get $get) {
-                                        $productId = $get('content.product');
-                                        if (! $productId) {
-                                            return false;
-                                        }
+                                                return ProductOption::where('product_id', $productId)->count() === 0;
+                                            })
+                                            ->required(function (Get $get) {
+                                                $productId = $get('content.product');
+                                                if (! $productId) {
+                                                    return false;
+                                                }
 
-                                        return ProductOption::where('product_id', $productId)->count() > 0;
-                                    })
-                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        if ($state) {
-                                            $price = ProductOption::find($state)->price ?? 0;
-                                            $set('content.price', $price);
-                                            $this->calculateTotal($get, $set);
-                                        }
-                                    })
-                                    ->dehydrated()
-                                    ->columnSpan(2), // Ocupa 2 de 4 colunas
+                                                return ProductOption::where('product_id', $productId)->count() > 0;
+                                            })
+                                            ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                                if ($state) {
+                                                    $price = ProductOption::find($state)->price ?? 0;
+                                                    $set('content.price', $price);
+                                                    $this->calculateTotal($get, $set);
+                                                }
+                                            })
+                                            ->dehydrated()
+                                            ->columnSpan(2),
 
-                                TextInput::make('content.quantity')
-                                    ->live(onBlur: true)
-                                    ->dehydrated()
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(3)
-                                    ->default(3)
-                                    ->suffix('m³')
-                                    ->placeholder('3')
-                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                        $this->calculateTotal($get, $set);
-                                    })
-                                    ->numeric()
-                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
+                                        TextInput::make('content.quantity')
+                                            ->live(onBlur: true)
+                                            ->dehydrated()
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(3)
+                                            ->default(3)
+                                            ->suffix('m³')
+                                            ->placeholder('3')
+                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                                $this->calculateTotal($get, $set);
+                                            })
+                                            ->numeric()
+                                            ->columnSpan(1),
 
-                                TextInput::make('content.price')
-                                    ->live()
+                                        TextInput::make('content.price')
+                                            ->live()
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->prefix(env('CURRENCY_SUFFIX'))
+                                            ->label(__('Preço'))
+                                            ->placeholder('0.00')
+                                            ->numeric()
+                                            ->step(0.01)
+                                            ->columnSpan(1),
+
+                                        TextInput::make('content.tax')
+                                            ->live(onBlur: true)
+                                            ->dehydrated()
+                                            ->prefix('+'.env('CURRENCY_SUFFIX'))
+                                            ->label(__('Taxa'))
+                                            ->numeric()
+                                            ->required()
+                                            ->default(0)
+                                            ->placeholder('0.00')
+                                            ->step(0.01)
+                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                                $this->calculateTotal($get, $set);
+                                                $this->calculateCartTotal();
+                                            })
+                                            ->columnSpan(1),
+
+                                        TextInput::make('content.discount')
+                                            ->live(onBlur: true)
+                                            ->numeric()
+                                            ->required()
+                                            ->default(0)
+                                            ->prefix('-'.env('CURRENCY_SUFFIX'))
+                                            ->label(__('Desconto'))
+                                            ->placeholder('0.00')
+                                            ->step(0.01)
+                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                                $this->calculateTotal($get, $set);
+                                                $this->calculateCartTotal();
+                                            })
+                                            ->columnSpan(1),
+
+                                        TextInput::make('content.total')
+                                            ->live()
+                                            ->readonly()
+                                            ->numeric()
+                                            ->required()
+                                            ->label(__('Preço Total'))
+                                            ->placeholder('0.00')
+                                            ->prefix(env('CURRENCY_SUFFIX'))
+                                            ->step(0.01)
+                                            ->columnSpan(2),
+
+                                        \Filament\Forms\Components\Actions::make([
+                                            Action::make('addToCart')
+                                                ->label(__('Adicionar ao Carrinho'))
+                                                ->icon('heroicon-m-shopping-cart')
+                                                ->color('primary')
+                                                ->disabled(fn (Get $get): bool => ! $get('content.product'))
+                                                ->action(fn () => $this->addToCart()),
+                                        ])
+                                            ->columnSpan(4),
+                                    ]),
+                            ]),
+
+                        // Grupo do Orçamento (Direita) - Nome alterado de "Carrinho de Compras" para "Itens do Orçamento"
+                        Section::make(__('Itens do Orçamento'))
+                            ->icon('heroicon-o-document-text')
+                            ->collapsible()
+                            ->columnSpan(1)
+                            ->schema([
+                                ViewField::make('cart_items')
+                                    ->view('filament.widgets.cart-items'),
+
+                                TextInput::make('cart_total')
+                                    ->label(__('Total do Orçamento'))
+                                    ->prefix(env('CURRENCY_SUFFIX'))
                                     ->disabled()
-                                    ->dehydrated()
-                                    ->prefix(env('CURRENCY_SUFFIX'))
-                                    ->label(__('Preço'))
+                                    ->extraInputAttributes(['style' => 'width: 120px;'])
                                     ->placeholder('0.00')
-                                    ->numeric()
-                                    ->step(0.01)
-                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
-
-                                TextInput::make('content.tax')
-                                    ->live(onBlur: true)
-                                    ->dehydrated()
-                                    ->prefix('+'.env('CURRENCY_SUFFIX'))
-                                    ->label(__('Taxa'))
-                                    ->numeric()
-                                    ->required()
-                                    ->default(0)
-                                    ->placeholder('0.00')
-                                    ->step(0.01)
-                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                        $this->calculateTotal($get, $set);
-                                        $this->calculateCartTotal();
+                                    ->afterStateHydrated(function (Get $get, Set $set) {
+                                        $set('cart_total', number_format($this->cartTotal, 2, '.', ''));
                                     })
-                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
-
-                                TextInput::make('content.discount')
-                                    ->live(onBlur: true)
-                                    ->numeric()
-                                    ->required()
-                                    ->default(0)
-                                    ->prefix('-'.env('CURRENCY_SUFFIX'))
-                                    ->label(__('Desconto'))
-                                    ->placeholder('0.00')
-                                    ->step(0.01)
-                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                        $this->calculateTotal($get, $set);
-                                        $this->calculateCartTotal();
-                                    })
-                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
-
-                                TextInput::make('content.total')
-                                    ->live()
-                                    ->readonly()
-                                    ->numeric()
-                                    ->required()
-                                    ->label(__('Preço Total'))
-                                    ->placeholder('0.00')
-                                    ->prefix(env('CURRENCY_SUFFIX'))
-                                    ->step(0.01)
-                                    ->columnSpan(1), // Ocupa 1 de 4 colunas
+                                    ->dehydrated(false),
 
                                 \Filament\Forms\Components\Actions::make([
-                                    Action::make('addToCart')
-                                        ->label(__('Adicionar ao Carrinho'))
-                                        ->icon('heroicon-m-shopping-cart')
-                                        ->color('primary')
-                                        ->disabled(fn (Get $get): bool => ! $get('content.product'))
-                                        ->action(fn () => $this->addToCart()),
-                                ])
-                                    ->columnSpan(4), // Ocupa toda a linha
+                                    Action::make('clearCart')
+                                        ->label(__('Limpar Itens'))
+                                        ->icon('heroicon-m-trash')
+                                        ->color('danger')
+                                        ->disabled(fn (): bool => empty($this->cart))
+                                        ->action(fn () => $this->clearCart()),
+
+                                    Action::make('createBudget')
+                                        ->label(__('Gerar Orçamento'))
+                                        ->icon('heroicon-m-document-text')
+                                        ->color('success')
+                                        ->url(function () {
+                                            // Verificar se há produtos no carrinho
+                                            if (empty($this->cart)) {
+                                                return route('filament.admin.resources.budgets.create');
+                                            }
+
+                                            // Transformar o carrinho em um formato compatível com o orçamento
+                                            $productsJson = json_encode($this->cart);
+
+                                            // Gerar URL com os produtos do carrinho como parâmetros e indicação para abrir a aba Shopping Bag
+                                            return route('filament.admin.resources.budgets.create', [
+                                                'activeTab' => 'shopping_bag',
+                                                'products'  => base64_encode($productsJson),
+                                            ]);
+                                        })
+                                        ->disabled(fn (): bool => empty($this->cart)),
+                                ])->columnSpanFull(),
                             ]),
                     ]),
-
-                Section::make(__('Carrinho'))
-                    ->description(__('Produtos adicionados ao orçamento'))
-                    ->icon('heroicon-o-shopping-bag')
-                    ->columnSpan(1)
-                    ->schema([
-                        ViewField::make('cart_items')
-                            ->view('filament.widgets.cart-items'),
-
-                        TextInput::make('cart_total')
-                            ->label(__('Total do Carrinho'))
-                            ->prefix(env('CURRENCY_SUFFIX'))
-                            ->disabled()
-                            ->extraInputAttributes(['style' => 'width: 120px;'])
-                            ->placeholder('0.00')
-                            ->afterStateHydrated(function (Get $get, Set $set) {
-                                $set('cart_total', number_format($this->cartTotal, 2, '.', ''));
-                            })
-                            ->dehydrated(false),
-
-                        \Filament\Forms\Components\Actions::make([
-                            Action::make('clearCart')
-                                ->label(__('Limpar Carrinho'))
-                                ->icon('heroicon-m-trash')
-                                ->color('danger')
-                                ->disabled(fn (): bool => empty($this->cart))
-                                ->action(fn () => $this->clearCart()),
-
-                            Action::make('createBudget')
-                                ->label(__('Gerar Orçamento'))
-                                ->icon('heroicon-m-document-text')
-                                ->color('success')
-                                ->url(function () {
-                                    // Verificar se há produtos no carrinho
-                                    if (empty($this->cart)) {
-                                        return route('filament.admin.resources.budgets.create');
-                                    }
-
-                                    // Transformar o carrinho em um formato compatível com o orçamento
-                                    $productsJson = json_encode($this->cart);
-
-                                    // Gerar URL com os produtos do carrinho como parâmetros e indicação para abrir a aba Shopping Bag
-                                    return route('filament.admin.resources.budgets.create', [
-                                        'activeTab' => 'shopping_bag',
-                                        'products'  => base64_encode($productsJson),
-                                    ]);
-                                })
-                                ->disabled(fn (): bool => empty($this->cart)),
-                        ])->columnSpanFull(),
-                    ]),
-            ]),
+                ]),
         ])
             ->statePath('data');
     }
