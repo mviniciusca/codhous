@@ -34,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->breadcrumbs(false)
+            ->maxContentWidth('full')
             ->id('admin')
             ->path('admin')
             ->navigationGroups([
