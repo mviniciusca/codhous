@@ -185,6 +185,7 @@ class CalculatorWidget extends Widget implements HasForms
             Section::make(__('Calculadora de Orçamento & Itens'))
                 ->description(__('Adicione produtos ao orçamento para gerar uma cotação rápida.'))
                 ->icon('heroicon-o-calculator')
+                ->collapsed()
                 ->columnSpanFull()
                 ->schema([
                     Grid::make(2)->schema([

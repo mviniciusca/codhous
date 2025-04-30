@@ -152,11 +152,6 @@ class MailWidget extends BaseWidget
                     ->icon('heroicon-o-envelope')
                     ->color('primary')
                     ->url(route('filament.admin.resources.mails.index')),
-
-                Action::make('compose')
-                    ->label(__('Compose'))
-                    ->icon('heroicon-o-pencil-square')
-                    ->url(route('filament.admin.resources.mails.create')),
             ])
             ->heading($unreadCount === 0
                 ? __('Inbox')
