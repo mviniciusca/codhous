@@ -33,10 +33,13 @@ class PdfGenerator
      */
     public function generateFilename(): string
     {
-        return Str::slug($this->state['code']
-            .$this->state['id'])
-            .now()->format('YmdHis')
-            .(env('PDF_TERMINATION', '.pdf'));
+        if (! isset($this->state['code']) || ! isset($this->state['id'])) {
+            throw new \Exception('Required state parameters missing (code or id)');
+        }
+
+        return Str::slug(
+            $this->state['code'].'-'.$this->state['id']
+        ).'-'.now()->format('YmdHis').(env('PDF_TERMINATION', '.pdf'));
     }
 
     /**

@@ -52,4 +52,32 @@ class Budget extends Model
     {
         return $this->pdfs()->latest()->first();
     }
+
+    /**
+     * Generate a unique budget code
+     *
+     * @return string
+     */
+    public static function generateUniqueCode(): string
+    {
+        $prefix = 'BD';
+        $year = date('Y');
+        $month = date('m');
+
+        // Get the last budget created in this month
+        $lastBudget = self::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastBudget) {
+            // Extract the sequence number from the last code
+            $lastSequence = (int) substr($lastBudget->code, -5);
+            $sequence = str_pad($lastSequence + 1, 5, '0', STR_PAD_LEFT);
+        } else {
+            $sequence = '00001';
+        }
+
+        return sprintf('%s%s%s%s', $prefix, $year, $month, $sequence);
+    }
 }

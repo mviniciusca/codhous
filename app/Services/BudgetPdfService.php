@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Budget;
 use App\Models\BudgetPdf;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -106,7 +107,7 @@ class BudgetPdfService
             // Record the activity
             activity()
                 ->performedOn($budget)
-                ->causedBy(auth()->user())
+                ->causedBy(Auth::user())
                 ->withProperties([
                     'filename' => $filename,
                     'path'     => $relativePath,

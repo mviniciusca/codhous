@@ -23,9 +23,12 @@ class BudgetFactory extends Factory
         $price = $this->faker->randomFloat(2, 100, 1000);
         $subtotal = $quantity * $price;
 
+        // Gera o código usando o mesmo padrão do modelo
+        $code = 'BD'.date('Ym').str_pad($this->faker->unique()->numberBetween(1, 99999), 5, '0', STR_PAD_LEFT);
+
         return [
             'created_at' => $this->faker->dateTimeBetween(date('2024-01-01')),
-            'code'       => $this->faker->numerify('####'),
+            'code'       => $code,
             'is_active'  => $this->faker->boolean(),
             'status'     => $this->faker->randomElement([
                 'on going',

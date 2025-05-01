@@ -84,6 +84,9 @@ class CreateBudget extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        // Gerar código único para o orçamento
+        $data['code'] = Budget::generateUniqueCode();
+
         // Se temos produtos do carrinho e ainda não foram adicionados ao formulário
         if (! empty($this->cartProducts) && empty($data['content']['products'])) {
             $data['content']['products'] = $this->cartProducts;
@@ -140,7 +143,7 @@ class CreateBudget extends CreateRecord
                                     ->prefix('#')
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
-                                    ->default(rand(10000, 99999)),
+                                    ->placeholder('Generated automatically'),
                                 DateTimePicker::make('created_at')
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
