@@ -87,7 +87,7 @@ class EditBudget extends EditRecord
                                     ->modalDescription(__('Are you sure you want to download this budget as PDF?'))
                                     ->modalSubmitActionLabel(__('Yes, download'))
                                     ->action(function () {
-                                        $budget = Budget::with(['products'])->findOrFail($this->record->id);
+                                        $budget = Budget::findOrFail($this->record->id);
                                         $pdfService = new BudgetPdfService();
                                         $pdfModel = $pdfService->generatePdf($budget, true);
 
@@ -106,12 +106,12 @@ class EditBudget extends EditRecord
                                         }
                                     }),
                                 FormAction::make('generate_link')
-                                    ->label(__('Share'))
+                                    ->label(__('Generate PDF Link'))
                                     ->icon('heroicon-o-link')
                                     ->color('primary')
                                     ->outlined()
                                     ->action(function (Get $get, Set $set) {
-                                        $budget = Budget::with(['products'])->findOrFail($this->record->id);
+                                        $budget = Budget::findOrFail($this->record->id);
                                         $budget->refresh();
 
                                         $pdfService = new BudgetPdfService();
@@ -129,13 +129,13 @@ class EditBudget extends EditRecord
                                             $budget->update(['content' => $content]);
 
                                             Notification::make()
-                                                ->title(__('Download link generated!'))
+                                                ->title(__('PDF download link generated!'))
                                                 ->success()
                                                 ->send();
                                         } else {
                                             Notification::make()
-                                                ->title(__('Error generating link'))
-                                                ->body(__('Could not generate download link. Please check logs.'))
+                                                ->title(__('Error generating PDF link'))
+                                                ->body(__('Could not generate PDF download link. Please check logs.'))
                                                 ->danger()
                                                 ->send();
                                         }
@@ -514,7 +514,7 @@ class EditBudget extends EditRecord
                                             ->modalDescription(__('Are you sure you want to download this budget as PDF?'))
                                             ->modalSubmitActionLabel(__('Yes, download'))
                                             ->action(function () {
-                                                $budget = Budget::with(['products'])->findOrFail($this->record->id);
+                                                $budget = Budget::findOrFail($this->record->id);
                                                 $pdfService = new BudgetPdfService();
                                                 $pdfModel = $pdfService->generatePdf($budget, true);
 
@@ -535,15 +535,15 @@ class EditBudget extends EditRecord
                                     ])
                                     ->schema([
                                         TextInput::make('content.share_link')
-                                            ->label(__('Share'))
-                                            ->helperText(__('Share this link with customers'))
-                                            ->placeholder(__('Generate a link first'))
+                                            ->label(__('PDF Share Link'))
+                                            ->helperText(__('Share this PDF link with customers'))
+                                            ->placeholder(__('Generate a PDF link first'))
                                             ->disabled()
                                             ->dehydrated()
                                             ->suffixAction(
                                                 FormAction::make('open_link')
                                                     ->icon('heroicon-m-arrow-top-right-on-square')
-                                                    ->tooltip(__('View'))
+                                                    ->tooltip(__('View PDF'))
                                                     ->url(fn ($state) => $state)
                                                     ->openUrlInNewTab()
                                             )
@@ -551,11 +551,11 @@ class EditBudget extends EditRecord
                                             ->suffixActions([
                                                 FormAction::make('share_whatsapp')
                                                     ->icon('heroicon-m-chat-bubble-left-right')
-                                                    ->tooltip(__('Share'))
+                                                    ->tooltip(__('Share PDF'))
                                                     ->outlined()
                                                     ->action(function ($state, $record) {
                                                         $whatsApp = new \App\Services\WhatsAppShare();
-                                                        $message = __("Hello! Here's your budget link: ").$state;
+                                                        $message = __("Hello! Here's your budget PDF link: ").$state;
                                                         $url = $whatsApp->generateUrl(
                                                             $record->content['customer_phone'] ?? '',
                                                             $message

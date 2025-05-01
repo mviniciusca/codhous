@@ -15,6 +15,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
@@ -334,6 +335,118 @@ class BudgetResource extends Resource
             ], FiltersLayout::AboveContent)
             ->actions([
                 ActionGroup::make([
+                    Tables\Actions\Action::make('copy_link')
+                        ->label(__('Copy PDF Link'))
+                        ->icon('heroicon-o-clipboard-document')
+                        ->color('success')
+                        ->visible(fn (Budget $record) => ! empty($record->content['share_link']))
+                        ->action(function (Budget $record) {
+                            Notification::make()
+                                ->title(__('PDF link copied!'))
+                                ->success()
+                                ->send();
+                        }),
+                    Tables\Actions\Action::make('generate_link')
+                        ->label(__('Generate PDF Link'))
+                        ->icon('heroicon-o-link')
+                        ->color('primary')
+                        ->visible(fn (Budget $record) => empty($record->content['share_link']))
+                        ->action(function (Budget $record) {
+                            // Generate new link
+                            $pdfService = new \App\Services\BudgetPdfService();
+                            $pdfModel = $pdfService->generatePdf($record, true);
+
+                            if ($pdfModel) {
+                                $url = $pdfModel->getDownloadUrl();
+                                $content = $record->content;
+                                $content['share_link'] = $url;
+                                $record->update(['content' => $content]);
+
+                                Notification::make()
+                                    ->title(__('PDF share link generated successfully'))
+                                    ->success()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title(__('Error generating PDF share link'))
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+                    Tables\Actions\Action::make('download_pdf')
+                        ->label(__('Download PDF'))
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->color('warning')
+                        ->action(function (Budget $record) {
+                            $pdfService = new \App\Services\BudgetPdfService();
+                            $pdfModel = $pdfService->generatePdf($record, true);
+
+                            if ($pdfModel && $pdfModel->fileExists()) {
+                                return response()->download(
+                                    $pdfModel->getFullPath(),
+                                    'Budget_'.$record->code.'.pdf',
+                                    ['Content-Type' => 'application/pdf']
+                                );
+                            }
+
+                            Notification::make()
+                                ->title(__('Error generating PDF'))
+                                ->body(__('Could not generate PDF file. Please try again.'))
+                                ->danger()
+                                ->send();
+                        }),
+                    Tables\Actions\Action::make('send_email')
+                        ->label(__('Send Email'))
+                        ->icon('heroicon-o-envelope')
+                        ->color('primary')
+                        ->action(function (Budget $record) {
+                            try {
+                                $mail = new \App\Services\SendBudgetMail(
+                                    $record->toArray(),
+                                    $record->content['customer_email'] ?? '',
+                                    new \App\Mail\BudgetMail($record->toArray())
+                                );
+                                $mail->dispatch();
+
+                                Notification::make()
+                                    ->title(__('Email sent successfully'))
+                                    ->success()
+                                    ->send();
+                            } catch (\Exception $e) {
+                                Notification::make()
+                                    ->title(__('Error sending email'))
+                                    ->body($e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+                    Tables\Actions\Action::make('share_whatsapp')
+                        ->label(__('Share on WhatsApp'))
+                        ->icon('heroicon-o-phone')
+                        ->color('success')
+                        ->action(function (Budget $record) {
+                            // Generate PDF and share link if not exists
+                            if (empty($record->content['share_link'] ?? null)) {
+                                $pdfService = new \App\Services\BudgetPdfService();
+                                $pdfModel = $pdfService->generatePdf($record, true);
+
+                                if ($pdfModel) {
+                                    $url = $pdfModel->getDownloadUrl();
+                                    $content = $record->content;
+                                    $content['share_link'] = $url;
+                                    $record->update(['content' => $content]);
+                                }
+                            }
+
+                            $whatsApp = new \App\Services\WhatsAppShare();
+                            $message = __("Hello! Here's your budget link: ").($record->content['share_link'] ?? '');
+                            $url = $whatsApp->generateUrl(
+                                $record->content['customer_phone'] ?? '',
+                                $message
+                            );
+
+                            return redirect()->away($url);
+                        }),
                     Tables\Actions\EditAction::make(),
                 ]),
             ])
