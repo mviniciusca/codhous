@@ -56,7 +56,7 @@ class EditBudget extends EditRecord
                             ->headerActions([
                                 FormAction::make('notify_email')
                                     ->icon('heroicon-o-envelope')
-                                    ->label(__('Notify Email'))
+                                    ->label(__('Send'))
                                     ->disabled(function (Get $get, ?array $state) {
                                         return self::checkId($get, $state);
                                     })
@@ -67,6 +67,7 @@ class EditBudget extends EditRecord
                                             return 'primary';
                                         }
                                     })
+                                    ->outlined()
                                     ->requiresConfirmation()
                                     ->action(function (Get $get, ?array $state) {
                                         $mail = new SendBudgetMail(
@@ -77,9 +78,10 @@ class EditBudget extends EditRecord
                                         $mail->dispatch();
                                     }),
                                 FormAction::make('download_pdf')
-                                    ->label(__('Download PDF'))
+                                    ->label(__('Save'))
                                     ->icon('heroicon-o-document-arrow-down')
                                     ->color('warning')
+                                    ->outlined()
                                     ->requiresConfirmation()
                                     ->modalHeading(__('Download PDF'))
                                     ->modalDescription(__('Are you sure you want to download this budget as PDF?'))
@@ -104,18 +106,10 @@ class EditBudget extends EditRecord
                                         }
                                     }),
                                 FormAction::make('generate_link')
-                                    ->label(__('Generate Share Link'))
+                                    ->label(__('Share'))
                                     ->icon('heroicon-o-link')
-                                    ->color(function () {
-                                        $budget = Budget::with(['pdfs'])->findOrFail($this->record->id);
-
-                                        return $budget->latestPdf() ? 'success' : 'gray';
-                                    })
-                                    ->outlined(function () {
-                                        $budget = Budget::with(['pdfs'])->findOrFail($this->record->id);
-
-                                        return ! $budget->latestPdf();
-                                    })
+                                    ->color('primary')
+                                    ->outlined()
                                     ->action(function (Get $get, Set $set) {
                                         $budget = Budget::with(['products'])->findOrFail($this->record->id);
                                         $budget->refresh();
@@ -145,6 +139,27 @@ class EditBudget extends EditRecord
                                                 ->danger()
                                                 ->send();
                                         }
+                                    }),
+                                FormAction::make('share_whatsapp')
+                                    ->label(__('WhatsApp'))
+                                    ->icon('heroicon-o-phone')
+                                    ->outlined()
+                                    ->color('success')
+                                    ->visible(function () {
+                                        $budget = Budget::with(['pdfs'])->findOrFail($this->record->id);
+
+                                        return ! empty($budget->content['share_link'] ?? null);
+                                    })
+                                    ->action(function () {
+                                        $budget = Budget::findOrFail($this->record->id);
+                                        $whatsApp = new \App\Services\WhatsAppShare();
+                                        $message = __("Hello! Here's your budget link: ").($budget->content['share_link'] ?? '');
+                                        $url = $whatsApp->generateUrl(
+                                            $budget->content['customer_phone'] ?? '',
+                                            $message
+                                        );
+
+                                        return redirect()->away($url);
                                     }),
                             ])
                             ->columns(4)
@@ -468,7 +483,7 @@ class EditBudget extends EditRecord
                                     ->headerActions([
                                         FormAction::make('notify_email')
                                             ->icon('heroicon-o-envelope')
-                                            ->label(__('Notify Email'))
+                                            ->label(__('Send'))
                                             ->disabled(function (Get $get, ?array $state) {
                                                 return self::checkId($get, $state);
                                             })
@@ -479,6 +494,7 @@ class EditBudget extends EditRecord
                                                     return 'primary';
                                                 }
                                             })
+                                            ->outlined()
                                             ->requiresConfirmation()
                                             ->action(function (Get $get, ?array $state) {
                                                 $mail = new SendBudgetMail(
@@ -489,9 +505,10 @@ class EditBudget extends EditRecord
                                                 $mail->dispatch();
                                             }),
                                         FormAction::make('download_pdf')
-                                            ->label(__('Download PDF'))
+                                            ->label(__('PDF'))
                                             ->icon('heroicon-o-document-arrow-down')
                                             ->color('warning')
+                                            ->outlined()
                                             ->requiresConfirmation()
                                             ->modalHeading(__('Download PDF'))
                                             ->modalDescription(__('Are you sure you want to download this budget as PDF?'))
@@ -518,18 +535,37 @@ class EditBudget extends EditRecord
                                     ])
                                     ->schema([
                                         TextInput::make('content.share_link')
-                                            ->label(__('Share Link'))
-                                            ->helperText(__('This link can be shared with customers'))
-                                            ->placeholder(__('Click on Generate Share Link to create a new link'))
+                                            ->label(__('Share'))
+                                            ->helperText(__('Share this link with customers'))
+                                            ->placeholder(__('Generate a link first'))
                                             ->disabled()
                                             ->dehydrated()
                                             ->suffixAction(
                                                 FormAction::make('open_link')
                                                     ->icon('heroicon-m-arrow-top-right-on-square')
-                                                    ->tooltip(__('Open link'))
+                                                    ->tooltip(__('View'))
                                                     ->url(fn ($state) => $state)
                                                     ->openUrlInNewTab()
                                             )
+                                            ->extraAttributes(['class' => 'flex-1'])
+                                            ->suffixActions([
+                                                FormAction::make('share_whatsapp')
+                                                    ->icon('heroicon-m-chat-bubble-left-right')
+                                                    ->tooltip(__('Share'))
+                                                    ->outlined()
+                                                    ->action(function ($state, $record) {
+                                                        $whatsApp = new \App\Services\WhatsAppShare();
+                                                        $message = __("Hello! Here's your budget link: ").$state;
+                                                        $url = $whatsApp->generateUrl(
+                                                            $record->content['customer_phone'] ?? '',
+                                                            $message
+                                                        );
+
+                                                        return redirect()->away($url);
+                                                    })
+                                                    ->visible(fn ($state) => ! empty($state))
+                                                    ->color('success'),
+                                            ])
                                             ->columnSpanFull(),
                                     ]),
                             ]),
