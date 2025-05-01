@@ -4,11 +4,145 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    :root {
+        --background: 0 0% 100%; /* white */
+        --foreground: 240 10% 3.9%; /* zinc-950 */
+
+        --card: 240 5% 98%; /* zinc-50 */
+        --card-foreground: 240 10% 3.9%; /* zinc-950 */
+
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+
+        --primary: 240 5.9% 10%; /* zinc-900 */
+        --primary-foreground: 240 5% 98%;
+
+        --secondary: 240 4.8% 95.9%; /* zinc-100 */
+        --secondary-foreground: 240 5.9% 10%;
+
+        --muted: 240 4.8% 95.9%; /* zinc-100 */
+        --muted-foreground: 240 3.8% 46.1%;
+
+        --accent: 240 4.8% 95.9%; /* zinc-100 */
+        --accent-foreground: 240 5.9% 10%;
+
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+
+        --border: 240 5.9% 90%; /* zinc-200 */
+        --input: 240 5.9% 90%;
+        --ring: 240 5.9% 10%;
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 240 5.9% 10%; /* zinc-900 */
+        --foreground: 240 5% 98%; /* zinc-50 */
+
+        --card: 240 10% 3.9%; /* zinc-950 */
+        --card-foreground: 240 5% 98%;
+
+        --popover: 240 5.9% 10%;
+        --popover-foreground: 240 5% 98%;
+
+        --primary: 240 5% 98%; /* zinc-50 */
+        --primary-foreground: 240 5.9% 10%;
+
+        --secondary: 240 3.7% 15.9%; /* zinc-800 */
+        --secondary-foreground: 240 5% 98%;
+
+        --muted: 213 50% 20%;
+        --muted-foreground: 213 30% 85%;
+
+        --accent: 213 50% 25%;      /* Azul médio-escuro para acentos */
+        --accent-foreground: 213 30% 98%;
+
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 85.7% 97.3%;
+
+        --border: 213 50% 20%;      /* Azul escuro para bordas */
+        --input: 213 50% 20%;
+        --ring: 213 80% 60%;
+    }
+}
+
 @layer components {
-textarea, select, input[type="text"], input[type="password"] {
-    @apply dark:bg-primary-800
-}
-form button {
-    @apply mt-5
-}
+    /* Estilizando inputs e botões do Filament */
+    .fi-input,
+    .fi-select,
+    .fi-textarea {
+        @apply rounded-md border border-input bg-background shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
+    }
+
+    .fi-btn {
+        @apply inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+    }
+
+    .fi-btn-primary {
+        @apply bg-primary text-primary-foreground hover:bg-primary/90;
+    }
+
+    .fi-btn-secondary {
+        @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+    }
+
+    .fi-btn-outline {
+        @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+    }
+
+    .fi-card {
+        @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+    }
+
+    .fi-dropdown-menu {
+        @apply rounded-md border bg-popover p-1 text-popover-foreground shadow-md;
+    }
+
+    .fi-tabs-item {
+        @apply inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+    }
+
+    textarea, select, input[type="text"], input[type="password"] {
+        @apply bg-background dark:bg-secondary;
+    }
+
+    form button {
+        @apply mt-5;
+    }
+
+    /* Override dark mode background for form inputs */
+    .dark .fi-input,
+    .dark .fi-select,
+    .dark .fi-textarea {
+        @apply bg-background border-border;
+    }
+
+    /* Personalizações adicionais para tons de azul */
+    .fi-sidebar {
+        @apply bg-background border-r border-border;
+    }
+
+    .fi-main-header {
+        @apply bg-background border-b border-border;
+    }
+
+    /* Links e elementos interativos */
+    a:not(.fi-btn) {
+        @apply text-primary hover:text-primary/80 transition-colors;
+    }
+
+    /* Tables */
+    .fi-ta {
+        @apply bg-card border border-border rounded-lg;
+    }
+
+    .fi-ta-header {
+        @apply bg-secondary/50;
+    }
+
+    /* Form sections */
+    .fi-section {
+        @apply bg-card border border-border rounded-lg;
+    }
 }
