@@ -524,12 +524,11 @@ class EditBudget extends EditRecord
                                             ->disabled()
                                             ->dehydrated()
                                             ->suffixAction(
-                                                FormAction::make('copy')
-                                                    ->icon('heroicon-m-clipboard')
-                                                    ->tooltip(__('Copy link'))
-                                                    ->action(function ($state) {
-                                                        $this->dispatch('copyShareLink', text: $state);
-                                                    })
+                                                FormAction::make('open_link')
+                                                    ->icon('heroicon-m-arrow-top-right-on-square')
+                                                    ->tooltip(__('Open link'))
+                                                    ->url(fn ($state) => $state)
+                                                    ->openUrlInNewTab()
                                             )
                                             ->columnSpanFull(),
                                     ]),
