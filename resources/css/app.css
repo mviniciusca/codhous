@@ -4,6 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/** Base **/
 @layer base {
     :root {
         --background: 0 0% 100%; /* white */
@@ -143,6 +144,6 @@
 
     /* Form sections */
     .fi-section {
-        @apply bg-card border border-border rounded-lg;
+        @apply bg-gray-950 border border-border rounded-lg;
     }
 }
