@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BudgetResource\Pages;
 use App\Filament\Resources\BudgetResource\RelationManagers\BudgetHistoryRelationManager;
 use App\Models\Budget;
+use App\Services\FakeBudgetDataService;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
@@ -101,6 +103,50 @@ class BudgetResource extends Resource
                 Section::make('Budget Content')
                     ->description(__('Here is the content from your budget'))
                     ->icon('heroicon-o-shopping-bag')
+                    ->headerActions([
+                        Action::make('fill_all_fake_data')
+                            ->label(__('Fill All with Fake Data'))
+                            ->icon('heroicon-o-sparkles')
+                            ->color('success')
+                            ->action(function (Set $set, Get $get) {
+                                $fakeService = new FakeBudgetDataService();
+                                $fakeData = $fakeService->generateCompleteBudgetData();
+
+                                foreach ($fakeData as $key => $value) {
+                                    $set('content.'.$key, $value);
+                                }
+
+                                Notification::make()
+                                    ->title(__('Fake data generated!'))
+                                    ->body(__('All fields have been filled with test data'))
+                                    ->success()
+                                    ->send();
+                            }),
+                        Action::make('clear_all_fields')
+                            ->label(__('Clear All'))
+                            ->icon('heroicon-o-trash')
+                            ->color('danger')
+                            ->requiresConfirmation()
+                            ->action(function (Set $set) {
+                                // Clear customer fields
+                                $set('content.customer_name', '');
+                                $set('content.customer_email', '');
+                                $set('content.customer_phone', '');
+
+                                // Clear address fields
+                                $set('content.postcode', '');
+                                $set('content.street', '');
+                                $set('content.number', '');
+                                $set('content.city', '');
+                                $set('content.neighborhood', '');
+                                $set('content.state', '');
+
+                                Notification::make()
+                                    ->title(__('All fields cleared!'))
+                                    ->success()
+                                    ->send();
+                            }),
+                    ])
                     ->schema([
                         Fieldset::make(__('Customer Information'))
                             ->columns(3)

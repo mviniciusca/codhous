@@ -8,6 +8,7 @@ use App\Models\BudgetHistory;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductOption;
+use App\Services\FakeBudgetDataService;
 use App\Services\PostcodeFinder;
 use App\Trait\BudgetStatus;
 use Filament\Forms\Components\Actions\Action;
@@ -20,6 +21,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -160,6 +162,57 @@ class CreateBudget extends CreateRecord
                     ->icon('heroicon-o-user')
                     ->columns(3)
                     ->collapsible()
+                    ->headerActions([
+                        Action::make('fill_customer_data')
+                            ->label(__('Fill with Fake Data'))
+                            ->icon('heroicon-o-sparkles')
+                            ->color('success')
+                            ->action(function (Set $set) {
+                                $fakeService = new FakeBudgetDataService();
+
+                                // Gerar dados do cliente
+                                $customerData = $fakeService->generateCustomerData();
+                                foreach ($customerData as $key => $value) {
+                                    $set('content.'.$key, $value);
+                                }
+
+                                // Gerar dados do endereço
+                                $addressData = $fakeService->generateAddressData();
+                                foreach ($addressData as $key => $value) {
+                                    $set('content.'.$key, $value);
+                                }
+
+                                Notification::make()
+                                    ->title(__('Customer data generated!'))
+                                    ->body(__('All customer and address fields filled with test data'))
+                                    ->success()
+                                    ->send();
+                            }),
+                        Action::make('clear_customer_fields')
+                            ->label(__('Clear'))
+                            ->icon('heroicon-o-trash')
+                            ->color('danger')
+                            ->requiresConfirmation()
+                            ->action(function (Set $set) {
+                                // Clear customer fields
+                                $set('content.customer_name', '');
+                                $set('content.customer_email', '');
+                                $set('content.customer_phone', '');
+
+                                // Clear address fields
+                                $set('content.postcode', '');
+                                $set('content.street', '');
+                                $set('content.number', '');
+                                $set('content.city', '');
+                                $set('content.neighborhood', '');
+                                $set('content.state', '');
+
+                                Notification::make()
+                                    ->title(__('Customer fields cleared!'))
+                                    ->success()
+                                    ->send();
+                            }),
+                    ])
                     ->schema([Group::make()
                         ->columns(3)
                         ->columnSpanFull()
