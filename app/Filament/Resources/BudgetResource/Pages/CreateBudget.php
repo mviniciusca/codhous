@@ -164,9 +164,9 @@ class CreateBudget extends CreateRecord
                     ->collapsible()
                     ->headerActions([
                         Action::make('fill_customer_data')
-                            ->label(__('Fill with Fake Data'))
+                            ->label(__('Quick Fill'))
                             ->icon('heroicon-o-sparkles')
-                            ->color('success')
+                            ->color('primary')
                             ->action(function (Set $set) {
                                 $fakeService = new FakeBudgetDataService();
 
