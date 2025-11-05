@@ -30,12 +30,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $role = Role::create(['name' => 'super_admin']);
+        // Criar o usuário super admin
         $user = User::factory()->create([
             'name'  => 'Codhous Software',
             'email' => 'codhous@codhous.app',
         ]);
 
+        // Criar a role super_admin usando Filament Shield com guard 'web'
+        $role = Role::firstOrCreate(
+            ['name' => 'super_admin', 'guard_name' => 'web']
+        );
+
+        // Sincronizar todas as permissões existentes com a role super_admin
+        $role->syncPermissions(\Spatie\Permission\Models\Permission::all());
+
+        // Atribuir a role ao usuário
         $user->assignRole($role);
 
         Setting::factory()

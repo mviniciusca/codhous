@@ -357,13 +357,23 @@ class EditBudget extends EditRecord
                                                 TextInput::make('quantity')
                                                     ->live(onBlur: true)
                                                     ->integer()
+                                                    ->step(1)
                                                     ->required()
                                                     ->minValue(3)
                                                     ->columnSpan(3)
                                                     ->label(__('Quantity'))
                                                     ->suffix(__('m³'))
                                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                                    ->afterStateHydrated(function (Get $get, Set $set, $state) {
+                                                        // Garantir que seja inteiro ao carregar
+                                                        if ($state !== null) {
+                                                            $set('quantity', (int) $state);
+                                                        }
+                                                    })
                                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                                        // Garantir que seja inteiro
+                                                        $set('quantity', (int) $state);
+
                                                         // Calcular subtotal do item atual
                                                         self::calculateItemSubtotal($get, $set);
 
@@ -420,14 +430,13 @@ class EditBudget extends EditRecord
                                     ->reorderable()
                                     ->defaultItems(1)
                                     ->columnSpanFull(),
-
                                 Section::make(__('Pricing Summary'))
                                     ->description(__('Pricing Definition & Total Cost'))
                                     ->icon('heroicon-o-currency-dollar')
                                     ->collapsible()
                                     ->schema([
                                         Group::make()
-                                            ->columns(4)
+                                            ->columns(5)
                                             ->columnSpanFull()
                                             ->schema([
                                                 TextInput::make('content.quantity')
@@ -436,10 +445,24 @@ class EditBudget extends EditRecord
                                                     ->dehydrated()
                                                     ->readonly()
                                                     ->required()
+                                                    ->integer()
+                                                    ->step(1)
                                                     ->suffix('m³')
                                                     ->label(__('Total Quantity'))
                                                     ->helperText(__('Total quantity for all products'))
                                                     ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
+                                                        self::calculateTotal($get, $set);
+                                                    }),
+                                                TextInput::make('content.shipping')
+                                                    ->live(onBlur: true)
+                                                    ->dehydrated()
+                                                    ->numeric()
+                                                    ->required()
+                                                    ->default(0)
+                                                    ->prefix(env('CURRENCY_SUFFIX'))
+                                                    ->helperText(__('Total shipping cost in '.env('CURRENCY_SUFFIX')))
+                                                    ->step(0.01)
+                                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                                         self::calculateTotal($get, $set);
                                                     }),
                                                 TextInput::make('content.tax')
@@ -619,7 +642,7 @@ class EditBudget extends EditRecord
                     'product'        => $product->id,
                     'product_option' => $product->pivot->product_option_id,
                     'location'       => $product->pivot->location_id,
-                    'quantity'       => $product->pivot->quantity,
+                    'quantity'       => (int) $product->pivot->quantity,
                     'price'          => $product->pivot->price,
                     'subtotal'       => $product->pivot->subtotal,
                 ];
@@ -631,11 +654,12 @@ class EditBudget extends EditRecord
             // Recalcular totais
             $totalQuantity = $budget->products->sum('pivot.quantity');
             $subtotal = $budget->products->sum('pivot.subtotal');
+            $shipping = $this->data['content']['shipping'] ?? 0;
             $tax = $this->data['content']['tax'] ?? 0;
             $discount = $this->data['content']['discount'] ?? 0;
 
-            $this->data['content']['quantity'] = $totalQuantity;
-            $this->data['content']['total'] = number_format($subtotal + floatval($tax) - floatval($discount), 2, '.', '');
+            $this->data['content']['quantity'] = (int) $totalQuantity;
+            $this->data['content']['total'] = number_format($subtotal + floatval($shipping) + floatval($tax) - floatval($discount), 2, '.', '');
         }
     }
 
@@ -666,7 +690,7 @@ class EditBudget extends EditRecord
                     $budget->products()->attach($product['product'], [
                         'product_option_id' => $product['product_option'] ?? null,
                         'location_id'       => $product['location'] ?? null,
-                        'quantity'          => $product['quantity'] ?? 0,
+                        'quantity'          => (int) ($product['quantity'] ?? 0),
                         'price'             => $product['price'] ?? 0,
                         'subtotal'          => $product['subtotal'] ?? 0,
                     ]);
@@ -677,12 +701,13 @@ class EditBudget extends EditRecord
             $totalQuantity = $budget->products()->sum('quantity');
             $subtotal = $budget->products()->sum('subtotal');
 
+            $shipping = floatval($this->data['content']['shipping'] ?? 0);
             $tax = floatval($this->data['content']['tax'] ?? 0);
             $discount = floatval($this->data['content']['discount'] ?? 0);
-            $total = $subtotal + $tax - $discount;
+            $total = $subtotal + $shipping + $tax - $discount;
 
             $content = $budget->content;
-            $content['quantity'] = $totalQuantity;
+            $content['quantity'] = (int) $totalQuantity;
             $content['total'] = number_format($total, 2, '.', '');
 
             // Atualizar o orçamento com os novos valores
@@ -730,7 +755,7 @@ class EditBudget extends EditRecord
 
         // Calcular subtotais de cada produto
         foreach ($products as $index => $product) {
-            $productQuantity = floatval($product['quantity'] ?? 0);
+            $productQuantity = intval($product['quantity'] ?? 0);
             $productPrice = floatval($product['price'] ?? 0);
             $itemSubtotal = $productQuantity * $productPrice;
 
@@ -742,14 +767,15 @@ class EditBudget extends EditRecord
             $quantity += $productQuantity;
         }
 
-        // Atualizar quantidade total na calculadora de preço
-        $set('content.quantity', number_format($quantity, 2, '.', ''));
+        // Atualizar quantidade total na calculadora de preço (como inteiro)
+        $set('content.quantity', (int) $quantity);
 
-        // Aplicar taxas e descontos
+        // Aplicar taxas, shipping e descontos
+        $shipping = floatval($get('content.shipping') ?? 0);
         $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
 
-        $total = $subtotal + $tax - $discount;
+        $total = $subtotal + $shipping + $tax - $discount;
         $set('content.total', number_format($total, 2, '.', ''));
     }
 
@@ -761,7 +787,7 @@ class EditBudget extends EditRecord
      */
     private static function calculateItemSubtotal(Get $get, Set $set): void
     {
-        $quantity = floatval($get('quantity') ?? 0);
+        $quantity = intval($get('quantity') ?? 0);
         $price = floatval($get('price') ?? 0);
         $subtotal = $quantity * $price;
         $set('subtotal', number_format($subtotal, 2, '.', ''));
