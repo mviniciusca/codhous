@@ -144,8 +144,8 @@ class CreateBudget extends CreateRecord
                                     ->dehydrated()
                                     ->prefix('#')
                                     ->label(__('Budget Code'))
-                                    ->helperText(__('Use this code to search'))
-                                    ->placeholder('Generated automatically'),
+                                    ->helperText(__('Auto-generated code (preview)'))
+                                    ->default(fn () => 'BD'.date('Ym').str_pad(rand(1, 99999), 5, '0', STR_PAD_LEFT)),
                                 DateTimePicker::make('created_at')
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
@@ -402,7 +402,7 @@ class CreateBudget extends CreateRecord
                                 Section::make(__('Pricing Calculator'))
                                     ->icon('heroicon-o-currency-dollar')
                                     ->description(__('Pricing Definition & Total Cost.'))
-                                    ->columns(6)
+                                    ->columns(3)
                                     ->schema([
                                         TextInput::make('content.quantity')
                                             ->live(onBlur: true)
