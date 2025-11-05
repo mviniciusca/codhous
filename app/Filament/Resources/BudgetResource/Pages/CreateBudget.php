@@ -527,7 +527,7 @@ class CreateBudget extends CreateRecord
             $shipping = floatval($data['content']['shipping'] ?? 0);
             $tax = floatval($data['content']['tax'] ?? 0);
             $discount = floatval($data['content']['discount'] ?? 0);
-            
+
             $total = BudgetCalculatorService::calculateTotalFromValues($subtotal, $shipping, $tax, $discount);
 
             $content = $budget->content;
@@ -607,7 +607,7 @@ class CreateBudget extends CreateRecord
     private function calculateTotal(Get $get, Set $set): void
     {
         $products = $get('content.products') ?? [];
-        
+
         // Calcular subtotais de cada produto usando o serviço
         foreach ($products as $index => $product) {
             $subtotal = BudgetCalculatorService::calculateItemSubtotal(

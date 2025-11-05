@@ -15,6 +15,7 @@ class BudgetCalculatorService
     {
         $quantity = intval($quantity);
         $subtotal = $quantity * $price;
+
         return number_format($subtotal, 2, '.', '');
     }
 
@@ -48,7 +49,7 @@ class BudgetCalculatorService
         return [
             'subtotal' => $subtotal,
             'quantity' => $totalQuantity,
-            'total' => number_format($total, 2, '.', ''),
+            'total'    => number_format($total, 2, '.', ''),
         ];
     }
 
@@ -94,6 +95,7 @@ class BudgetCalculatorService
     public static function calculateTotalFromValues(float $subtotal, float $shipping = 0, float $tax = 0, float $discount = 0): string
     {
         $total = $subtotal + $shipping + $tax - $discount;
+
         return self::formatCurrency($total);
     }
 }

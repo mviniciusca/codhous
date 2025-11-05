@@ -754,7 +754,7 @@ class EditBudget extends EditRecord
 
         // Calcular subtotais de cada produto usando o service
         $subtotalsByProduct = BudgetCalculatorService::calculateProductSubtotals($products);
-        
+
         foreach ($products as $index => $product) {
             // Atualizar subtotal do item
             $set("content.products.{$index}.subtotal", $subtotalsByProduct[$index]['subtotal']);
@@ -766,7 +766,7 @@ class EditBudget extends EditRecord
         $discount = floatval($get('content.discount') ?? 0);
 
         $result = BudgetCalculatorService::calculateTotal($products, $shipping, $tax, $discount);
-        
+
         // Atualizar quantidade total na calculadora de preço (como inteiro)
         $set('content.quantity', $result['quantity']);
         $set('content.total', $result['total']);
