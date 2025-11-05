@@ -37,7 +37,7 @@ class BudgetFactory extends Factory
                 'done',
             ]),
             'content' => [
-                'quantity'       => (string) $quantity,
+                'quantity'       => $quantity,
                 'product'        => (string) $product_id,
                 'product_option' => (string) $product_option_id,
                 'location'       => (string) $this->faker->randomElement([1, 2, 3]),
