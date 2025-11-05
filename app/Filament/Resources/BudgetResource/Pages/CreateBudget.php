@@ -298,6 +298,7 @@ class CreateBudget extends CreateRecord
                     ->schema([
                         \Filament\Forms\Components\Repeater::make('content.products')
                             ->label(__('Product List'))
+                            ->cloneable()
                             ->schema([
                                 Select::make('product')
                                     ->live()
@@ -382,7 +383,7 @@ class CreateBudget extends CreateRecord
                 Section::make(__('Pricing Calculator'))
                     ->icon('heroicon-o-currency-dollar')
                     ->description(__('Pricing Definition & Total Cost.'))
-                    ->columns(5)
+                    ->columns(6)
                     ->schema([
                         TextInput::make('content.quantity')
                             ->live(onBlur: true)
@@ -407,6 +408,20 @@ class CreateBudget extends CreateRecord
                             ->step(0.01)
                             ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
                             ->afterStateUpdated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set)),
+                        TextInput::make('content.shipping')
+                            ->live(onBlur: true)
+                            ->dehydrated()
+                            ->prefix('+'.env('CURRENCY_SUFFIX'))
+                            ->numeric()
+                            ->required()
+                            ->helperText(__('Shipping cost in '.env('CURRENCY_SUFFIX')))
+                            ->step(0.01)
+                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                $this->calculateTotal($get, $set);
+                            })
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                $this->calculateTotal($get, $set);
+                            }),
                         TextInput::make('content.tax')
                             ->live(onBlur: true)
                             ->dehydrated()
@@ -588,10 +603,11 @@ class CreateBudget extends CreateRecord
         $set('content.quantity', $quantity);
 
         // Aplicar taxas e descontos
+        $shipping = floatval($get('content.shipping') ?? 0);
         $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
 
-        $total = $subtotal + $tax - $discount;
+        $total = $subtotal + $shipping + $tax - $discount;
         $set('content.total', number_format($total, 2, '.', ''));
     }
 
