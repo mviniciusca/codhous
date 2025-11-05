@@ -295,37 +295,15 @@ class CreateBudget extends CreateRecord
                 Section::make(__('Shopping Bag'))
                     ->description(__('Products in the shopping bag.'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->columns(8)
                     ->schema([
                         \Filament\Forms\Components\Repeater::make('content.products')
                             ->label(__('Product List'))
                             ->schema([
-                                TextInput::make('quantity')
-                                    ->live(true)
-                                    ->integer()
-                                    ->required()
-                                    ->minValue(3)
-                                    ->label(__('Quantity'))
-                                    ->suffix(__('m³'))
-                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        $this->calculateTotal($get, $set);
-                                    }),
-                                Select::make('location')
-                                    ->dehydrated()
-                                    ->required()
-                                    ->columnSpan(2)
-                                    ->label(__('Local / Area'))
-                                    ->helperText(__('Local or area to be concreted'))
-                                    ->searchable()
-                                    ->prefixIcon('heroicon-o-map-pin')
-                                    ->options(Location::all()
-                                        ->pluck('name', 'id')),
                                 Select::make('product')
                                     ->live()
                                     ->dehydrated()
                                     ->required()
-                                    ->columnSpan(2)
+                                    ->columnSpan(4)
                                     ->searchable()
                                     ->prefixIcon('heroicon-o-shopping-cart')
                                     ->label(__('Product'))
@@ -340,20 +318,47 @@ class CreateBudget extends CreateRecord
                                     ->dehydrated()
                                     ->searchable()
                                     ->prefixIcon('heroicon-o-shopping-bag')
-                                    ->columnSpan(2)
+                                    ->columnSpan(4)
                                     ->label(__('Option'))
                                     ->helperText(__('Option selected'))
                                     ->options(fn (Get $get): Collection => $this->getOptions($get))
                                     ->required(fn (Get $get): bool => $this->getOptions($get)->count() > 0)
                                     ->hidden(fn (Get $get): bool => $this->getOptions($get)->count() == 0)
                                     ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
+                                Select::make('location')
+                                    ->dehydrated()
+                                    ->required()
+                                    ->columnSpan(4)
+                                    ->label(__('Local / Area'))
+                                    ->helperText(__('Local or area to be concreted'))
+                                    ->searchable()
+                                    ->prefixIcon('heroicon-o-map-pin')
+                                    ->options(Location::all()->pluck('name', 'id')),
+                                TextInput::make('quantity')
+                                    ->live(true)
+                                    ->integer()
+                                    ->required()
+                                    ->minValue(1)
+                                    ->columnSpan(4)
+                                    ->label(__('Quantity'))
+                                    ->suffix(__('m³'))
+                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        $this->calculateItemSubtotal($get, $set);
+                                        $this->calculateTotal($get, $set);
+                                    }),
                                 TextInput::make('price')
                                     ->live(onBlur: true)
                                     ->disabled()
                                     ->dehydrated()
+                                    ->columnSpan(4)
                                     ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
                                     ->afterStateHydrated(function (Get $get, Set $set) {
                                         $this->getPrice($get, $set);
+                                    })
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        $this->calculateItemSubtotal($get, $set);
+                                        $this->calculateTotal($get, $set);
                                     })
                                     ->prefix(env('CURRENCY_SUFFIX'))
                                     ->label(__('Price per Unity'))
@@ -362,35 +367,17 @@ class CreateBudget extends CreateRecord
                                     ->live()
                                     ->disabled()
                                     ->dehydrated()
+                                    ->columnSpan(4)
                                     ->prefix(env('CURRENCY_SUFFIX'))
                                     ->label(__('Subtotal'))
                                     ->helperText(__('Product quantity x price'))
                                     ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateItemSubtotal($get, $set)),
                             ])
-                            ->columns(4)
-                            ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null
-                            )
+                            ->columns(12)
+                            ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null)
                             ->addActionLabel(__('Add Product'))
                             ->collapsible()
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                $this->calculateTotal($get, $set);
-                            })
-                            ->reorderable()
-                            ->defaultItems(1)
-                            ->columnSpanFull()
-                            ->createItemButtonLabel(__('Adicionar Produto'))
-                            ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
-                                // Add logging to debug
-                                \Illuminate\Support\Facades\Log::debug('Saving repeater data:', $data);
-
-                                return $data;
-                            })
-                            ->mutateRelationshipDataBeforeFillUsing(function (array $data): array {
-                                // Add logging to debug
-                                \Illuminate\Support\Facades\Log::debug('Loading repeater data:', $data);
-
-                                return $data;
-                            }),
+                            ->columnSpanFull(),
                     ]),
                 Section::make(__('Pricing Calculator'))
                     ->icon('heroicon-o-currency-dollar')
