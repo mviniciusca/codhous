@@ -297,6 +297,11 @@ class EditBudget extends EditRecord
                                 \Filament\Forms\Components\Repeater::make('content.products')
                                     ->label(__('Product List'))
                                     ->collapsed()
+                                    ->live()
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        // Recalcular totais quando produtos são adicionados ou removidos
+                                        self::calculateTotal($get, $set);
+                                    })
                                     ->schema([
                                         Group::make()
                                             ->columnSpanFull()
@@ -350,7 +355,7 @@ class EditBudget extends EditRecord
                                                     ->options(Location::all()
                                                         ->pluck('name', 'id')),
                                                 TextInput::make('quantity')
-                                                    ->live(true)
+                                                    ->live(onBlur: true)
                                                     ->integer()
                                                     ->required()
                                                     ->minValue(3)
@@ -359,6 +364,10 @@ class EditBudget extends EditRecord
                                                     ->suffix(__('m³'))
                                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                                        // Calcular subtotal do item atual
+                                                        self::calculateItemSubtotal($get, $set);
+
+                                                        // Recalcular total geral e atualizar quantidade total
                                                         self::calculateTotal($get, $set);
                                                     }),
                                             ]),
@@ -733,8 +742,8 @@ class EditBudget extends EditRecord
             $quantity += $productQuantity;
         }
 
-        // Atualizar total de todos os produtos
-        $set('content.quantity', $quantity);
+        // Atualizar quantidade total na calculadora de preço
+        $set('content.quantity', number_format($quantity, 2, '.', ''));
 
         // Aplicar taxas e descontos
         $tax = floatval($get('content.tax') ?? 0);

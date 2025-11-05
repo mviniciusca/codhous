@@ -299,6 +299,11 @@ class CreateBudget extends CreateRecord
                         \Filament\Forms\Components\Repeater::make('content.products')
                             ->label(__('Product List'))
                             ->cloneable()
+                            ->live()
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                // Recalcular totais quando produtos são adicionados ou removidos
+                                $this->calculateTotal($get, $set);
+                            })
                             ->schema([
                                 Select::make('product')
                                     ->live()
@@ -336,7 +341,7 @@ class CreateBudget extends CreateRecord
                                     ->prefixIcon('heroicon-o-map-pin')
                                     ->options(Location::all()->pluck('name', 'id')),
                                 TextInput::make('quantity')
-                                    ->live(true)
+                                    ->live(onBlur: true)
                                     ->integer()
                                     ->required()
                                     ->minValue(1)
@@ -344,8 +349,11 @@ class CreateBudget extends CreateRecord
                                     ->label(__('Quantity'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        // Calcular subtotal do item atual
                                         $this->calculateItemSubtotal($get, $set);
+
+                                        // Recalcular total geral e atualizar quantidade total
                                         $this->calculateTotal($get, $set);
                                     }),
                                 TextInput::make('price')
@@ -599,8 +607,8 @@ class CreateBudget extends CreateRecord
             $quantity += $productQuantity;
         }
 
-        // Atualizar total de todos os produtos
-        $set('content.quantity', $quantity);
+        // Atualizar quantidade total na calculadora de preço
+        $set('content.quantity', number_format($quantity, 2, '.', ''));
 
         // Aplicar taxas e descontos
         $shipping = floatval($get('content.shipping') ?? 0);
