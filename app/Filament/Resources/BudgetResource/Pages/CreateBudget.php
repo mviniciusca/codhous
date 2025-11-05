@@ -8,6 +8,7 @@ use App\Models\BudgetHistory;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductOption;
+use App\Services\BudgetCalculatorService;
 use App\Services\FakeBudgetDataService;
 use App\Services\PostcodeFinder;
 use App\Trait\BudgetStatus;
@@ -523,13 +524,15 @@ class CreateBudget extends CreateRecord
             $totalQuantity = $budget->products()->sum('quantity');
             $subtotal = $budget->products()->sum('subtotal');
 
+            $shipping = floatval($data['content']['shipping'] ?? 0);
             $tax = floatval($data['content']['tax'] ?? 0);
             $discount = floatval($data['content']['discount'] ?? 0);
-            $total = $subtotal + $tax - $discount;
+            
+            $total = BudgetCalculatorService::calculateTotalFromValues($subtotal, $shipping, $tax, $discount);
 
             $content = $budget->content;
-            $content['quantity'] = $totalQuantity;
-            $content['total'] = number_format($total, 2, '.', '');
+            $content['quantity'] = (int) $totalQuantity;
+            $content['total'] = $total;
 
             // Atualizar o orçamento com os valores atualizados
             $budget->update(['content' => $content]);
@@ -604,33 +607,26 @@ class CreateBudget extends CreateRecord
     private function calculateTotal(Get $get, Set $set): void
     {
         $products = $get('content.products') ?? [];
-        $subtotal = 0;
-        $quantity = 0;
-
-        // Calcular subtotais de cada produto
+        
+        // Calcular subtotais de cada produto usando o serviço
         foreach ($products as $index => $product) {
-            $productQuantity = floatval($product['quantity'] ?? 0);
-            $productPrice = floatval($product['price'] ?? 0);
-            $itemSubtotal = $productQuantity * $productPrice;
-
-            // Atualizar subtotal do item
-            $set("content.products.{$index}.subtotal", number_format($itemSubtotal, 2, '.', ''));
-
-            // Somar ao total geral
-            $subtotal += $itemSubtotal;
-            $quantity += $productQuantity;
+            $subtotal = BudgetCalculatorService::calculateItemSubtotal(
+                $product['quantity'] ?? 0,
+                floatval($product['price'] ?? 0)
+            );
+            $set("content.products.{$index}.subtotal", $subtotal);
         }
 
-        // Atualizar quantidade total na calculadora de preço
-        $set('content.quantity', number_format($quantity, 2, '.', ''));
-
-        // Aplicar taxas e descontos
+        // Calcular total usando o serviço
         $shipping = floatval($get('content.shipping') ?? 0);
         $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
 
-        $total = $subtotal + $shipping + $tax - $discount;
-        $set('content.total', number_format($total, 2, '.', ''));
+        $result = BudgetCalculatorService::calculateTotal($products, $shipping, $tax, $discount);
+
+        // Atualizar os campos
+        $set('content.quantity', $result['quantity']);
+        $set('content.total', $result['total']);
     }
 
     /**
@@ -641,10 +637,10 @@ class CreateBudget extends CreateRecord
      */
     private function calculateItemSubtotal(Get $get, Set $set): void
     {
-        $quantity = floatval($get('quantity') ?? 0);
+        $quantity = intval($get('quantity') ?? 0);
         $price = floatval($get('price') ?? 0);
-        $subtotal = $quantity * $price;
-        $set('subtotal', number_format($subtotal, 2, '.', ''));
+        $subtotal = BudgetCalculatorService::calculateItemSubtotal($quantity, $price);
+        $set('subtotal', $subtotal);
     }
 
     /**
