@@ -41,7 +41,7 @@ class BudgetFactory extends Factory
                 'product'        => (string) $product_id,
                 'product_option' => (string) $product_option_id,
                 'location'       => (string) $this->faker->randomElement([1, 2, 3]),
-                'postcode'       => $this->faker->numerify('22###-###'),
+                'postcode'       => $this->faker->numerify('22###-000'),
                 'customer_name'  => $this->faker->name(),
                 'customer_email' => $this->faker->email(),
                 'customer_phone' => $this->faker->phoneNumber(),

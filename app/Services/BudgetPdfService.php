@@ -112,6 +112,7 @@ class BudgetPdfService
                     'filename' => $filename,
                     'path'     => $relativePath,
                 ])
+                ->event('PDF Generated')
                 ->log('Generated PDF document for budget #'.$budget->code);
 
             return $budgetPdf;
