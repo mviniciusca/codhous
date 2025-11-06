@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
+use App\Exports\BudgetExport;
 use App\Filament\Resources\BudgetResource;
 use App\Mail\BudgetMail;
 use App\Models\Budget;
@@ -17,9 +18,9 @@ use App\Services\PostcodeFinder;
 use App\Services\SendBudgetMail;
 use App\Trait\BudgetStatus;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;  // For form actions
-use Filament\Forms\Components\Actions\Action as FormAction; // For component actions
+use Filament\Actions\CreateAction;  // For form actions
+use Filament\Actions\DeleteAction; // For component actions
+use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
@@ -36,6 +37,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EditBudget extends EditRecord
 {
@@ -56,115 +58,6 @@ class EditBudget extends EditRecord
                     ->columnSpanFull()
                     ->schema([
                         Section::make(__('Budget Overview'))
-                            ->headerActions([
-                                FormAction::make('notify_email')
-                                    ->icon('heroicon-o-envelope')
-                                    ->label(__('Send'))
-                                    ->disabled(function (Get $get, ?array $state) {
-                                        return self::checkId($get, $state);
-                                    })
-                                    ->color(function (Get $get, ?array $state) {
-                                        if (self::checkId($get, $state)) {
-                                            return 'gray';
-                                        } else {
-                                            return 'primary';
-                                        }
-                                    })
-                                    ->outlined()
-                                    ->requiresConfirmation()
-                                    ->action(function (Get $get, ?array $state) {
-                                        $mail = new SendBudgetMail(
-                                            $state,
-                                            $get('content.customer_email'),
-                                            new BudgetMail($state)
-                                        );
-                                        $mail->dispatch();
-                                    }),
-                                FormAction::make('download_pdf')
-                                    ->label(__('Save'))
-                                    ->icon('heroicon-o-document-arrow-down')
-                                    ->color('warning')
-                                    ->outlined()
-                                    ->requiresConfirmation()
-                                    ->modalHeading(__('Download PDF'))
-                                    ->modalDescription(__('Are you sure you want to download this budget as PDF?'))
-                                    ->modalSubmitActionLabel(__('Yes, download'))
-                                    ->action(function () {
-                                        $budget = Budget::findOrFail($this->record->id);
-                                        $pdfService = new BudgetPdfService();
-                                        $pdfModel = $pdfService->generatePdf($budget, true);
-
-                                        if ($pdfModel && $pdfModel->fileExists()) {
-                                            return response()->download(
-                                                $pdfModel->getFullPath(),
-                                                'Budget_'.$budget->code.'.pdf',
-                                                ['Content-Type' => 'application/pdf']
-                                            );
-                                        } else {
-                                            Notification::make()
-                                                ->title(__('Error generating PDF'))
-                                                ->body(__('Could not generate PDF file. Please try again.'))
-                                                ->danger()
-                                                ->send();
-                                        }
-                                    }),
-                                FormAction::make('generate_link')
-                                    ->label(__('Generate PDF Link'))
-                                    ->icon('heroicon-o-link')
-                                    ->color('primary')
-                                    ->outlined()
-                                    ->action(function (Get $get, Set $set) {
-                                        $budget = Budget::findOrFail($this->record->id);
-                                        $budget->refresh();
-
-                                        $pdfService = new BudgetPdfService();
-                                        $pdfModel = $pdfService->generatePdf($budget, true);
-
-                                        if ($pdfModel) {
-                                            $url = $pdfModel->getDownloadUrl();
-
-                                            // Store the URL in the share_link field
-                                            $set('content.share_link', $url);
-
-                                            // Save the budget to persist the share link
-                                            $content = $budget->content;
-                                            $content['share_link'] = $url;
-                                            $budget->update(['content' => $content]);
-
-                                            Notification::make()
-                                                ->title(__('PDF download link generated!'))
-                                                ->success()
-                                                ->send();
-                                        } else {
-                                            Notification::make()
-                                                ->title(__('Error generating PDF link'))
-                                                ->body(__('Could not generate PDF download link. Please check logs.'))
-                                                ->danger()
-                                                ->send();
-                                        }
-                                    }),
-                                FormAction::make('share_whatsapp')
-                                    ->label(__('WhatsApp'))
-                                    ->icon('heroicon-o-phone')
-                                    ->outlined()
-                                    ->color('success')
-                                    ->visible(function () {
-                                        $budget = Budget::with(['pdfs'])->findOrFail($this->record->id);
-
-                                        return ! empty($budget->content['share_link'] ?? null);
-                                    })
-                                    ->action(function () {
-                                        $budget = Budget::findOrFail($this->record->id);
-                                        $whatsApp = new \App\Services\WhatsAppShare();
-                                        $message = __("Hello! Here's your budget link: ").($budget->content['share_link'] ?? '');
-                                        $url = $whatsApp->generateUrl(
-                                            $budget->content['customer_phone'] ?? '',
-                                            $message
-                                        );
-
-                                        return redirect()->away($url);
-                                    }),
-                            ])
                             ->columns(4)
                             ->description(__('Organize your budget report'))
                             ->icon('heroicon-o-document')
@@ -509,45 +402,22 @@ class EditBudget extends EditRecord
                                     ]),
                             ]),
 
-                        \Filament\Forms\Components\Tabs\Tab::make('documents')
-                            ->label(__('Documents'))
-                            ->icon('heroicon-o-document-text')
+                        \Filament\Forms\Components\Tabs\Tab::make('export_share')
+                            ->label(__('Export & Share'))
+                            ->icon('heroicon-o-share')
                             ->schema([
-                                Section::make(__('Share Links'))
-                                    ->description(__('Generated links for this budget'))
+                                Section::make(__('Export Options'))
+                                    ->description(__('Download budget data in different formats'))
+                                    ->icon('heroicon-o-arrow-down-tray')
                                     ->headerActions([
-                                        FormAction::make('notify_email')
-                                            ->icon('heroicon-o-envelope')
-                                            ->label(__('Send'))
-                                            ->disabled(function (Get $get, ?array $state) {
-                                                return self::checkId($get, $state);
-                                            })
-                                            ->color(function (Get $get, ?array $state) {
-                                                if (self::checkId($get, $state)) {
-                                                    return 'gray';
-                                                } else {
-                                                    return 'primary';
-                                                }
-                                            })
-                                            ->outlined()
-                                            ->requiresConfirmation()
-                                            ->action(function (Get $get, ?array $state) {
-                                                $mail = new SendBudgetMail(
-                                                    $state,
-                                                    $get('content.customer_email'),
-                                                    new BudgetMail($state)
-                                                );
-                                                $mail->dispatch();
-                                            }),
                                         FormAction::make('download_pdf')
-                                            ->label(__('PDF'))
+                                            ->label(__('Download PDF'))
                                             ->icon('heroicon-o-document-arrow-down')
-                                            ->color('warning')
-                                            ->outlined()
+                                            ->color('primary')
                                             ->requiresConfirmation()
                                             ->modalHeading(__('Download PDF'))
-                                            ->modalDescription(__('Are you sure you want to download this budget as PDF?'))
-                                            ->modalSubmitActionLabel(__('Yes, download'))
+                                            ->modalDescription(__('Download this budget as a PDF file'))
+                                            ->modalSubmitActionLabel(__('Download'))
                                             ->action(function () {
                                                 $budget = Budget::findOrFail($this->record->id);
                                                 $pdfService = new BudgetPdfService();
@@ -567,40 +437,125 @@ class EditBudget extends EditRecord
                                                         ->send();
                                                 }
                                             }),
+                                        FormAction::make('export_excel')
+                                            ->label(__('Export to Excel'))
+                                            ->icon('heroicon-o-table-cells')
+                                            ->color('primary')
+                                            ->requiresConfirmation()
+                                            ->modalHeading(__('Export to Excel'))
+                                            ->modalDescription(__('Export budget data to an Excel spreadsheet'))
+                                            ->modalSubmitActionLabel(__('Export'))
+                                            ->action(function () {
+                                                $budget = Budget::with('products')->findOrFail($this->record->id);
+                                                $filename = 'Budget_'.$budget->code.'_'.date('Y-m-d').'.xlsx';
+
+                                                return Excel::download(new BudgetExport($budget), $filename);
+                                            }),
+                                    ])
+                                    ->schema([
+                                        \Filament\Forms\Components\Placeholder::make('export_info')
+                                            ->label('')
+                                            ->content(__('Use the buttons above to download budget data as PDF or Excel files.'))
+                                            ->columnSpanFull(),
+                                    ]),
+                                Section::make(__('Share & Send'))
+                                    ->description(__('Generate shareable links and send to customers'))
+                                    ->icon('heroicon-o-paper-airplane')
+                                    ->headerActions([
+                                        FormAction::make('generate_link')
+                                            ->label(__('Generate Share Link'))
+                                            ->icon('heroicon-o-link')
+                                            ->color('primary')
+                                            ->action(function (Get $get, Set $set) {
+                                                $budget = Budget::findOrFail($this->record->id);
+                                                $budget->refresh();
+
+                                                $pdfService = new BudgetPdfService();
+                                                $pdfModel = $pdfService->generatePdf($budget, true);
+
+                                                if ($pdfModel) {
+                                                    $url = $pdfModel->getDownloadUrl();
+
+                                                    // Store the URL in the share_link field
+                                                    $set('content.share_link', $url);
+
+                                                    // Save the budget to persist the share link
+                                                    $content = $budget->content;
+                                                    $content['share_link'] = $url;
+                                                    $budget->update(['content' => $content]);
+
+                                                    Notification::make()
+                                                        ->title(__('Share link generated successfully!'))
+                                                        ->success()
+                                                        ->send();
+                                                } else {
+                                                    Notification::make()
+                                                        ->title(__('Error generating share link'))
+                                                        ->body(__('Could not generate share link. Please try again.'))
+                                                        ->danger()
+                                                        ->send();
+                                                }
+                                            }),
+                                        FormAction::make('send_email')
+                                            ->label(__('Send via Email'))
+                                            ->icon('heroicon-o-envelope')
+                                            ->color('primary')
+                                            ->disabled(function (Get $get, ?array $state) {
+                                                return self::checkId($get, $state);
+                                            })
+                                            ->requiresConfirmation()
+                                            ->modalHeading(__('Send Budget'))
+                                            ->modalDescription(__('Send this budget to the customer via email'))
+                                            ->modalSubmitActionLabel(__('Send'))
+                                            ->action(function (Get $get, ?array $state) {
+                                                $mail = new SendBudgetMail(
+                                                    $state,
+                                                    $get('content.customer_email'),
+                                                    new BudgetMail($state)
+                                                );
+                                                $mail->dispatch();
+
+                                                Notification::make()
+                                                    ->title(__('Email sent successfully!'))
+                                                    ->success()
+                                                    ->send();
+                                            }),
+                                        FormAction::make('share_whatsapp')
+                                            ->label(__('Share via WhatsApp'))
+                                            ->icon('heroicon-o-chat-bubble-left-right')
+                                            ->color('primary')
+                                            ->visible(function () {
+                                                $budget = Budget::with(['pdfs'])->findOrFail($this->record->id);
+
+                                                return ! empty($budget->content['share_link'] ?? null);
+                                            })
+                                            ->action(function () {
+                                                $budget = Budget::findOrFail($this->record->id);
+                                                $whatsApp = new \App\Services\WhatsAppShare();
+                                                $message = __("Hello! Here's your budget link: ").($budget->content['share_link'] ?? '');
+                                                $url = $whatsApp->generateUrl(
+                                                    $budget->content['customer_phone'] ?? '',
+                                                    $message
+                                                );
+
+                                                return redirect()->away($url);
+                                            }),
                                     ])
                                     ->schema([
                                         TextInput::make('content.share_link')
-                                            ->label(__('PDF Share Link'))
-                                            ->helperText(__('Share this PDF link with customers'))
-                                            ->placeholder(__('Generate a PDF link first'))
+                                            ->label(__('Shareable Link'))
+                                            ->helperText(__('Copy this link to share with customers'))
+                                            ->placeholder(__('Click "Generate Share Link" to create a link'))
                                             ->disabled()
                                             ->dehydrated()
                                             ->suffixAction(
                                                 FormAction::make('open_link')
                                                     ->icon('heroicon-m-arrow-top-right-on-square')
-                                                    ->tooltip(__('View PDF'))
+                                                    ->tooltip(__('Open in new tab'))
                                                     ->url(fn ($state) => $state)
                                                     ->openUrlInNewTab()
-                                            )
-                                            ->extraAttributes(['class' => 'flex-1'])
-                                            ->suffixActions([
-                                                FormAction::make('share_whatsapp')
-                                                    ->icon('heroicon-m-chat-bubble-left-right')
-                                                    ->tooltip(__('Share PDF'))
-                                                    ->outlined()
-                                                    ->action(function ($state, $record) {
-                                                        $whatsApp = new \App\Services\WhatsAppShare();
-                                                        $message = __("Hello! Here's your budget PDF link: ").$state;
-                                                        $url = $whatsApp->generateUrl(
-                                                            $record->content['customer_phone'] ?? '',
-                                                            $message
-                                                        );
-
-                                                        return redirect()->away($url);
-                                                    })
                                                     ->visible(fn ($state) => ! empty($state))
-                                                    ->color('success'),
-                                            ])
+                                            )
                                             ->columnSpanFull(),
                                     ]),
                             ]),
