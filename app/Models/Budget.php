@@ -48,6 +48,11 @@ class Budget extends Model
         return $this->hasMany(BudgetPdf::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(BudgetDocument::class);
+    }
+
     public function latestPdf()
     {
         return $this->pdfs()->latest()->first();

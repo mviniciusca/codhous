@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BudgetResource\Pages;
 use App\Filament\Resources\BudgetResource\RelationManagers\BudgetHistoryRelationManager;
+use App\Filament\Resources\BudgetResource\RelationManagers\DocumentsRelationManager;
 use App\Models\Budget;
 use App\Services\FakeBudgetDataService;
 use Filament\Forms\Components\Actions\Action;
@@ -297,6 +298,7 @@ class BudgetResource extends Resource
     {
         return [
             BudgetHistoryRelationManager::class,
+            DocumentsRelationManager::class,
         ];
     }
 

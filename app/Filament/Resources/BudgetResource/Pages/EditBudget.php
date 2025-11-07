@@ -825,29 +825,26 @@ class EditBudget extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('save')
+                ->label(__('Save'))
+                ->color('primary')
+                ->icon('heroicon-o-check')
+                ->action('save'),
+            DeleteAction::make()
+                ->requiresConfirmation()
+                ->icon('heroicon-o-trash')
+                ->label(__('Delete')),
             CreateAction::make('new_budget')
                 ->label(__('New Budget'))
-                ->color('primary')
+                ->color('gray')
                 ->url(route('filament.admin.resources.budgets.create'))
                 ->icon('heroicon-o-currency-dollar'),
-
         ];
     }
 
     protected function getFormActions(): array
     {
-        return [
-            $this->getSaveFormAction(),
-            $this->getDeleteFormAction(),
-        ];
-    }
-
-    protected function getDeleteFormAction(): DeleteAction
-    {
-        return DeleteAction::make('delete')
-            ->requiresConfirmation()
-            ->icon('heroicon-o-trash')
-            ->label(__('Delete'));
+        return [];
     }
 
     /**
