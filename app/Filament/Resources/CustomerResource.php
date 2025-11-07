@@ -31,7 +31,7 @@ class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
 
-    protected static ?string $navigationGroup = 'Customers & Partners';
+    protected static ?string $navigationGroup = 'Customers';
 
     public static function getNavigationLabel(): string
     {

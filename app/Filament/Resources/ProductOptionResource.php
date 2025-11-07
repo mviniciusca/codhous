@@ -23,7 +23,7 @@ class ProductOptionResource extends Resource
 {
     protected static ?string $model = ProductOption::class;
 
-    protected static ?string $navigationGroup = 'Budget Tool';
+    protected static ?string $navigationGroup = 'Budget';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

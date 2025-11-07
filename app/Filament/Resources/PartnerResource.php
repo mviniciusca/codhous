@@ -26,7 +26,7 @@ class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
 
-    protected static ?string $navigationGroup = 'Customers & Partners';
+    protected static ?string $navigationGroup = 'Customers';
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 

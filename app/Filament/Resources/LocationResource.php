@@ -2,27 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Location;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Section;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\LocationResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\LocationResource\RelationManagers;
+use App\Models\Location;
+use Filament\Forms;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
+
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationGroup = 'Budget Tool';
+
+    protected static ?string $navigationGroup = 'Budget';
+
     protected static ?string $navigationIcon = 'heroicon-o-map';
+
     protected static ?string $navigationParentItem = 'Products';
 
     public static function getNavigationLabel(): string
@@ -58,7 +62,7 @@ class LocationResource extends Resource
             ->searchPlaceholder(__('Search'))
             ->columns([
                 TextColumn::make('name')
-                    ->searchable()
+                    ->searchable(),
             ])
             ->filters([
                 //
@@ -85,9 +89,9 @@ class LocationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLocations::route('/'),
+            'index'  => Pages\ListLocations::route('/'),
             'create' => Pages\CreateLocation::route('/create'),
-            'edit' => Pages\EditLocation::route('/{record}/edit'),
+            'edit'   => Pages\EditLocation::route('/{record}/edit'),
         ];
     }
 }
