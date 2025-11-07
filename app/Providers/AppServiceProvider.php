@@ -2,13 +2,31 @@
 
 namespace App\Providers;
 
+use App\Models\Budget;
+use App\Models\Customer;
+use App\Models\Mail;
 use App\Models\Setting;
+use App\Policies\BudgetPolicy;
+use App\Policies\CustomerPolicy;
+use App\Policies\MailPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * The policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected $policies = [
+        Budget::class   => BudgetPolicy::class,
+        Mail::class     => MailPolicy::class,
+        Customer::class => CustomerPolicy::class,
+    ];
+
     /**
      * Register any application services.
      */
@@ -22,6 +40,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register policies
+        foreach ($this->policies as $model => $policy) {
+            Gate::policy($model, $policy);
+        }
+
         // Verifica se a tabela settings existe (para evitar erros durante migrações)
         if (Schema::hasTable('settings')) {
             // Para configurações críticas como modo de manutenção, verificamos diretamente

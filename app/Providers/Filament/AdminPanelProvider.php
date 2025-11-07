@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
                 __('Customers'),
                 __('Communication'),
                 __('Configuration'),
+                __('Security'),
             ])
             ->resources([
                 config('filament-logger.activity_resource'),

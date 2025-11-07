@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\UserBudgetScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -23,12 +24,35 @@ class Budget extends Model
         ];
     }
 
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new UserBudgetScope);
+
+        // Automatically set user_id when creating
+        static::creating(function ($budget) {
+            if (! $budget->user_id && \Illuminate\Support\Facades\Auth::check()) {
+                $budget->user_id = \Illuminate\Support\Facades\Auth::id();
+            }
+        });
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    /**
+     * Get the user who created this budget.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function activities()

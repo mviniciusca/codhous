@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\UserResource\Widgets\UserStatsWidget;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,14 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            // Actions\DeleteAction::make(),
+            Actions\DeleteAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            UserStatsWidget::class,
         ];
     }
 }

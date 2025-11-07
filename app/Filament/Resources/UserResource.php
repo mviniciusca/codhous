@@ -5,64 +5,117 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationGroup = 'Configuration';
+    protected static ?string $navigationGroup = 'Security';
 
     public static function getNavigationLabel(): string
     {
-        return __('User Settings');
+        return __('Team Management');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('User');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Users');
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make(__('User Settings'))
+                Section::make(__('User Information'))
                     ->icon('heroicon-o-user')
-                    ->description(__('Manager your user here.'))
+                    ->description(__('Basic user information and credentials'))
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Name'))
-                            ->helperText(__('Your name'))
+                            ->label(__('Full Name'))
+                            ->helperText(__('User full name'))
                             ->prefixIcon('heroicon-o-user')
-                            ->required(),
+                            ->required()
+                            ->maxLength(255),
+
                         TextInput::make('email')
                             ->label(__('Email'))
-                            ->helperText(__('Your email. This affetcs your login.'))
+                            ->helperText(__('User email for login'))
                             ->prefixIcon('heroicon-o-envelope')
-                            ->required(),
+                            ->email()
+                            ->required()
+                            ->unique(ignoreRecord: true)
+                            ->maxLength(255),
+
                         TextInput::make('password')
                             ->label(__('Password'))
-                            ->helperText(__('Your password. This affetcs your login.'))
+                            ->helperText(__('Minimum 8 characters'))
                             ->prefixIcon('heroicon-o-key')
-                            ->required()
                             ->password()
-                            ->revealable(),
+                            ->revealable()
+                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->required(fn (string $context): bool => $context === 'create')
+                            ->minLength(8),
+
                         TextInput::make('password_confirmation')
                             ->prefixIcon('heroicon-o-key')
-                            ->helperText(__('Confirm your password. This affetcs your login.'))
+                            ->helperText(__('Confirm the password'))
                             ->label(__('Confirm Password'))
-                            ->required()
-                            ->same('password')
                             ->password()
-                            ->revealable(),
+                            ->revealable()
+                            ->same('password')
+                            ->required(fn (string $context): bool => $context === 'create')
+                            ->dehydrated(false),
+                    ]),
+
+                Section::make(__('Role & Permissions'))
+                    ->icon('heroicon-o-shield-check')
+                    ->description(__('Assign role to user'))
+                    ->schema([
+                        Select::make('roles')
+                            ->label(__('User Role'))
+                            ->helperText(__('Select the role for this user. Super Admin: Full access | Admin: Manager | Vendedor: Sales | Financeiro: Financial | Atendimento: Customer Service'))
+                            ->relationship('roles', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->required()
+                            ->native(false)
+                            ->getOptionLabelFromRecordUsing(fn ($record) => match ($record->name) {
+                                'super_admin' => '🔴 Super Admin (Full Access)',
+                                'admin'       => '🟡 Admin (Manager/Supervisor)',
+                                'vendedor'    => '🟢 Vendedor (Sales Team)',
+                                'financeiro'  => '🔵 Financeiro (Financial)',
+                                'atendimento' => '🟣 Atendimento (Customer Service)',
+                                default       => $record->name,
+                            }),
                     ]),
             ]);
     }
@@ -71,27 +124,89 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
-                TextColumn::make('roles.name'),
+                TextColumn::make('name')
+                    ->label(__('Name'))
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
+
+                TextColumn::make('email')
+                    ->label(__('Email'))
+                    ->searchable()
+                    ->sortable()
+                    ->icon('heroicon-o-envelope')
+                    ->copyable(),
+
+                TextColumn::make('roles.name')
+                    ->label(__('Role'))
+                    ->badge()
+                    ->colors([
+                        'danger'  => 'super_admin',
+                        'warning' => 'admin',
+                        'success' => 'vendedor',
+                        'info'    => 'financeiro',
+                        'primary' => 'atendimento',
+                    ])
+                    ->formatStateUsing(function ($state) {
+                        return match ($state) {
+                            'super_admin' => 'Super Admin',
+                            'admin'       => 'Admin',
+                            'vendedor'    => 'Vendedor',
+                            'financeiro'  => 'Financeiro',
+                            'atendimento' => 'Atendimento',
+                            default       => $state,
+                        };
+                    }),
+
+                TextColumn::make('created_at')
+                    ->label(__('Created At'))
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('budgets_count')
+                    ->label(__('Budgets'))
+                    ->counts('budgets')
+                    ->badge()
+                    ->color('success')
+                    ->toggleable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                SelectFilter::make('role')
+                    ->label(__('Filter by Role'))
+                    ->relationship('roles', 'name')
+                    ->preload()
+                    ->multiple()
+                    ->options([
+                        'super_admin' => 'Super Admin',
+                        'admin'       => 'Admin',
+                        'vendedor'    => 'Vendedor',
+                        'financeiro'  => 'Financeiro',
+                        'atendimento' => 'Atendimento',
+                    ]),
             ])
             ->actions([
-                //Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    //Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->emptyStateHeading(__('No users yet'))
+            ->emptyStateDescription(__('Create your first team member'))
+            ->emptyStateIcon('heroicon-o-users');
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            UserResource\RelationManagers\BudgetsRelationManager::class,
+            UserResource\RelationManagers\ActivitiesRelationManager::class,
         ];
     }
 
