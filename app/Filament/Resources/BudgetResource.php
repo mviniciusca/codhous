@@ -327,19 +327,33 @@ class BudgetResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->recordClasses(fn (Budget $record) => match ($record->status) {
-                'ignored' => 'opacity-30 dark:opacity-30 hover:opacity-100 dark:hover:opacity-100',
-                'done'    => 'opacity-50 dark:opacity-50 hover:opacity-100 dark:hover:opacity-100',
-                default   => null,
+            ->recordClasses(fn (Budget $record) => match (true) {
+                // Deletado: bem apagado com linha atravessada
+                $record->trashed() => 'opacity-40 dark:opacity-40 hover:opacity-70 dark:hover:opacity-70 [&_*]:line-through',
+                // Ignorado: muito apagado (não é mais relevante)
+                $record->status === 'ignored' => 'opacity-40 dark:opacity-40 hover:opacity-90 dark:hover:opacity-90',
+                // Finalizado: levemente apagado (já foi concluído)
+                $record->status === 'done' => 'opacity-70 dark:opacity-70 hover:opacity-100 dark:hover:opacity-100',
+                // Em andamento e Pendente: totalmente visíveis (100%)
+                default => null,
             })
             ->columns([
                 TextColumn::make('code')
                     ->searchable()
-                    ->label(__('Code')),
+                    ->label(__('Code'))
+                    ->icon(fn (Budget $record) => $record->trashed() ? 'heroicon-o-trash' : null)
+                    ->iconColor('danger'),
                 TextColumn::make('status')
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->icon(fn (Budget $record, string $state): string => $record->trashed() ? 'heroicon-o-trash' : match ($state) {
+                        'pending'  => 'heroicon-o-clock',
+                        'on going' => 'heroicon-o-arrow-path',
+                        'done'     => 'heroicon-o-check-circle',
+                        'ignored'  => 'heroicon-o-x-circle',
+                        default    => 'heroicon-o-question-mark-circle',
+                    })
+                    ->color(fn (Budget $record, string $state): string => $record->trashed() ? 'gray' : match ($state) {
                         'pending'  => 'primary',
                         'on going' => 'warning',
                         'done'     => 'success',
@@ -364,6 +378,12 @@ class BudgetResource extends Resource
             ])
             ->defaultSort('id', 'desc')
             ->filters([
+                Tables\Filters\TrashedFilter::make()
+                    ->label(__('Trash'))
+                    ->placeholder(__('Without trashed'))
+                    ->trueLabel(__('Only trashed'))
+                    ->falseLabel(__('With trashed'))
+                    ->native(false),
                 TernaryFilter::make('is_active')
                     ->placeholder(__('Default'))
                     ->default(true)
@@ -496,12 +516,31 @@ class BudgetResource extends Resource
                             return redirect()->away($url);
                         }),
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->label(__('Delete')),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->label(__('Force Delete')),
+                    Tables\Actions\RestoreAction::make()
+                        ->label(__('Restore')),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label(__('Delete Selected')),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label(__('Force Delete Selected')),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label(__('Restore Selected')),
                 ]),
+            ]);
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                \Illuminate\Database\Eloquent\SoftDeletingScope::class,
             ]);
     }
 
