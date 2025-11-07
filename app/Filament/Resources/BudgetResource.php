@@ -327,6 +327,8 @@ class BudgetResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordAction(null)
+            ->recordUrl(fn (Budget $record): ?string => $record->trashed() ? null : BudgetResource::getUrl('edit', ['record' => $record]))
             ->recordClasses(fn (Budget $record) => match (true) {
                 // Deletado: bem apagado com linha atravessada
                 $record->trashed() => 'opacity-40 dark:opacity-40 hover:opacity-70 dark:hover:opacity-70 [&_*]:line-through',
@@ -367,6 +369,16 @@ class BudgetResource extends Resource
                     ->label(__('Email')),
                 TextColumn::make('content.customer_phone')
                     ->label(__('Phone')),
+                TextColumn::make('documents_count')
+                    ->counts('documents')
+                    ->label(__('Documents'))
+                    ->badge()
+                    ->color(fn ($state) => $state > 0 ? 'success' : 'gray')
+                    ->icon(fn ($state) => $state > 0 ? 'heroicon-o-paper-clip' : 'heroicon-o-document')
+                    ->formatStateUsing(fn ($state) => $state > 0 ? $state : __('None'))
+                    ->sortable()
+                    ->alignCenter()
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->date('d/m/Y H:i')
                     ->sortable()
@@ -407,7 +419,7 @@ class BudgetResource extends Resource
                         ->label(__('Copy PDF Link'))
                         ->icon('heroicon-o-clipboard-document')
                         ->color('success')
-                        ->visible(fn (Budget $record) => ! empty($record->content['share_link']))
+                        ->visible(fn (Budget $record) => ! $record->trashed() && ! empty($record->content['share_link']))
                         ->action(function (Budget $record) {
                             Notification::make()
                                 ->title(__('PDF link copied!'))
@@ -418,7 +430,7 @@ class BudgetResource extends Resource
                         ->label(__('Generate PDF Link'))
                         ->icon('heroicon-o-link')
                         ->color('primary')
-                        ->visible(fn (Budget $record) => empty($record->content['share_link']))
+                        ->visible(fn (Budget $record) => ! $record->trashed() && empty($record->content['share_link']))
                         ->action(function (Budget $record) {
                             // Generate new link
                             $pdfService = new \App\Services\BudgetPdfService();
@@ -445,6 +457,7 @@ class BudgetResource extends Resource
                         ->label(__('Download PDF'))
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('warning')
+                        ->visible(fn (Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             $pdfService = new \App\Services\BudgetPdfService();
                             $pdfModel = $pdfService->generatePdf($record, true);
@@ -467,6 +480,7 @@ class BudgetResource extends Resource
                         ->label(__('Send Email'))
                         ->icon('heroicon-o-envelope')
                         ->color('primary')
+                        ->visible(fn (Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             try {
                                 $mail = new \App\Services\SendBudgetMail(
@@ -492,6 +506,7 @@ class BudgetResource extends Resource
                         ->label(__('Share on WhatsApp'))
                         ->icon('heroicon-o-phone')
                         ->color('success')
+                        ->visible(fn (Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             // Generate PDF and share link if not exists
                             if (empty($record->content['share_link'] ?? null)) {
@@ -515,13 +530,17 @@ class BudgetResource extends Resource
 
                             return redirect()->away($url);
                         }),
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make('edit')
+                        ->visible(fn (Budget $record) => ! $record->trashed()),
                     Tables\Actions\DeleteAction::make()
-                        ->label(__('Delete')),
+                        ->label(__('Delete'))
+                        ->visible(fn (Budget $record) => ! $record->trashed()),
                     Tables\Actions\ForceDeleteAction::make()
-                        ->label(__('Force Delete')),
+                        ->label(__('Force Delete'))
+                        ->visible(fn (Budget $record) => $record->trashed()),
                     Tables\Actions\RestoreAction::make()
-                        ->label(__('Restore')),
+                        ->label(__('Restore'))
+                        ->visible(fn (Budget $record) => $record->trashed()),
                 ]),
             ])
             ->bulkActions([
