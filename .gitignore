@@ -18,6 +18,3 @@ yarn-error.log
 /.idea
 /.vscode
 .php-cs-fixer.php
-
-# Documentation
-/docs
