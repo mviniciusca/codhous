@@ -49,8 +49,8 @@ class BudgetDocument extends Model
 
             $userName = \Illuminate\Support\Facades\Auth::user()?->name ?? 'System';
             $description = match ($eventName) {
-                'created' => "Documento anexado",
-                'deleted' => "Documento removido",
+                'created' => 'Documento anexado',
+                'deleted' => 'Documento removido',
                 default   => $eventName,
             };
 
