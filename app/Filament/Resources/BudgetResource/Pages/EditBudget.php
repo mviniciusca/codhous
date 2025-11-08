@@ -96,8 +96,10 @@ class EditBudget extends EditRecord
                             ]),
                     ]),
                 \Filament\Forms\Components\Tabs::make('budget_tabs')
+                    ->persistTabInQueryString('tab')
                     ->tabs([
                         \Filament\Forms\Components\Tabs\Tab::make('customer_information')
+                            ->id('customer-information')
                             ->label(__('Customer Information'))
                             ->icon('heroicon-o-user')
                             ->schema([
@@ -185,12 +187,14 @@ class EditBudget extends EditRecord
                             ]),
 
                         \Filament\Forms\Components\Tabs\Tab::make('budget_content')
+                            ->id('budget-content')
                             ->label(__('Budget Content'))
                             ->icon('heroicon-o-shopping-bag')
                             ->schema([
                                 \Filament\Forms\Components\Repeater::make('content.products')
                                     ->label(__('Product List'))
                                     ->collapsed()
+                                    ->cloneable()
                                     ->live()
                                     ->afterStateUpdated(function (Get $get, Set $set) {
                                         // Recalcular totais quando produtos são adicionados ou removidos
@@ -403,6 +407,7 @@ class EditBudget extends EditRecord
                             ]),
 
                         \Filament\Forms\Components\Tabs\Tab::make('export_share')
+                            ->id('export-share')
                             ->label(__('Export & Share'))
                             ->icon('heroicon-o-share')
                             ->schema([
@@ -561,6 +566,7 @@ class EditBudget extends EditRecord
                             ]),
 
                         \Filament\Forms\Components\Tabs\Tab::make('resume')
+                            ->id('resume')
                             ->label(__('Resume'))
                             ->icon('heroicon-o-document-text')
                             ->schema([
