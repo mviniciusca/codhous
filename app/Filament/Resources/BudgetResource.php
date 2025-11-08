@@ -4,7 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BudgetResource\Pages;
 use App\Filament\Resources\BudgetResource\RelationManagers\BudgetHistoryRelationManager;
+use App\Filament\Resources\BudgetResource\RelationManagers\DocumentsRelationManager;
 use App\Models\Budget;
+use App\Services\FakeBudgetDataService;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
@@ -15,6 +18,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
@@ -100,6 +104,50 @@ class BudgetResource extends Resource
                 Section::make('Budget Content')
                     ->description(__('Here is the content from your budget'))
                     ->icon('heroicon-o-shopping-bag')
+                    ->headerActions([
+                        Action::make('fill_all_fake_data')
+                            ->label(__('Fill All with Fake Data'))
+                            ->icon('heroicon-o-sparkles')
+                            ->color('success')
+                            ->action(function (Set $set, Get $get) {
+                                $fakeService = new FakeBudgetDataService();
+                                $fakeData = $fakeService->generateCompleteBudgetData();
+
+                                foreach ($fakeData as $key => $value) {
+                                    $set('content.'.$key, $value);
+                                }
+
+                                Notification::make()
+                                    ->title(__('Fake data generated!'))
+                                    ->body(__('All fields have been filled with test data'))
+                                    ->success()
+                                    ->send();
+                            }),
+                        Action::make('clear_all_fields')
+                            ->label(__('Clear All'))
+                            ->icon('heroicon-o-trash')
+                            ->color('danger')
+                            ->requiresConfirmation()
+                            ->action(function (Set $set) {
+                                // Clear customer fields
+                                $set('content.customer_name', '');
+                                $set('content.customer_email', '');
+                                $set('content.customer_phone', '');
+
+                                // Clear address fields
+                                $set('content.postcode', '');
+                                $set('content.street', '');
+                                $set('content.number', '');
+                                $set('content.city', '');
+                                $set('content.neighborhood', '');
+                                $set('content.state', '');
+
+                                Notification::make()
+                                    ->title(__('All fields cleared!'))
+                                    ->success()
+                                    ->send();
+                            }),
+                    ])
                     ->schema([
                         Fieldset::make(__('Customer Information'))
                             ->columns(3)
@@ -250,6 +298,7 @@ class BudgetResource extends Resource
     {
         return [
             BudgetHistoryRelationManager::class,
+            DocumentsRelationManager::class,
         ];
     }
 
@@ -278,19 +327,35 @@ class BudgetResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->recordClasses(fn (Budget $record) => match ($record->status) {
-                'ignored' => 'opacity-30 dark:opacity-30 hover:opacity-100 dark:hover:opacity-100',
-                'done'    => 'opacity-50 dark:opacity-50 hover:opacity-100 dark:hover:opacity-100',
-                default   => null,
+            ->recordAction(null)
+            ->recordUrl(fn (Budget $record): ?string => $record->trashed() ? null : BudgetResource::getUrl('edit', ['record' => $record]))
+            ->recordClasses(fn (Budget $record) => match (true) {
+                // Deletado: bem apagado com linha atravessada
+                $record->trashed() => 'opacity-40 dark:opacity-40 hover:opacity-70 dark:hover:opacity-70 [&_*]:line-through',
+                // Ignorado: muito apagado (não é mais relevante)
+                $record->status === 'ignored' => 'opacity-40 dark:opacity-40 hover:opacity-90 dark:hover:opacity-90',
+                // Finalizado: levemente apagado (já foi concluído)
+                $record->status === 'done' => 'opacity-70 dark:opacity-70 hover:opacity-100 dark:hover:opacity-100',
+                // Em andamento e Pendente: totalmente visíveis (100%)
+                default => null,
             })
             ->columns([
                 TextColumn::make('code')
                     ->searchable()
-                    ->label(__('Code')),
+                    ->label(__('Code'))
+                    ->icon(fn (Budget $record) => $record->trashed() ? 'heroicon-o-trash' : null)
+                    ->iconColor('danger'),
                 TextColumn::make('status')
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->icon(fn (Budget $record, string $state): string => $record->trashed() ? 'heroicon-o-trash' : match ($state) {
+                        'pending'  => 'heroicon-o-clock',
+                        'on going' => 'heroicon-o-arrow-path',
+                        'done'     => 'heroicon-o-check-circle',
+                        'ignored'  => 'heroicon-o-x-circle',
+                        default    => 'heroicon-o-question-mark-circle',
+                    })
+                    ->color(fn (Budget $record, string $state): string => $record->trashed() ? 'gray' : match ($state) {
                         'pending'  => 'primary',
                         'on going' => 'warning',
                         'done'     => 'success',
@@ -304,6 +369,16 @@ class BudgetResource extends Resource
                     ->label(__('Email')),
                 TextColumn::make('content.customer_phone')
                     ->label(__('Phone')),
+                TextColumn::make('documents_count')
+                    ->counts('documents')
+                    ->label(__('Documents'))
+                    ->badge()
+                    ->color(fn ($state) => $state > 0 ? 'success' : 'gray')
+                    ->icon(fn ($state) => $state > 0 ? 'heroicon-o-paper-clip' : 'heroicon-o-document')
+                    ->formatStateUsing(fn ($state) => $state > 0 ? $state : __('None'))
+                    ->sortable()
+                    ->alignCenter()
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->date('d/m/Y H:i')
                     ->sortable()
@@ -315,6 +390,12 @@ class BudgetResource extends Resource
             ])
             ->defaultSort('id', 'desc')
             ->filters([
+                Tables\Filters\TrashedFilter::make()
+                    ->label(__('Trash'))
+                    ->placeholder(__('Without trashed'))
+                    ->trueLabel(__('Only trashed'))
+                    ->falseLabel(__('With trashed'))
+                    ->native(false),
                 TernaryFilter::make('is_active')
                     ->placeholder(__('Default'))
                     ->default(true)
@@ -334,13 +415,151 @@ class BudgetResource extends Resource
             ], FiltersLayout::AboveContent)
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('copy_link')
+                        ->label(__('Copy PDF Link'))
+                        ->icon('heroicon-o-clipboard-document')
+                        ->color('success')
+                        ->visible(fn (Budget $record) => ! $record->trashed() && ! empty($record->content['share_link']))
+                        ->action(function (Budget $record) {
+                            Notification::make()
+                                ->title(__('PDF link copied!'))
+                                ->success()
+                                ->send();
+                        }),
+                    Tables\Actions\Action::make('generate_link')
+                        ->label(__('Generate PDF Link'))
+                        ->icon('heroicon-o-link')
+                        ->color('primary')
+                        ->visible(fn (Budget $record) => ! $record->trashed() && empty($record->content['share_link']))
+                        ->action(function (Budget $record) {
+                            // Generate new link
+                            $pdfService = new \App\Services\BudgetPdfService();
+                            $pdfModel = $pdfService->generatePdf($record, true);
+
+                            if ($pdfModel) {
+                                $url = $pdfModel->getDownloadUrl();
+                                $content = $record->content;
+                                $content['share_link'] = $url;
+                                $record->update(['content' => $content]);
+
+                                Notification::make()
+                                    ->title(__('PDF share link generated successfully'))
+                                    ->success()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title(__('Error generating PDF share link'))
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+                    Tables\Actions\Action::make('download_pdf')
+                        ->label(__('Download PDF'))
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->color('warning')
+                        ->visible(fn (Budget $record) => ! $record->trashed())
+                        ->action(function (Budget $record) {
+                            $pdfService = new \App\Services\BudgetPdfService();
+                            $pdfModel = $pdfService->generatePdf($record, true);
+
+                            if ($pdfModel && $pdfModel->fileExists()) {
+                                return response()->download(
+                                    $pdfModel->getFullPath(),
+                                    'Budget_'.$record->code.'.pdf',
+                                    ['Content-Type' => 'application/pdf']
+                                );
+                            }
+
+                            Notification::make()
+                                ->title(__('Error generating PDF'))
+                                ->body(__('Could not generate PDF file. Please try again.'))
+                                ->danger()
+                                ->send();
+                        }),
+                    Tables\Actions\Action::make('send_email')
+                        ->label(__('Send Email'))
+                        ->icon('heroicon-o-envelope')
+                        ->color('primary')
+                        ->visible(fn (Budget $record) => ! $record->trashed())
+                        ->action(function (Budget $record) {
+                            try {
+                                $mail = new \App\Services\SendBudgetMail(
+                                    $record->toArray(),
+                                    $record->content['customer_email'] ?? '',
+                                    new \App\Mail\BudgetMail($record->toArray())
+                                );
+                                $mail->dispatch();
+
+                                Notification::make()
+                                    ->title(__('Email sent successfully'))
+                                    ->success()
+                                    ->send();
+                            } catch (\Exception $e) {
+                                Notification::make()
+                                    ->title(__('Error sending email'))
+                                    ->body($e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+                    Tables\Actions\Action::make('share_whatsapp')
+                        ->label(__('Share on WhatsApp'))
+                        ->icon('heroicon-o-phone')
+                        ->color('success')
+                        ->visible(fn (Budget $record) => ! $record->trashed())
+                        ->action(function (Budget $record) {
+                            // Generate PDF and share link if not exists
+                            if (empty($record->content['share_link'] ?? null)) {
+                                $pdfService = new \App\Services\BudgetPdfService();
+                                $pdfModel = $pdfService->generatePdf($record, true);
+
+                                if ($pdfModel) {
+                                    $url = $pdfModel->getDownloadUrl();
+                                    $content = $record->content;
+                                    $content['share_link'] = $url;
+                                    $record->update(['content' => $content]);
+                                }
+                            }
+
+                            $whatsApp = new \App\Services\WhatsAppShare();
+                            $message = __("Hello! Here's your budget link: ").($record->content['share_link'] ?? '');
+                            $url = $whatsApp->generateUrl(
+                                $record->content['customer_phone'] ?? '',
+                                $message
+                            );
+
+                            return redirect()->away($url);
+                        }),
+                    Tables\Actions\EditAction::make('edit')
+                        ->visible(fn (Budget $record) => ! $record->trashed()),
+                    Tables\Actions\DeleteAction::make()
+                        ->label(__('Delete'))
+                        ->visible(fn (Budget $record) => ! $record->trashed()),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->label(__('Force Delete'))
+                        ->visible(fn (Budget $record) => $record->trashed()),
+                    Tables\Actions\RestoreAction::make()
+                        ->label(__('Restore'))
+                        ->visible(fn (Budget $record) => $record->trashed()),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label(__('Delete Selected')),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label(__('Force Delete Selected')),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label(__('Restore Selected')),
                 ]),
+            ]);
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                \Illuminate\Database\Eloquent\SoftDeletingScope::class,
             ]);
     }
 

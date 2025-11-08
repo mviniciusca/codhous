@@ -15,6 +15,7 @@
         "laravel/framework": "^11.41",
         "laravel/tinker": "^2.9",
         "predis/predis": "^2.0",
+        "pxlrbt/filament-excel": "^2.5",
         "spatie/laravel-pdf": "^1.5",
         "symfony/http-client": "^7.1",
         "symfony/mailgun-mailer": "^7.1",
@@ -22,7 +23,6 @@
         "z3d0x/filament-logger": "^0.7.2"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.14",
         "fakerphp/faker": "^1.23",
         "friendsofphp/php-cs-fixer": "^3.68",
         "laradumps/laradumps": "^3.2",

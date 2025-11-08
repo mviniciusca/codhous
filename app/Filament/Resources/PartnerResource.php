@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use App\Models\Setting;
+use App\Services\AddressFinder;
 use App\Services\PostcodeFinder;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -25,7 +26,7 @@ class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
 
-    protected static ?string $navigationGroup = 'Customers & Partners';
+    protected static ?string $navigationGroup = 'Customers';
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
@@ -85,19 +86,45 @@ class PartnerResource extends Resource
                                 Forms\Components\TextInput::make('postcode')
                                     ->required()
                                     ->minLength(9)
-                                    ->mask('99999-9999')
+                                    ->mask('99999-999')
                                     ->placeholder('22022-000')
                                     ->maxLength(9)
                                     ->helperText(__('Postcode'))
-                                    ->required()
                                     ->label(__('Postcode'))
                                     ->suffixAction(
-                                        fn ($state, $set, $livewire) => Action::make('search-action')
+                                        fn ($state, Set $set, $livewire) => Action::make('search-action')
                                             ->icon('heroicon-o-magnifying-glass')
+                                            ->tooltip(__('Search address by postcode'))
                                             ->action(function () use ($state, $livewire, $set) {
-                                                $livewire->validateOnly('content.data.postcode');
-                                                $postcode = new PostcodeFinder($state, $set);
-                                                $postcode->find();
+                                                try {
+                                                    // Validar o formato do CEP antes de fazer a busca
+                                                    $livewire->validateOnly('data.postcode');
+
+                                                    // Criar mapeamento de campos da API para campos do formulário
+                                                    $fieldMap = [
+                                                        'logradouro' => 'content.address',
+                                                        'bairro'     => 'content.neighborhood',
+                                                        'localidade' => 'content.city',
+                                                        'uf'         => 'content.state',
+                                                    ];
+
+                                                    // Instanciar e executar a busca de CEP
+                                                    $finder = new AddressFinder($state, $set, $fieldMap, 'data.postcode');
+                                                    $finder->find();
+
+                                                    // Notificação de sucesso
+                                                    \Filament\Notifications\Notification::make()
+                                                        ->title('CEP encontrado!')
+                                                        ->success()
+                                                        ->send();
+                                                } catch (\Exception $e) {
+                                                    // Em caso de erro, exibir notificação
+                                                    \Filament\Notifications\Notification::make()
+                                                        ->title('Erro')
+                                                        ->body($e->getMessage())
+                                                        ->danger()
+                                                        ->send();
+                                                }
                                             })
                                     ),
                                 Forms\Components\TextInput::make('content.address')

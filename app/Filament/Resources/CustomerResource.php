@@ -5,9 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Models\Customer;
+use App\Services\AddressFinder;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
@@ -21,20 +24,26 @@ use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
-    protected static ?string $navigationGroup = 'Customers & Partners';
+
+    protected static ?string $navigationGroup = 'Customers';
+
     public static function getNavigationLabel(): string
     {
         return __('Customers');
     }
+
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
     public static function count(): ?string
     {
         $count = Customer::withoutTrashed()->count();
+
         return $count !== 0 ? $count : null;
     }
 
@@ -69,7 +78,46 @@ class CustomerResource extends Resource
                             ->label(__('Postcode'))
                             ->helperText(__('Customer Postcode'))
                             ->required()
-                            ->maxLength(255),
+                            ->mask('99999-999')
+                            ->prefixIcon('heroicon-o-map-pin')
+                            ->placeholder('----- ---')
+                            ->maxLength(255)
+                            ->suffixAction(
+                                fn ($state, Set $set, $livewire) => Action::make('search-cep')
+                                    ->icon('heroicon-o-magnifying-glass')
+                                    ->tooltip(__('Search address by postcode'))
+                                    ->action(function () use ($state, $livewire, $set) {
+                                        try {
+                                            // Validar o formato do CEP antes de fazer a busca
+                                            $livewire->validateOnly('data.postcode');
+
+                                            // Criar mapeamento de campos da API para campos do formulário
+                                            $fieldMap = [
+                                                'logradouro' => 'address.street',
+                                                'bairro'     => 'address.neighborhood',
+                                                'localidade' => 'address.city',
+                                                'uf'         => 'address.state',
+                                            ];
+
+                                            // Instanciar e executar a busca de CEP
+                                            $finder = new AddressFinder($state, $set, $fieldMap, 'data.postcode');
+                                            $finder->find();
+
+                                            // Notificação de sucesso
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('CEP encontrado!')
+                                                ->success()
+                                                ->send();
+                                        } catch (\Exception $e) {
+                                            // Em caso de erro, exibir notificação
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('Erro')
+                                                ->body($e->getMessage())
+                                                ->danger()
+                                                ->send();
+                                        }
+                                    })
+                            ),
                         Forms\Components\TextInput::make('address.street')
                             ->label(__('Address Street'))
                             ->helperText(__('Address Street'))
@@ -140,6 +188,7 @@ class CustomerResource extends Resource
             //
         ];
     }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -147,13 +196,14 @@ class CustomerResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomers::route('/'),
+            'index'  => Pages\ListCustomers::route('/'),
             'create' => Pages\CreateCustomer::route('/create'),
-            'edit' => Pages\EditCustomer::route('/{record}/edit'),
-            'bin' => Pages\CustomerBin::route('/bin'),
+            'edit'   => Pages\EditCustomer::route('/{record}/edit'),
+            'bin'    => Pages\CustomerBin::route('/bin'),
         ];
     }
 }

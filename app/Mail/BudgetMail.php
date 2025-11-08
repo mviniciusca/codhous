@@ -2,8 +2,10 @@
 
 namespace App\Mail;
 
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -13,12 +15,14 @@ class BudgetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    protected $companySetting;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public array $budgetData = [], public ?string $pdfPath = null)
     {
-        //
+        $this->companySetting = Setting::first()->companySetting;
     }
 
     /**
@@ -26,8 +30,12 @@ class BudgetMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $budget = $this->budgetData;
+        $customerName = $budget['content'][0]['customer_name'] ?? 'Cliente';
+        $code = $budget['code'] ?? '';
+
         return new Envelope(
-            subject: 'Budget Mail',
+            subject: "Orçamento #{$code} - ".env('APP_NAME'),
         );
     }
 
@@ -37,17 +45,39 @@ class BudgetMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'budget.mail',
+            view: 'mail.budget',
         );
     }
 
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {
+        if ($this->pdfPath && file_exists($this->pdfPath)) {
+            return [
+                Attachment::fromPath($this->pdfPath)
+                    ->as(basename($this->pdfPath))
+                    ->withMime('application/pdf'),
+            ];
+        }
+
         return [];
+    }
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->view('mail.budget')
+            ->with([
+                'budget'  => $this->budgetData,
+                'company' => $this->companySetting,
+            ]);
     }
 }

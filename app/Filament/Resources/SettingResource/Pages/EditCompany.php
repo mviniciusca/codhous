@@ -2,21 +2,23 @@
 
 namespace App\Filament\Resources\SettingResource\Pages;
 
-use Filament\Actions;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Filament\Forms\Form;
-use Illuminate\Support\Str;
+use App\Filament\Resources\SettingResource;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\SettingResource;
+use Illuminate\Support\Str;
 
 class EditCompany extends EditRecord
 {
     protected static string $resource = SettingResource::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
+
     public static function getNavigationLabel(): string
     {
         return __('Company Information');
@@ -46,7 +48,7 @@ class EditCompany extends EditRecord
                             ->tel()
                             ->required()
                             ->maxLength(255)
-                            ->prefix('+' . env('COUNTRY_CODE'))
+                            ->prefix('+'.env('COUNTRY_CODE'))
                             ->mask('(99) 9999-9999')
                             ->helperText(__('Visible in Budget / Invoice Document'))
                             ->label(__('Phone Number')),
@@ -75,11 +77,76 @@ class EditCompany extends EditRecord
                             ->maxLength(255)
                             ->label(__('Postcode'))
                             ->helperText(__('Company Postcode'))
-                            ->mask('99.999-999'),
+                            ->mask('99999-999')
+                            ->prefixIcon('heroicon-o-map-pin')
+                            ->placeholder('----- ---')
+                            ->live(true)
+                            ->suffixAction(
+                                fn ($state, Set $set, $livewire) => Action::make('search-cep')
+                                    ->icon('heroicon-o-magnifying-glass')
+                                    ->tooltip(__('Search address by postcode'))
+                                    ->action(function () use ($state, $livewire, $set) {
+                                        try {
+                                            if (empty($state)) {
+                                                throw new \Exception('CEP inválido');
+                                            }
+
+                                            // Formatar CEP removendo caracteres não numéricos
+                                            $cep = preg_replace('/[^0-9]/', '', $state);
+
+                                            // Verificar se o CEP tem 8 dígitos
+                                            if (strlen($cep) !== 8) {
+                                                throw new \Exception('CEP deve ter 8 dígitos');
+                                            }
+
+                                            // Fazer a requisição à API do ViaCEP
+                                            $response = \Illuminate\Support\Facades\Http::get("https://viacep.com.br/ws/{$cep}/json/");
+
+                                            \Illuminate\Support\Facades\Log::debug("Resposta da API para CEP {$cep}:", $response->json());
+
+                                            // Verificar se a requisição foi bem-sucedida
+                                            if (! $response->successful()) {
+                                                throw new \Exception('Erro ao buscar CEP: '.$response->status());
+                                            }
+
+                                            // Obter os dados da resposta
+                                            $data = $response->json();
+
+                                            // Verificar se o CEP foi encontrado
+                                            if (isset($data['erro']) && $data['erro'] === true) {
+                                                throw new \Exception('CEP não encontrado');
+                                            }
+
+                                            // Preencher os campos com os dados retornados
+                                            $set('address.street', $data['logradouro'] ?? '');
+                                            $set('address.neighborhood', $data['bairro'] ?? '');
+                                            $set('address.city', $data['localidade'] ?? '');
+                                            $set('address.state', $data['uf'] ?? '');
+
+                                            // Adicionar log para debug
+                                            \Illuminate\Support\Facades\Log::debug('Campos atualizados com sucesso');
+
+                                            // Notificação de sucesso
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('CEP encontrado!')
+                                                ->success()
+                                                ->send();
+                                        } catch (\Exception $e) {
+                                            \Illuminate\Support\Facades\Log::error('Erro ao buscar CEP: '.$e->getMessage());
+
+                                            // Em caso de erro, exibir notificação
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('Erro')
+                                                ->body($e->getMessage())
+                                                ->danger()
+                                                ->send();
+                                        }
+                                    })
+                            ),
                         TextInput::make('address.street')
-                            ->required()
                             ->maxLength(255)
                             ->helperText(__('Company Street'))
+                            ->required()
                             ->label(__('Street')),
                         TextInput::make('address.number')
                             ->maxLength(255)

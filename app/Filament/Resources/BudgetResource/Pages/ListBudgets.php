@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 use App\Filament\Resources\BudgetResource;
+use App\Models\Budget;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
@@ -22,7 +23,8 @@ class ListBudgets extends ListRecords
                 ->color('gray')
                 ->icon('heroicon-o-trash')
                 ->url(route('filament.admin.resources.budgets.bin'))
-                ->label(__(false)),
+                ->badge(fn () => Budget::onlyTrashed()->count() ?: null)
+                ->label(__('Trash')),
         ];
     }
 }

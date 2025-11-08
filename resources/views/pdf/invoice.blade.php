@@ -1,96 +1,219 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
 <head>
-    <title>Invoice</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-        rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento {{ $state['code'] ?? '' }}</title>
+    @vite('resources/css/app.css')
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 72px;
+            color: rgba(229, 231, 235, 0.2);
+            pointer-events: none;
+            z-index: -1;
+            white-space: nowrap;
+        }
+
+        @page {
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
 
-<body>
+<body class="bg-white text-xs leading-relaxed">
+    <!-- Marca d'água -->
+    <div class="watermark">{{ $company->trade_name ?? env('APP_NAME','Concrete') }}</div>
 
-    <div class="px-2 py-8 max-w-xl mx-auto">
-        <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center">
-                <div class="text-gray-950">
-                    <p class="font-semibold text-2xl">{{ env('APP_NAME') . ' ' . __('') }}</p>
-                    <p>Rua Rio de Janeiro, 25 - Rio de Janeiro, RJ </p>
-                    <p>CNPJ: 54012200000441/4000</p>
-                    <p>Phone: (21) 966134366 • Email: sac@codhous.app</p>
+    <div class="w-full mx-auto px-8 py-6">
+        <!-- Header Section -->
+        <div class="pb-4">
+            <div class="flex justify-between items-start gap-4">
+                <!-- Logo -->
+                @if(isset($layout) && $layout->logo)
+                <div class="w-32">
+                    <img src="{{ Storage::url($layout->logo) }}" alt="Logo" class="w-full h-auto object-contain">
+                </div>
+                @endif
+
+                <div class="flex-1">
+                    <h1 class="text-base font-medium">ORÇAMENTO #{{ $state['code'] ?? 'N/A' }}</h1>
+                    <div class="text-xs text-gray-500">
+                        {{ date('d/m/Y', strtotime($state['created_at'] ?? now())) }}
+                    </div>
                 </div>
 
+                <div>
+                    <span class="inline-flex px-2 py-1 rounded-sm text-xs font-medium
+                        {{ $state['status']=='aprovado' ? 'bg-green-100 text-green-800' :
+                           ($state['status']=='rejeitado' ? 'bg-red-100 text-red-800' :
+                           'bg-amber-100 text-amber-800') }}">
+                        {{ ucfirst($state['status'] ?? 'Pendente') }}
+                    </span>
+                </div>
             </div>
-            <div class="text-gray-700">
-                <div class="font-bold text-xl mb-2 uppercase">{{ __('Budget') }}</div>
-                <div class="text-sm">{{ date('d/m/Y H:i', strtotime($state['created_at'])) }}</div>
-                <div class="text-sm">{{ __('Budget') . ': #' . $state['code']}} </div>
+
+            <!-- Two Column Layout for Company and Client Info -->
+            <div class="mt-4 grid grid-cols-2 gap-6">
+                <div class="space-y-1">
+                    <p class="text-lg font-medium text-gray-900">{{ $company->trade_name }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $company->address['street'] }}, {{
+                        $company->address['number'] }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $company->address['neighborhood'] }} - {{
+                        $company->address['city'] }}/{{ $company->address['state'] }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $company->phone }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $company->email }}</p>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-gray-900 leading-tight">{{ $state['content'][0]['customer_name'] ?? 'N/A' }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $state['content'][0]['customer_email'] ?? 'N/A' }}</p>
+                    <p class="text-gray-600 leading-tight">{{ $state['content'][0]['customer_phone'] ?? 'N/A' }}</p>
+                    @if(isset($state['content'][0]['street']))
+                    <p class="text-gray-600 leading-tight">
+                        {{ $state['content'][0]['street'] }}, {{ $state['content'][0]['number'] }}
+                        {{ $state['content'][0]['neighborhood'] }} - {{ $state['content'][0]['city'] }}/{{
+                        $state['content'][0]['state'] }}
+                        CEP: {{ $state['content'][0]['postcode'] }}
+                    </p>
+                    @endif
+                </div>
             </div>
-        </div>
-        <div class="pb-8 mb-8">
-            <h2 class="text-2xl font-bold mb-4">{{ _('Budget to') }}: </h2>
-            <div class="text-gray-700 mb-2">
-                {{ $state['content']['customer_name'] ?? __('No Customer Name') }}
-            </div>
-            <div class="text-gray-700 mb-2">
-                {{ $state['content']['street'] ? $state['content']['street'] . ', ' . $state['content']['number'] :
-                __('No Address') }}
-            </div>
-            <div class="text-gray-700 mb-2">
-                {{ $state['content']['city'] . ' - ' . $state['content']['state'] }}
-            </div>
-            <div class="text-gray-700">
-                {{ $state['content']['customer_email'] }} •
-                {{ $state['content']['customer_phone'] }}
-            </div>
-        </div>
-        <table class="w-full text-left mb-8">
-            <thead>
-                <tr>
-                    <th class="text-gray-700 font-bold uppercase py-2">{{ _('Description') }}</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">{{ __('Quantity') }}</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">{{ __('Price') }}</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">{{ __('Total') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="py-4 text-gray-700">{!! $product_name['name'] !!}</td>
-                    <td class="py-4 text-gray-700">{{ $state['content']['quantity'] . 'm³' }}</td>
-                    <td class="py-4 text-gray-700">{{ env('CURRENCY_SUFFIX').' '.$state['content']['price'] }}</td>
-                    <td class="py-4 text-gray-700">{{ env('CURRENCY_SUFFIX').' '.$state['content']['total'] }}</td>
-                </tr>
-            </tbody>
-        </table>
-        <hr class="my-2">
-        <div class="text-right mb-8">
-            <div class="text-gray-700 mr-2">{{ __('Tax') }}: </div>
-            <div class="text-gray-700 mr-2">{{ env('CURRENCY_SUFFIX').' '. $state['content']['tax'] }}</div>
-            <hr class="my-2">
-            <div class="text-gray-700 mr-2">{{ __('Discount') }}: </div>
-            <div class="text-gray-700 mr-2">{{ env('CURRENCY_SUFFIX').' '. $state['content']['discount'] }}</div>
-            <hr class="my-2">
-            <div class="text-gray-700 mr-2 font-bold">{{ __('Total') }}: </div>
-            <div class="text-gray-700 font-bold">{{ env('CURRENCY_SUFFIX').' '.$state['content']['total'] }}</div>
         </div>
 
-        <div class="border-t-1 border-gray-300 pt-8 mb-8">
-            <div class="text-gray-700 mb-12">{{
-                __('This is a Budget document.') }} <p></p>
-                {{ __(' This don\'t replace a
-                fiscal Documentation or Legal Contract') }}
+        <!-- Products Table -->
+        <div class="mt-4">
+            <p class="font-medium mb-2 text-sm">PRODUTOS E SERVIÇOS</p>
+            <table class="w-full text-[10px]">
+                <thead>
+                    <tr class="border-b border-gray-200">
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[5%]">#</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[30%]">Produto</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[20%]">Opção</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[15%]">Local</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[10%]">Quant.</th>
+                        <th class="py-1.5 text-left font-medium text-gray-600 w-[10%]">Preço Un.</th>
+                        <th class="py-1.5 text-right font-medium text-gray-600 w-[10%]">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                    $products = $state['content'][0]['products'] ?? [];
+                    $productsList = [];
+                    $totalItems = 0;
+
+                    if (isset($products[0]) && is_array($products[0]) && !isset($products[0]['product'])) {
+                    foreach ($products as $productGroup) {
+                    if (is_array($productGroup) && isset($productGroup[0])) {
+                    foreach ($productGroup as $p) {
+                    if (is_array($p) && isset($p['product'])) {
+                    $productsList[] = $p;
+                    $totalItems++;
+                    }
+                    }
+                    }
+                    }
+                    } else {
+                    $productsList = $products;
+                    $totalItems = count($productsList);
+                    }
+                    @endphp
+
+                    @foreach($productsList as $index => $product)
+                    @php
+                    $productObj = \App\Models\Product::find($product['product'] ?? 0);
+                    $productName = $productObj ? $productObj->name : ($product_name->name ?? 'Produto');
+                    $productOption = \App\Models\ProductOption::find($product['product_option'] ?? 0);
+                    $location = \App\Models\Location::find($product['location'] ?? 0);
+                    @endphp
+                    <tr class="border-b border-gray-100">
+                        <td class="py-1.5">{{ $index + 1 }}</td>
+                        <td class="py-1.5">{{ $productName }}</td>
+                        <td class="py-1.5">{{ $productOption ? $productOption->name : '-' }}</td>
+                        <td class="py-1.5">{{ $location ? $location->name : '-' }}</td>
+                        <td class="py-1.5">{{ $product['quantity'] ?? 0 }} m³</td>
+                        <td class="py-1.5">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($product['price'] ??
+                            0),2,',','.') }}</td>
+                        <td class="py-1.5 text-right">{{ env('CURRENCY_SUFFIX','R$') }} {{
+                            number_format(($product['subtotal'] ?? 0),2,',','.') }}</td>
+                    </tr>
+                    @endforeach
+
+                    @if($totalItems == 0)
+                    <tr>
+                        <td colspan="7" class="py-1.5 text-center text-gray-500">Nenhum produto encontrado</td>
+                    </tr>
+                    @endif
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary and Totals - Two Columns -->
+        <div class="mt-6 grid grid-cols-2 gap-6">
+            <!-- Left Column - Notes -->
+            <div class="text-[10px] space-y-2">
+                <div class="bg-gray-50 p-3 rounded">
+                    <p class="font-medium mb-1">Observações:</p>
+                    <ol class="pl-4 space-y-1 list-decimal text-gray-600">
+                        <li>Este documento é apenas um orçamento e não possui valor fiscal.</li>
+                        <li>Orçamento válido por 15 dias a partir da data de emissão.</li>
+                        <li>Forma de pagamento a combinar.</li>
+                        @if($company->budget_information)
+                        <li>{{ $company->budget_information }}</li>
+                        @endif
+                    </ol>
+                </div>
             </div>
-            <div class="text-gray-700 mt-4">{{ env('APP_NAME') }}</div>
+
+            <!-- Right Column - Totals -->
+            <div>
+                <div class="border rounded p-3 space-y-1.5 ml-auto">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Quantidade Total:</span>
+                        <span>{{ $state['content'][0]['quantity'] ?? 0 }} m³</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Taxa Adicional:</span>
+                        <span>{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($state['content'][0]['tax'] ??
+                            0),2,',','.') }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Desconto:</span>
+                        <span>-{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($state['content'][0]['discount'] ??
+                            0),2,',','.') }}</span>
+                    </div>
+                    <div class="border-t border-gray-200 mt-2 pt-2 flex justify-between font-medium">
+                        <span>TOTAL:</span>
+                        <span>{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($state['content'][0]['total'] ??
+                            0),2,',','.') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer with Signatures -->
+        <div class="mt-12 mb-4">
+            <!-- Signatures -->
+            <div class="grid grid-cols-2 gap-12 w-4/5 mx-auto mt-24">
+                <div class="text-center">
+                    <div class="border-t border-gray-300 pt-2">{{ $company->trade_name }}</div>
+                    <div class="text-xs text-gray-500 mt-1">CNPJ: {{ $company->cnpj }}</div>
+                </div>
+                <div class="text-center">
+                    <div class="border-t border-gray-300 pt-2">Cliente</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright Footer -->
+        <div class="mt-6 pt-4 text-xs text-center text-gray-500">
+            &copy; {{ date('Y') }} {{ $company->trade_name }}. Todos os direitos reservados.
         </div>
     </div>
-
 </body>
 
 </html>

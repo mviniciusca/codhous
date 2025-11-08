@@ -33,17 +33,16 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->viteTheme('resources/css/filament/admin/theme.css')
             ->breadcrumbs(false)
+            ->maxContentWidth('full')
             ->id('admin')
             ->path('admin')
             ->navigationGroups([
                 __('Budget'),
-                __('Budget Tool'),
-                __('Mail'),
-                __('Customers & Partners'),
-                __('Mailing'),
-                __('Settings'),
+                __('Customers'),
+                __('Communication'),
+                __('Configuration'),
+                __('Security'),
             ])
             ->resources([
                 config('filament-logger.activity_resource'),
@@ -62,17 +61,15 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => ProductResource::getUrl())
                     ->label(fn (): string => __('Products'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->badge(fn (): ?string => ProductResource::getNavigationBadge())
-                    ->group(__('Budget Tool'))
-                    ->sort(2)
                     ->badge(fn (): ?string => ProductResource::count())
+                    ->group(__('Budget'))
+                    ->sort(2)
                     ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.products.index')),
-
-                NavigationItem::make('budget')
+                NavigationItem::make('budget_settings')
                     ->url(fn (): string => EditBudget::getUrl([Setting::first()->id]), )
-                    ->label(fn (): string => __('Design & Layout'))
-                    ->icon('heroicon-o-arrow-up-right')
-                    ->group(__('Budget Tool'))
+                    ->label(fn (): string => __('Budget Settings'))
+                    ->icon('heroicon-o-cog')
+                    ->group(__('Budget'))
                     ->sort(3),
                 /** Customers */
                 NavigationItem::make('customer')
@@ -80,16 +77,16 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => CustomerResource::getUrl())
                     ->badge(fn (): ?string => CustomerResource::count())
                     ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.customers.index'))
-                    ->icon('heroicon-o-user')
-                    ->group(__('Customers & Partners'))
+                    ->icon('heroicon-o-users')
+                    ->group(__('Customers'))
                     ->sort(1),
 
-                // /** App Setting */
+                /** App Settings */
                 NavigationItem::make('settings')
-                    ->label(fn (): string => __('App Settings'))
+                    ->label(fn (): string => __('General Settings'))
                     ->url(fn (): string => EditSetting::getUrl([1]))
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->group(__('Settings'))
+                    ->group(__('Configuration'))
                     ->sort(1),
             ])
             ->plugins([
@@ -98,14 +95,15 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->login()
             ->colors([
-                'primary'   => Color::Indigo,
-                'secondary' => Color::Stone,
-                'tertiary'  => Color::Purple,
-                'warning'   => Color::Orange,
-                'info'      => Color::Sky,
-                'danger'    => Color::Red,
-                'success'   => Color::Teal,
+                'danger'  => Color::Rose,
+                'gray'    => Color::Zinc,
+                'info'    => Color::Blue,
+                'primary' => Color::Indigo,
+                'success' => Color::Emerald,
+                'warning' => Color::Orange,
+
             ])
+
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -113,8 +111,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\AccountWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->middleware([

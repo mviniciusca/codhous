@@ -52,4 +52,29 @@ class User extends Authenticatable
     {
         return $this->hasMany(BudgetHistory::class);
     }
+
+    /**
+     * Get all budgets created by this user.
+     */
+    public function budgets()
+    {
+        return $this->hasMany(Budget::class);
+    }
+
+    /**
+     * Get all mails sent/received by this user.
+     */
+    public function mails()
+    {
+        return $this->hasMany(Mail::class);
+    }
+
+    /**
+     * Get all activities performed by this user.
+     */
+    public function activities()
+    {
+        return $this->morphMany(\Spatie\Activitylog\Models\Activity::class, 'causer')
+            ->orderBy('created_at', 'desc');
+    }
 }
