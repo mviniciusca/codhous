@@ -27,9 +27,35 @@ class BudgetDocument extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logFillable()
+            ->logAll()
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontSubmitEmptyLogs()
+            ->useLogName('budget')
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
+                'created' => 'document_attached',
+                'deleted' => 'document_removed',
+                default   => $eventName,
+            });
+    }
+
+    /**
+     * Tap into activity log to associate with budget
+     */
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName)
+    {
+        // Log on the budget instead of the document
+        if ($this->budget) {
+            $activity->subject()->associate($this->budget);
+
+            $userName = \Illuminate\Support\Facades\Auth::user()?->name ?? 'System';
+            $description = match ($eventName) {
+                'created' => "Documento '{$this->file_name}' anexado por {$userName}",
+                'deleted' => "Documento '{$this->file_name}' removido por {$userName}",
+                default   => "{$eventName} por {$userName}",
+            };
+
+            $activity->description = $description;
+        }
     }
 
     public function budget()

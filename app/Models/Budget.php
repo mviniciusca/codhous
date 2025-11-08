@@ -42,9 +42,10 @@ class Budget extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logFillable()
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->logAll() // Log all attributes for complete history
+            ->logOnlyDirty() // But only when something actually changed
+            ->dontSubmitEmptyLogs()
+            ->useLogName('budget');
     }
 
     /**

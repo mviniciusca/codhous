@@ -6,6 +6,7 @@ use App\Models\Budget;
 use App\Models\Customer;
 use App\Models\Mail;
 use App\Models\Setting;
+use App\Observers\BudgetObserver;
 use App\Policies\BudgetPolicy;
 use App\Policies\CustomerPolicy;
 use App\Policies\MailPolicy;
@@ -40,6 +41,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register observers
+        Budget::observe(BudgetObserver::class);
+
         // Register policies
         foreach ($this->policies as $model => $policy) {
             Gate::policy($model, $policy);
