@@ -2,11 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Budget;
 use App\Models\Mail as MailModel;
+use App\Models\Setting;
+use App\Services\PdfGeneratorService;
 use Closure;
 use Filament\Notifications\Notification;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class SendBudgetMail
 {
@@ -36,9 +40,39 @@ class SendBudgetMail
 
     private function generatePdf()
     {
-        $pdfGenerator = new PdfGenerator($this->state);
-        $pdfGenerator->generate();
-        $this->pdfPath = $pdfGenerator->filePath;
+        // Buscar dados necessários
+        $budget = Budget::where('code', $this->code)->first();
+        $company = Setting::first()->companySetting;
+        $layout = Setting::first()->layoutSetting;
+        
+        // Aplicar fix de UTF-8 nos dados
+        $budgetArray = $this->state;
+        array_walk_recursive($budgetArray, function (&$item) {
+            if (is_string($item)) {
+                $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+            }
+        });
+
+        // Garantir formato content[0]
+        if (isset($budgetArray['content']) && !isset($budgetArray['content'][0])) {
+            $budgetArray['content'] = [$budgetArray['content']];
+        }
+
+        // Gerar PDF
+        $pdfService = new PdfGeneratorService();
+        $filename = 'budget-' . $this->code . '-' . time() . '.pdf';
+        $this->pdfPath = storage_path('app/public/budgets/' . $filename);
+
+        $pdfService->saveFromView(
+            'pdf.invoice',
+            [
+                'state' => $budgetArray,
+                'budget' => $budget,
+                'company' => $company,
+                'layout' => $layout,
+            ],
+            $this->pdfPath
+        );
     }
 
     private function send()
@@ -50,13 +84,8 @@ class SendBudgetMail
                 ->send($this->mailable);
         }
 
-        // Como estamos usando a classe BudgetMail com a API fluente,
-        // precisamos passar o caminho do PDF para o construtor ou para um método set
-        if (method_exists($this->mailable, 'pdfPath')) {
-            // Se existir um setter, usamos ele
-            $this->mailable->pdfPath($this->pdfPath);
-        } elseif ($this->mailable instanceof \App\Mail\BudgetMail) {
-            // Se for a classe BudgetMail, definimos a propriedade diretamente
+        // Se for a classe BudgetMail, definimos a propriedade diretamente
+        if ($this->mailable instanceof \App\Mail\BudgetMail) {
             $this->mailable->pdfPath = $this->pdfPath;
         }
 

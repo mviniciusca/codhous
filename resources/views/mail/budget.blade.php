@@ -15,7 +15,7 @@
         </div>
 
         <div style="margin-bottom: 28px; color: #374151; line-height: 1.5; font-size: 15px;">
-            <p>Olá <strong>{{ $budget['content']['customer_name'] ?? 'Cliente' }}</strong>,</p>
+            <p>Olá <strong>{{ $budget['content'][0]['customer_name'] ?? 'Cliente' }}</strong>,</p>
             <p style="color: #6B7280;">Segue o orçamento solicitado com as informações principais:</p>
         </div>
 
@@ -33,7 +33,7 @@
             <div>
                 <p style="color: #6B7280; font-size: 13px; margin: 0 0 3px 0;">Valor Total</p>
                 <p style="color: #111827; font-weight: 600; margin: 0; font-size: 15px;">{{ env('CURRENCY_SUFFIX') }} {{
-                    $budget['content']['total'] ?? '0,00' }}</p>
+                    number_format(($budget['content'][0]['total'] ?? 0), 2, ',', '.') }}</p>
             </div>
         </div>
 
