@@ -8,7 +8,7 @@ use Exception;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Mail;
 
-class SendMail
+class SendMailService
 {
     private string $fromEmail;
 

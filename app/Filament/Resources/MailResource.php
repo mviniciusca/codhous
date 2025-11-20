@@ -2,24 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MailResource\Pages;
 use App\Models\Mail;
-use App\Services\SendMail;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Services\SendMailService;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\TextInput;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Enums\FiltersLayout;
+use Filament\Forms\Components\RichEditor;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\MailResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MailResource extends Resource
@@ -99,7 +99,7 @@ class MailResource extends Resource
                             ->helperText(__('Your Message. Max.: 5000 characters')),
                     ])
                     ->action(function (?array $data): void {
-                        $mail = new SendMail($data);
+                        $mail = new SendMailService($data);
                         $mail->send();
                     }),
             ])

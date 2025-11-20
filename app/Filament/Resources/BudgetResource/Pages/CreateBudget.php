@@ -2,31 +2,31 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
-use App\Filament\Resources\BudgetResource;
 use App\Models\Budget;
-use App\Models\BudgetHistory;
-use App\Models\Location;
 use App\Models\Product;
-use App\Models\ProductOption;
-use App\Services\BudgetCalculatorService;
-use App\Services\FakeBudgetDataService;
-use App\Services\PostcodeFinder;
-use App\Trait\BudgetStatus;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Notifications\Notification;
-use Filament\Resources\Pages\CreateRecord;
+use App\Models\Location;
+use Filament\Forms\Form;
+use App\Trait\BudgetStatus;
+use App\Models\BudgetHistory;
+use App\Models\ProductOption;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Section;
+use App\Services\FakeBudgetDataService;
+use App\Services\PostcodeFinderService;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use App\Services\BudgetCalculatorService;
+use App\Filament\Resources\BudgetResource;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\DateTimePicker;
 
 class CreateBudget extends CreateRecord
 {
@@ -261,7 +261,7 @@ class CreateBudget extends CreateRecord
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $livewire->validateOnly('content.data.postcode');
-                                                        $postcode = new PostcodeFinder($state, $set);
+                                                        $postcode = new PostcodeFinderService($state, $set);
                                                         $postcode->find();
                                                     })
                                             )

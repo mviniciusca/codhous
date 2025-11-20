@@ -2,41 +2,42 @@
 
 namespace App\Filament\Resources\BudgetResource\Pages;
 
-use App\Exports\BudgetExport;
-use App\Filament\Resources\BudgetResource;
-use App\Mail\BudgetMail;
 use App\Models\Budget;
-use App\Models\BudgetHistory;
-use App\Models\Location;
 use App\Models\Product;
-use App\Models\ProductOption;
-use App\Services\BudgetCalculatorService;
-use App\Services\FakeBudgetDataService;
-use App\Services\PdfGeneratorService;
-use App\Services\PostcodeFinder;
-use App\Services\SendBudgetMail;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use App\Mail\BudgetMail;
+use App\Models\Location;
+use Filament\Forms\Form;
 use App\Trait\BudgetStatus;
 use Filament\Actions\Action;
+use App\Exports\BudgetExport;
+use App\Models\BudgetHistory;
+use App\Models\ProductOption;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Filament\Forms\Components\View;
+use Illuminate\Support\Facades\Log;
+use Filament\Forms\Components\Group;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Services\PdfGeneratorService;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use App\Services\WhatsAppShareService;
+use Filament\Forms\Components\Section;
+use App\Services\PostcodeFinderService;
+use App\Services\SendBudgetMailService;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
+use App\Services\BudgetCalculatorService;
+use App\Filament\Resources\BudgetResource;
+use Illuminate\Contracts\Support\Htmlable;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Actions\CreateAction;  // For form actions
 use Filament\Actions\DeleteAction; // For component actions
 use Filament\Forms\Components\Actions\Action as FormAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\View;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Filament\Notifications\Notification;
-use Filament\Resources\Pages\EditRecord;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
 
 class EditBudget extends EditRecord
 {
@@ -147,7 +148,7 @@ class EditBudget extends EditRecord
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $livewire->validateOnly('data.content.postcode');
-                                                        $postcode = new PostcodeFinder($state, $set);
+                                                        $postcode = new PostcodeFinderService($state, $set);
                                                         $postcode->find();
                                                     })
                                             )
@@ -467,8 +468,8 @@ class EditBudget extends EditRecord
                                                     // Return download response
                                                     return response()->download($path, 'Budget_'.$budget->code.'.pdf')->deleteFileAfterSend(true);
                                                 } catch (\Exception $e) {
-                                                    \Log::error('PDF Generation Error: ' . $e->getMessage());
-                                                    \Log::error('Stack trace: ' . $e->getTraceAsString());
+                                                    Log::error('PDF Generation Error: ' . $e->getMessage());
+                                                    Log::error('Stack trace: ' . $e->getTraceAsString());
                                                     
                                                     Notification::make()
                                                         ->title(__('Error generating PDF'))
@@ -564,7 +565,7 @@ class EditBudget extends EditRecord
                                                         ->success()
                                                         ->send();
                                                 } catch (\Exception $e) {
-                                                    \Log::error('Share Link Generation Error: ' . $e->getMessage());
+                                                    Log::error('Share Link Generation Error: ' . $e->getMessage());
                                                     
                                                     Notification::make()
                                                         ->title(__('Error generating share link'))
@@ -585,7 +586,7 @@ class EditBudget extends EditRecord
                                             ->modalDescription(__('Send this budget to the customer via email'))
                                             ->modalSubmitActionLabel(__('Send'))
                                             ->action(function (Get $get, ?array $state) {
-                                                $mail = new SendBudgetMail(
+                                                $mail = new SendBudgetMailService(
                                                     $state,
                                                     $get('content.customer_email'),
                                                     new BudgetMail($state)
@@ -608,7 +609,7 @@ class EditBudget extends EditRecord
                                             })
                                             ->action(function () {
                                                 $budget = Budget::findOrFail($this->record->id);
-                                                $whatsApp = new \App\Services\WhatsAppShare();
+                                                $whatsApp = new WhatsAppShareService();
                                                 $message = __("Hello! Here's your budget link: ").($budget->content['share_link'] ?? '');
                                                 $url = $whatsApp->generateUrl(
                                                     $budget->content['customer_phone'] ?? '',

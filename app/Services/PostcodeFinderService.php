@@ -3,14 +3,12 @@
 namespace App\Services;
 
 use Exception;
-use Filament\Forms\Components\Livewire;
 use Filament\Forms\Set;
-use Filament\Notifications\Notification;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 
-class PostcodeFinder
+class PostcodeFinderService
 {
     /**
      * Create a new class instance.

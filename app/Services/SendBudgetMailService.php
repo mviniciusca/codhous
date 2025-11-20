@@ -12,7 +12,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
-class SendBudgetMail
+class SendBudgetMailService
 {
     /**
      * Create a new class instance.
