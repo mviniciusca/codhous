@@ -11,9 +11,8 @@ use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductOption;
 use App\Services\BudgetCalculatorService;
-use App\Services\BudgetPdfService;
 use App\Services\FakeBudgetDataService;
-use App\Services\PdfGenerator;
+use App\Services\PdfGeneratorService;
 use App\Services\PostcodeFinder;
 use App\Services\SendBudgetMail;
 use App\Trait\BudgetStatus;
@@ -424,20 +423,56 @@ class EditBudget extends EditRecord
                                             ->modalDescription(__('Download this budget as a PDF file'))
                                             ->modalSubmitActionLabel(__('Download'))
                                             ->action(function () {
-                                                $budget = Budget::findOrFail($this->record->id);
-                                                $pdfService = new BudgetPdfService();
-                                                $pdfModel = $pdfService->generatePdf($budget, true);
-
-                                                if ($pdfModel && $pdfModel->fileExists()) {
-                                                    return response()->download(
-                                                        $pdfModel->getFullPath(),
-                                                        'Budget_'.$budget->code.'.pdf',
-                                                        ['Content-Type' => 'application/pdf']
+                                                try {
+                                                    $budget = Budget::with('products')->findOrFail($this->record->id);
+                                                    $pdfService = new PdfGeneratorService();
+                                                    
+                                                    // Prepare data for PDF
+                                                    $setting = \App\Models\Setting::with('companySetting', 'layout')->first();
+                                                    
+                                                    // Convert budget to array and fix UTF-8 encoding
+                                                    $budgetArray = $budget->toArray();
+                                                    array_walk_recursive($budgetArray, function(&$item) {
+                                                        if (is_string($item)) {
+                                                            $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+                                                        }
+                                                    });
+                                                    
+                                                    // Ensure content is in the expected format for the PDF template
+                                                    if (isset($budgetArray['content']) && !isset($budgetArray['content'][0]) && is_array($budgetArray['content'])) {
+                                                        $budgetArray['content'] = [$budgetArray['content']];
+                                                    }
+                                                    
+                                                    // Generate PDF filename and path
+                                                    $filename = 'Budget_'.$budget->code.'_'.now()->format('YmdHis').'.pdf';
+                                                    $path = storage_path('app/public/budgets/'.$filename);
+                                                    
+                                                    // Ensure directory exists
+                                                    if (!file_exists(dirname($path))) {
+                                                        mkdir(dirname($path), 0755, true);
+                                                    }
+                                                    
+                                                    // Save PDF (same approach as generate_link)
+                                                    $pdfService->saveFromView(
+                                                        'pdf.invoice',
+                                                        [
+                                                            'state' => $budgetArray,
+                                                            'product_name' => null,
+                                                            'layout' => $setting->layout ?? null,
+                                                            'company' => $setting->companySetting ?? null,
+                                                        ],
+                                                        $path
                                                     );
-                                                } else {
+                                                    
+                                                    // Return download response
+                                                    return response()->download($path, 'Budget_'.$budget->code.'.pdf')->deleteFileAfterSend(true);
+                                                } catch (\Exception $e) {
+                                                    \Log::error('PDF Generation Error: ' . $e->getMessage());
+                                                    \Log::error('Stack trace: ' . $e->getTraceAsString());
+                                                    
                                                     Notification::make()
                                                         ->title(__('Error generating PDF'))
-                                                        ->body(__('Could not generate PDF file. Please try again.'))
+                                                        ->body($e->getMessage())
                                                         ->danger()
                                                         ->send();
                                                 }
@@ -472,15 +507,50 @@ class EditBudget extends EditRecord
                                             ->icon('heroicon-o-link')
                                             ->color('primary')
                                             ->action(function (Get $get, Set $set) {
-                                                $budget = Budget::findOrFail($this->record->id);
+                                                $budget = Budget::with('products')->findOrFail($this->record->id);
                                                 $budget->refresh();
 
-                                                $pdfService = new BudgetPdfService();
-                                                $pdfModel = $pdfService->generatePdf($budget, true);
-
-                                                if ($pdfModel) {
-                                                    $url = $pdfModel->getDownloadUrl();
-
+                                                try {
+                                                    $pdfService = new PdfGeneratorService();
+                                                    $setting = \App\Models\Setting::with('companySetting', 'layout')->first();
+                                                    
+                                                    // Convert budget to array and fix UTF-8 encoding
+                                                    $budgetArray = $budget->toArray();
+                                                    array_walk_recursive($budgetArray, function(&$item) {
+                                                        if (is_string($item)) {
+                                                            $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+                                                        }
+                                                    });
+                                                    
+                                                    // Ensure content is in the expected format for the PDF template
+                                                    if (isset($budgetArray['content']) && !isset($budgetArray['content'][0]) && is_array($budgetArray['content'])) {
+                                                        $budgetArray['content'] = [$budgetArray['content']];
+                                                    }
+                                                    
+                                                    // Generate PDF filename and path
+                                                    $filename = 'Budget_'.$budget->code.'_'.now()->format('YmdHis').'.pdf';
+                                                    $path = storage_path('app/public/budgets/'.$filename);
+                                                    
+                                                    // Ensure directory exists
+                                                    if (!file_exists(dirname($path))) {
+                                                        mkdir(dirname($path), 0755, true);
+                                                    }
+                                                    
+                                                    // Save PDF
+                                                    $pdfService->saveFromView(
+                                                        'pdf.invoice',
+                                                        [
+                                                            'state' => $budgetArray,
+                                                            'product_name' => null,
+                                                            'layout' => $setting->layout ?? null,
+                                                            'company' => $setting->companySetting ?? null,
+                                                        ],
+                                                        $path
+                                                    );
+                                                    
+                                                    // Generate public URL
+                                                    $url = asset('storage/budgets/'.$filename);
+                                                    
                                                     // Store the URL in the share_link field
                                                     $set('content.share_link', $url);
 
@@ -493,10 +563,12 @@ class EditBudget extends EditRecord
                                                         ->title(__('Share link generated successfully!'))
                                                         ->success()
                                                         ->send();
-                                                } else {
+                                                } catch (\Exception $e) {
+                                                    \Log::error('Share Link Generation Error: ' . $e->getMessage());
+                                                    
                                                     Notification::make()
                                                         ->title(__('Error generating share link'))
-                                                        ->body(__('Could not generate share link. Please try again.'))
+                                                        ->body($e->getMessage())
                                                         ->danger()
                                                         ->send();
                                                 }
