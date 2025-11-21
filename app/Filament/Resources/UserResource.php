@@ -64,7 +64,6 @@ class UserResource extends Resource
                             ->prefixIcon('heroicon-o-user')
                             ->required()
                             ->maxLength(255),
-
                         TextInput::make('email')
                             ->label(__('Email'))
                             ->helperText(__('User email for login'))
@@ -73,7 +72,6 @@ class UserResource extends Resource
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
-
                         TextInput::make('password')
                             ->label(__('Password'))
                             ->helperText(__('Minimum 8 characters'))
@@ -84,7 +82,6 @@ class UserResource extends Resource
                             ->dehydrated(fn ($state) => filled($state))
                             ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8),
-
                         TextInput::make('password_confirmation')
                             ->prefixIcon('heroicon-o-key')
                             ->helperText(__('Confirm the password'))
