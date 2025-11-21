@@ -22,7 +22,7 @@ class BudgetMail extends Mailable
      */
     public function __construct(public array $budgetData = [], public ?string $pdfPath = null)
     {
-        $this->companySetting = Setting::first()->companySetting;
+        $this->companySetting = Setting::first()->companySetting ?? config('app.name', 'Codhous Software');
     }
 
     /**
@@ -30,9 +30,10 @@ class BudgetMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $budget = $this->budgetData;
-        $customerName = $budget['content'][0]['customer_name'] ?? 'Cliente';
+        $budget = $this->budgetData;       
+  
         $code = $budget['code'] ?? '';
+   
 
         return new Envelope(
             subject: "Orçamento #{$code} - ".env('APP_NAME'),
@@ -77,7 +78,8 @@ class BudgetMail extends Mailable
         return $this->view('mail.budget')
             ->with([
                 'budget'  => $this->budgetData,
-                'company' => $this->companySetting,
+                'company' => $this->companySetting,          
+                
             ]);
     }
 }
