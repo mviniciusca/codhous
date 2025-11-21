@@ -78,8 +78,7 @@ class BudgetMail extends Mailable
         return $this->view('mail.budget')
             ->with([
                 'budget'  => $this->budgetData,
-                'company' => $this->companySetting,          
-                
+                'company' => $this->companySetting,    
             ]);
     }
 }
