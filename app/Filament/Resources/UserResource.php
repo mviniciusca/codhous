@@ -108,14 +108,13 @@ class UserResource extends Resource
                             ->searchable()
                             ->required()
                             ->native(false)
-                            ->getOptionLabelFromRecordUsing(fn ($record) => match ($record->name) {
+                            ->options([
                                 'super_admin' => '🔴 Super Admin (Full Access)',
                                 'admin'       => '🟡 Admin (Manager/Supervisor)',
                                 'vendedor'    => '🟢 Vendedor (Sales Team)',
                                 'financeiro'  => '🔵 Financeiro (Financial)',
                                 'atendimento' => '🟣 Atendimento (Customer Service)',
-                                default       => $record->name,
-                            }),
+                            ]),
                     ]),
             ]);
     }
