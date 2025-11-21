@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-class WhatsAppShareService
+class WhatsappService
 {
     public function generateUrl(string $phone, string $message): string
     {

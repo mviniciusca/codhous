@@ -24,7 +24,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Services\PdfGeneratorService;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use App\Services\WhatsAppShareService;
+use App\Services\WhatsappService;
 use Filament\Forms\Components\Section;
 use App\Services\PostcodeFinderService;
 use App\Services\SendBudgetMailService;
@@ -609,7 +609,7 @@ class EditBudget extends EditRecord
                                             })
                                             ->action(function () {
                                                 $budget = Budget::findOrFail($this->record->id);
-                                                $whatsApp = new WhatsAppShareService();
+                                                $whatsApp = new WhatsappService();
                                                 $message = __("Hello! Here's your budget link: ").($budget->content['share_link'] ?? '');
                                                 $url = $whatsApp->generateUrl(
                                                     $budget->content['customer_phone'] ?? '',
