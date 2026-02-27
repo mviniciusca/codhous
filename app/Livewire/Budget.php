@@ -10,7 +10,7 @@ use App\Models\ProductOption;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\NewBudget;
-use App\Services\PostcodeFinder;
+use App\Services\PostcodeFinderService;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
@@ -102,6 +102,7 @@ class Budget extends Component implements HasForms
                                     ->columns(4)
                                     ->schema([
                                         \Filament\Forms\Components\Repeater::make('content.products')
+                                         ->columnSpanFull()
                                             ->label(__('Product List'))
                                             ->schema([
                                                 TextInput::make('quantity')
@@ -169,7 +170,7 @@ class Budget extends Component implements HasForms
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $livewire->validateOnly('data.content.postcode');
-                                                        $postcode = new PostcodeFinder($state, $set);
+                                                        $postcode = new PostcodeFinderService($state, $set);
                                                         $postcode->find();
                                                     })
                                             ),
