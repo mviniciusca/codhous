@@ -23,11 +23,18 @@ class ProductOptionRelationManager extends RelationManager
             ->schema([
                 TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
+                    ->unique(ignoreRecord: true, modifyRuleUsing: fn ($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
+                TextInput::make('slug')
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true, modifyRuleUsing: fn ($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
                 TextInput::make('price')
                     ->required()
                     ->numeric()
-                    ->prefix(env('CURRENCY_SUFFIX'))
+                    ->prefix(env('CURRENCY_PUFFIX'))
                     ->maxValue(42949672.95)
                     ->label(__('Price'))
                     ->helperText(__('Price per unity')),
@@ -44,6 +51,8 @@ class ProductOptionRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')
                     ->label(__('Name')),
+                        TextColumn::make('slug')
+                    ->label(__('Slug')),
                 TextColumn::make('price')
                     ->label(__('Price per Unity'))
                     ->alignEnd()
