@@ -106,7 +106,7 @@ class ProductOptionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
+            ->actions([ 
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

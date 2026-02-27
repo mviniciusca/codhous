@@ -40,17 +40,15 @@ class ProductRelationManager extends RelationManager
                     ->label(__('Active')),
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Name')),
-                Tables\Columns\TextColumn::make('price')
-                    ->prefix(env('CURRENCY_SUFFIX').' ')
-                    ->label(__('Price per Unity')),
+                    
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
-                    ->icon('heroicon-o-shopping-bag')
-                    ->label(__('New Product')),
+                // Tables\Actions\CreateAction::make()
+                //     ->icon('heroicon-o-shopping-bag')
+                //     ->label(__('New Product')),
             ])
             ->actions([
                 ActionGroup::make([
