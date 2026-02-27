@@ -56,10 +56,20 @@ class ProductOptionResource extends Resource
                             ->label(__('Option / Variation'))
                             ->required()
                             ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
                             ->unique(ignoreRecord: true, modifyRuleUsing: function ($rule, callable $get) {
                                 return $rule->where('product_id', $get('product_id'));
                             })
                             ->helperText(__('Option or variation for main product (must be unique per product)')),
+                        TextInput::make('slug')
+                            ->label(__('Slug'))
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true, modifyRuleUsing: function ($rule, callable $get) {
+                                return $rule->where('product_id', $get('product_id'));
+                            })
+                            ->helperText(__('Unique identifier (auto-generated)')),
                         TextInput::make('price')
                             ->label(__('Price'))
                             ->required()
@@ -83,6 +93,10 @@ class ProductOptionResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->label(__('Option')),
+                TextColumn::make('slug')
+                    ->sortable()
+                    ->searchable()
+                    ->label(__('Slug')),
                 TextColumn::make('price')
                     ->sortable()
                     ->money(env('CURRENCY_CODE', 'BRL'))
