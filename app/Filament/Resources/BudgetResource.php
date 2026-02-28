@@ -114,7 +114,7 @@ class BudgetResource extends Resource
                                 $fakeData = $fakeService->generateCompleteBudgetData();
 
                                 foreach ($fakeData as $key => $value) {
-                                    $set('content.'.$key, $value);
+                                    $set('content.' . $key, $value);
                                 }
 
                                 Notification::make()
@@ -210,7 +210,7 @@ class BudgetResource extends Resource
                                     ->label(__('Quantity m³'))
                                     ->suffix(__('m³'))
                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateHydrated(fn (Set $set, string $state) => $set('quantity', $state))
+                                    ->afterStateHydrated(fn(Set $set, string $state) => $set('quantity', $state))
                                     ->disabled()
                                     ->dehydrated(),
                                 TextInput::make('content.location')
@@ -272,7 +272,7 @@ class BudgetResource extends Resource
                         TextInput::make('content.tax')
                             ->live()
                             ->dehydrated()
-                            ->prefix('+'.env('CURRENCY_SUFFIX'))
+                            ->prefix('+' . env('CURRENCY_SUFFIX'))
                             ->numeric()
                             ->required()
                             ->default(0)
@@ -285,7 +285,7 @@ class BudgetResource extends Resource
                             ->dehydrated()
                             ->numeric()
                             ->required()
-                            ->prefix('-'.env('CURRENCY_SUFFIX'))
+                            ->prefix('-' . env('CURRENCY_SUFFIX'))
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 self::calculateTotal($get, $set);
@@ -325,7 +325,7 @@ class BudgetResource extends Resource
 
         $subtotal = $quantity * $price;
         $total = $subtotal + $tax - $discount;
-        
+
         $set('content.subtotal', number_format($subtotal, 2, '.', ''));
         $set('content.total', number_format($total, 2, '.', ''));
     }
@@ -339,8 +339,8 @@ class BudgetResource extends Resource
     {
         return $table
             ->recordAction(null)
-            ->recordUrl(fn (Budget $record): ?string => $record->trashed() ? null : BudgetResource::getUrl('edit', ['record' => $record]))
-            ->recordClasses(fn (Budget $record) => match (true) {
+            ->recordUrl(fn(Budget $record): ?string => $record->trashed() ? null : BudgetResource::getUrl('edit', ['record' => $record]))
+            ->recordClasses(fn(Budget $record) => match (true) {
                 // Deletado: bem apagado com linha atravessada
                 $record->trashed() => 'opacity-40 dark:opacity-40 hover:opacity-70 dark:hover:opacity-70 [&_*]:line-through',
                 // Ignorado: muito apagado (não é mais relevante)
@@ -354,19 +354,19 @@ class BudgetResource extends Resource
                 TextColumn::make('code')
                     ->searchable()
                     ->label(__('Code'))
-                    ->icon(fn (Budget $record) => $record->trashed() ? 'heroicon-o-trash' : null)
+                    ->icon(fn(Budget $record) => $record->trashed() ? 'heroicon-o-trash' : null)
                     ->iconColor('danger'),
                 TextColumn::make('status')
                     ->sortable()
                     ->badge()
-                    ->icon(fn (Budget $record, string $state): string => $record->trashed() ? 'heroicon-o-trash' : match ($state) {
+                    ->icon(fn(Budget $record, string $state): string => $record->trashed() ? 'heroicon-o-trash' : match ($state) {
                         'pending'  => 'heroicon-o-clock',
                         'on going' => 'heroicon-o-arrow-path',
                         'done'     => 'heroicon-o-check-circle',
                         'ignored'  => 'heroicon-o-x-circle',
                         default    => 'heroicon-o-question-mark-circle',
                     })
-                    ->color(fn (Budget $record, string $state): string => $record->trashed() ? 'gray' : match ($state) {
+                    ->color(fn(Budget $record, string $state): string => $record->trashed() ? 'gray' : match ($state) {
                         'pending'  => 'primary',
                         'on going' => 'warning',
                         'done'     => 'success',
@@ -376,6 +376,23 @@ class BudgetResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->label(__('Name')),
+                TextColumn::make('products_display')
+                    ->label(__('Products & Units'))
+                    ->state(function (Budget $record): string {
+                        $products = $record->content['products'] ?? [];
+                        if (empty($products)) return '-';
+
+                        $lines = [];
+                        foreach ($products as $item) {
+                            $productName = \App\Models\Product::find($item['product'] ?? 0)?->name ?? 'Product';
+                            $unit = \App\Models\ProductOption::find($item['product_option'] ?? 0)?->unit?->value ?? '';
+                            $lines[] = "{$productName} ({$item['quantity']} {$unit})";
+                        }
+
+                        return implode(', ', $lines);
+                    })
+                    ->wrap()
+                    ->limit(50),
                 TextColumn::make('content.customer_email')
                     ->label(__('Email')),
                 TextColumn::make('content.customer_phone')
@@ -384,9 +401,9 @@ class BudgetResource extends Resource
                     ->counts('documents')
                     ->label(__('Documents'))
                     ->badge()
-                    ->color(fn ($state) => $state > 0 ? 'success' : 'gray')
-                    ->icon(fn ($state) => $state > 0 ? 'heroicon-o-paper-clip' : 'heroicon-o-document')
-                    ->formatStateUsing(fn ($state) => $state > 0 ? $state : __('None'))
+                    ->color(fn($state) => $state > 0 ? 'success' : 'gray')
+                    ->icon(fn($state) => $state > 0 ? 'heroicon-o-paper-clip' : 'heroicon-o-document')
+                    ->formatStateUsing(fn($state) => $state > 0 ? $state : __('None'))
                     ->sortable()
                     ->alignCenter()
                     ->toggleable(),
@@ -430,7 +447,7 @@ class BudgetResource extends Resource
                         ->label(__('Copy PDF Link'))
                         ->icon('heroicon-o-clipboard-document')
                         ->color('success')
-                        ->visible(fn (Budget $record) => ! $record->trashed() && ! empty($record->content['share_link']))
+                        ->visible(fn(Budget $record) => ! $record->trashed() && ! empty($record->content['share_link']))
                         ->action(function (Budget $record) {
                             Notification::make()
                                 ->title(__('PDF link copied!'))
@@ -441,7 +458,7 @@ class BudgetResource extends Resource
                         ->label(__('Generate PDF Link'))
                         ->icon('heroicon-o-link')
                         ->color('primary')
-                        ->visible(fn (Budget $record) => ! $record->trashed() && empty($record->content['share_link']))
+                        ->visible(fn(Budget $record) => ! $record->trashed() && empty($record->content['share_link']))
                         ->action(function (Budget $record) {
                             // Generate new link
                             $pdfService = new \App\Services\BudgetPdfService();
@@ -468,7 +485,7 @@ class BudgetResource extends Resource
                         ->label(__('Download PDF'))
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('warning')
-                        ->visible(fn (Budget $record) => ! $record->trashed())
+                        ->visible(fn(Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             $pdfService = new \App\Services\BudgetPdfService();
                             $pdfModel = $pdfService->generatePdf($record, true);
@@ -476,7 +493,7 @@ class BudgetResource extends Resource
                             if ($pdfModel && $pdfModel->fileExists()) {
                                 return response()->download(
                                     $pdfModel->getFullPath(),
-                                    'Budget_'.$record->code.'.pdf',
+                                    'Budget_' . $record->code . '.pdf',
                                     ['Content-Type' => 'application/pdf']
                                 );
                             }
@@ -491,7 +508,7 @@ class BudgetResource extends Resource
                         ->label(__('Send Email'))
                         ->icon('heroicon-o-envelope')
                         ->color('primary')
-                        ->visible(fn (Budget $record) => ! $record->trashed())
+                        ->visible(fn(Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             try {
                                 $mail = new \App\Services\SendBudgetMail(
@@ -517,7 +534,7 @@ class BudgetResource extends Resource
                         ->label(__('Share on WhatsApp'))
                         ->icon('heroicon-o-phone')
                         ->color('success')
-                        ->visible(fn (Budget $record) => ! $record->trashed())
+                        ->visible(fn(Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             // Generate PDF and share link if not exists
                             if (empty($record->content['share_link'] ?? null)) {
@@ -533,7 +550,7 @@ class BudgetResource extends Resource
                             }
 
                             $whatsApp = new \App\Services\WhatsAppShare();
-                            $message = __("Hello! Here's your budget link: ").($record->content['share_link'] ?? '');
+                            $message = __("Hello! Here's your budget link: ") . ($record->content['share_link'] ?? '');
                             $url = $whatsApp->generateUrl(
                                 $record->content['customer_phone'] ?? '',
                                 $message
@@ -542,16 +559,16 @@ class BudgetResource extends Resource
                             return redirect()->away($url);
                         }),
                     Tables\Actions\EditAction::make('edit')
-                        ->visible(fn (Budget $record) => ! $record->trashed()),
+                        ->visible(fn(Budget $record) => ! $record->trashed()),
                     Tables\Actions\DeleteAction::make()
                         ->label(__('Delete'))
-                        ->visible(fn (Budget $record) => ! $record->trashed()),
+                        ->visible(fn(Budget $record) => ! $record->trashed()),
                     Tables\Actions\ForceDeleteAction::make()
                         ->label(__('Force Delete'))
-                        ->visible(fn (Budget $record) => $record->trashed()),
+                        ->visible(fn(Budget $record) => $record->trashed()),
                     Tables\Actions\RestoreAction::make()
                         ->label(__('Restore'))
-                        ->visible(fn (Budget $record) => $record->trashed()),
+                        ->visible(fn(Budget $record) => $record->trashed()),
                 ]),
             ])
             ->bulkActions([

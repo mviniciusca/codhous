@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ProductUnit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -22,6 +23,7 @@ class ProductOptionFactory extends Factory
         return [
             'name'  => $name,
             'slug'  => Str::slug($name),
+            'unit'  => fake()->randomElement(ProductUnit::cases()),
             'price' => fake()->randomFloat(2, 300, 1000),
         ];
     }

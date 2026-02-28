@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Enums\ProductUnit;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -10,8 +12,6 @@ use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductOptionRelationManager extends RelationManager
 {
@@ -25,16 +25,20 @@ class ProductOptionRelationManager extends RelationManager
                     ->required()
                     ->maxLength(255)
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn (\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
-                    ->unique(ignoreRecord: true, modifyRuleUsing: fn ($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
+                    ->afterStateUpdated(fn(\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
+                    ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
                 TextInput::make('slug')
                     ->required()
                     ->maxLength(255)
-                    ->unique(ignoreRecord: true, modifyRuleUsing: fn ($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
+                    ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
+                Select::make('unit')
+                    ->label(__('Unit'))
+                    ->required()
+                    ->options(ProductUnit::class),
                 TextInput::make('price')
                     ->required()
                     ->numeric()
-                    ->prefix(env('CURRENCY_PUFFIX'))
+                    ->prefix(env('CURRENCY_SUFFIX'))
                     ->maxValue(42949672.95)
                     ->label(__('Price'))
                     ->helperText(__('Price per unity')),
@@ -51,12 +55,15 @@ class ProductOptionRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')
                     ->label(__('Name')),
-                        TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->label(__('Slug')),
+                TextColumn::make('unit')
+                    ->label(__('Unit'))
+                    ->badge(),
                 TextColumn::make('price')
                     ->label(__('Price per Unity'))
                     ->alignEnd()
-                    ->prefix(env('CURRENCY_SUFFIX').' '),
+                    ->prefix(env('CURRENCY_SUFFIX') . ' '),
             ])
             ->filters([
                 //

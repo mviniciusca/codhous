@@ -83,14 +83,14 @@ class EditBudget extends EditRecord
                                     ->prefix('#')
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Use this code to search'))
-                                    ->default('ADMIN'.rand(10000, 99999)),
+                                    ->default('ADMIN' . rand(10000, 99999)),
                                 DateTimePicker::make('created_at')
                                     ->disabled()
                                     ->dehydrated()
                                     ->format('Y-m-d H:i:s')
                                     ->prefixIcon('heroicon-o-calendar')
                                     ->displayFormat('d/m/Y H:i')
-                                    ->default(fn () => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->default(fn() => Carbon::now()->format('Y-m-d H:i:s'))
                                     ->label(__('Date'))
                                     ->helperText(__('When this budget was created')),
                             ]),
@@ -144,7 +144,7 @@ class EditBudget extends EditRecord
                                             ->helperText(__('Customer postcode'))
                                             ->maxLength(9)
                                             ->suffixAction(
-                                                fn ($state, Set $set, $livewire) => FormAction::make('search-action')
+                                                fn($state, Set $set, $livewire) => FormAction::make('search-action')
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $livewire->validateOnly('data.content.postcode');
@@ -227,10 +227,10 @@ class EditBudget extends EditRecord
                                                     ->columnSpan(3)
                                                     ->label(__('Option'))
                                                     ->helperText(__('Option selected'))
-                                                    ->options(fn (Get $get): Collection => self::getOptions($get))
-                                                    ->required(fn (Get $get): bool => self::getOptions($get)->count() > 0)
-                                                    ->hidden(fn (Get $get): bool => self::getOptions($get)->count() == 0)
-                                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => self::updatePrice($get, $set, $state))
+                                                    ->options(fn(Get $get): Collection => self::getOptions($get))
+                                                    ->required(fn(Get $get): bool => self::getOptions($get)->count() > 0)
+                                                    ->hidden(fn(Get $get): bool => self::getOptions($get)->count() == 0)
+                                                    ->afterStateUpdated(fn(Get $get, Set $set, $state) => self::updatePrice($get, $set, $state))
                                                     ->afterStateHydrated(function (Get $get, Set $set, $state) {
                                                         // Garantir que o price seja carregado corretamente
                                                         if ($state && $get('product')) {
@@ -260,7 +260,7 @@ class EditBudget extends EditRecord
                                                     ->minValue(3)
                                                     ->columnSpan(3)
                                                     ->label(__('Quantity'))
-                                                    ->suffix(__('m³'))
+                                                    ->suffix(fn(Get $get) => ProductOption::find($get('product_option'))?->unit?->value ?? '')
                                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                                     ->afterStateHydrated(function (Get $get, Set $set, $state) {
                                                         // Garantir que seja inteiro ao carregar
@@ -288,12 +288,12 @@ class EditBudget extends EditRecord
                                                     ->disabled()
                                                     ->dehydrated()
                                                     ->columnSpan(3)
-                                                    ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                                                    ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
                                                     ->afterStateHydrated(function (Get $get, Set $set) {
                                                         self::getPrice($get, $set);
                                                     })
                                                     ->prefix(env('CURRENCY_SUFFIX'))
-                                                    ->label(__('Price per Unity'))
+                                                    ->label(fn(Get $get) => __('Price per Unity') . ' (' . (ProductOption::find($get('product_option'))?->unit?->value ?? '') . ')')
                                                     ->required(),
                                                 TextInput::make('subtotal')
                                                     ->live()
@@ -303,11 +303,16 @@ class EditBudget extends EditRecord
                                                     ->prefix(env('CURRENCY_SUFFIX'))
                                                     ->label(__('Subtotal'))
                                                     ->helperText(__('Product quantity x price'))
-                                                    ->afterStateHydrated(fn (Get $get, Set $set) => self::calculateItemSubtotal($get, $set)),
+                                                    ->afterStateHydrated(fn(Get $get, Set $set) => self::calculateItemSubtotal($get, $set)),
                                             ]),
                                     ])
                                     ->columns(1)
-                                    ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null)
+                                    ->itemLabel(function (array $state): ?string {
+                                        if (!$state['product']) return null;
+                                        $name = Product::find($state['product'])?->name;
+                                        $unit = ProductOption::find($state['product_option'] ?? null)?->unit?->value ?? '';
+                                        return $name . ' (' . ($state['quantity'] ?? 0) . ' ' . $unit . ')';
+                                    })
                                     ->addActionLabel(__('Add Product'))
                                     ->collapsible()
                                     ->afterStateUpdated(function (Get $get, Set $set) {
@@ -345,7 +350,7 @@ class EditBudget extends EditRecord
                                                     ->required()
                                                     ->integer()
                                                     ->step(1)
-                                                    ->suffix('m³')
+                                                    ->suffix(fn(Get $get) => '') // Total quantity doesn't have a single unit
                                                     ->label(__('Total Quantity'))
                                                     ->helperText(__('Total quantity for all products'))
                                                     ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
@@ -356,7 +361,7 @@ class EditBudget extends EditRecord
                                                     ->disabled()
                                                     ->dehydrated()
                                                     ->prefix(env('CURRENCY_SUFFIX'))
-                                                    ->label(__('Price per Unity (m³)'))
+                                                    ->label(__('Price per Unity'))
                                                     ->numeric()
                                                     ->step(0.01),
                                                 TextInput::make('content.subtotal')
@@ -374,7 +379,7 @@ class EditBudget extends EditRecord
                                                     ->required()
                                                     ->default(0)
                                                     ->prefix(env('CURRENCY_SUFFIX'))
-                                                    ->helperText(__('Total shipping cost in '.env('CURRENCY_SUFFIX')))
+                                                    ->helperText(__('Total shipping cost in ' . env('CURRENCY_SUFFIX')))
                                                     ->step(0.01)
                                                     ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                                         self::calculateTotal($get, $set);
@@ -382,11 +387,11 @@ class EditBudget extends EditRecord
                                                 TextInput::make('content.tax')
                                                     ->live()
                                                     ->dehydrated()
-                                                    ->prefix('+'.env('CURRENCY_SUFFIX'))
+                                                    ->prefix('+' . env('CURRENCY_SUFFIX'))
                                                     ->numeric()
                                                     ->required()
                                                     ->default(0)
-                                                    ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
+                                                    ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
                                                     ->step(0.01)
                                                     ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                                         self::calculateTotal($get, $set);
@@ -397,8 +402,8 @@ class EditBudget extends EditRecord
                                                     ->numeric()
                                                     ->required()
                                                     ->default(0)
-                                                    ->prefix('-'.env('CURRENCY_SUFFIX'))
-                                                    ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
+                                                    ->prefix('-' . env('CURRENCY_SUFFIX'))
+                                                    ->helperText(__('Applies a discount in ' . env('CURRENCY_SUFFIX')))
                                                     ->step(0.01)
                                                     ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                                         self::calculateTotal($get, $set);
@@ -409,14 +414,14 @@ class EditBudget extends EditRecord
                                                     ->required()
                                                     ->prefix(env('CURRENCY_SUFFIX'))
                                                     ->label(__('Total Price'))
-                                                    ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
+                                                    ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
                                                     ->suffixAction(function () {
                                                         return FormAction::make('calculator')
                                                             ->icon('heroicon-o-calculator')
                                                             ->color('gray')
                                                             ->disabled()
                                                             ->visible(true)
-                                                            ->action(fn () => self::generateCode($this->data));
+                                                            ->action(fn() => self::generateCode($this->data));
                                                     }),
                                             ]),
                                     ]),
@@ -443,32 +448,32 @@ class EditBudget extends EditRecord
                                                 try {
                                                     $budget = Budget::with('products')->findOrFail($this->record->id);
                                                     $pdfService = new PdfGeneratorService();
-                                                    
+
                                                     // Prepare data for PDF
                                                     $setting = \App\Models\Setting::with('companySetting', 'layout')->first();
-                                                    
+
                                                     // Convert budget to array and fix UTF-8 encoding
                                                     $budgetArray = $budget->toArray();
-                                                    array_walk_recursive($budgetArray, function(&$item) {
+                                                    array_walk_recursive($budgetArray, function (&$item) {
                                                         if (is_string($item)) {
                                                             $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
                                                         }
                                                     });
-                                                    
+
                                                     // Ensure content is in the expected format for the PDF template
                                                     if (isset($budgetArray['content']) && !isset($budgetArray['content'][0]) && is_array($budgetArray['content'])) {
                                                         $budgetArray['content'] = [$budgetArray['content']];
                                                     }
-                                                    
+
                                                     // Generate PDF filename and path
-                                                    $filename = 'Budget_'.$budget->code.'_'.now()->format('YmdHis').'.pdf';
-                                                    $path = storage_path('app/public/budgets/'.$filename);
-                                                    
+                                                    $filename = 'Budget_' . $budget->code . '_' . now()->format('YmdHis') . '.pdf';
+                                                    $path = storage_path('app/public/budgets/' . $filename);
+
                                                     // Ensure directory exists
                                                     if (!file_exists(dirname($path))) {
                                                         mkdir(dirname($path), 0755, true);
                                                     }
-                                                    
+
                                                     // Save PDF (same approach as generate_link)
                                                     $pdfService->saveFromView(
                                                         'pdf.invoice',
@@ -480,13 +485,13 @@ class EditBudget extends EditRecord
                                                         ],
                                                         $path
                                                     );
-                                                    
+
                                                     // Return download response
-                                                    return response()->download($path, 'Budget_'.$budget->code.'.pdf')->deleteFileAfterSend(true);
+                                                    return response()->download($path, 'Budget_' . $budget->code . '.pdf')->deleteFileAfterSend(true);
                                                 } catch (\Exception $e) {
                                                     Log::error('PDF Generation Error: ' . $e->getMessage());
                                                     Log::error('Stack trace: ' . $e->getTraceAsString());
-                                                    
+
                                                     Notification::make()
                                                         ->title(__('Error generating PDF'))
                                                         ->body($e->getMessage())
@@ -504,7 +509,7 @@ class EditBudget extends EditRecord
                                             ->modalSubmitActionLabel(__('Export'))
                                             ->action(function () {
                                                 $budget = Budget::with('products')->findOrFail($this->record->id);
-                                                $filename = 'Budget_'.$budget->code.'_'.date('Y-m-d').'.xlsx';
+                                                $filename = 'Budget_' . $budget->code . '_' . date('Y-m-d') . '.xlsx';
 
                                                 return Excel::download(new BudgetExport($budget), $filename);
                                             }),
@@ -530,29 +535,29 @@ class EditBudget extends EditRecord
                                                 try {
                                                     $pdfService = new PdfGeneratorService();
                                                     $setting = \App\Models\Setting::with('companySetting', 'layout')->first();
-                                                    
+
                                                     // Convert budget to array and fix UTF-8 encoding
                                                     $budgetArray = $budget->toArray();
-                                                    array_walk_recursive($budgetArray, function(&$item) {
+                                                    array_walk_recursive($budgetArray, function (&$item) {
                                                         if (is_string($item)) {
                                                             $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
                                                         }
                                                     });
-                                                    
+
                                                     // Ensure content is in the expected format for the PDF template
                                                     if (isset($budgetArray['content']) && !isset($budgetArray['content'][0]) && is_array($budgetArray['content'])) {
                                                         $budgetArray['content'] = [$budgetArray['content']];
                                                     }
-                                                    
+
                                                     // Generate PDF filename and path
-                                                    $filename = 'Budget_'.$budget->code.'_'.now()->format('YmdHis').'.pdf';
-                                                    $path = storage_path('app/public/budgets/'.$filename);
-                                                    
+                                                    $filename = 'Budget_' . $budget->code . '_' . now()->format('YmdHis') . '.pdf';
+                                                    $path = storage_path('app/public/budgets/' . $filename);
+
                                                     // Ensure directory exists
                                                     if (!file_exists(dirname($path))) {
                                                         mkdir(dirname($path), 0755, true);
                                                     }
-                                                    
+
                                                     // Save PDF
                                                     $pdfService->saveFromView(
                                                         'pdf.invoice',
@@ -564,10 +569,10 @@ class EditBudget extends EditRecord
                                                         ],
                                                         $path
                                                     );
-                                                    
+
                                                     // Generate public URL
-                                                    $url = asset('storage/budgets/'.$filename);
-                                                    
+                                                    $url = asset('storage/budgets/' . $filename);
+
                                                     // Store the URL in the share_link field
                                                     $set('content.share_link', $url);
 
@@ -582,7 +587,7 @@ class EditBudget extends EditRecord
                                                         ->send();
                                                 } catch (\Exception $e) {
                                                     Log::error('Share Link Generation Error: ' . $e->getMessage());
-                                                    
+
                                                     Notification::make()
                                                         ->title(__('Error generating share link'))
                                                         ->body($e->getMessage())
@@ -626,7 +631,7 @@ class EditBudget extends EditRecord
                                             ->action(function () {
                                                 $budget = Budget::findOrFail($this->record->id);
                                                 $whatsApp = new WhatsappService();
-                                                $message = __("Hello! Here's your budget link: ").($budget->content['share_link'] ?? '');
+                                                $message = __("Hello! Here's your budget link: ") . ($budget->content['share_link'] ?? '');
                                                 $url = $whatsApp->generateUrl(
                                                     $budget->content['customer_phone'] ?? '',
                                                     $message
@@ -646,9 +651,9 @@ class EditBudget extends EditRecord
                                                 FormAction::make('open_link')
                                                     ->icon('heroicon-m-arrow-top-right-on-square')
                                                     ->tooltip(__('Open in new tab'))
-                                                    ->url(fn ($state) => $state)
+                                                    ->url(fn($state) => $state)
                                                     ->openUrlInNewTab()
-                                                    ->visible(fn ($state) => ! empty($state))
+                                                    ->visible(fn($state) => ! empty($state))
                                             )
                                             ->columnSpanFull(),
                                     ]),

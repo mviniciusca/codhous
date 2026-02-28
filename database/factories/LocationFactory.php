@@ -17,7 +17,34 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->country()
+            'name' => $this->faker->randomElement([
+                'Laje',
+                'Calçada',
+                'Piso Garagem',
+                'Piso Industrial',
+                'Fundação / Sapata',
+                'Viga Baldrame',
+                'Pilar / Coluna',
+                'Rampa de Acesso',
+                'Estacionamento',
+                'Quadra Poliesportiva',
+            ])
         ];
+    }
+
+    /**
+     * State for specific construction locations
+     */
+    public function construction(): self
+    {
+        return $this->sequence(
+            ['name' => 'Laje'],
+            ['name' => 'Calçada'],
+            ['name' => 'Piso Garagem'],
+            ['name' => 'Piso Industrial'],
+            ['name' => 'Fundação'],
+            ['name' => 'Pilar'],
+            ['name' => 'Piscina'],
+        );
     }
 }

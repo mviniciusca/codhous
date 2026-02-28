@@ -73,7 +73,7 @@ class CreateBudget extends CreateRecord
                 }
             } catch (\Exception $e) {
                 // Em caso de erro no processamento, apenas continua sem os produtos
-                \Illuminate\Support\Facades\Log::error('Erro ao processar produtos do carrinho: '.$e->getMessage());
+                \Illuminate\Support\Facades\Log::error('Erro ao processar produtos do carrinho: ' . $e->getMessage());
             }
         }
 
@@ -138,7 +138,7 @@ class CreateBudget extends CreateRecord
                                         'done'     => __('Done'),
                                         'ignored'  => __('Ignored'),
                                     ])
-                                    ->afterStateUpdated(fn (Get $get, Set $set, $state): string => $this->updateBudgetStatus($get, $set, $state))
+                                    ->afterStateUpdated(fn(Get $get, Set $set, $state): string => $this->updateBudgetStatus($get, $set, $state))
                                     ->default('pending'),
                                 TextInput::make('code')
                                     ->disabled()
@@ -146,11 +146,11 @@ class CreateBudget extends CreateRecord
                                     ->prefix('#')
                                     ->label(__('Budget Code'))
                                     ->helperText(__('Auto-generated code (preview)'))
-                                    ->default(fn () => 'BD'.date('Ym').str_pad(rand(1, 99999), 5, '0', STR_PAD_LEFT)),
+                                    ->default(fn() => 'BD' . date('Ym') . str_pad(rand(1, 99999), 5, '0', STR_PAD_LEFT)),
                                 DateTimePicker::make('created_at')
                                     ->format('Y-m-d H:i:s')
                                     ->displayFormat('d/m/Y H:i')
-                                    ->default(fn (): string => Carbon::now()->format('Y-m-d H:i:s'))
+                                    ->default(fn(): string => Carbon::now()->format('Y-m-d H:i:s'))
                                     ->required()
                                     ->disabled()
                                     ->prefixIcon('heroicon-o-calendar')
@@ -180,13 +180,13 @@ class CreateBudget extends CreateRecord
                                                 // Gerar dados do cliente
                                                 $customerData = $fakeService->generateCustomerData();
                                                 foreach ($customerData as $key => $value) {
-                                                    $set('content.'.$key, $value);
+                                                    $set('content.' . $key, $value);
                                                 }
 
                                                 // Gerar dados do endereço
                                                 $addressData = $fakeService->generateAddressData();
                                                 foreach ($addressData as $key => $value) {
-                                                    $set('content.'.$key, $value);
+                                                    $set('content.' . $key, $value);
                                                 }
 
                                                 Notification::make()
@@ -220,34 +220,35 @@ class CreateBudget extends CreateRecord
                                                     ->send();
                                             }),
                                     ])
-                                    ->schema([Group::make()
-                                        ->columns(3)
-                                        ->columnSpanFull()
-                                        ->schema([
-                                            TextInput::make('content.customer_name')
-                                                ->dehydrated()
-                                                ->default('' ?? env('APP_NAME'))
-                                                ->required()
-                                                ->prefixIcon('heroicon-o-user')
-                                                ->helperText(__('Customer name'))
-                                                ->label(__('Customer Name')),
-                                            TextInput::make('content.customer_email')
-                                                ->dehydrated()
-                                                ->email()
-                                                ->required()
-                                                ->prefixIcon('heroicon-o-envelope')
-                                                ->helperText(__('Customer email address'))
-                                                ->label(__('Email')),
-                                            TextInput::make('content.customer_phone')
-                                                ->required()
-                                                ->helperText(__('Phone Number'))
-                                                ->tel()
-                                                ->prefixIcon('heroicon-o-phone')
-                                                ->mask('(99)99999-9999')
-                                                ->placeholder(_('(--) ---- ----'))
-                                                ->helperText(__('Customer phone number'))
-                                                ->label(__('Phone')),
-                                        ]),
+                                    ->schema([
+                                        Group::make()
+                                            ->columns(3)
+                                            ->columnSpanFull()
+                                            ->schema([
+                                                TextInput::make('content.customer_name')
+                                                    ->dehydrated()
+                                                    ->default('' ?? env('APP_NAME'))
+                                                    ->required()
+                                                    ->prefixIcon('heroicon-o-user')
+                                                    ->helperText(__('Customer name'))
+                                                    ->label(__('Customer Name')),
+                                                TextInput::make('content.customer_email')
+                                                    ->dehydrated()
+                                                    ->email()
+                                                    ->required()
+                                                    ->prefixIcon('heroicon-o-envelope')
+                                                    ->helperText(__('Customer email address'))
+                                                    ->label(__('Email')),
+                                                TextInput::make('content.customer_phone')
+                                                    ->required()
+                                                    ->helperText(__('Phone Number'))
+                                                    ->tel()
+                                                    ->prefixIcon('heroicon-o-phone')
+                                                    ->mask('(99)99999-9999')
+                                                    ->placeholder(_('(--) ---- ----'))
+                                                    ->helperText(__('Customer phone number'))
+                                                    ->label(__('Phone')),
+                                            ]),
                                         TextInput::make('content.postcode')
                                             ->required()
                                             ->minLength(9)
@@ -257,7 +258,7 @@ class CreateBudget extends CreateRecord
                                             ->helperText(__('Customer postcode'))
                                             ->maxLength(9)
                                             ->suffixAction(
-                                                fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                                fn($state, Set $set, $livewire) => Action::make('search-action')
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
                                                         $livewire->validateOnly('content.data.postcode');
@@ -339,10 +340,10 @@ class CreateBudget extends CreateRecord
                                                     ->columnSpan(4)
                                                     ->label(__('Option'))
                                                     ->helperText(__('Option selected'))
-                                                    ->options(fn (Get $get): Collection => $this->getOptions($get))
-                                                    ->required(fn (Get $get): bool => $this->getOptions($get)->count() > 0)
-                                                    ->hidden(fn (Get $get): bool => $this->getOptions($get)->count() == 0)
-                                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
+                                                    ->options(fn(Get $get): Collection => $this->getOptions($get))
+                                                    ->required(fn(Get $get): bool => $this->getOptions($get)->count() > 0)
+                                                    ->hidden(fn(Get $get): bool => $this->getOptions($get)->count() == 0)
+                                                    ->afterStateUpdated(fn(Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
                                                 Select::make('location')
                                                     ->dehydrated()
                                                     ->required()
@@ -359,7 +360,7 @@ class CreateBudget extends CreateRecord
                                                     ->minValue(1)
                                                     ->columnSpan(4)
                                                     ->label(__('Quantity'))
-                                                    ->suffix(__('m³'))
+                                                    ->suffix(fn(Get $get) => ProductOption::find($get('product_option'))?->unit?->value ?? '')
                                                     ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
                                                         // Calcular subtotal do item atual
@@ -373,7 +374,7 @@ class CreateBudget extends CreateRecord
                                                     ->disabled()
                                                     ->dehydrated()
                                                     ->columnSpan(4)
-                                                    ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                                                    ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
                                                     ->afterStateHydrated(function (Get $get, Set $set) {
                                                         $this->getPrice($get, $set);
                                                     })
@@ -382,7 +383,7 @@ class CreateBudget extends CreateRecord
                                                         $this->calculateTotal($get, $set);
                                                     })
                                                     ->prefix(env('CURRENCY_SUFFIX'))
-                                                    ->label(__('Price per Unity'))
+                                                    ->label(fn(Get $get) => __('Price per Unity') . ' (' . (ProductOption::find($get('product_option'))?->unit?->value ?? '') . ')')
                                                     ->required(),
                                                 TextInput::make('subtotal')
                                                     ->live()
@@ -392,15 +393,20 @@ class CreateBudget extends CreateRecord
                                                     ->prefix(env('CURRENCY_SUFFIX'))
                                                     ->label(__('Subtotal'))
                                                     ->helperText(__('Product quantity x price'))
-                                                    ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateItemSubtotal($get, $set)),
+                                                    ->afterStateHydrated(fn(Get $get, Set $set) => $this->calculateItemSubtotal($get, $set)),
                                             ])
                                             ->columns(12)
-                                            ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null)
+                                            ->itemLabel(function (array $state): ?string {
+                                                if (!$state['product']) return null;
+                                                $name = Product::find($state['product'])?->name;
+                                                $unit = ProductOption::find($state['product_option'] ?? null)?->unit?->value ?? '';
+                                                return $name . ' (' . ($state['quantity'] ?? 0) . ' ' . $unit . ')';
+                                            })
                                             ->addActionLabel(__('Add Product'))
                                             ->collapsible()
                                             ->columnSpanFull(),
                                     ]),
-                                        Section::make(__('Pricing Calculator'))
+                                Section::make(__('Pricing Calculator'))
                                     ->icon('heroicon-o-currency-dollar')
                                     ->description(__('Pricing Definition & Total Cost.'))
                                     ->columns(4)
@@ -412,22 +418,22 @@ class CreateBudget extends CreateRecord
                                             ->required()
                                             ->integer()
                                             ->minValue(3)
-                                            ->suffix('m³')
+                                            ->suffix(fn(Get $get) => '')
                                             ->helperText(__('Quantity of items'))
-                                            ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
-                                            ->afterStateUpdated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
+                                            ->afterStateHydrated(fn(Get $get, Set $set) => $this->calculateTotal($get, $set))
+                                            ->afterStateUpdated(fn(Get $get, Set $set) => $this->calculateTotal($get, $set))
                                             ->numeric(),
                                         TextInput::make('content.price')
                                             ->live()
                                             ->disabled()
                                             ->dehydrated()
                                             ->prefix(env('CURRENCY_SUFFIX'))
-                                            ->label(__('Price per Unity (m³)'))
+                                            ->label(__('Price per Unity'))
                                             ->numeric()
-                                            ->helperText(__('Price of product in '.env('CURRENCY_SUFFIX')))
+                                            ->helperText(__('Price of product in ' . env('CURRENCY_SUFFIX')))
                                             ->step(0.01)
-                                            ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
-                                            ->afterStateUpdated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set)),
+                                            ->afterStateHydrated(fn(Get $get, Set $set) => $this->calculateTotal($get, $set))
+                                            ->afterStateUpdated(fn(Get $get, Set $set) => $this->calculateTotal($get, $set)),
                                         TextInput::make('content.subtotal')
                                             ->live()
                                             ->disabled()
@@ -437,14 +443,14 @@ class CreateBudget extends CreateRecord
                                             ->numeric()
                                             ->helperText(__('Subtotal before taxes and discounts'))
                                             ->step(0.01)
-                                            ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set)),
+                                            ->afterStateHydrated(fn(Get $get, Set $set) => $this->calculateTotal($get, $set)),
                                         TextInput::make('content.shipping')
                                             ->live()
                                             ->dehydrated()
-                                            ->prefix('+'.env('CURRENCY_SUFFIX'))
+                                            ->prefix('+' . env('CURRENCY_SUFFIX'))
                                             ->numeric()
                                             ->required()
-                                            ->helperText(__('Shipping cost in '.env('CURRENCY_SUFFIX')))
+                                            ->helperText(__('Shipping cost in ' . env('CURRENCY_SUFFIX')))
                                             ->step(0.01)
                                             ->afterStateHydrated(function (Get $get, Set $set) {
                                                 $this->calculateTotal($get, $set);
@@ -455,10 +461,10 @@ class CreateBudget extends CreateRecord
                                         TextInput::make('content.tax')
                                             ->live()
                                             ->dehydrated()
-                                            ->prefix('+'.env('CURRENCY_SUFFIX'))
+                                            ->prefix('+' . env('CURRENCY_SUFFIX'))
                                             ->numeric()
                                             ->required()
-                                            ->helperText(__('Sum tax or other values in '.env('CURRENCY_SUFFIX')))
+                                            ->helperText(__('Sum tax or other values in ' . env('CURRENCY_SUFFIX')))
                                             ->step(0.01)
                                             ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                                 $this->calculateTotal($get, $set);
@@ -472,8 +478,8 @@ class CreateBudget extends CreateRecord
                                             ->live()
                                             ->numeric()
                                             ->required()
-                                            ->prefix('-'.env('CURRENCY_SUFFIX'))
-                                            ->helperText(__('Applies a discount in '.env('CURRENCY_SUFFIX')))
+                                            ->prefix('-' . env('CURRENCY_SUFFIX'))
+                                            ->helperText(__('Applies a discount in ' . env('CURRENCY_SUFFIX')))
                                             ->step(0.01)
                                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                                 $this->calculateTotal($get, $set);
@@ -495,7 +501,7 @@ class CreateBudget extends CreateRecord
                                             ->numeric()
                                             ->required()
                                             ->label(__('Total Price'))
-                                            ->helperText(__('The total budget value in '.env('CURRENCY_SUFFIX')))
+                                            ->helperText(__('The total budget value in ' . env('CURRENCY_SUFFIX')))
                                             ->prefix(env('CURRENCY_SUFFIX'))
                                             ->step(0.01),
                                     ]),
@@ -694,7 +700,7 @@ class CreateBudget extends CreateRecord
                     'totalValue'    => $subtotal,
                 ]);
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Erro ao preencher formulário com produtos: '.$e->getMessage());
+                \Illuminate\Support\Facades\Log::error('Erro ao preencher formulário com produtos: ' . $e->getMessage());
             }
         }
     }

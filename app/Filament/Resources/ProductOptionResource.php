@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ProductUnit;
 use App\Filament\Resources\ProductOptionResource\Pages;
 use App\Filament\Resources\ProductOptionResource\RelationManagers;
 use App\Filament\Resources\ProductOptionResource\RelationManagers\ProductRelationManager;
@@ -57,11 +58,17 @@ class ProductOptionResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
+                            ->afterStateUpdated(fn(\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
                             ->unique(ignoreRecord: true, modifyRuleUsing: function ($rule, callable $get) {
                                 return $rule->where('product_id', $get('product_id'));
                             })
                             ->helperText(__('Option or variation for main product (must be unique per product)')),
+                        Select::make('unit')
+                            ->label(__('Unit'))
+                            ->required()
+                            ->options(
+                                ProductUnit::class,
+                            ),
                         TextInput::make('slug')
                             ->label(__('Slug'))
                             ->required()
@@ -97,6 +104,10 @@ class ProductOptionResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->label(__('Slug')),
+                TextColumn::make('unit')
+                    ->label(__('Unit'))
+                    ->badge()
+                    ->sortable(),
                 TextColumn::make('price')
                     ->sortable()
                     ->money(env('CURRENCY_CODE', 'BRL'))
@@ -106,7 +117,7 @@ class ProductOptionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([ 
+            ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

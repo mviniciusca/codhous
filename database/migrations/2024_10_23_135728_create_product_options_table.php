@@ -18,6 +18,7 @@ return new class extends Migration {
                 ->cascadeOnDelete();
             $table->string('name');
             $table->string('slug');
+            $table->string('unit')->nullable();
             $table->decimal('price', 10, 2);
             $table->timestamps();
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProductUnit;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ class ProductOption extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'unit' => ProductUnit::class,
     ];
 
     /**

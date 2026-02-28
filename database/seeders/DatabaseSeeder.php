@@ -15,12 +15,9 @@ use App\Models\Navigation;
 use App\Models\Newsletter;
 use App\Models\Partner;
 use App\Models\Product;
-use App\Models\ProductOption;
 use App\Models\Setting;
 use App\Models\User;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
@@ -56,11 +53,10 @@ class DatabaseSeeder extends Seeder
             ->has(Partner::factory()->count(5))
             ->create();
 
-        // Criar produtos e opções de produtos
-        $products = Product::factory(5)
-            ->has(ProductOption::factory()
-                ->count(3))
-            ->create();
+        // Criar produtos e opções de produtos específicos
+        Product::factory()->concreto()->create();
+        Product::factory()->polimento()->create();
+        Product::factory()->maquinario()->create();
 
         // Criar localizações
         Location::factory(5)->create();
