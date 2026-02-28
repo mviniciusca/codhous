@@ -238,10 +238,10 @@ class BudgetResource extends Resource
                     ->icon('heroicon-o-currency-dollar')
                     ->description(__('Pricing Definition & Total Cost'))
                     ->collapsible()
-                    ->columns(5)
+                    ->columns(6)
                     ->schema([
                         TextInput::make('content.quantity')
-                            ->live(onBlur: true)
+                            ->live()
                             ->dehydrated()
                             ->readonly()
                             ->required()
@@ -251,7 +251,7 @@ class BudgetResource extends Resource
                             })
                             ->numeric(),
                         TextInput::make('content.price')
-                            ->live(onBlur: true)
+                            ->live()
                             ->dehydrated()
                             ->prefix(env('CURRENCY_SUFFIX'))
                             ->label(__('Price per Unity (m³)'))
@@ -261,8 +261,16 @@ class BudgetResource extends Resource
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 self::calculateTotal($get, $set);
                             }),
+                        TextInput::make('content.subtotal')
+                            ->live()
+                            ->dehydrated()
+                            ->readonly()
+                            ->label(__('Subtotal'))
+                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->numeric()
+                            ->step(0.01),
                         TextInput::make('content.tax')
-                            ->live(onBlur: true)
+                            ->live()
                             ->dehydrated()
                             ->prefix('+'.env('CURRENCY_SUFFIX'))
                             ->numeric()
@@ -273,7 +281,7 @@ class BudgetResource extends Resource
                                 self::calculateTotal($get, $set);
                             }),
                         TextInput::make('content.discount')
-                            ->live(onBlur: true)
+                            ->live()
                             ->dehydrated()
                             ->numeric()
                             ->required()
@@ -283,7 +291,7 @@ class BudgetResource extends Resource
                                 self::calculateTotal($get, $set);
                             }),
                         TextInput::make('content.total')
-                            ->live(onBlur: true)
+                            ->live()
                             ->dehydrated()
                             ->disabled()
                             ->numeric()
@@ -315,7 +323,10 @@ class BudgetResource extends Resource
         $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
 
-        $total = $quantity * $price + $tax - $discount;
+        $subtotal = $quantity * $price;
+        $total = $subtotal + $tax - $discount;
+        
+        $set('content.subtotal', number_format($subtotal, 2, '.', ''));
         $set('content.total', number_format($total, 2, '.', ''));
     }
 

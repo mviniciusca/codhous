@@ -400,13 +400,13 @@ class CreateBudget extends CreateRecord
                                             ->collapsible()
                                             ->columnSpanFull(),
                                     ]),
-                                Section::make(__('Pricing Calculator'))
+                                        Section::make(__('Pricing Calculator'))
                                     ->icon('heroicon-o-currency-dollar')
                                     ->description(__('Pricing Definition & Total Cost.'))
-                                    ->columns(3)
+                                    ->columns(4)
                                     ->schema([
                                         TextInput::make('content.quantity')
-                                            ->live(onBlur: true)
+                                            ->live()
                                             ->disabled()
                                             ->dehydrated()
                                             ->required()
@@ -428,8 +428,18 @@ class CreateBudget extends CreateRecord
                                             ->step(0.01)
                                             ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
                                             ->afterStateUpdated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set)),
+                                        TextInput::make('content.subtotal')
+                                            ->live()
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->prefix(env('CURRENCY_SUFFIX'))
+                                            ->label(__('Subtotal'))
+                                            ->numeric()
+                                            ->helperText(__('Subtotal before taxes and discounts'))
+                                            ->step(0.01)
+                                            ->afterStateHydrated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set)),
                                         TextInput::make('content.shipping')
-                                            ->live(onBlur: true)
+                                            ->live()
                                             ->dehydrated()
                                             ->prefix('+'.env('CURRENCY_SUFFIX'))
                                             ->numeric()
@@ -443,7 +453,7 @@ class CreateBudget extends CreateRecord
                                                 $this->calculateTotal($get, $set);
                                             }),
                                         TextInput::make('content.tax')
-                                            ->live(onBlur: true)
+                                            ->live()
                                             ->dehydrated()
                                             ->prefix('+'.env('CURRENCY_SUFFIX'))
                                             ->numeric()
@@ -459,7 +469,7 @@ class CreateBudget extends CreateRecord
                                                 $this->updateBudgetStatus($get, $set, $state);
                                             }),
                                         TextInput::make('content.discount')
-                                            ->live(onBlur: true)
+                                            ->live()
                                             ->numeric()
                                             ->required()
                                             ->prefix('-'.env('CURRENCY_SUFFIX'))
@@ -626,6 +636,8 @@ class CreateBudget extends CreateRecord
 
         // Atualizar os campos
         $set('content.quantity', $result['quantity']);
+        $set('content.price', $result['price']);
+        $set('content.subtotal', $result['subtotal']);
         $set('content.total', $result['total']);
     }
 

@@ -334,11 +334,11 @@ class EditBudget extends EditRecord
                                     ->collapsible()
                                     ->schema([
                                         Group::make()
-                                            ->columns(5)
+                                            ->columns(4)
                                             ->columnSpanFull()
                                             ->schema([
                                                 TextInput::make('content.quantity')
-                                                    ->live(onBlur: true)
+                                                    ->live()
                                                     ->disabled()
                                                     ->dehydrated()
                                                     ->readonly()
@@ -351,8 +351,24 @@ class EditBudget extends EditRecord
                                                     ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
                                                         self::calculateTotal($get, $set);
                                                     }),
+                                                TextInput::make('content.price')
+                                                    ->live()
+                                                    ->disabled()
+                                                    ->dehydrated()
+                                                    ->prefix(env('CURRENCY_SUFFIX'))
+                                                    ->label(__('Price per Unity (m³)'))
+                                                    ->numeric()
+                                                    ->step(0.01),
+                                                TextInput::make('content.subtotal')
+                                                    ->live()
+                                                    ->disabled()
+                                                    ->dehydrated()
+                                                    ->prefix(env('CURRENCY_SUFFIX'))
+                                                    ->label(__('Subtotal'))
+                                                    ->numeric()
+                                                    ->step(0.01),
                                                 TextInput::make('content.shipping')
-                                                    ->live(onBlur: true)
+                                                    ->live()
                                                     ->dehydrated()
                                                     ->numeric()
                                                     ->required()
@@ -364,7 +380,7 @@ class EditBudget extends EditRecord
                                                         self::calculateTotal($get, $set);
                                                     }),
                                                 TextInput::make('content.tax')
-                                                    ->live(onBlur: true)
+                                                    ->live()
                                                     ->dehydrated()
                                                     ->prefix('+'.env('CURRENCY_SUFFIX'))
                                                     ->numeric()
@@ -376,7 +392,7 @@ class EditBudget extends EditRecord
                                                         self::calculateTotal($get, $set);
                                                     }),
                                                 TextInput::make('content.discount')
-                                                    ->live(onBlur: true)
+                                                    ->live()
                                                     ->dehydrated()
                                                     ->numeric()
                                                     ->required()
@@ -801,8 +817,10 @@ class EditBudget extends EditRecord
 
         $result = BudgetCalculatorService::calculateTotal($products, $shipping, $tax, $discount);
 
-        // Atualizar quantidade total na calculadora de preço (como inteiro)
+        // Atualizar os campos
         $set('content.quantity', $result['quantity']);
+        $set('content.price', $result['price']);
+        $set('content.subtotal', $result['subtotal']);
         $set('content.total', $result['total']);
     }
 

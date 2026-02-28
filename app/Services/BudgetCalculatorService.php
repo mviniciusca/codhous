@@ -46,10 +46,14 @@ class BudgetCalculatorService
         // Aplicar shipping, taxas e descontos
         $total = $subtotal + $shipping + $tax - $discount;
 
+        // Calcular preço médio por unidade
+        $averagePrice = ($totalQuantity > 0) ? ($subtotal / $totalQuantity) : 0;
+
         return [
-            'subtotal' => $subtotal,
-            'quantity' => $totalQuantity,
-            'total'    => number_format($total, 2, '.', ''),
+            'subtotal'      => number_format($subtotal, 2, '.', ''),
+            'quantity'      => $totalQuantity,
+            'price'         => number_format($averagePrice, 2, '.', ''),
+            'total'         => number_format($total, 2, '.', ''),
         ];
     }
 
