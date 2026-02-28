@@ -110,8 +110,9 @@ class Budget extends Component implements HasForms
                         \Filament\Forms\Components\Repeater::make('content.products')
                             ->label(__('Product List'))
                             ->live()
+                            ->cloneable()
                             ->schema([
-                                Select::make('product')
+                                Select::make('product')                                
                                     ->live()
                                     ->dehydrated()
                                     ->required()
