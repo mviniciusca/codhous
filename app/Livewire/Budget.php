@@ -12,7 +12,7 @@ use App\Models\User;
 use App\Notifications\NewBudget;
 use App\Services\PostcodeFinderService;
 use Filament\Notifications\Notification;
-use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -39,6 +39,8 @@ class Budget extends Component implements HasForms
     public $image;
 
     public ?bool $module;
+
+    public bool $isSubmitted = false;
 
     /**
      * Summary of mount
@@ -73,133 +75,132 @@ class Budget extends Component implements HasForms
     {
         return $form
             ->schema([
-                Group::make()
+                Hidden::make('code')
+                    ->default(Str::random(8)),
+
+                Fieldset::make('customer_info')
+                    ->label(__('Customer Information'))
                     ->schema([
-                        Hidden::make('code')
-                            ->default(Str::random(8)),
-                        
-                        Group::make()
-                            ->schema([
-                                TextInput::make('content.customer_name')
-                                    ->required()
-                                    ->helperText(__('Your Full Name'))
-                                    ->label(__('Full Name')),
-                                TextInput::make('content.customer_phone')
-                                    ->required()
-                                    ->helperText(__('Phone Number'))
-                                    ->tel()
-                                    ->mask('(99)99999-9999')
-                                    ->placeholder(_('(xx) XXXX-XXXX'))
-                                    ->label(__('Phone')),
-                                TextInput::make('content.customer_email')
-                                    ->required()
-                                    ->email()
-                                    ->helperText(__('Enter your contact email'))
-                                    ->label(__('Email')),
-                            ])
-                            ->columns(3),
+                        TextInput::make('content.customer_name')
+                            ->required()
+                            ->placeholder(__('Full Name'))
+                            ->hiddenLabel(),
+                        TextInput::make('content.customer_phone')
+                            ->required()
+                            ->tel()
+                            ->mask('(99)99999-9999')
+                            ->placeholder(__('Phone Number'))
+                            ->hiddenLabel(),
+                        TextInput::make('content.customer_email')
+                            ->required()
+                            ->email()
+                            ->placeholder(__('Email Address'))
+                            ->hiddenLabel(),
+                    ])
+                    ->columns(3),
 
-                        Group::make()
+                Fieldset::make('products')
+                    ->label(__('Product Selection'))
+                    ->schema([
+                        \Filament\Forms\Components\Repeater::make('content.products')
+                            ->label(__('Product List'))
+                            ->live()
                             ->schema([
-                                \Filament\Forms\Components\Repeater::make('content.products')
-                                    ->label(__('Product List'))
+                                Select::make('product')
                                     ->live()
-                                    ->schema([
-                                        Select::make('product')
-                                            ->live()
-                                            ->dehydrated()
-                                            ->required()
-                                            ->label(__('Product'))
-                                            ->helperText(__('Product selected'))
-                                            ->options(Product::all()->pluck('name', 'id'))
-                                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                                $set('product_option', null);
-                                                $this->dispatchCartUpdatedEvent($get);
-                                            }),
-                                        Select::make('product_option')
-                                            ->live()
-                                            ->dehydrated()
-                                            ->label(__('Option'))
-                                            ->helperText(__('Option selected'))
-                                            ->options(fn (Get $get): Collection => $this->getProductOptions($get))
-                                            ->required(fn (Get $get): bool => $this->getProductOptions($get)->count() > 0)
-                                            ->hidden(fn (Get $get): bool => $this->getProductOptions($get)->count() == 0),
-                                        Select::make('location')
-                                            ->dehydrated()
-                                            ->required()
-                                            ->label(__('Local / Area'))
-                                            ->helperText(__('Local or area to be concreted'))
-                                            ->options(Location::all()->pluck('name', 'id')),
-                                        TextInput::make('quantity')
-                                            ->live(true)
-                                            ->integer()
-                                            ->required()
-                                            ->minValue(3)
-                                            ->label(__('Quantity'))
-                                            ->suffix(__('m³'))
-                                            ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                            ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                                $this->calculateTotal($get, $set);
-                                                $this->dispatchCartUpdatedEvent($get);
-                                            }),
-                                    ])
-                                    ->columns(2)
-                                    ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null)
-                                    ->addActionLabel(__('Add Product'))
-                                    ->collapsible()
-                                    ->reorderable()
-                                    ->defaultItems(1),
-                            ]),
-
-                        Group::make()
-                            ->schema([
-                                TextInput::make('content.postcode')
-                                    ->required()
-                                    ->minLength(9)
-                                    ->mask('99999-999')
-                                    ->placeholder('22022-000')
-                                    ->maxLength(9)
-                                    ->helperText(__('Postcode for your construction'))
-                                    ->label(__('Postcode'))
-                                    ->suffixAction(
-                                        fn ($state, Set $set, $livewire) => Action::make('search-action')
-                                            ->icon('heroicon-o-magnifying-glass')
-                                            ->action(function () use ($state, $livewire, $set) {
-                                                $livewire->validateOnly('data.content.postcode');
-                                                $postcode = new PostcodeFinderService($state, $set);
-                                                $postcode->find();
-                                            })
-                                    ),
-                                TextInput::make('content.number')
-                                    ->helperText(__('Number'))
-                                    ->label(__('Number')),
-                                TextInput::make('content.street')
-                                    ->disabled()
                                     ->dehydrated()
                                     ->required()
-                                    ->helperText(__('Street Address'))
-                                    ->label(__('Street')),
-                                TextInput::make('content.city')
-                                    ->disabled()
+                                    ->placeholder(__('Select Product'))
+                                    ->hiddenLabel()
+                                    ->options(Product::all()->pluck('name', 'id'))
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        $set('product_option', null);
+                                        $this->dispatchCartUpdatedEvent($get);
+                                    }),
+                                Select::make('product_option')
+                                    ->live()
+                                    ->dehydrated()
+                                    ->placeholder(__('Select Option'))
+                                    ->hiddenLabel()
+                                    ->options(fn (Get $get): Collection => $this->getProductOptions($get))
+                                    ->required(fn (Get $get): bool => $this->getProductOptions($get)->count() > 0)
+                                    ->hidden(fn (Get $get): bool => $this->getProductOptions($get)->count() == 0),
+                                Select::make('location')
                                     ->dehydrated()
                                     ->required()
-                                    ->helperText(__('City'))
-                                    ->label(__('City')),
-                                TextInput::make('content.neighborhood')
-                                    ->disabled()
-                                    ->dehydrated()
+                                    ->placeholder(__('Select Area'))
+                                    ->hiddenLabel()
+                                    ->options(Location::all()->pluck('name', 'id')),
+                                TextInput::make('quantity')
+                                    ->live(true)
+                                    ->integer()
                                     ->required()
-                                    ->helperText(__('Neighborhood'))
-                                    ->label(__('Neighborhood')),
-                                TextInput::make('content.state')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->helperText(__('State'))
-                                    ->label(__('State')),
+                                    ->minValue(3)
+                                    ->placeholder(__('Quantity (m³)'))
+                                    ->hiddenLabel()
+                                    ->suffix(__('m³'))
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        $this->calculateTotal($get, $set);
+                                        $this->dispatchCartUpdatedEvent($get);
+                                    }),
                             ])
-                            ->columns(3),
-                    ]),
+                            ->columns(2)
+                            ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null)
+                            ->addActionLabel(__('Add Product'))
+                            ->collapsible()
+                            ->reorderable()
+                            ->defaultItems(1),
+                    ])
+                    ->columns(1),
+
+                Fieldset::make('address')
+                    ->label(__('Delivery Address'))
+                    ->schema([
+                        TextInput::make('content.postcode')
+                            ->required()
+                            ->minLength(9)
+                            ->mask('99999-999')
+                            ->placeholder(__('Postcode (e.g. 22022-000)'))
+                            ->hiddenLabel()
+                            ->maxLength(9)
+                            ->suffixAction(
+                                fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                    ->icon('heroicon-o-magnifying-glass')
+                                    ->action(function () use ($state, $livewire, $set) {
+                                        $livewire->validateOnly('data.content.postcode');
+                                        $postcode = new PostcodeFinderService($state, $set);
+                                        $postcode->find();
+                                    })
+                            ),
+                        TextInput::make('content.number')
+                            ->placeholder(__('Number'))
+                            ->hiddenLabel(),
+                        TextInput::make('content.street')
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->placeholder(__('Street'))
+                            ->hiddenLabel(),
+                        TextInput::make('content.city')
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->placeholder(__('City'))
+                            ->hiddenLabel(),
+                        TextInput::make('content.neighborhood')
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->placeholder(__('Neighborhood'))
+                            ->hiddenLabel(),
+                        TextInput::make('content.state')
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->placeholder(__('State'))
+                            ->hiddenLabel(),
+                    ])
+                    ->columns(3),
             ])
             ->statePath('data');
     }
@@ -220,7 +221,16 @@ class Budget extends Component implements HasForms
             ->success()
             ->send();
 
+        $this->isSubmitted = true;
+    }
+
+    /**
+     * Reset the form to allow for a new submission.
+     */
+    public function resetForm(): void
+    {
         $this->form->fill();
+        $this->isSubmitted = false;
     }
 
     /**
