@@ -12,9 +12,7 @@ return new class extends Migration {
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->json('website')->nullable();
-            $table->json('company')->nullable();
-            $table->json('security')->nullable();
+            $table->json('settings')->nullable();
             $table->timestamps();
         });
     }

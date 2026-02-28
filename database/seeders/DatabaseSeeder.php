@@ -90,5 +90,6 @@ class DatabaseSeeder extends Seeder
         Newsletter::factory(20)->create();
         Mail::factory(20)->create();
         Customer::factory(10)->create();
+        $this->call(SettingSeeder::class);
     }
 }

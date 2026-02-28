@@ -14,9 +14,7 @@ class Setting extends Model
     protected function casts(): array
     {
         return [
-            'website' => 'array',
-            'company' => 'array',
-            'security' => 'array',
+            'settings' => 'array',
         ];
     }
 }
