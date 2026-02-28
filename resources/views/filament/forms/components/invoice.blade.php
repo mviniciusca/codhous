@@ -11,7 +11,7 @@
                     'on going' => 'info',
                     'done' => 'success',
                     'ignored' => 'danger',
-                    default => 'gray',
+                    'default' => 'gray',
                 }" size="lg" class="text-xs font-semibold">
                     {{ __(ucfirst($getRecord()->status)) }}
                 </x-filament::badge>

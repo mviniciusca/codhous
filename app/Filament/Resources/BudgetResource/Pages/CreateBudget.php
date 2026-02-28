@@ -8,7 +8,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Location;
 use Filament\Forms\Form;
-use App\Trait\BudgetStatus;
+use App\Traits\BudgetStatus;
 use App\Models\BudgetHistory;
 use App\Models\ProductOption;
 use Illuminate\Support\Carbon;

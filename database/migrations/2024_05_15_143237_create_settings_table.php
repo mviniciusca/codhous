@@ -12,34 +12,9 @@ return new class extends Migration {
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-
-            $table->string('name');
-
-            $table->string('app_name');
-            $table->string('email');
-            $table->string('office_hour');
-            $table->string('phone');
-
-            $table->string('meta_title');
-            $table->string('meta_author');
-            $table->string('meta_keywords');
-            $table->string('meta_description');
-
-            $table->boolean('maintenance_mode')->default(false);
-            $table->boolean('discovery_mode')->default(false);
-
-            $table->text('header_scripts')->nullable();
-            $table->text('body_scripts')->nullable();
-            $table->text('google_tag')->nullable();
-            $table->text('google_analytics')->nullable();
-
-            $table->boolean('budget_is_active')->default(true);
-            $table->string('budget_image')->nullable();
-            $table->json('budget')->nullable();
-
-            $table->json('social')->nullable();
-            $table->json('whatsapp')->nullable();
-
+            $table->json('website')->nullable();
+            $table->json('company')->nullable();
+            $table->json('security')->nullable();
             $table->timestamps();
         });
     }

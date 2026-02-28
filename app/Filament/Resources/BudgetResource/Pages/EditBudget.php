@@ -9,7 +9,7 @@ use Filament\Forms\Set;
 use App\Mail\BudgetMail;
 use App\Models\Location;
 use Filament\Forms\Form;
-use App\Trait\BudgetStatus;
+use App\Traits\BudgetStatus;
 use Filament\Actions\Action;
 use App\Exports\BudgetExport;
 use App\Models\BudgetHistory;

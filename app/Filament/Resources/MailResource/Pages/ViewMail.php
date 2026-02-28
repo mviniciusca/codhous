@@ -10,8 +10,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\Actions\Action as InfolistAction;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\Split as InfolistSplit;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;

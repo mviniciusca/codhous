@@ -39,7 +39,7 @@ class ActivityWidget extends BaseWidget
             ->columns([
                 TextColumn::make('log_name')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'Access'       => 'danger',
                         'Resource'     => 'success',
                         'Model'        => 'warning',
@@ -80,7 +80,7 @@ class ActivityWidget extends BaseWidget
 
                         return $formatted;
                     })
-                    ->icon(fn (string $state): string => match ($state) {
+                    ->icon(fn(string $state): string => match ($state) {
                         'login'   => 'heroicon-o-lock-open',
                         'logout'  => 'heroicon-o-lock-closed',
                         'created' => 'heroicon-o-plus-circle',

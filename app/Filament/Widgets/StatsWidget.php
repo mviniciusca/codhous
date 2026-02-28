@@ -6,13 +6,11 @@ use App\Models\Budget;
 use App\Models\Customer;
 use App\Models\Mail;
 use App\Models\Newsletter;
-use App\Models\Setting;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Filament\Widgets\StatsOverviewWidget\Card;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
-use Illuminate\Support\Carbon;
+
 
 class StatsWidget extends BaseWidget
 {
@@ -37,7 +35,7 @@ class StatsWidget extends BaseWidget
         return [
 
             // Maintenance status
-            $this->makeMaintenanceModeStat(),
+
             // Budget statistics
             $this->makeBudgetStat(),
             // Total budgets
@@ -123,7 +121,7 @@ class StatsWidget extends BaseWidget
 
         return Stat::make(__('Pending Budgets'), $pendingBudgets)
             ->icon('heroicon-o-clock')
-            ->description($percentage.'% '.__('of all budgets'))
+            ->description($percentage . '% ' . __('of all budgets'))
             ->descriptionIcon('heroicon-m-information-circle')
             ->color('warning');
     }
@@ -143,7 +141,7 @@ class StatsWidget extends BaseWidget
 
         return Stat::make(__('On Going Budgets'), $ongoingBudgets)
             ->icon('heroicon-o-arrow-trending-up')
-            ->description($percentage.'% '.__('of all budgets'))
+            ->description($percentage . '% ' . __('of all budgets'))
             ->descriptionIcon('heroicon-m-information-circle')
             ->color('info');
     }
@@ -169,7 +167,7 @@ class StatsWidget extends BaseWidget
 
         $currencySuffix = env('CURRENCY_SUFFIX', '$');
 
-        return Stat::make(__('Total Budget Value'), $currencySuffix.' '.number_format($totalValue, 2, '.', ','))
+        return Stat::make(__('Total Budget Value'), $currencySuffix . ' ' . number_format($totalValue, 2, '.', ','))
             ->icon('heroicon-o-banknotes')
             ->description(__('Sum of all budgets completed'))
             ->descriptionIcon('heroicon-m-calculator')
@@ -197,36 +195,12 @@ class StatsWidget extends BaseWidget
 
         return Stat::make(__('Unread Messages'), $unreadMails)
             ->icon('heroicon-o-envelope')
-            ->description($percentage.'% '.__('of all messages'))
+            ->description($percentage . '% ' . __('of all messages'))
             ->descriptionIcon('heroicon-m-inbox-stack')
             ->color($unreadMails > 0 ? 'warning' : 'success');
     }
 
-    /**
-     * Creates the maintenance mode statistics widget
-     * @return Stat
-     */
-    protected function makeMaintenanceModeStat(): Stat
-    {
-        // Get the current maintenance mode status
-        $setting = Setting::select(['maintenance_mode', 'discovery_mode'])->first();
-        $maintenanceMode = $setting ? $setting->maintenance_mode : false;
-        $discoveryMode = $setting ? $setting->discovery_mode : false;
 
-        $statusText = $maintenanceMode
-            ? __('Maintenance Mode Active')
-            : __('Site Online');
-
-        $description = $maintenanceMode && $discoveryMode
-            ? __('Discovery Mode Enabled')
-            : ($maintenanceMode ? __('Site Inaccessible to Visitors') : __('Site Accessible to All'));
-
-        return Stat::make(__('Site Status'), $statusText)
-            ->icon($maintenanceMode ? 'heroicon-o-wrench' : 'heroicon-o-globe-alt')
-            ->description($description)
-            ->descriptionIcon($maintenanceMode ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
-            ->color($maintenanceMode ? 'warning' : 'success');
-    }
 
     /**
      * Gets the monthly trend for a model
@@ -245,7 +219,7 @@ class StatsWidget extends BaseWidget
             ->count();
 
         // Calculate the percentage difference relative to the previous month
-        $values = $data->map(fn (TrendValue $value) => $value->aggregate);
+        $values = $data->map(fn(TrendValue $value) => $value->aggregate);
         $latestMonth = $values->last();
         $previousMonth = $values->count() > 1 ? $values[$values->count() - 2] : 0;
 
@@ -257,7 +231,7 @@ class StatsWidget extends BaseWidget
         }
 
         return [
-            'data'       => $data->map(fn (TrendValue $value) => $value->aggregate),
+            'data'       => $data->map(fn(TrendValue $value) => $value->aggregate),
             'difference' => $difference,
         ];
     }
@@ -271,12 +245,12 @@ class StatsWidget extends BaseWidget
     protected function getComparisonText(int $difference, string $itemLabel): string
     {
         if ($difference > 0) {
-            return "+{$difference}% ".__('more')." {$itemLabel}";
+            return "+{$difference}% " . __('more') . " {$itemLabel}";
         } elseif ($difference < 0) {
-            return "{$difference}% ".__('less')." {$itemLabel}";
+            return "{$difference}% " . __('less') . " {$itemLabel}";
         }
 
-        return __('No change in')." {$itemLabel}";
+        return __('No change in') . " {$itemLabel}";
     }
 
     /**

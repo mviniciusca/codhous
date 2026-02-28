@@ -50,41 +50,41 @@ class AdminPanelProvider extends PanelProvider
             ->navigationItems([
                 /** Budgets */
                 NavigationItem::make('budget')
-                    ->url(fn (): string => BudgetResource::getUrl())
-                    ->label(fn (): string => __('Budgets'))
+                    ->url(fn(): string => BudgetResource::getUrl())
+                    ->label(fn(): string => __('Budgets'))
                     ->icon('heroicon-o-currency-dollar')
-                    ->badge(fn (): ?string => BudgetResource::getNavigationBadge())
+                    ->badge(fn(): ?string => BudgetResource::getNavigationBadge())
                     ->group(__('Budget'))
                     ->sort(1)
-                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.budgets.index')),
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.index')),
                 NavigationItem::make('product')
-                    ->url(fn (): string => ProductResource::getUrl())
-                    ->label(fn (): string => __('Products'))
+                    ->url(fn(): string => ProductResource::getUrl())
+                    ->label(fn(): string => __('Products'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->badge(fn (): ?string => ProductResource::count())
+                    ->badge(fn(): ?string => ProductResource::count())
                     ->group(__('Budget'))
                     ->sort(2)
-                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.products.index')),
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
                 NavigationItem::make('budget_settings')
-                    ->url(fn (): string => EditBudget::getUrl([Setting::first()->id]), )
-                    ->label(fn (): string => __('Budget Settings'))
+
+                    ->label(fn(): string => __('Budget Settings'))
                     ->icon('heroicon-o-cog')
                     ->group(__('Budget'))
                     ->sort(3),
                 /** Customers */
                 NavigationItem::make('customer')
-                    ->label(fn (): string => __('Customers'))
-                    ->url(fn (): string => CustomerResource::getUrl())
-                    ->badge(fn (): ?string => CustomerResource::count())
-                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.customers.index'))
+                    ->label(fn(): string => __('Customers'))
+                    ->url(fn(): string => CustomerResource::getUrl())
+                    ->badge(fn(): ?string => CustomerResource::count())
+                    ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.index'))
                     ->icon('heroicon-o-users')
                     ->group(__('Customers'))
                     ->sort(1),
 
                 /** App Settings */
                 NavigationItem::make('settings')
-                    ->label(fn (): string => __('General Settings'))
-                    ->url(fn (): string => EditSetting::getUrl([1]))
+                    ->label(fn(): string => __('General Settings'))
+
                     ->icon('heroicon-o-cog-6-tooth')
                     ->group(__('Configuration'))
                     ->sort(1),

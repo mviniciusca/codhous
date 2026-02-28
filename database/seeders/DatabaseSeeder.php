@@ -44,15 +44,6 @@ class DatabaseSeeder extends Seeder
         // Atribuir a role ao usuário
         $user->assignRole($role);
 
-        Setting::factory()
-            ->has(Contact::factory())
-            ->has(Module::factory())
-            ->has(Layout::factory())
-            ->has(Navigation::factory())
-            ->has(CompanySetting::factory())
-            ->has(Partner::factory()->count(5))
-            ->create();
-
         // Criar produtos e opções de produtos específicos
         Product::factory()->concreto()->create();
         Product::factory()->polimento()->create();

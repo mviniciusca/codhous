@@ -52,9 +52,9 @@ class Budget extends Component implements HasForms
         $this->image = $this->image();
         $this->module = $this->module();
         $this->form->fill();
-        
+
         // Initial dispatch
-        $this->dispatch('cart-updated', count: count($this->data['content']['products'] ?? []));
+        $this->dispatch('cart-updated', count($this->data['content']['products'] ?? []));
     }
 
     /**
@@ -77,7 +77,7 @@ class Budget extends Component implements HasForms
             ->schema([
                 Hidden::make('code')
                     ->default(Str::random(8)),
-                
+
                 Hidden::make('content.price'),
                 Hidden::make('content.subtotal'),
                 Hidden::make('content.total'),
@@ -112,7 +112,7 @@ class Budget extends Component implements HasForms
                             ->live()
                             ->cloneable()
                             ->schema([
-                                Select::make('product')                                
+                                Select::make('product')
                                     ->live()
                                     ->dehydrated()
                                     ->required()
@@ -128,9 +128,9 @@ class Budget extends Component implements HasForms
                                     ->dehydrated()
                                     ->placeholder(__('Select Option'))
                                     ->hiddenLabel()
-                                    ->options(fn (Get $get): Collection => $this->getProductOptions($get))
-                                    ->required(fn (Get $get): bool => $this->getProductOptions($get)->count() > 0)
-                                    ->hidden(fn (Get $get): bool => $this->getProductOptions($get)->count() == 0)
+                                    ->options(fn(Get $get): Collection => $this->getProductOptions($get))
+                                    ->required(fn(Get $get): bool => $this->getProductOptions($get)->count() > 0)
+                                    ->hidden(fn(Get $get): bool => $this->getProductOptions($get)->count() == 0)
                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
                                         $this->updatePrice($get, $set, $state);
                                     }),
@@ -157,7 +157,7 @@ class Budget extends Component implements HasForms
                                 Hidden::make('subtotal'),
                             ])
                             ->columns(2)
-                            ->itemLabel(fn (array $state): ?string => $state['product'] ? Product::find($state['product'])?->name.' ('.($state['quantity'] ?? 0).' m³)' : null)
+                            ->itemLabel(fn(array $state): ?string => $state['product'] ? Product::find($state['product'])?->name . ' (' . ($state['quantity'] ?? 0) . ' m³)' : null)
                             ->addActionLabel(__('Add Product'))
                             ->collapsible()
                             ->reorderable()
@@ -184,7 +184,7 @@ class Budget extends Component implements HasForms
                             ->hiddenLabel()
                             ->maxLength(9)
                             ->suffixAction(
-                                fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                fn($state, Set $set, $livewire) => Action::make('search-action')
                                     ->icon('heroicon-o-magnifying-glass')
                                     ->action(function () use ($state, $livewire, $set) {
                                         if (empty($state)) return;
@@ -224,7 +224,7 @@ class Budget extends Component implements HasForms
                                     ->hiddenLabel(),
                             ])
                             ->columns(3)
-                            ->visible(fn (Get $get) => filled($get('content.street')))
+                            ->visible(fn(Get $get) => filled($get('content.street')))
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
@@ -320,7 +320,7 @@ class Budget extends Component implements HasForms
     private function calculateTotal(Get $get, Set $set): void
     {
         $products = $get('content.products') ?? [];
-        
+
         // Use the service to calculate everything
         $result = BudgetCalculatorService::calculateTotal($products);
 
@@ -371,7 +371,7 @@ class Budget extends Component implements HasForms
     public function updated($property): void
     {
         if (str_contains($property, 'products')) {
-            $this->dispatch('cart-updated', count: count($this->data['content']['products'] ?? []));
+            $this->dispatch('cart-updated', count($this->data['content']['products'] ?? []));
         }
     }
 
@@ -381,6 +381,6 @@ class Budget extends Component implements HasForms
     private function dispatchCartUpdatedEvent(Get $get): void
     {
         $products = $get('content.products') ?? [];
-        $this->dispatch('cart-updated', count: count($products));
+        $this->dispatch('cart-updated', count($products));
     }
 }
