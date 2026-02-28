@@ -50,6 +50,9 @@ class Budget extends Component implements HasForms
         $this->image = $this->image();
         $this->module = $this->module();
         $this->form->fill();
+        
+        // Initial dispatch
+        $this->dispatch('cart-updated', count: count($this->data['content']['products'] ?? []));
     }
 
     /**
@@ -100,6 +103,7 @@ class Budget extends Component implements HasForms
                             ->schema([
                                 \Filament\Forms\Components\Repeater::make('content.products')
                                     ->label(__('Product List'))
+                                    ->live()
                                     ->schema([
                                         Select::make('product')
                                             ->live()
@@ -110,6 +114,7 @@ class Budget extends Component implements HasForms
                                             ->options(Product::all()->pluck('name', 'id'))
                                             ->afterStateUpdated(function (Get $get, Set $set) {
                                                 $set('product_option', null);
+                                                $this->dispatchCartUpdatedEvent($get);
                                             }),
                                         Select::make('product_option')
                                             ->live()
@@ -135,6 +140,7 @@ class Budget extends Component implements HasForms
                                             ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
                                             ->afterStateUpdated(function (Get $get, Set $set, $state) {
                                                 $this->calculateTotal($get, $set);
+                                                $this->dispatchCartUpdatedEvent($get);
                                             }),
                                     ])
                                     ->columns(2)
@@ -287,5 +293,24 @@ class Budget extends Component implements HasForms
 
         // Atualizar quantidade total
         $set('content.quantity', $quantity);
+    }
+
+    /**
+     * @param $property
+     */
+    public function updated($property): void
+    {
+        if (str_contains($property, 'products')) {
+            $this->dispatch('cart-updated', count: count($this->data['content']['products'] ?? []));
+        }
+    }
+
+    /**
+     * @param Get $get
+     */
+    private function dispatchCartUpdatedEvent(Get $get): void
+    {
+        $products = $get('content.products') ?? [];
+        $this->dispatch('cart-updated', count: count($products));
     }
 }

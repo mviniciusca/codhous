@@ -1,6 +1,7 @@
 @props(['code' => null])
 <x-layout.section>
     @if($module)
+    <livewire:cart-bag :count="count($data['content']['products'] ?? [])" wire:key="bag-count-{{ count($data['content']['products'] ?? []) }}" />
     <x-layout.content>
         @if($status)
 
