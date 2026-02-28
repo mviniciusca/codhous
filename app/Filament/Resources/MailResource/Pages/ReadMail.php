@@ -6,12 +6,15 @@ use App\Filament\Resources\MailResource;
 use App\Models\Mail;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -80,6 +83,30 @@ class ReadMail extends ListRecords
             ])
             ->persistFiltersInSession()
             ->actions([
+                Action::make('reply')
+                    ->label(__('Reply'))
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('primary')
+                    ->modalHeading(__('Reply to Message'))
+                    ->hidden(fn(Mail $record) => $record->is_sent)
+                    ->form([
+                        TextInput::make('email')
+                            ->label(__('To:'))
+                            ->default(fn($record) => $record->email)
+                            ->readOnly(),
+                        TextInput::make('subject')
+                            ->label(__('Subject:'))
+                            ->default(fn($record) => "Re: " . $record->subject)
+                            ->required(),
+                        RichEditor::make('message')
+                            ->label(__('Message:'))
+                            ->required(),
+                    ])
+                    ->action(function (Mail $record, array $data) {
+                        $data['name'] = env('MAIL_FROM_NAME') ?? 'Codhous Software';
+                        $service = new \App\Services\SendMailService($data);
+                        $service->send();
+                    }),
                 ActionGroup::make([
                     DeleteAction::make()->label(__('Trash')),
                     ForceDeleteAction::make(),

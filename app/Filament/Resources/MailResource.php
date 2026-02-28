@@ -8,10 +8,11 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Services\SendMailService;
 use Filament\Tables\Actions\Action;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Enums\FiltersLayout;
@@ -38,12 +39,12 @@ class MailResource extends Resource
     public static function count(): ?string
     {
         $count = Mail::query()
-            ->where('is_read', false)
-            ->where('is_sent', false)
-            ->where('is_spam', false)
+            ->where('is_read', 0)
+            ->where('is_sent', 0)
+            ->where('is_spam', 0)
             ->count();
 
-        return $count !== 0 ? $count : null;
+        return $count > 0 ? (string) $count : null;
     }
 
     public static function getNavigationLabel(): string
@@ -65,22 +66,18 @@ class MailResource extends Resource
                     ->form([
                         Hidden::make('is_sent')
                             ->default(true),
-                        Group::make()
-                            ->columns(2)
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label(__('From:'))
-                                    ->required()
-                                    ->placeholder(__('Your name or Company name'))
-                                    ->maxLength(255)
-                                    ->default(env('MAIL_FROM_NAME') ?? 'Codhous Software'),
-                                TextInput::make('sending_mail')
-                                    ->label(__('Sending E-mail:'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->disabled()
-                                    ->default(env('MAIL_FROM_ADDRESS') ?? 'Codhous Software'),
-                            ]),
+                        TextInput::make('name')
+                            ->label(__('From:'))
+                            ->required()
+                            ->placeholder(__('Your name or Company name'))
+                            ->maxLength(255)
+                            ->default(env('MAIL_FROM_NAME') ?? 'Codhous Software'),
+                        TextInput::make('sending_mail')
+                            ->label(__('Sending E-mail:'))
+                            ->required()
+                            ->maxLength(255)
+                            ->disabled()
+                            ->default(env('MAIL_FROM_ADDRESS') ?? 'Codhous Software'),
                         TextInput::make('email')
                             ->label('To:')
                             ->email()
@@ -105,41 +102,45 @@ class MailResource extends Resource
             ])
             ->description(__('Your messages from website.'))
             ->columns([
-                IconColumn::make('is_sent')
-                    ->label(__(''))
-                    ->inline()
-                    ->falseIcon('heroicon-m-arrow-down-tray')
+                Split::make([
+                    TextColumn::make('name')
+                        ->weight('bold')
+                        ->searchable()
+                        ->formatStateUsing(fn($state) => self::normalizeText($state))
+                        ->description(fn(Mail $record) => $record->email)
+                        ->grow(false),
+                    Stack::make([
+                        TextColumn::make('subject')
+                            ->weight('semibold')
+                            ->searchable()
+                            ->limit(100),
+                        TextColumn::make('message')
+                            ->limit(150)
+                            ->color('gray')
+                            ->wrap()
+                            ->html(),
+                    ]),
+                    TextColumn::make('created_at')
+                        ->dateTime('d/m/y H:i')
+                        ->color('gray')
+                        ->alignEnd()
+                        ->description(fn(Mail $record) => $record->created_at->diffForHumans()),
+                ])->extraAttributes([
+                    'class' => 'py-3',
+                ]),
+                IconColumn::make('is_read')
+                    ->label('')
+                    ->boolean()
+                    ->trueIcon('')
+                    ->falseIcon('heroicon-m-sparkles')
                     ->falseColor('primary')
-                    ->trueIcon('heroicon-m-arrow-up-tray')
-                    ->trueColor('gray')
-                    ->alignCenter(),
-                IconColumn::make('is_favorite')
-                    ->label(__(''))
-                    ->inline()
-                    ->trueIcon('heroicon-m-bookmark')
-                    ->trueColor('primary')
-                    ->falseIcon('')
-                    ->alignCenter(),
-                TextColumn::make('name')
-                    ->limit(50)
-                    ->formatStateUsing(function (?string $state) {
-                        return self::normalizeText($state);
-                    })
-                    ->label(__('From')),
-                TextColumn::make('subject')
-                    ->limit(60)
-                    ->formatStateUsing(function (?string $state) {
-                        return ucfirst($state);
-                    })
-                    ->label(ucfirst(__('Subject'))),
-                TextColumn::make('created_at')
-                    ->label(__('Received'))
-                    ->date('d/m/Y H:i'),
+                    ->alignCenter()
+                    ->grow(false),
             ])
-            ->searchable()
-            ->recordClasses(fn (Mail $record) => match ($record->is_read) {
-                1       => 'opacity-50 dark:opacity-30 decoration-dashed line-through',
-                default => null,
+            ->recordAction('view')
+            ->recordClasses(fn(Mail $record) => match ($record->is_read) {
+                0, false => ['bg-primary-50/50 dark:bg-primary-500/5 border-l-4 border-l-primary-500'],
+                default => ['opacity-70'],
             })
             ->paginated(25)
             ->defaultSort('created_at', 'desc')
@@ -172,6 +173,42 @@ class MailResource extends Resource
             ], FiltersLayout::BelowContent)
             ->persistFiltersInSession()
             ->actions([
+                Tables\Actions\Action::make('reply')
+                    ->label(__('Reply'))
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('primary')
+                    ->modalHeading(__('Reply to Message'))
+                    ->hidden(fn(Mail $record) => $record->is_sent)
+                    ->form([
+                        TextInput::make('email')
+                            ->label(__('To:'))
+                            ->default(fn($record) => $record->email)
+                            ->readOnly(),
+                        TextInput::make('subject')
+                            ->label(__('Subject:'))
+                            ->default(fn($record) => "Re: " . $record->subject)
+                            ->required(),
+                        RichEditor::make('message')
+                            ->label(__('Message:'))
+                            ->required(),
+                    ])
+                    ->action(function (Mail $record, array $data) {
+                        $data['name'] = env('MAIL_FROM_NAME') ?? 'Codhous Software';
+                        $service = new \App\Services\SendMailService($data);
+                        $service->send();
+                    }),
+                Tables\Actions\Action::make('mark_as_read')
+                    ->label(__('Mark Read'))
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->hidden(fn(Mail $record) => $record->is_read)
+                    ->action(fn(Mail $record) => $record->update(['is_read' => true])),
+                Tables\Actions\Action::make('mark_as_unread')
+                    ->label(__('Mark Unread'))
+                    ->icon('heroicon-o-envelope')
+                    ->color('gray')
+                    ->visible(fn(Mail $record) => $record->is_read)
+                    ->action(fn(Mail $record) => $record->update(['is_read' => false])),
                 ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->label(__('Trash')),
@@ -181,6 +218,14 @@ class MailResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('mark_as_read')
+                        ->label(__('Mark as Read'))
+                        ->icon('heroicon-o-check-circle')
+                        ->action(fn($records) => $records->each->update(['is_read' => true])),
+                    Tables\Actions\BulkAction::make('mark_as_unread')
+                        ->label(__('Mark as Unread'))
+                        ->icon('heroicon-o-envelope')
+                        ->action(fn($records) => $records->each->update(['is_read' => false])),
                     Tables\Actions\DeleteBulkAction::make()
                         ->label(__('Trash all Messages')),
                 ]),
@@ -206,14 +251,8 @@ class MailResource extends Resource
     {
         return [
             'index'   => Pages\ListMails::route('/'),
-            'starred' => Pages\StarredMail::route('/starred'),
-            'sent'    => Pages\SentMail::route('/sent'),
             'view'    => Pages\ViewMail::route('/{record}/view'),
             'create'  => Pages\CreateMail::route('/create'),
-            'fav'     => Pages\FavoriteMail::route('/fav'),
-            'read'    => Pages\ReadMail::route('/read'),
-            'spam'    => Pages\SpamMail::route('/spam'),
-            'bin'     => Pages\BinMail::route('/bin'),
         ];
     }
 

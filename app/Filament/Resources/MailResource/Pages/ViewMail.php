@@ -5,14 +5,16 @@ namespace App\Filament\Resources\MailResource\Pages;
 use App\Filament\Resources\MailResource;
 use App\Models\Mail;
 use Filament\Actions;
-use Filament\Actions\Action;
-use Filament\Forms\Get;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\Actions\Action as InfolistAction;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Split as InfolistSplit;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\HtmlString;
 
 class ViewMail extends ViewRecord
 {
@@ -21,20 +23,31 @@ class ViewMail extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('mark_favorite')
-                ->icon('heroicon-o-star')
-                ->color(function () {
-                    return $this->toggle('is_favorite');
-                })
-                ->disabled()
-                ->label(__('Fav')),
-            Action::make('mark_spam')
-                ->icon('heroicon-o-speaker-x-mark')
-                ->color(function () {
-                    return $this->toggle('is_spam');
-                })
-                ->disabled()
-                ->label(__('Spam')),
+            Actions\Action::make('reply')
+                ->label(__('Reply'))
+                ->icon('heroicon-o-arrow-uturn-left')
+                ->color('primary')
+                ->modalHeading(__('Reply to Message'))
+                ->modalSubmitActionLabel(__('Send Message'))
+                ->hidden(fn(Mail $record) => $record->is_sent)
+                ->form([
+                    TextInput::make('email')
+                        ->label(__('To:'))
+                        ->default(fn($record) => $record->email)
+                        ->readOnly(),
+                    TextInput::make('subject')
+                        ->label(__('Subject:'))
+                        ->default(fn($record) => "Re: " . $record->subject)
+                        ->required(),
+                    RichEditor::make('message')
+                        ->label(__('Message:'))
+                        ->required(),
+                ])
+                ->action(function (Mail $record, array $data) {
+                    $data['name'] = env('MAIL_FROM_NAME') ?? 'Codhous Software';
+                    $service = new \App\Services\SendMailService($data);
+                    $service->send();
+                }),
             Actions\DeleteAction::make()
                 ->label('Move')
                 ->icon('heroicon-o-trash'),
@@ -52,23 +65,6 @@ class ViewMail extends ViewRecord
         }
     }
 
-    public function toggle(?string $column)
-    {
-        $check = Mail::select($column)
-            ->where('id', '=', request()->route('record'))
-            ->first([$column]);
-
-        if ($check) {
-            if ($check[$column] == true) {
-                return match ($column) {
-                    'is_spam' => 'warning',
-                    default   => 'primary',
-                };
-            } else {
-                return 'secondary';
-            }
-        }
-    }
 
     public function getTitle(): Htmlable|string
     {
@@ -84,18 +80,47 @@ class ViewMail extends ViewRecord
                     ->columns(3)
                     ->schema([
                         TextEntry::make('name')
-                            ->label(new HtmlString(__('<strong>From:</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString(__('<strong>From:</strong>'))),
                         TextEntry::make('email')
-                            ->label(new HtmlString(__('<strong>Email:</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString(__('<strong>Email:</strong>'))),
                         TextEntry::make('created_at')
                             ->dateTime('d/m/y H:i')
-                            ->label(new HtmlString(__('<strong>Received At</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString(__('<strong>Received At</strong>'))),
                         TextEntry::make('subject')
                             ->columnSpanFull()
-                            ->label(new HtmlString(__('<strong>Subject:</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString(__('<strong>Subject:</strong>'))),
                         TextEntry::make('message')
                             ->columnSpanFull()
-                            ->label(new HtmlString(__('<strong>Message:</strong>'))),
+                            ->html()
+                            ->label(new \Illuminate\Support\HtmlString(__('<strong>Message:</strong>'))),
+                    ])
+                    ->footerActions([
+                        InfolistAction::make('reply_infolist')
+                            ->label(__('Reply to Message'))
+                            ->icon('heroicon-o-arrow-uturn-left')
+                            ->color('primary')
+                            ->button()
+                            ->modalHeading(__('Reply to Message'))
+                            ->modalSubmitActionLabel(__('Send Message'))
+                            ->hidden(fn(Mail $record) => $record->is_sent)
+                            ->form([
+                                TextInput::make('email')
+                                    ->label(__('To:'))
+                                    ->default(fn($record) => $record->email)
+                                    ->readOnly(),
+                                TextInput::make('subject')
+                                    ->label(__('Subject:'))
+                                    ->default(fn($record) => "Re: " . $record->subject)
+                                    ->required(),
+                                RichEditor::make('message')
+                                    ->label(__('Message:'))
+                                    ->required(),
+                            ])
+                            ->action(function (Mail $record, array $data) {
+                                $data['name'] = env('MAIL_FROM_NAME') ?? 'Codhous Software';
+                                $service = new \App\Services\SendMailService($data);
+                                $service->send();
+                            })
                     ]),
             ]);
     }

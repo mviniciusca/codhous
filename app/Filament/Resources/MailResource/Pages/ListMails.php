@@ -3,68 +3,42 @@
 namespace App\Filament\Resources\MailResource\Pages;
 
 use App\Filament\Resources\MailResource;
-use App\Mail\Message;
-use App\Models\Customer;
 use App\Models\Mail;
-use App\Models\User;
-use Filament\Actions;
-use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Facades\Mail as Mailer;
+use Filament\Resources\Components\Tab;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListMails extends ListRecords
 {
     protected static string $resource = MailResource::class;
 
-    public function getTitle(): string|Htmlable
+    public function getTabs(): array
     {
-        return '';
+        return [
+            'inbox' => Tab::make(__('Inbox'))
+                ->icon('heroicon-m-inbox')
+                ->badge(Mail::query()->where('is_sent', false)->where('is_read', false)->where('is_spam', false)->count())
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_sent', false)->where('is_spam', false)->withoutTrashed()),
+            'sent' => Tab::make(__('Sent'))
+                ->icon('heroicon-m-paper-airplane')
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_sent', true)->withoutTrashed()),
+            'starred' => Tab::make(__('Starred'))
+                ->icon('heroicon-m-star')
+                ->badge(Mail::query()->where('is_favorite', true)->count())
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_favorite', true)->withoutTrashed()),
+            'trash' => Tab::make(__('Trash'))
+                ->icon('heroicon-m-trash')
+                ->modifyQueryUsing(fn(Builder $query) => $query->onlyTrashed()),
+        ];
     }
 
-    // protected function getHeaderActions(): array
-    // {
-    //     return [
-    //         Action::make('new_mail')
-    //             ->icon('heroicon-o-pencil')
-    //             ->color('primary')
-    //             ->label(__('New Mail'))
-    //             ->closeModalByClickingAway(false)
-    //             ->form([
-    //                 Hidden::make('is_sent')
-    //                     ->default(true),
-    //                 Hidden::make('name')
-    //                     ->default(env('APP_NAME')),
-    //                 TextInput::make('email')
-    //                     ->label('To: ')
-    //                     ->required()
-    //                     ->placeholder(__('Email address')),
-    //                 TextInput::make('subject')
-    //                     ->label('Subject: ')
-    //                     ->required()
-    //                     ->maxLength(255)
-    //                     ->placeholder(__('Subject of your email')),
-    //                 RichEditor::make('message')
-    //                     ->label('Message: ')
-    //                     ->required()
-    //                     ->maxLength(5000)
-    //                     ->helperText(__('Your Message. Max.: 5000 characters')),
-    //             ])
-    //             ->action(function (Mail $mail, ?array $data): void {
-    //                 Mailer::to($data['email'])
-    //                     ->send(new Message($data));
-    //                 $mail->create($data);
-    //                 Notification::make()
-    //                     ->success()
-    //                     ->title(__('Message was sent with success'))
-    //                     ->send();
-    //             })
-    //     ];
-    // }
+    public function getDefaultActiveTab(): string | int | null
+    {
+        return 'inbox';
+    }
+
+    public function getHeaderActions(): array
+    {
+        return [];
+    }
 }
