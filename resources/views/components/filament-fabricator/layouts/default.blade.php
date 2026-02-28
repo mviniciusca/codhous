@@ -1,13 +1,20 @@
-
-
-@vite('resources/css/app.css', 'resources/js/app.js')
 @props(['page'])
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    @vite('resources/css/app.css')
+</head>
+<body class="antialiased">
+  
 
-<x-filament-fabricator::layouts.base :title="$page->title">
-    {{-- Header Here --}}
 
+    
     <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
+        
+ 
 
-     {{-- Footer Here --}}
-</x-filament-fabricator::layouts.base>
+    @vite('resources/js/app.js')
+    @livewire('notifications')
+</body>
+</html>
 
