@@ -1,4 +1,5 @@
 import './bootstrap';
+import './site';
 
 document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('copyShareLink', (event) => {

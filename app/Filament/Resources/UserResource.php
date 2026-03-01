@@ -27,7 +27,7 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationGroup = 'Security';
+    protected static ?string $navigationGroup = 'Settings';
 
     public static function getNavigationLabel(): string
     {
@@ -78,9 +78,9 @@ class UserResource extends Resource
                             ->prefixIcon('heroicon-o-key')
                             ->password()
                             ->revealable()
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->required(fn (string $context): bool => $context === 'create')
+                            ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                            ->dehydrated(fn($state) => filled($state))
+                            ->required(fn(string $context): bool => $context === 'create')
                             ->minLength(8),
                         TextInput::make('password_confirmation')
                             ->prefixIcon('heroicon-o-key')
@@ -89,7 +89,7 @@ class UserResource extends Resource
                             ->password()
                             ->revealable()
                             ->same('password')
-                            ->required(fn (string $context): bool => $context === 'create')
+                            ->required(fn(string $context): bool => $context === 'create')
                             ->dehydrated(false),
                     ]),
 

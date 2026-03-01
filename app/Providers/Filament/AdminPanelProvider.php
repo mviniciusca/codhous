@@ -5,9 +5,6 @@ namespace App\Providers\Filament;
 use App\Filament\Resources\BudgetResource;
 use App\Filament\Resources\CustomerResource;
 use App\Filament\Resources\ProductResource;
-use App\Filament\Resources\SettingResource\Pages\EditBudget;
-use App\Filament\Resources\SettingResource\Pages\EditSetting;
-use App\Models\Setting;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -41,8 +38,7 @@ class AdminPanelProvider extends PanelProvider
                 __('Budget'),
                 __('Customers'),
                 __('Communication'),
-                __('Configuration'),
-                __('Security'),
+                'Settings',
             ])
             ->resources([
                 config('filament-logger.activity_resource'),
@@ -53,7 +49,7 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn(): string => BudgetResource::getUrl())
                     ->label(fn(): string => __('Budgets'))
                     ->icon('heroicon-o-currency-dollar')
-                    ->badge(fn(): ?string => BudgetResource::getNavigationBadge())
+                    ->badge(BudgetResource::getNavigationBadge())
                     ->group(__('Budget'))
                     ->sort(1)
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.budgets.index')),
@@ -61,7 +57,7 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn(): string => ProductResource::getUrl())
                     ->label(fn(): string => __('Products'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->badge(fn(): ?string => ProductResource::count())
+                    ->badge(ProductResource::count())
                     ->group(__('Budget'))
                     ->sort(2)
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.products.index')),
@@ -75,18 +71,10 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('customer')
                     ->label(fn(): string => __('Customers'))
                     ->url(fn(): string => CustomerResource::getUrl())
-                    ->badge(fn(): ?string => CustomerResource::count())
+                    ->badge(CustomerResource::count())
                     ->isActiveWhen(fn(): bool => request()->routeIs('filament.admin.resources.customers.index'))
                     ->icon('heroicon-o-users')
                     ->group(__('Customers'))
-                    ->sort(1),
-
-                /** App Settings */
-                NavigationItem::make('settings')
-                    ->label(fn(): string => __('General Settings'))
-
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->group(__('Configuration'))
                     ->sort(1),
             ])
             ->plugins([

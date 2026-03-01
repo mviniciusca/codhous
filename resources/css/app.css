@@ -129,8 +129,8 @@
     }
 
     /* Links e elementos interativos */
-    a:not(.fi-btn) {
-        @apply text-primary hover:text-primary/80 transition-colors;
+    a:not(.fi-btn):not(.bg-primary):not([class*="text-"]) {
+        @apply transition-colors;
     }
 
     /* Tables */
