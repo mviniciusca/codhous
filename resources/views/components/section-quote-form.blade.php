@@ -46,14 +46,12 @@
                     <form id="quote-form" action="#" class="flex flex-col gap-4">
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div>
-                                <label for="name" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nome Completo</label>
-                                <input type="text" id="name" name="name" required placeholder="Seu nome"
-                                    class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                <x-ui.label for="name">Nome Completo</x-ui.label>
+                                <x-ui.input type="text" id="name" name="name" required placeholder="Seu nome" />
                             </div>
                             <div>
-                                <label for="phone" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Telefone / WhatsApp</label>
-                                <input type="tel" id="phone" name="phone" required placeholder="(11) 99999-9999"
-                                    class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                <x-ui.label for="phone">Telefone / WhatsApp</x-ui.label>
+                                <x-ui.input type="tel" id="phone" name="phone" required placeholder="(11) 99999-9999" />
                             </div>
                         </div>
 
@@ -78,37 +76,34 @@
                         <div id="concreto-fields" class="flex flex-col gap-4">
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label for="volume" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Volume Estimado</label>
+                                    <x-ui.label for="volume">Volume Estimado</x-ui.label>
                                     <div class="relative flex items-center">
-                                        <input type="number" id="volume" name="volume" placeholder="Ex: 5"
-                                            class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none">
+                                        <x-ui.input type="number" id="volume" name="volume" placeholder="Ex: 5"
+                                            class="pr-10 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
                                         <span class="absolute right-4 text-xs font-bold text-muted-foreground">m&sup3;</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="fck" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Resistência (FCK)</label>
-                                    <select id="fck" name="fck"
-                                        class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary appearance-none">
+                                    <x-ui.label for="fck">Resistência (FCK)</x-ui.label>
+                                    <x-ui.select id="fck" name="fck">
                                         <option value="20">FCK 20 MPa</option>
                                         <option value="25" selected>FCK 25 MPa</option>
                                         <option value="30">FCK 30 MPa</option>
                                         <option value="35">FCK 35 MPa</option>
                                         <option value="outro">Outro traço</option>
-                                    </select>
+                                    </x-ui.select>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label for="address" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Endereço da Obra</label>
-                            <input type="text" id="address" name="address" required placeholder="Rua, número e bairro"
-                                class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                            <x-ui.label for="address">Endereço da Obra</x-ui.label>
+                            <x-ui.input type="text" id="address" name="address" required placeholder="Rua, número e bairro" />
                         </div>
 
                         <div>
-                            <label for="obs" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Observações Adicionais</label>
-                            <textarea id="obs" name="obs" rows="3" placeholder="Conte mais detalhes sobre sua necessidade..."
-                                class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"></textarea>
+                            <x-ui.label for="obs">Observações Adicionais</x-ui.label>
+                            <x-ui.textarea id="obs" name="obs" rows="3" placeholder="Conte mais detalhes sobre sua necessidade..."></x-ui.textarea>
                         </div>
 
                         <button type="submit" class="group mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90">

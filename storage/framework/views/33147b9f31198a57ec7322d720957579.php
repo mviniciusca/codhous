@@ -62,6 +62,7 @@ unset($__defined_vars); ?>
 
 </head>
 <body class="font-sans antialiased bg-background text-foreground">
+    
     <?php if (isset($component)) { $__componentOriginalfdc8967a87956c0a7185abbef03fae20 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalfdc8967a87956c0a7185abbef03fae20 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.site-header','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -81,9 +82,11 @@ unset($__defined_vars); ?>
 <?php if (isset($__componentOriginalfdc8967a87956c0a7185abbef03fae20)): ?>
 <?php $component = $__componentOriginalfdc8967a87956c0a7185abbef03fae20; ?>
 <?php unset($__componentOriginalfdc8967a87956c0a7185abbef03fae20); ?>
-<?php endif; ?>
+<?php endif; ?>   
+    
 
     <main>
+        
         <?php if (isset($component)) { $__componentOriginalcc2b6f54f08a7d7e868cd3ed75c160fe = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalcc2b6f54f08a7d7e868cd3ed75c160fe = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.section-home','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -106,6 +109,7 @@ unset($__defined_vars); ?>
 <?php endif; ?>
         <?php echo e($slot); ?>
 
+        
     </main>
 
     <?php if (isset($component)) { $__componentOriginal222c87a019257fb1d70ae0ff46ab02e1 = $component; } ?>

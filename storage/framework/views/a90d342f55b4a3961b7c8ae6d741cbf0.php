@@ -46,14 +46,86 @@
                     <form id="quote-form" action="#" class="flex flex-col gap-4">
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div>
-                                <label for="name" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nome Completo</label>
-                                <input type="text" id="name" name="name" required placeholder="Seu nome"
-                                    class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'name']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'name']); ?>Nome Completo <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+                                <?php if (isset($component)) { $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.input','data' => ['type' => 'text','id' => 'name','name' => 'name','required' => true,'placeholder' => 'Seu nome']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['type' => 'text','id' => 'name','name' => 'name','required' => true,'placeholder' => 'Seu nome']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $attributes = $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $component = $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
                             </div>
                             <div>
-                                <label for="phone" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Telefone / WhatsApp</label>
-                                <input type="tel" id="phone" name="phone" required placeholder="(11) 99999-9999"
-                                    class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'phone']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'phone']); ?>Telefone / WhatsApp <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+                                <?php if (isset($component)) { $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.input','data' => ['type' => 'tel','id' => 'phone','name' => 'phone','required' => true,'placeholder' => '(11) 99999-9999']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['type' => 'tel','id' => 'phone','name' => 'phone','required' => true,'placeholder' => '(11) 99999-9999']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $attributes = $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $component = $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
                             </div>
                         </div>
 
@@ -78,37 +150,179 @@
                         <div id="concreto-fields" class="flex flex-col gap-4">
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label for="volume" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Volume Estimado</label>
+                                    <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'volume']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'volume']); ?>Volume Estimado <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
                                     <div class="relative flex items-center">
-                                        <input type="number" id="volume" name="volume" placeholder="Ex: 5"
-                                            class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none">
+                                        <?php if (isset($component)) { $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.input','data' => ['type' => 'number','id' => 'volume','name' => 'volume','placeholder' => 'Ex: 5','class' => 'pr-10 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['type' => 'number','id' => 'volume','name' => 'volume','placeholder' => 'Ex: 5','class' => 'pr-10 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $attributes = $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $component = $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
                                         <span class="absolute right-4 text-xs font-bold text-muted-foreground">m&sup3;</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="fck" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Resistência (FCK)</label>
-                                    <select id="fck" name="fck"
-                                        class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary appearance-none">
+                                    <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'fck']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'fck']); ?>Resistência (FCK) <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+                                    <?php if (isset($component)) { $__componentOriginal231e2c645bf8af0c5c05a5dc5a94c862 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal231e2c645bf8af0c5c05a5dc5a94c862 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.select','data' => ['id' => 'fck','name' => 'fck']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'fck','name' => 'fck']); ?>
                                         <option value="20">FCK 20 MPa</option>
                                         <option value="25" selected>FCK 25 MPa</option>
                                         <option value="30">FCK 30 MPa</option>
                                         <option value="35">FCK 35 MPa</option>
                                         <option value="outro">Outro traço</option>
-                                    </select>
+                                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal231e2c645bf8af0c5c05a5dc5a94c862)): ?>
+<?php $attributes = $__attributesOriginal231e2c645bf8af0c5c05a5dc5a94c862; ?>
+<?php unset($__attributesOriginal231e2c645bf8af0c5c05a5dc5a94c862); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal231e2c645bf8af0c5c05a5dc5a94c862)): ?>
+<?php $component = $__componentOriginal231e2c645bf8af0c5c05a5dc5a94c862; ?>
+<?php unset($__componentOriginal231e2c645bf8af0c5c05a5dc5a94c862); ?>
+<?php endif; ?>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label for="address" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Endereço da Obra</label>
-                            <input type="text" id="address" name="address" required placeholder="Rua, número e bairro"
-                                class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                            <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'address']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'address']); ?>Endereço da Obra <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+                            <?php if (isset($component)) { $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.input','data' => ['type' => 'text','id' => 'address','name' => 'address','required' => true,'placeholder' => 'Rua, número e bairro']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['type' => 'text','id' => 'address','name' => 'address','required' => true,'placeholder' => 'Rua, número e bairro']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $attributes = $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $component = $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
                         </div>
 
                         <div>
-                            <label for="obs" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Observações Adicionais</label>
-                            <textarea id="obs" name="obs" rows="3" placeholder="Conte mais detalhes sobre sua necessidade..."
-                                class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"></textarea>
+                            <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'obs']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'obs']); ?>Observações Adicionais <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+                            <?php if (isset($component)) { $__componentOriginal62d1193389a71cd99ff302a00abbf991 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal62d1193389a71cd99ff302a00abbf991 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.textarea','data' => ['id' => 'obs','name' => 'obs','rows' => '3','placeholder' => 'Conte mais detalhes sobre sua necessidade...']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.textarea'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'obs','name' => 'obs','rows' => '3','placeholder' => 'Conte mais detalhes sobre sua necessidade...']); ?> <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal62d1193389a71cd99ff302a00abbf991)): ?>
+<?php $attributes = $__attributesOriginal62d1193389a71cd99ff302a00abbf991; ?>
+<?php unset($__attributesOriginal62d1193389a71cd99ff302a00abbf991); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal62d1193389a71cd99ff302a00abbf991)): ?>
+<?php $component = $__componentOriginal62d1193389a71cd99ff302a00abbf991; ?>
+<?php unset($__componentOriginal62d1193389a71cd99ff302a00abbf991); ?>
+<?php endif; ?>
                         </div>
 
                         <button type="submit" class="group mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90">

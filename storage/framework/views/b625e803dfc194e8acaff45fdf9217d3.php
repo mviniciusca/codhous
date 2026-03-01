@@ -21,23 +21,129 @@
 
                 <div class="flex flex-col gap-5">
                     <div>
-                        <label for="calc-largura" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-background/60">Largura (metros)</label>
-                        <input wire:model.live="width" id="calc-largura" type="number" step="0.01" min="0" placeholder="Ex: 5.00"
-                            class="w-full rounded-md border border-background/10 bg-background/5 px-4 py-3 text-background placeholder:text-background/30 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                        <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'calc-largura','class' => 'text-background/60']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'calc-largura','class' => 'text-background/60']); ?>Largura (metros) <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.input','data' => ['wire:model.live' => 'width','id' => 'calc-largura','type' => 'number','step' => '0.01','min' => '0','placeholder' => 'Ex: 5.00']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model.live' => 'width','id' => 'calc-largura','type' => 'number','step' => '0.01','min' => '0','placeholder' => 'Ex: 5.00']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $attributes = $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $component = $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
                     </div>
                     <div>
-                        <label for="calc-comprimento" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-background/60">Comprimento (metros)</label>
-                        <input wire:model.live="length" id="calc-comprimento" type="number" step="0.01" min="0" placeholder="Ex: 10.00"
-                            class="w-full rounded-md border border-background/10 bg-background/5 px-4 py-3 text-background placeholder:text-background/30 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                        <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'calc-comprimento','class' => 'text-background/60']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'calc-comprimento','class' => 'text-background/60']); ?>Comprimento (metros) <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.input','data' => ['wire:model.live' => 'length','id' => 'calc-comprimento','type' => 'number','step' => '0.01','min' => '0','placeholder' => 'Ex: 10.00']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model.live' => 'length','id' => 'calc-comprimento','type' => 'number','step' => '0.01','min' => '0','placeholder' => 'Ex: 10.00']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $attributes = $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $component = $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
                     </div>
                     <div>
-    <label for="calc-espessura" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-background/60">
-        Espessura (Centímetros)
-    </label>
-    <input wire:model.live="thickness_cm" id="calc-espessura" type="number" step="1" min="0" placeholder="Ex: 10"
-        class="w-full rounded-md border border-background/10 bg-background/5 px-4 py-3 text-background ...">
-    <p class="mt-1 text-[10px] text-background/30 italic">O sistema converte automaticamente para metros.</p>
-</div>
+                        <?php if (isset($component)) { $__componentOriginalb2c43a998f3174877f99993c62e16bb4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c43a998f3174877f99993c62e16bb4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.label','data' => ['for' => 'calc-espessura','class' => 'text-background/60']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'calc-espessura','class' => 'text-background/60']); ?>Espessura (Centímetros) <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $attributes = $__attributesOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__attributesOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c43a998f3174877f99993c62e16bb4)): ?>
+<?php $component = $__componentOriginalb2c43a998f3174877f99993c62e16bb4; ?>
+<?php unset($__componentOriginalb2c43a998f3174877f99993c62e16bb4); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ui.input','data' => ['wire:model.live' => 'thickness_cm','id' => 'calc-espessura','type' => 'number','step' => '1','min' => '0','placeholder' => 'Ex: 10']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ui.input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model.live' => 'thickness_cm','id' => 'calc-espessura','type' => 'number','step' => '1','min' => '0','placeholder' => 'Ex: 10']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $attributes = $__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__attributesOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46)): ?>
+<?php $component = $__componentOriginal65bd7e7dbd93cec773ad6501ce127e46; ?>
+<?php unset($__componentOriginal65bd7e7dbd93cec773ad6501ce127e46); ?>
+<?php endif; ?>
+                        <p class="mt-1 text-[10px] text-background/30 italic">O sistema converte automaticamente para metros.</p>
+                    </div>
                 </div>
 
                 <div class="mt-8 rounded-lg border border-primary/30 bg-primary/10 p-6">

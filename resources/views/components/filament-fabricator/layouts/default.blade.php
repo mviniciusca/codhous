@@ -10,11 +10,15 @@
     @livewireStyles
 </head>
 <body class="font-sans antialiased bg-background text-foreground">
-    <x-site-header />
+    
+    <x-site-header />   
+    
 
     <main>
+        
         <x-section-home />
         {{ $slot }}
+        
     </main>
 
     <x-site-footer />

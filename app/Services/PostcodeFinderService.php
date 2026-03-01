@@ -23,7 +23,7 @@ class PostcodeFinderService
 
     private array|Response $response;
 
-    public function __construct(string $state, private Set $set)
+    public function __construct(string $state, private \Closure|Set $set)
     {
         $this->set = $set;
         $this->state = $state;

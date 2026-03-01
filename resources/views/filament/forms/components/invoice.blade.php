@@ -6,13 +6,16 @@
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
                     {{ __('Budget') }}
                 </h1>
-                <x-filament::badge :color="match($getRecord()->status) {
-                    'pending' => 'warning',
-                    'on going' => 'info',
-                    'done' => 'success',
-                    'ignored' => 'danger',
-                    'default' => 'gray',
-                }" size="lg" class="text-xs font-semibold">
+                @php
+                    $statusColor = match($getRecord()->status) {
+                        'pending' => 'warning',
+                        'on going' => 'info',
+                        'done' => 'success',
+                        'ignored' => 'danger',
+                        default => 'gray',
+                    };
+                @endphp
+                <x-filament::badge :color="$statusColor" size="lg" class="text-xs font-semibold">
                     {{ __(ucfirst($getRecord()->status)) }}
                 </x-filament::badge>
             </div>
@@ -53,8 +56,7 @@
                 </svg>
                 <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Name') }}</p>
-                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ data_get($getRecord(),
-                        'content.customer_name') }}</p>
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ data_get($getRecord(), 'content.customer_name') }}</p>
                 </div>
             </div>
             <div class="flex items-start gap-3">
@@ -64,8 +66,7 @@
                 </svg>
                 <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Email') }}</p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ data_get($getRecord(),
-                        'content.customer_email') }}</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ data_get($getRecord(), 'content.customer_email') }}</p>
                 </div>
             </div>
             <div class="flex items-start gap-3">
@@ -75,8 +76,7 @@
                 </svg>
                 <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Phone') }}</p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ data_get($getRecord(),
-                        'content.customer_phone') }}</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ data_get($getRecord(), 'content.customer_phone') }}</p>
                 </div>
             </div>
         </div>
@@ -178,9 +178,8 @@
                         <td class="px-6 py-4">
                             <div class="flex items-start gap-3">
                                 <div class="flex-shrink-0 w-8 h-8 rounded flex items-center justify-center">
-                                    <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">{{ $index + 1
-                                        }}</span>
-                                </div>
+                                     <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">{{ $index + 1 }}</span>
+                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-900 dark:text-white text-sm">
                                         {{ $productModel?->name ?? 'Produto não encontrado' }}
@@ -205,9 +204,8 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($product, 'price', 0), 2, ',',
-                                '.') }}
-                            </span>
+                                 {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($product, 'price', 0), 2, ',', '.') }}
+                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
                             <span class="text-sm font-bold text-gray-900 dark:text-white">
@@ -297,9 +295,7 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{{
                             __('Shipping') }}</p>
                         <p class="text-lg font-bold text-gray-900 dark:text-white">
-                            {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($getRecord(), 'content.shipping', 0),
-                            2,
-                            ',', '.') }}
+                            {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($getRecord(), 'content.shipping', 0), 2, ',', '.') }}
                         </p>
                     </div>
                 </div>
@@ -318,8 +314,7 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{{ __('Taxes')
                             }}</p>
                         <p class="text-lg font-bold text-gray-900 dark:text-white">
-                            + {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($getRecord(), 'content.tax', 0), 2,
-                            ',', '.') }}
+                            + {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($getRecord(), 'content.tax', 0), 2, ',', '.') }}
                         </p>
                     </div>
                 </div>
@@ -338,9 +333,7 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{{
                             __('Discount') }}</p>
                         <p class="text-lg font-bold text-gray-900 dark:text-white">
-                            - {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($getRecord(), 'content.discount',
-                            0),
-                            2, ',', '.') }}
+                            - {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($getRecord(), 'content.discount', 0), 2, ',', '.') }}
                         </p>
                     </div>
                 </div>
@@ -359,8 +352,7 @@
                         <p class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-1">{{
                             __('Total Value') }}</p>
                         <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                            {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($getRecord(), 'content.total', 0), 2,
-                            ',', '.') }}
+                            {{ env('CURRENCY_SUFFIX') }} {{ number_format(data_get($getRecord(), 'content.total', 0), 2, ',', '.') }}
                         </p>
                     </div>
                 </div>
@@ -399,3 +391,4 @@
         </div>
     </div>
 </div>
+ 

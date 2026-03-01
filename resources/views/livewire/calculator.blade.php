@@ -21,23 +21,18 @@
 
                 <div class="flex flex-col gap-5">
                     <div>
-                        <label for="calc-largura" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-background/60">Largura (metros)</label>
-                        <input wire:model.live="width" id="calc-largura" type="number" step="0.01" min="0" placeholder="Ex: 5.00"
-                            class="w-full rounded-md border border-background/10 bg-background/5 px-4 py-3 text-background placeholder:text-background/30 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                        <x-ui.label for="calc-largura" class="text-background/60">Largura (metros)</x-ui.label>
+                        <x-ui.input wire:model.live="width" id="calc-largura" type="number" step="0.01" min="0" placeholder="Ex: 5.00" />
                     </div>
                     <div>
-                        <label for="calc-comprimento" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-background/60">Comprimento (metros)</label>
-                        <input wire:model.live="length" id="calc-comprimento" type="number" step="0.01" min="0" placeholder="Ex: 10.00"
-                            class="w-full rounded-md border border-background/10 bg-background/5 px-4 py-3 text-background placeholder:text-background/30 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                        <x-ui.label for="calc-comprimento" class="text-background/60">Comprimento (metros)</x-ui.label>
+                        <x-ui.input wire:model.live="length" id="calc-comprimento" type="number" step="0.01" min="0" placeholder="Ex: 10.00" />
                     </div>
                     <div>
-    <label for="calc-espessura" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-background/60">
-        Espessura (Centímetros)
-    </label>
-    <input wire:model.live="thickness_cm" id="calc-espessura" type="number" step="1" min="0" placeholder="Ex: 10"
-        class="w-full rounded-md border border-background/10 bg-background/5 px-4 py-3 text-background ...">
-    <p class="mt-1 text-[10px] text-background/30 italic">O sistema converte automaticamente para metros.</p>
-</div>
+                        <x-ui.label for="calc-espessura" class="text-background/60">Espessura (Centímetros)</x-ui.label>
+                        <x-ui.input wire:model.live="thickness_cm" id="calc-espessura" type="number" step="1" min="0" placeholder="Ex: 10" />
+                        <p class="mt-1 text-[10px] text-background/30 italic">O sistema converte automaticamente para metros.</p>
+                    </div>
                 </div>
 
                 <div class="mt-8 rounded-lg border border-primary/30 bg-primary/10 p-6">

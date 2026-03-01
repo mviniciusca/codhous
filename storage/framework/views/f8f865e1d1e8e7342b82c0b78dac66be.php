@@ -1,7 +1,28 @@
-<?php if (isset($component)) { $__componentOriginal96b9fa84654c596d39f389d66769f007 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal96b9fa84654c596d39f389d66769f007 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.section-hero','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('section-hero'); ?>
+<?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('section-hero-cep', []);
+
+$__key = null;
+
+$__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2999842189-0', $__key);
+
+$__html = app('livewire')->mount($__name, $__params, $__key);
+
+echo $__html;
+
+unset($__html);
+unset($__key);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
+<?php if (isset($component)) { $__componentOriginal7238c7c8110204d6c3b950ad713ee86b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal7238c7c8110204d6c3b950ad713ee86b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.section-partners','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('section-partners'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
@@ -10,13 +31,13 @@
 <?php $component->withAttributes([]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal96b9fa84654c596d39f389d66769f007)): ?>
-<?php $attributes = $__attributesOriginal96b9fa84654c596d39f389d66769f007; ?>
-<?php unset($__attributesOriginal96b9fa84654c596d39f389d66769f007); ?>
+<?php if (isset($__attributesOriginal7238c7c8110204d6c3b950ad713ee86b)): ?>
+<?php $attributes = $__attributesOriginal7238c7c8110204d6c3b950ad713ee86b; ?>
+<?php unset($__attributesOriginal7238c7c8110204d6c3b950ad713ee86b); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal96b9fa84654c596d39f389d66769f007)): ?>
-<?php $component = $__componentOriginal96b9fa84654c596d39f389d66769f007; ?>
-<?php unset($__componentOriginal96b9fa84654c596d39f389d66769f007); ?>
+<?php if (isset($__componentOriginal7238c7c8110204d6c3b950ad713ee86b)): ?>
+<?php $component = $__componentOriginal7238c7c8110204d6c3b950ad713ee86b; ?>
+<?php unset($__componentOriginal7238c7c8110204d6c3b950ad713ee86b); ?>
 <?php endif; ?>
 <?php if (isset($component)) { $__componentOriginalc7a64e9baa6bc2170a05d8e981c8dd9c = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc7a64e9baa6bc2170a05d8e981c8dd9c = $attributes; } ?>
@@ -38,6 +59,26 @@
 <?php $component = $__componentOriginalc7a64e9baa6bc2170a05d8e981c8dd9c; ?>
 <?php unset($__componentOriginalc7a64e9baa6bc2170a05d8e981c8dd9c); ?>
 <?php endif; ?>
+<?php if (isset($component)) { $__componentOriginal07aa6dee5be1908ba098b2a7fde79770 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal07aa6dee5be1908ba098b2a7fde79770 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.section-timeline','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('section-timeline'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal07aa6dee5be1908ba098b2a7fde79770)): ?>
+<?php $attributes = $__attributesOriginal07aa6dee5be1908ba098b2a7fde79770; ?>
+<?php unset($__attributesOriginal07aa6dee5be1908ba098b2a7fde79770); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal07aa6dee5be1908ba098b2a7fde79770)): ?>
+<?php $component = $__componentOriginal07aa6dee5be1908ba098b2a7fde79770; ?>
+<?php unset($__componentOriginal07aa6dee5be1908ba098b2a7fde79770); ?>
+<?php endif; ?>
 <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
@@ -46,7 +87,7 @@ $__split = function ($name, $params = []) {
 
 $__key = null;
 
-$__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2999842189-0', $__key);
+$__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2999842189-1', $__key);
 
 $__html = app('livewire')->mount($__name, $__params, $__key);
 
