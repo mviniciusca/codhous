@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 const colors = require('tailwindcss/colors')
 
+// Altere a cor aqui para qualquer uma do Tailwind (ex: colors.zinc, colors.red, colors.orange)
+const themeColor = colors.orange
+
 export default {
     content: [
         './app/Filament/**/*.php',
@@ -34,8 +37,8 @@ export default {
                     foreground: 'oklch(0.18 0.01 250 / <alpha-value>)',
                 },
                 primary: {
-                    DEFAULT: 'oklch(0.82 0.17 85 / <alpha-value>)',
-                    foreground: 'oklch(0.18 0.01 250 / <alpha-value>)',
+                    DEFAULT: themeColor[500],
+                    foreground: colors.white,
                 },
                 secondary: {
                     DEFAULT: 'oklch(0.92 0.005 250 / <alpha-value>)',
@@ -59,7 +62,7 @@ export default {
                 },
                 border: 'oklch(0.88 0.005 250 / <alpha-value>)',
                 input: 'oklch(0.88 0.005 250 / <alpha-value>)',
-                ring: 'oklch(0.82 0.17 85 / <alpha-value>)',
+                ring: themeColor[500],
             },
             boxShadow: {
                 'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',

@@ -36,7 +36,7 @@
                 </p>
 
                 <div class="mt-10 flex flex-col gap-4 sm:flex-row">
-                    <a href="#orcamento" class="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-base font-semibold text-zinc-950 transition-all hover:bg-primary/90 hover:gap-3">
+                    <a href="#orcamento" class="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:gap-3">
                         Solicitar Orçamento Agora
                         <i data-lucide="arrow-right" class="h-5 w-5"></i>
                     </a>

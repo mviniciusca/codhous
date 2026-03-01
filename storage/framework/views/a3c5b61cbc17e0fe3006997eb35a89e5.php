@@ -33,7 +33,7 @@
             <div class="lg:col-span-2">
                 <a href="#" class="flex items-center gap-2">
                     <div class="flex h-10 w-10 items-center justify-center rounded-md bg-primary">
-                        <i data-lucide="truck" class="h-5 w-5 text-zinc-950"></i>
+                        <i data-lucide="truck" class="h-5 w-5 text-primary-foreground"></i>
                     </div>
                     <span class="font-mono text-xl font-bold tracking-tight text-foreground"><?php echo e($websiteName); ?></span>
                 </a>

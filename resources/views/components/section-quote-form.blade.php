@@ -111,7 +111,7 @@
                                 class="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"></textarea>
                         </div>
 
-                        <button type="submit" class="group mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-base font-semibold text-zinc-950 transition-all hover:bg-primary/90">
+                        <button type="submit" class="group mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90">
                             Enviar Solicitação <i data-lucide="send" class="h-5 w-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"></i>
                         </button>
                     </form>

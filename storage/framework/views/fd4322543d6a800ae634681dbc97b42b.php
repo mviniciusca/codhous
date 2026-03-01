@@ -30,7 +30,7 @@
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </nav>
 
-        <a href="#orcamento" class="hidden rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-primary/90 md:inline-flex">
+        <a href="#orcamento" class="hidden rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 md:inline-flex">
             Solicitar Orçamento
         </a>
 
@@ -57,7 +57,7 @@
                 <a href="#diferenciais" onclick="closeMobileMenu()" class="rounded-md px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-muted hover:text-primary">Diferenciais</a>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             
-            <a href="#orcamento" onclick="closeMobileMenu()" class="mt-2 rounded-md bg-primary px-5 py-2.5 text-center text-sm font-semibold text-zinc-950 transition-colors hover:bg-primary/90">Solicitar Orçamento</a>
+            <a href="#orcamento" onclick="closeMobileMenu()" class="mt-2 rounded-md bg-primary px-5 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">Solicitar Orçamento</a>
         </nav>
     </div>
 </header>
