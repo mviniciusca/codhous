@@ -7,68 +7,85 @@
 /** Base **/
 @layer base {
     :root {
-        --background: 0 0% 100%; /* white */
-        --foreground: 240 10% 3.9%; /* zinc-950 */
+        --background: 0 0% 100%;
+        /* white */
+        --foreground: 240 10% 3.9%;
+        /* zinc-950 */
 
-        --card: 240 5% 98%; /* zinc-50 */
-        --card-foreground: 240 10% 3.9%; /* zinc-950 */
+        --card: 240 5% 98%;
+        /* zinc-50 */
+        --card-foreground: 240 10% 3.9%;
+        /* zinc-950 */
 
         --popover: 0 0% 100%;
         --popover-foreground: 240 10% 3.9%;
 
-        --primary: 240 5.9% 10%; /* zinc-900 */
+        --primary: 240 5.9% 10%;
+        /* zinc-900 */
         --primary-foreground: 240 5% 98%;
 
-        --secondary: 240 4.8% 95.9%; /* zinc-100 */
+        --secondary: 240 4.8% 95.9%;
+        /* zinc-100 */
         --secondary-foreground: 240 5.9% 10%;
 
-        --muted: 240 4.8% 95.9%; /* zinc-100 */
+        --muted: 240 4.8% 95.9%;
+        /* zinc-100 */
         --muted-foreground: 240 3.8% 46.1%;
 
-        --accent: 240 4.8% 95.9%; /* zinc-100 */
+        --accent: 240 4.8% 95.9%;
+        /* zinc-100 */
         --accent-foreground: 240 5.9% 10%;
 
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
 
-        --border: 240 5.9% 90%; /* zinc-200 */
+        --border: 240 5.9% 90%;
+        /* zinc-200 */
         --input: 240 5.9% 90%;
         --ring: 240 5.9% 10%;
         --radius: 0.5rem;
     }
 
     .dark {
-        --background: 240 5.9% 10%; /* zinc-900 */
-        --foreground: 240 5% 98%; /* zinc-50 */
+        --background: 240 5.9% 10%;
+        /* zinc-900 */
+        --foreground: 240 5% 98%;
+        /* zinc-50 */
 
-        --card: 240 10% 3.9%; /* zinc-950 */
+        --card: 240 10% 3.9%;
+        /* zinc-950 */
         --card-foreground: 240 5% 98%;
 
         --popover: 240 5.9% 10%;
         --popover-foreground: 240 5% 98%;
 
-        --primary: 240 5% 98%; /* zinc-50 */
+        --primary: 240 5% 98%;
+        /* zinc-50 */
         --primary-foreground: 240 5.9% 10%;
 
-        --secondary: 240 3.7% 15.9%; /* zinc-800 */
+        --secondary: 240 3.7% 15.9%;
+        /* zinc-800 */
         --secondary-foreground: 240 5% 98%;
 
         --muted: 213 50% 20%;
         --muted-foreground: 213 30% 85%;
 
-        --accent: 213 50% 25%;      /* Azul médio-escuro para acentos */
+        --accent: 213 50% 25%;
+        /* Azul médio-escuro para acentos */
         --accent-foreground: 213 30% 98%;
 
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 0 85.7% 97.3%;
 
-        --border: 213 50% 20%;      /* Azul escuro para bordas */
+        --border: 213 50% 20%;
+        /* Azul escuro para bordas */
         --input: 213 50% 20%;
         --ring: 213 80% 60%;
     }
 }
 
 @layer components {
+
     /* Estilizando inputs e botões do Filament */
     .fi-input,
     .fi-select,
@@ -104,7 +121,10 @@
         @apply inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
     }
 
-    textarea, select, input[type="text"], input[type="password"] {
+    textarea,
+    select,
+    input[type="text"],
+    input[type="password"] {
         @apply bg-background dark:bg-secondary;
     }
 
@@ -145,5 +165,18 @@
     /* Form sections */
     .fi-section {
         @apply bg-gray-950 border border-border rounded-lg;
+    }
+
+    /* Aplica a fonte Mono (Space Grotesk) em todos os labels e inputs do Filament */
+    #orcamento .fi-fo-field-group-label {
+        @apply font-mono text-xs uppercase tracking-wider text-muted-foreground;
+    }
+
+    #orcamento .fi-input {
+        @apply font-mono border-input bg-background placeholder:text-muted-foreground;
+    }
+
+    #orcamento .fi-input-wrp {
+        @apply focus-within:ring-primary;
     }
 }

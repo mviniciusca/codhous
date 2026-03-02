@@ -4,26 +4,27 @@ namespace App\Livewire;
 
 use App\Models\Budget as BudgetModel;
 use App\Models\Location;
-use App\Models\Module;
 use App\Models\Product;
 use App\Models\ProductOption;
-use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\NewBudget;
+use App\Services\BudgetCalculatorService;
 use App\Services\PostcodeFinderService;
-use Filament\Notifications\Notification;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use App\Services\BudgetCalculatorService;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -34,276 +35,173 @@ class Budget extends Component implements HasForms
 
     public ?array $data = [];
 
-    public $status;
-
-    public $image;
-
-    public ?bool $module;
-
     public bool $isSubmitted = false;
 
-    /**
-     * Summary of mount
-     * @return void
-     */
     public function mount(): void
     {
-        $this->status = $this->status();
-        $this->image = $this->image();
-        $this->module = $this->module();
         $this->form->fill();
-
-        // Initial dispatch
         $this->dispatch('cart-updated', count($this->data['content']['products'] ?? []));
     }
 
-    /**
-     * Summary of module
-     * @return mixed
-     */
-    public function module()
-    {
-        return Module::first()->module['budget'];
-    }
-
-    /**
-     * Summary of form
-     * @param Form $form
-     * @return Form
-     */
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Hidden::make('code')
-                    ->default(Str::random(8)),
-
-                Hidden::make('content.price'),
-                Hidden::make('content.subtotal'),
-                Hidden::make('content.total'),
-                Hidden::make('content.quantity'),
-
-                Fieldset::make('customer_info')
-                    ->label(__('Customer Information'))
+                Group::make([
+                    Hidden::make('code')->default(Str::random(8)),
+                    Hidden::make('content.price'),
+                    Hidden::make('content.subtotal'),
+                    Hidden::make('content.total'),
+                    Hidden::make('content.quantity'),
+                ]),
+                Section::make('Suas Informações')
+                    ->icon('heroicon-o-user')
+                    ->collapsible()
                     ->schema([
                         TextInput::make('content.customer_name')
+                            ->label('NOME COMPLETO')
                             ->required()
-                            ->placeholder(__('Full Name *'))
-                            ->hiddenLabel(),
-                        TextInput::make('content.customer_phone')
-                            ->required()
-                            ->tel()
-                            ->mask('(99)99999-9999')
-                            ->placeholder(__('Phone Number *'))
-                            ->hiddenLabel(),
-                        TextInput::make('content.customer_email')
-                            ->required()
-                            ->email()
-                            ->placeholder(__('Email Address *'))
-                            ->hiddenLabel(),
-                    ])
-                    ->columns(3),
-
-                Fieldset::make('products')
-                    ->label(__('Product Selection'))
+                            ->placeholder('Ex: Marcos Vinícius'),
+                        Group::make([
+                            TextInput::make('content.customer_phone')
+                                ->label('WHATSAPP')
+                                ->tel()
+                                ->mask('(99) 99999-9999')
+                                ->required(),
+                            TextInput::make('content.customer_email')
+                                ->label('E-MAIL')
+                                ->email()
+                                ->required(),
+                        ])->columns(2),
+                    ]),
+                Section::make('Detalhes do Pedido')
+                    ->icon('heroicon-o-shopping-bag')
+                    ->collapsed()
                     ->schema([
-                        \Filament\Forms\Components\Repeater::make('content.products')
-                            ->label(__('Product List'))
-                            ->live()
+                        Repeater::make('content.products')
+                            ->hiddenLabel()
+                            ->itemLabel(
+                                fn(array $state): ?string => ($state['product'] ?? null)
+                                    ? (
+                                        Product::find($state['product'])?->name
+                                        // append option name if chosen
+                                        . ($state['product_option'] ? ' – ' . ProductOption::find($state['product_option'])?->name : '')
+                                        // append quantity with unit when available
+                                        . ($state['quantity']
+                                            ? ' — ' . $state['quantity'] . ' ' . (ProductOption::find($state['product_option'])?->unit?->value ?? '')
+                                            : '')
+                                    )
+                                    : 'Novo Item'
+                            )
+                            ->collapsible()
                             ->cloneable()
                             ->schema([
-                                Select::make('product')
-                                    ->live()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->placeholder(__('Select Product *'))
-                                    ->hiddenLabel()
-                                    ->options(Product::all()->pluck('name', 'id'))
-                                    ->afterStateUpdated(function (Get $get, Set $set) {
-                                        $set('product_option', null);
-                                        $this->dispatchCartUpdatedEvent($get);
-                                    }),
-                                Select::make('product_option')
-                                    ->live()
-                                    ->dehydrated()
-                                    ->placeholder(__('Select Option'))
-                                    ->hiddenLabel()
-                                    ->options(fn(Get $get): Collection => $this->getProductOptions($get))
-                                    ->required(fn(Get $get): bool => $this->getProductOptions($get)->count() > 0)
-                                    ->hidden(fn(Get $get): bool => $this->getProductOptions($get)->count() == 0)
-                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        $this->updatePrice($get, $set, $state);
-                                    }),
-                                Select::make('location')
-                                    ->dehydrated()
-                                    ->required()
-                                    ->placeholder(__('Select Area *'))
-                                    ->hiddenLabel()
-                                    ->options(Location::all()->pluck('name', 'id')),
-                                TextInput::make('quantity')
-                                    ->live(true)
-                                    ->integer()
-                                    ->required()
-                                    ->minValue(3)
-                                    ->placeholder(__('Quantity (m³) *'))
-                                    ->hiddenLabel()
-                                    ->suffix(__('m³'))
-                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        $this->calculateItemSubtotal($get, $set);
-                                        $this->calculateTotal($get, $set);
-                                        $this->dispatchCartUpdatedEvent($get);
-                                    }),
-                                Hidden::make('price'),
-                                Hidden::make('subtotal'),
+                                Grid::make(2)->schema([
+                                    Select::make('product')
+                                        ->label('PRODUTO')
+                                        ->options(Product::all()->pluck('name', 'id'))
+                                        ->required()
+                                        ->live()
+                                        ->afterStateUpdated(fn(Set $set) => $set('product_option', null)),
+                                    Select::make('product_option')
+                                        ->label('OPÇÃO / TRAÇO')
+                                        ->options(fn(Get $get) => $this->getProductOptions($get))
+                                        ->required(fn(Get $get) => $this->getProductOptions($get)->isNotEmpty())
+                                        ->hidden(fn(Get $get) => $this->getProductOptions($get)->isEmpty())
+                                        ->live()
+                                        ->afterStateUpdated(fn(Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
+                                ]),
+                                Grid::make(2)->schema([
+                                    Select::make('location')
+                                        ->label('LOCAL DA OBRA')
+                                        ->options(Location::all()->pluck('name', 'id'))
+                                        ->required(),
+                                    TextInput::make('quantity')
+                                        ->label('QUANTIDADE')
+                                        ->numeric()
+                                        ->suffix(fn(Get $get) => ProductOption::find($get('product_option'))?->unit?->value ?? '')
+                                        ->minValue(fn(Get $get) => $get('product_option') ? 1 : 3)
+                                        ->required()
+                                        ->live(debounce: 500)
+                                        ->afterStateUpdated(function (Get $get, Set $set) {
+                                            $this->calculateItemSubtotal($get, $set);
+                                            $this->calculateTotal($get, $set);
+                                            $this->dispatchCartUpdatedEvent($get);
+                                        }),
+                                ]),
                             ])
-                            ->columns(2)
-                            ->itemLabel(fn(array $state): ?string => $state['product'] ? Product::find($state['product'])?->name . ' (' . ($state['quantity'] ?? 0) . ' m³)' : null)
-                            ->addActionLabel(__('Add Product'))
-                            ->collapsible()
-                            ->reorderable()
-                            ->defaultItems(1),
-                    ])
-                    ->columns(1),
-
-                Fieldset::make('address')
-                    ->label(__('Delivery Address'))
+                            ->columns(1)
+                            ->addActionLabel('Adicionar outro item'),
+                    ]),
+                Section::make('Local de Entrega')
+                    ->icon('heroicon-o-map')
+                    ->collapsed()
                     ->schema([
                         TextInput::make('content.postcode')
+                            ->label('CEP')
+                            ->mask('99999-999')
                             ->required()
                             ->minLength(9)
+                            ->maxLength(9)
                             ->live(debounce: 500)
+                            ->suffixAction(
+                                Action::make('search-action')
+                                    ->icon('heroicon-m-magnifying-glass')
+                                    ->color('primary')
+                                    ->action(function ($state, Set $set, $livewire) {
+                                        if (empty($state)) return;
+                                        $livewire->validateOnly('data.content.postcode');
+                                        $postcode = new PostcodeFinderService($state, $set);
+                                        $postcode->find();
+                                    })
+                            )
                             ->afterStateUpdated(function ($state, Set $set, $livewire) {
                                 if (strlen($state) === 9) {
                                     $livewire->validateOnly('data.content.postcode');
                                     $postcode = new PostcodeFinderService($state, $set);
                                     $postcode->find();
                                 }
-                            })
-                            ->mask('99999-999')
-                            ->placeholder(__('Postcode (e.g. 22022-000) *'))
-                            ->hiddenLabel()
-                            ->maxLength(9)
-                            ->suffixAction(
-                                fn($state, Set $set, $livewire) => Action::make('search-action')
-                                    ->icon('heroicon-o-magnifying-glass')
-                                    ->action(function () use ($state, $livewire, $set) {
-                                        if (empty($state)) return;
-                                        $livewire->validateOnly('data.content.postcode');
-                                        $postcode = new PostcodeFinderService($state, $set);
-                                        $postcode->find();
-                                    })
-                            ),
-                        Group::make()
+                            }),
+                        Grid::make(3)
                             ->schema([
-                                TextInput::make('content.number')
-                                    ->placeholder(__('Number'))
-                                    ->hiddenLabel(),
-                                TextInput::make('content.street')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->placeholder(__('Street *'))
-                                    ->hiddenLabel(),
-                                TextInput::make('content.city')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->placeholder(__('City *'))
-                                    ->hiddenLabel(),
-                                TextInput::make('content.neighborhood')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->placeholder(__('Neighborhood *'))
-                                    ->hiddenLabel(),
-                                TextInput::make('content.state')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->placeholder(__('State *'))
-                                    ->hiddenLabel(),
+                                TextInput::make('content.street')->label('RUA')->columnSpan(2)->disabled()->dehydrated(),
+                                TextInput::make('content.number')->label('Nº')->required(),
+                                TextInput::make('content.neighborhood')->label('BAIRRO')->disabled()->dehydrated(),
+                                TextInput::make('content.city')->label('CIDADE')->disabled()->dehydrated(),
+                                TextInput::make('content.state')->label('UF')->disabled()->dehydrated(),
                             ])
-                            ->columns(3)
                             ->visible(fn(Get $get) => filled($get('content.street')))
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(1),
+                    ]),
             ])
-            ->statePath('data');
+            ->statePath('data')
+            ->extraAttributes([
+                'class' => 'font-mono'
+            ]);
     }
 
-    /**
-     * Summary of create
-     * @return void
-     */
     public function create(): void
     {
         $budget = BudgetModel::create($this->form->getState());
-
         $user = new User();
         $user->first()->notify(new NewBudget($budget->toArray()));
-
         Notification::make()
             ->title(__('Thanks! Our team will answer you until 24 hours!'))
             ->success()
             ->send();
-
         $this->isSubmitted = true;
     }
 
-    /**
-     * Reset the form to allow for a new submission.
-     */
     public function resetForm(): void
     {
         $this->form->fill();
         $this->isSubmitted = false;
     }
 
-    /**
-     * Summary of render
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
     public function render()
     {
-        return view('livewire.budget', [
-            'status' => $this->status(),
-        ]);
+        return view('livewire.budget', []);
     }
 
-    /**
-     * Summary of status
-     * @return bool
-     */
-    public function status(): bool
-    {
-        $status = Setting::query()
-            ->select(['budget_is_active'])
-            ->first()
-            ->budget_is_active;
-
-        return $status;
-    }
-
-    /**
-     * Summary of image
-     * @return string|null
-     */
-    public function image(): string|null
-    {
-        $image = Setting::query()
-            ->select(['budget_image'])
-            ->first()
-            ->budget_image;
-
-        return $image;
-    }
-
-    /**
-     * Summary of getProductOptions
-     * @param Get $get
-     * @return Collection
-     */
     private function getProductOptions(Get $get): Collection
     {
         return ProductOption::where('product_id', '=', $get('product'))
@@ -311,33 +209,16 @@ class Budget extends Component implements HasForms
             ->pluck('name', 'id');
     }
 
-    /**
-     * Summary of calculateTotal
-     * @param Get $get
-     * @param Set $set
-     * @return void
-     */
     private function calculateTotal(Get $get, Set $set): void
     {
         $products = $get('content.products') ?? [];
-
-        // Use the service to calculate everything
         $result = BudgetCalculatorService::calculateTotal($products);
-
-        // Update the hidden summary fields
         $set('content.quantity', $result['quantity']);
         $set('content.price', $result['price']);
         $set('content.subtotal', $result['subtotal']);
         $set('content.total', $result['total']);
     }
 
-    /**
-     * Summary of updatePrice
-     * @param Get $get
-     * @param Set $set
-     * @param mixed $productId
-     * @return void
-     */
     private function updatePrice(Get $get, Set $set, $productId): void
     {
         if ($productId) {
@@ -346,17 +227,17 @@ class Budget extends Component implements HasForms
         } else {
             $price = 0;
         }
+
+        // whenever the selected option changes we should reset the quantity so
+        // the user doesn't end up with a value from a previous unit and to let
+        // the suffix update immediately
+        $set('quantity', null);
+
         $set('price', $price);
         $this->calculateItemSubtotal($get, $set);
         $this->calculateTotal($get, $set);
     }
 
-    /**
-     * Summary of calculateItemSubtotal
-     * @param Get $get
-     * @param Set $set
-     * @return void
-     */
     private function calculateItemSubtotal(Get $get, Set $set): void
     {
         $quantity = intval($get('quantity') ?? 0);
@@ -365,9 +246,6 @@ class Budget extends Component implements HasForms
         $set('subtotal', $subtotal);
     }
 
-    /**
-     * @param $property
-     */
     public function updated($property): void
     {
         if (str_contains($property, 'products')) {
@@ -375,9 +253,6 @@ class Budget extends Component implements HasForms
         }
     }
 
-    /**
-     * @param Get $get
-     */
     private function dispatchCartUpdatedEvent(Get $get): void
     {
         $products = $get('content.products') ?? [];
