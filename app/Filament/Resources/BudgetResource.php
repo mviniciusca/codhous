@@ -44,7 +44,8 @@ class BudgetResource extends Resource
         return __('Budget');
     }
 
-    protected static ?string $navigationGroup = 'Budget';
+    protected static ?string $navigationGroup = 'Orçamentos';
+    protected static ?int $navigationSort = 1;
 
     public static function getGloballySearchableAttributes(): array
     {

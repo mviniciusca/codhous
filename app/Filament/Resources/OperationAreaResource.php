@@ -23,9 +23,8 @@ class OperationAreaResource extends Resource
 {
     protected static ?string $model = OperationArea::class;
 
-    protected static ?int $navigationSort = 3;
-
-    protected static ?string $navigationGroup = 'Budget';
+    protected static ?string $navigationGroup = 'Orçamentos';
+    protected static ?int $navigationSort = 5;
 
     // the heroicon set included in the project doesn't contain a `location-marker` glyph,
     // fall back to the map icon which is already used elsewhere.

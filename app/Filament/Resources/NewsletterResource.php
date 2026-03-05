@@ -24,7 +24,8 @@ class NewsletterResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
-    protected static ?string $navigationGroup = 'Communication';
+    protected static ?string $navigationGroup = 'Comunicação';
+    protected static ?int $navigationSort = 2;
 
     public static function getNavigationBadge(): ?string
     {

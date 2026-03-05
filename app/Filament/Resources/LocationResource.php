@@ -21,13 +21,9 @@ class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
 
-    protected static ?int $navigationSort = 2;
-
-    protected static ?string $navigationGroup = 'Budget';
-
+    protected static ?string $navigationGroup = 'Orçamentos';
+    protected static ?int $navigationSort = 4;
     protected static ?string $navigationIcon = 'heroicon-o-map';
-
-    protected static ?string $navigationParentItem = 'Products';
 
     public static function getNavigationLabel(): string
     {

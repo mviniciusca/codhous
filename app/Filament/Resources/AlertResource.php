@@ -17,6 +17,7 @@ class AlertResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-bell-alert';
 
     protected static ?string $navigationGroup = 'Website';
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'Alertas e notificações';
 

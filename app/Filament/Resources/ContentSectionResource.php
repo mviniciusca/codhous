@@ -15,6 +15,7 @@ class ContentSectionResource extends Resource
     protected static ?string $model = ContentSection::class;
 
     protected static ?string $navigationGroup = 'Website';
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
 
