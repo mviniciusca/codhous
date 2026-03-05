@@ -19,6 +19,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
 use App\Services\FakeBudgetDataService;
+use App\Services\OperationAreaService;
 use App\Services\PostcodeFinderService;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -213,6 +214,7 @@ class CreateBudget extends CreateRecord
                                                 $set('content.city', '');
                                                 $set('content.neighborhood', '');
                                                 $set('content.state', '');
+                                                $set('content.shipping', '0');
 
                                                 Notification::make()
                                                     ->title(__('Customer fields cleared!'))
@@ -257,13 +259,23 @@ class CreateBudget extends CreateRecord
                                             ->placeholder('----- ---')
                                             ->helperText(__('Customer postcode'))
                                             ->maxLength(9)
+                                            ->live(debounce: 500)
+                                            ->afterStateUpdated(function ($state, Set $set, $livewire) {
+                                                if (strlen(preg_replace('/\D/', '', $state ?? '')) >= 8) {
+                                                    $livewire->validateOnly('data.content.postcode');
+                                                    $postcode = new PostcodeFinderService($state, $set);
+                                                    $postcode->find();
+                                                    $livewire->applyShippingFromCep($state, $set);
+                                                }
+                                            })
                                             ->suffixAction(
                                                 fn($state, Set $set, $livewire) => Action::make('search-action')
                                                     ->icon('heroicon-o-magnifying-glass')
                                                     ->action(function () use ($state, $livewire, $set) {
-                                                        $livewire->validateOnly('content.data.postcode');
+                                                        $livewire->validateOnly('data.content.postcode');
                                                         $postcode = new PostcodeFinderService($state, $set);
                                                         $postcode->find();
+                                                        $livewire->applyShippingFromCep($state, $set);
                                                     })
                                             )
                                             ->label(__('CEP')),
@@ -450,7 +462,8 @@ class CreateBudget extends CreateRecord
                                             ->prefix('+' . env('CURRENCY_SUFFIX'))
                                             ->numeric()
                                             ->required()
-                                            ->helperText(__('Shipping cost in ' . env('CURRENCY_SUFFIX')))
+                                            ->default(0)
+                                            ->helperText(__('Preenchido automaticamente pela área de operação ao consultar o CEP. Editável se necessário.'))
                                             ->step(0.01)
                                             ->afterStateHydrated(function (Get $get, Set $set) {
                                                 $this->calculateTotal($get, $set);
@@ -565,6 +578,27 @@ class CreateBudget extends CreateRecord
             'user_id'   => Auth::user()->id,
             'action'    => 'create',
         ]);
+    }
+
+    /**
+     * Aplica frete da área de operação ao CEP e recalcula o total.
+     */
+    public function applyShippingFromCep(?string $postcode, Set $set): void
+    {
+        if (empty($postcode) || strlen(preg_replace('/\D/', '', $postcode)) < 8) {
+            return;
+        }
+        $result = OperationAreaService::resultForCep($postcode);
+        $set('content.shipping', $result['shipping_fee'] ?? 0);
+        $get = fn (string $key) => data_get($this->data, $key);
+        $this->calculateTotal($get, $set);
+        if (! ($result['in_area'] ?? true)) {
+            Notification::make()
+                ->title(__('CEP fora da área de atendimento'))
+                ->body($result['message'] ?? '')
+                ->warning()
+                ->send();
+        }
     }
 
     /**

@@ -9,12 +9,14 @@ use App\Models\ProductOption;
 use App\Models\User;
 use App\Notifications\NewBudget;
 use App\Services\BudgetCalculatorService;
+use App\Services\OperationAreaService;
 use App\Services\PostcodeFinderService;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -53,6 +55,7 @@ class Budget extends Component implements HasForms
                     Hidden::make('content.subtotal'),
                     Hidden::make('content.total'),
                     Hidden::make('content.quantity'),
+                    Hidden::make('content.shipping')->default(0),
                 ]),
                 Section::make('Suas Informações')
                     ->icon('heroicon-o-user')
@@ -153,15 +156,21 @@ class Budget extends Component implements HasForms
                                         $livewire->validateOnly('data.content.postcode');
                                         $postcode = new PostcodeFinderService($state, $set);
                                         $postcode->find();
+                                        $livewire->applyShippingFromCep($state, $set);
                                     })
                             )
                             ->afterStateUpdated(function ($state, Set $set, $livewire) {
-                                if (strlen($state) === 9) {
+                                if (strlen($state ?? '') === 9) {
                                     $livewire->validateOnly('data.content.postcode');
                                     $postcode = new PostcodeFinderService($state, $set);
                                     $postcode->find();
+                                    $livewire->applyShippingFromCep($state, $set);
                                 }
                             }),
+                        Placeholder::make('content.shipping_info')
+                            ->label('')
+                            ->content(fn (Get $get): string => $this->getShippingInfoContent($get))
+                            ->visible(fn (Get $get): bool => filled($get('content.postcode')) && strlen(preg_replace('/\D/', '', $get('content.postcode') ?? '')) >= 8),
                         Grid::make(3)
                             ->schema([
                                 TextInput::make('content.street')->label('RUA')->columnSpan(2)->disabled()->dehydrated(),
@@ -209,14 +218,57 @@ class Budget extends Component implements HasForms
             ->pluck('name', 'id');
     }
 
-    private function calculateTotal(Get $get, Set $set): void
+    /**
+     * @param Get|\Closure $get
+     */
+    private function calculateTotal(Get|\Closure $get, Set $set): void
     {
         $products = $get('content.products') ?? [];
-        $result = BudgetCalculatorService::calculateTotal($products);
+        $shipping = (float) ($get('content.shipping') ?? 0);
+        $result = BudgetCalculatorService::calculateTotal($products, $shipping, 0, 0);
         $set('content.quantity', $result['quantity']);
         $set('content.price', $result['price']);
         $set('content.subtotal', $result['subtotal']);
         $set('content.total', $result['total']);
+    }
+
+    /**
+     * Aplica frete da área de operação ao CEP e recalcula o total.
+     */
+    public function applyShippingFromCep(?string $postcode, Set $set): void
+    {
+        if (empty($postcode) || strlen(preg_replace('/\D/', '', $postcode)) < 8) {
+            return;
+        }
+        $result = OperationAreaService::resultForCep($postcode);
+        $fee = $result['shipping_fee'] ?? 0;
+        $set('content.shipping', (string) $fee);
+        $get = fn (string $key) => data_get($this->data, $key);
+        $this->calculateTotal($get, $set);
+        if (! ($result['in_area'] ?? true)) {
+            Notification::make()
+                ->title(__('CEP fora da área de atendimento'))
+                ->body($result['message'] ?? '')
+                ->warning()
+                ->send();
+        }
+    }
+
+    private function getShippingInfoContent(Get $get): string
+    {
+        $postcode = $get('content.postcode');
+        if (empty($postcode) || strlen(preg_replace('/\D/', '', $postcode)) < 8) {
+            return '';
+        }
+        $result = OperationAreaService::resultForCep($postcode);
+        if ($result['in_area']) {
+            $suffix = env('CURRENCY_SUFFIX', 'R$');
+            $fee = $result['shipping_fee'] ?? 0;
+            return $fee > 0
+                ? "Frete para {$result['city']}: {$suffix} " . number_format($fee, 2, ',', '.')
+                : "Entrega em {$result['city']} sem custo adicional de frete.";
+        }
+        return $result['message'] ?? '';
     }
 
     private function updatePrice(Get $get, Set $set, $productId): void

@@ -141,6 +141,7 @@ class BudgetResource extends Resource
                                 $set('content.city', '');
                                 $set('content.neighborhood', '');
                                 $set('content.state', '');
+                                $set('content.shipping', '0');
 
                                 Notification::make()
                                     ->title(__('All fields cleared!'))
@@ -397,6 +398,10 @@ class BudgetResource extends Resource
                     ->label(__('Email')),
                 TextColumn::make('content.customer_phone')
                     ->label(__('Phone')),
+                TextColumn::make('content.shipping')
+                    ->label(__('Frete'))
+                    ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? (env('CURRENCY_SUFFIX', 'R$') . ' ' . number_format((float) $state, 2, ',', '.')) : '–')
+                    ->toggleable(),
                 TextColumn::make('documents_count')
                     ->counts('documents')
                     ->label(__('Documents'))
