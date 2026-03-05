@@ -10,7 +10,11 @@
     $companyName = data_get($company, 'trade_name', 'ConcretoPro');
     $companyEmail = data_get($company, 'email', 'contato@concretopro.com.br');
     $companyPhone = data_get($company, 'phone', '(11) 99999-9999');
-    
+    $companyPhoneDigits = $companyPhone ? preg_replace('/\D/', '', $companyPhone) : '';
+    $companyPhoneTel = $companyPhoneDigits && in_array(strlen($companyPhoneDigits), [10, 11], true)
+        ? '55' . $companyPhoneDigits
+        : $companyPhoneDigits;
+
     // Address is an array in SettingResource, we need to format it
     $addressData = data_get($company, 'address', []);
     if (is_array($addressData) && !empty($addressData)) {
@@ -53,7 +57,14 @@
             <div>
                 <h4 class="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-foreground">Contato</h4>
                 <ul class="flex flex-col gap-3 text-sm text-muted-foreground">
-                    <li class="flex items-center gap-2"><i data-lucide="phone" class="h-4 w-4 text-primary"></i>{{ $companyPhone }}</li>
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="phone" class="h-4 w-4 shrink-0 text-primary"></i>
+                        @if($companyPhoneTel)
+                        <a href="tel:{{ $companyPhoneTel }}" class="transition-colors hover:text-primary">{{ $companyPhone }}</a>
+                        @else
+                        {{ $companyPhone }}
+                        @endif
+                    </li>
                     <li class="flex items-center gap-2"><i data-lucide="mail" class="h-4 w-4 text-primary"></i>{{ $companyEmail }}</li>
                     <li class="flex items-start gap-2"><i data-lucide="map-pin" class="mt-0.5 h-4 w-4 shrink-0 text-primary"></i>{{ $companyAddress }}</li>
                 </ul>
