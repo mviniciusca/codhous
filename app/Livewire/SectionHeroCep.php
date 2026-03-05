@@ -28,8 +28,15 @@ class SectionHeroCep extends Component
 
     public function updatedCep($value)
     {
-        // Simple numeric cleanup, mask applied on frontend or let Livewire handle it
-        $this->cep = preg_replace('/(\d{5})(\d{3})/', '$1-$2', preg_replace('/[^0-9]/', '', $value));
+        $digits = preg_replace('/[^0-9]/', '', $value);
+        $digits = substr($digits, 0, 8); // CEP tem apenas 8 dígitos — corta se digitar rápido a mais
+        if ($digits === '') {
+            $this->cep = '';
+            return;
+        }
+        $this->cep = strlen($digits) <= 5
+            ? $digits
+            : substr($digits, 0, 5) . '-' . substr($digits, 5, 3);
     }
 
     public function lookupCep()

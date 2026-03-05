@@ -87,13 +87,23 @@ class OperationAreaResource extends Resource
                             ])
                             ->default('RJ'),
                         TextInput::make('postcode_prefix')
-                            ->label(__('CEP prefix'))
+                            ->label(__('CEP prefix (representativo)'))
                             ->required()
                             ->maxLength(5)
-                            // use "9" pattern so the field is editable and still
-                            // restricts to digits; "0" forces placeholder zeros.
                             ->mask('99999')
-                            ->helperText(__('First five digits of the CEP')),
+                            ->helperText(__('Primeiros 5 dígitos representativos (ex: 25000). Use a faixa abaixo para cobrir toda a cidade.')),
+                        TextInput::make('postcode_start')
+                            ->label(__('Início da faixa de CEP'))
+                            ->maxLength(5)
+                            ->mask('99999')
+                            ->placeholder('20000')
+                            ->helperText(__('Início da faixa (5 dígitos). Ex: Rio de Janeiro usa 20000 a 23999.')),
+                        TextInput::make('postcode_end')
+                            ->label(__('Fim da faixa de CEP'))
+                            ->maxLength(5)
+                            ->mask('99999')
+                            ->placeholder('23999')
+                            ->helperText(__('Fim da faixa (5 dígitos). CEP é considerado na área se estiver entre início e fim.')),
                     ]),
                 Section::make(__('Settings'))
                     ->columns(2)
@@ -139,6 +149,12 @@ class OperationAreaResource extends Resource
                     ->label(__('CEP prefix'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('postcode_start')
+                    ->label(__('Faixa CEP'))
+                    ->formatStateUsing(fn ($record) => $record->postcode_start && $record->postcode_end
+                        ? "{$record->postcode_start} – {$record->postcode_end}"
+                        : '–')
+                    ->placeholder('–'),
                 Tables\Columns\BadgeColumn::make('is_base')
                     // only render text when value is truthy - otherwise badge will
                     // be empty and visually absent

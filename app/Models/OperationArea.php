@@ -19,6 +19,8 @@ class OperationArea extends Model
         'city',
         'state',
         'postcode_prefix',
+        'postcode_start',
+        'postcode_end',
         'is_active',
         'shipping_fee',
         'is_base',
@@ -37,20 +39,31 @@ class OperationArea extends Model
 
     /**
      * Verifica se um CEP (8 dígitos) está na área de operação.
-     * Uma cidade tem um único postcode_prefix (ex: 25000 = Duque de Caxias).
-     * A comparação usa os 2 primeiros dígitos do CEP: 25xxx cobre Duque de Caxias.
+     * Se postcode_start e postcode_end estiverem preenchidos, usa a faixa (ex: Rio 20000-23999).
+     * Caso contrário, usa os 2 primeiros dígitos do postcode_prefix (comportamento antigo).
      */
     public static function isCepInOperationArea(string $cep): bool
     {
         $digits = preg_replace('/\D/', '', $cep);
-        if (strlen($digits) < 2) {
+        if (strlen($digits) < 5) {
             return false;
         }
-        $prefix2 = substr($digits, 0, 2);
+        $prefix5 = substr($digits, 0, 5);
 
         return static::query()
             ->where('is_active', true)
-            ->whereRaw('LEFT(postcode_prefix, 2) = ?', [$prefix2])
+            ->where(function ($q) use ($prefix5) {
+                $q->where(function ($q2) use ($prefix5) {
+                    $q2->whereNotNull('postcode_start')
+                        ->whereNotNull('postcode_end')
+                        ->where('postcode_start', '<=', $prefix5)
+                        ->where('postcode_end', '>=', $prefix5);
+                })->orWhere(function ($q2) use ($prefix5) {
+                    $q2->whereNull('postcode_start')
+                        ->whereNull('postcode_end')
+                        ->whereRaw('LEFT(postcode_prefix, 2) = ?', [substr($prefix5, 0, 2)]);
+                });
+            })
             ->exists();
     }
 
@@ -60,14 +73,25 @@ class OperationArea extends Model
     public static function findOperationAreaByCep(string $cep): ?self
     {
         $digits = preg_replace('/\D/', '', $cep);
-        if (strlen($digits) < 2) {
+        if (strlen($digits) < 5) {
             return null;
         }
-        $prefix2 = substr($digits, 0, 2);
+        $prefix5 = substr($digits, 0, 5);
 
         return static::query()
             ->where('is_active', true)
-            ->whereRaw('LEFT(postcode_prefix, 2) = ?', [$prefix2])
+            ->where(function ($q) use ($prefix5) {
+                $q->where(function ($q2) use ($prefix5) {
+                    $q2->whereNotNull('postcode_start')
+                        ->whereNotNull('postcode_end')
+                        ->where('postcode_start', '<=', $prefix5)
+                        ->where('postcode_end', '>=', $prefix5);
+                })->orWhere(function ($q2) use ($prefix5) {
+                    $q2->whereNull('postcode_start')
+                        ->whereNull('postcode_end')
+                        ->whereRaw('LEFT(postcode_prefix, 2) = ?', [substr($prefix5, 0, 2)]);
+                });
+            })
             ->first();
     }
 }

@@ -18,10 +18,11 @@
         <div id="hero-cep-form">
             <div class="flex gap-3">
                 <x-ui.input
-                    wire:model.live.debounce.500ms="cep"
+                    wire:model.live.debounce.300ms="cep"
                     wire:keydown.enter="lookupCep"
                     id="hero-cep-input"
                     type="text"
+                    inputmode="numeric"
                     maxlength="9"
                     placeholder="00000-000"
                     class="flex-1 text-lg font-mono"
@@ -29,12 +30,12 @@
                 <button
                     wire:click="lookupCep"
                     id="hero-cep-btn"
-                    class="flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3.5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                    class="hero-cep-search-btn flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3.5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                 >
-                    <span wire:ignore wire:loading.remove wire:target="lookupCep">
+                    <span wire:loading.remove wire:target="lookupCep" class="hero-cep-icon-search">
                         <i data-lucide="search" class="h-5 w-5"></i>
                     </span>
-                    <span wire:ignore wire:loading wire:target="lookupCep">
+                    <span wire:loading wire:target="lookupCep" class="hero-cep-icon-loading">
                         <i data-lucide="loader-2" class="h-5 w-5 animate-spin"></i>
                     </span>
                 </button>

@@ -76,3 +76,14 @@
         @endif
     </div>
 </section>
+
+@script
+<script>
+    // Reaplica ícones Lucide após atualização do Livewire (ex: "Consultar outro CEP") para o botão da lupa voltar
+    Livewire.hook('morph.updated', () => {
+        if (document.getElementById('hero-cep-form') && typeof window.lucide !== 'undefined') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+@endscript
