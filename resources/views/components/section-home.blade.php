@@ -5,3 +5,7 @@
 <livewire:calculator />
 <x-section-quote-form />
 <x-section-differentials />
+<x-section-faq />
+<x-section-testimonials />
+<x-section-coverage />
+<x-section-cta-contact />
