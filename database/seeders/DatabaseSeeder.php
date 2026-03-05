@@ -91,5 +91,6 @@ class DatabaseSeeder extends Seeder
         Mail::factory(20)->create();
         Customer::factory(10)->create();
         $this->call(SettingSeeder::class);
+        $this->call(PageSeeder::class);
     }
 }
