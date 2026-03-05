@@ -45,22 +45,24 @@
             scroll-margin-top: 10rem;
         }
 
-        /* Botão Próximo visível (fundo e texto) – override do tema */
+        /* Botões do rodapé do wizard com cores neutras e legíveis (independente do tema) */
         .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(1) .fi-btn {
-            background-color: rgb(229 231 235) !important;
-            color: rgb(17 24 39) !important;
+            /* Botão Voltar: cinza claro com texto escuro */
+            background-color: rgb(229 231 235) !important; /* gray-200 */
+            color: rgb(17 24 39) !important;               /* gray-900 */
         }
         .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(1) .fi-btn:hover {
-            opacity: 0.9;
+            background-color: rgb(209 213 219) !important; /* gray-300 */
         }
         .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(3) .fi-btn,
         .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(4) .fi-btn {
-            background-color: #dc2626 !important; /* primary visível em fundo branco */
-            color: #fff !important;
+            /* Botão Próximo / Enviar: cinza bem escuro com texto claro */
+            background-color: rgb(17 24 39) !important;    /* gray-900 */
+            color: #ffffff !important;
         }
         .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(3) .fi-btn:hover,
         .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(4) .fi-btn:hover {
-            opacity: 0.9;
+            background-color: rgb(31 41 55) !important;    /* gray-800 */
         }
     </style>
     @if(!$isSubmitted)
@@ -70,7 +72,7 @@
             </form>
         </div>
     @else
-        <div class="flex flex-col items-center justify-center p-8 rounded-xl bg-background/5 border border-background/10 space-y-6 animate-in fade-in zoom-in duration-700">
+        <div class="mx-auto flex max-w-md flex-col items-center justify-center space-y-6 rounded-xl border border-background/10 bg-background/5 p-8 text-center animate-in fade-in zoom-in duration-700">
             <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary">
                 <span wire:ignore>
                     <!-- inline check SVG (Lucide style) -->
@@ -93,10 +95,16 @@
                 </div>
             </div>
 
-            <div class="pt-4 w-full">
-                <button wire:click="resetForm" class="flex w-full items-center justify-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-6 py-4 text-xs font-semibold uppercase tracking-widest text-primary transition-colors hover:bg-primary/20 hover:text-primary-foreground focus:outline-none">
-                    <span wire:ignore><i data-lucide="rotate-ccw" class="h-4 w-4 text-primary"></i></span>
-                    Nova Solicitação
+            <div class="pt-4 flex justify-center">
+                <button
+                    wire:click="resetForm"
+                    type="button"
+                    class="inline-flex items-center justify-center gap-2 rounded-md border border-primary/20 bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                >
+                    <span wire:ignore>
+                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                    </span>
+                    Nova solicitação
                 </button>
             </div>
         </div>
