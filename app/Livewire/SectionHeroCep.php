@@ -2,9 +2,10 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
+use App\Models\OperationArea;
 use App\Services\PostcodeFinderService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class SectionHeroCep extends Component
 {
@@ -43,17 +44,22 @@ class SectionHeroCep extends Component
             return;
         }
 
+        // Verifica se o CEP está na área de operação (restrição por Operation Area)
+        if (! OperationArea::isCepInOperationArea($cleanCep)) {
+            $this->error = 'Este CEP está fora da nossa área de atendimento. No momento atendemos apenas a região do Rio de Janeiro e Grande Rio.';
+            return;
+        }
+
         $addressData = [];
 
         try {
             $service = new PostcodeFinderService($cleanCep, function ($key, $value) use (&$addressData) {
-                // Remove 'content.' prefix for keys set by the service
                 $k = str_replace('content.', '', $key);
                 $addressData[$k] = $value;
             });
             $service->find();
 
-            if (!empty($addressData['street'])) {
+            if (! empty($addressData['street'])) {
                 $this->success = true;
                 $this->addressText = "{$addressData['street']} - {$addressData['neighborhood']}, {$addressData['city']} - {$addressData['state']}";
             } else {

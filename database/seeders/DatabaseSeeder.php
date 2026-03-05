@@ -93,5 +93,6 @@ class DatabaseSeeder extends Seeder
         $this->call(SettingSeeder::class);
         $this->call(PageSeeder::class);
         $this->call(ContentSectionSeeder::class);
+        $this->call(OperationAreaSeeder::class);
     }
 }
