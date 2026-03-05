@@ -11,16 +11,17 @@ use App\Notifications\NewBudget;
 use App\Services\BudgetCalculatorService;
 use App\Services\OperationAreaService;
 use App\Services\PostcodeFinderService;
+use App\Rules\CepInOperationAreaRule;
 use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -57,139 +58,184 @@ class Budget extends Component implements HasForms
                     Hidden::make('content.quantity'),
                     Hidden::make('content.shipping')->default(0),
                 ]),
-                Section::make('Suas Informações')
-                    ->icon('heroicon-o-user')
-                    ->collapsible()
-                    ->schema([
-                        TextInput::make('content.customer_name')
-                            ->label('NOME COMPLETO')
-                            ->required()
-                            ->placeholder('Ex: Marcos Vinícius'),
-                        Group::make([
-                            TextInput::make('content.customer_phone')
-                                ->label('WHATSAPP')
-                                ->tel()
-                                ->mask('(99) 99999-9999')
-                                ->required(),
-                            TextInput::make('content.customer_email')
-                                ->label('E-MAIL')
-                                ->email()
-                                ->required(),
-                        ])->columns(2),
-                    ]),
-                Section::make('Detalhes do Pedido')
-                    ->icon('heroicon-o-shopping-bag')
-                    ->collapsed()
-                    ->schema([
-                        Repeater::make('content.products')
-                            ->hiddenLabel()
-                            ->itemLabel(
-                                fn(array $state): ?string => ($state['product'] ?? null)
-                                    ? (
-                                        Product::find($state['product'])?->name
-                                        // append option name if chosen
-                                        . ($state['product_option'] ? ' – ' . ProductOption::find($state['product_option'])?->name : '')
-                                        // append quantity with unit when available
-                                        . ($state['quantity']
-                                            ? ' — ' . $state['quantity'] . ' ' . (ProductOption::find($state['product_option'])?->unit?->value ?? '')
-                                            : '')
-                                    )
-                                    : 'Novo Item'
-                            )
-                            ->collapsible()
-                            ->cloneable()
-                            ->schema([
-                                Grid::make(2)->schema([
-                                    Select::make('product')
-                                        ->label('PRODUTO')
-                                        ->options(Product::all()->pluck('name', 'id'))
-                                        ->required()
-                                        ->live()
-                                        ->afterStateUpdated(fn(Set $set) => $set('product_option', null)),
-                                    Select::make('product_option')
-                                        ->label('OPÇÃO / TRAÇO')
-                                        ->options(fn(Get $get) => $this->getProductOptions($get))
-                                        ->required(fn(Get $get) => $this->getProductOptions($get)->isNotEmpty())
-                                        ->hidden(fn(Get $get) => $this->getProductOptions($get)->isEmpty())
-                                        ->live()
-                                        ->afterStateUpdated(fn(Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
-                                ]),
-                                Grid::make(2)->schema([
-                                    Select::make('location')
-                                        ->label('LOCAL DA OBRA')
-                                        ->options(Location::all()->pluck('name', 'id'))
-                                        ->required(),
-                                    TextInput::make('quantity')
-                                        ->label('QUANTIDADE')
-                                        ->numeric()
-                                        ->suffix(fn(Get $get) => ProductOption::find($get('product_option'))?->unit?->value ?? '')
-                                        ->minValue(fn(Get $get) => $get('product_option') ? 1 : 3)
-                                        ->required()
-                                        ->live(debounce: 500)
-                                        ->afterStateUpdated(function (Get $get, Set $set) {
-                                            $this->calculateItemSubtotal($get, $set);
-                                            $this->calculateTotal($get, $set);
-                                            $this->dispatchCartUpdatedEvent($get);
-                                        }),
-                                ]),
-                            ])
-                            ->columns(1)
-                            ->addActionLabel('Adicionar outro item'),
-                    ]),
-                Section::make('Local de Entrega')
-                    ->icon('heroicon-o-map')
-                    ->collapsed()
-                    ->schema([
-                        TextInput::make('content.postcode')
-                            ->label('CEP')
-                            ->mask('99999-999')
-                            ->required()
-                            ->minLength(9)
-                            ->maxLength(9)
-                            ->live(debounce: 500)
-                            ->suffixAction(
-                                Action::make('search-action')
-                                    ->icon('heroicon-m-magnifying-glass')
-                                    ->color('primary')
-                                    ->action(function ($state, Set $set, $livewire) {
-                                        if (empty($state)) return;
+                Wizard::make([
+                    Step::make('Onde entregar')
+                        ->icon('heroicon-o-map-pin')
+                        ->description('Confirme que atendemos sua região')
+                        ->schema([
+                            TextInput::make('content.postcode')
+                                ->label('CEP do local de entrega')
+                                ->placeholder('00000-000')
+                                ->helperText('Digite o CEP da obra ou do local onde deseja receber o material. Consultamos automaticamente seu endereço.')
+                                ->mask('99999-999')
+                                ->required()
+                                ->minLength(9)
+                                ->maxLength(9)
+                                ->live(debounce: 500)
+                                ->rules($this->getPostcodeRules())
+                                ->columnSpanFull()
+                                ->suffixAction(
+                                    Action::make('search-action')
+                                        ->icon('heroicon-m-magnifying-glass')
+                                        ->color('primary')
+                                        ->action(function ($state, Set $set, $livewire) {
+                                            if (empty($state)) return;
+                                            $livewire->validateOnly('data.content.postcode');
+                                            $postcode = new PostcodeFinderService($state, $set);
+                                            $postcode->find();
+                                            $livewire->applyShippingFromCep($state, $set);
+                                        })
+                                )
+                                ->afterStateUpdated(function ($state, Set $set, $livewire) {
+                                    if (strlen($state ?? '') === 9) {
                                         $livewire->validateOnly('data.content.postcode');
                                         $postcode = new PostcodeFinderService($state, $set);
                                         $postcode->find();
                                         $livewire->applyShippingFromCep($state, $set);
-                                    })
-                            )
-                            ->afterStateUpdated(function ($state, Set $set, $livewire) {
-                                if (strlen($state ?? '') === 9) {
-                                    $livewire->validateOnly('data.content.postcode');
-                                    $postcode = new PostcodeFinderService($state, $set);
-                                    $postcode->find();
-                                    $livewire->applyShippingFromCep($state, $set);
-                                }
-                            }),
-                        Placeholder::make('content.shipping_info')
-                            ->label('')
-                            ->content(fn (Get $get): string => $this->getShippingInfoContent($get))
-                            ->visible(fn (Get $get): bool => filled($get('content.postcode')) && strlen(preg_replace('/\D/', '', $get('content.postcode') ?? '')) >= 8),
-                        Grid::make(3)
-                            ->schema([
-                                TextInput::make('content.street')->label('RUA')->columnSpan(2)->disabled()->dehydrated(),
-                                TextInput::make('content.number')->label('Nº')->required(),
-                                TextInput::make('content.neighborhood')->label('BAIRRO')->disabled()->dehydrated(),
-                                TextInput::make('content.city')->label('CIDADE')->disabled()->dehydrated(),
-                                TextInput::make('content.state')->label('UF')->disabled()->dehydrated(),
-                            ])
-                            ->visible(fn(Get $get) => filled($get('content.street')))
-                    ]),
+                                    }
+                                }),
+                            Placeholder::make('content.shipping_info')
+                                ->label('')
+                                ->content(fn (Get $get): string => $this->getShippingInfoContent($get))
+                                ->visible(fn (Get $get): bool => filled($get('content.postcode')) && strlen(preg_replace('/\D/', '', $get('content.postcode') ?? '')) >= 8),
+                            Grid::make(3)
+                                ->schema([
+                                    TextInput::make('content.street')
+                                        ->label('Logradouro')
+                                        ->columnSpan(2)
+                                        ->disabled()
+                                        ->dehydrated(),
+                                    TextInput::make('content.number')
+                                        ->label('Número')
+                                        ->required()
+                                        ->placeholder('Ex.: 100'),
+                                    TextInput::make('content.neighborhood')
+                                        ->label('Bairro')
+                                        ->disabled()
+                                        ->dehydrated(),
+                                    TextInput::make('content.city')
+                                        ->label('Cidade')
+                                        ->disabled()
+                                        ->dehydrated(),
+                                    TextInput::make('content.state')
+                                        ->label('UF')
+                                        ->disabled()
+                                        ->dehydrated(),
+                                ])
+                                ->visible(fn (Get $get) => filled($get('content.street'))),
+                        ]),
+                    Step::make('Seus dados')
+                        ->icon('heroicon-o-user')
+                        ->description('Para contato e envio do orçamento')
+                        ->schema([
+                            TextInput::make('content.customer_name')
+                                ->label('Nome completo')
+                                ->required()
+                                ->placeholder('Como deseja ser chamado'),
+                            Group::make([
+                                TextInput::make('content.customer_phone')
+                                    ->label('WhatsApp')
+                                    ->tel()
+                                    ->mask('(99) 99999-9999')
+                                    ->required()
+                                    ->placeholder('(00) 00000-0000')
+                                    ->helperText('Responderemos por aqui em até 24 horas.'),
+                                TextInput::make('content.customer_email')
+                                    ->label('E-mail')
+                                    ->email()
+                                    ->required()
+                                    ->placeholder('seu@email.com'),
+                            ])->columns(2),
+                        ]),
+                    Step::make('Seu pedido')
+                        ->icon('heroicon-o-shopping-bag')
+                        ->description('Produtos, quantidades e local de aplicação')
+                        ->schema([
+                            Repeater::make('content.products')
+                                ->label('Itens do orçamento')
+                                ->helperText('Adicione um ou mais produtos. Nossa equipe preparará um orçamento personalizado.')
+                                ->itemLabel(
+                                    fn (array $state): ?string => ($state['product'] ?? null)
+                                        ? (
+                                            Product::find($state['product'])?->name
+                                            . ($state['product_option'] ? ' · ' . ProductOption::find($state['product_option'])?->name : '')
+                                            . ($state['quantity'] ? ' — ' . $state['quantity'] . ' ' . (ProductOption::find($state['product_option'])?->unit?->value ?? '') : '')
+                                        )
+                                        : 'Novo item'
+                                )
+                                ->collapsible()
+                                ->cloneable()
+                                ->schema([
+                                    Grid::make(2)->schema([
+                                        Select::make('product')
+                                            ->label('Produto')
+                                            ->options(Product::all()->pluck('name', 'id'))
+                                            ->required()
+                                            ->live()
+                                            ->afterStateUpdated(fn (Set $set) => $set('product_option', null)),
+                                        Select::make('product_option')
+                                            ->label('Opção / traço')
+                                            ->options(fn (Get $get) => $this->getProductOptions($get))
+                                            ->required(fn (Get $get) => $this->getProductOptions($get)->isNotEmpty())
+                                            ->hidden(fn (Get $get) => $this->getProductOptions($get)->isEmpty())
+                                            ->live()
+                                            ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
+                                    ]),
+                                    Grid::make(2)->schema([
+                                        Select::make('location')
+                                            ->label('Local da obra')
+                                            ->options(Location::all()->pluck('name', 'id'))
+                                            ->required()
+                                            ->helperText('Onde o material será aplicado (ex.: laje, piso).'),
+                                        TextInput::make('quantity')
+                                            ->label('Quantidade')
+                                            ->numeric()
+                                            ->suffix(fn (Get $get) => ProductOption::find($get('product_option'))?->unit?->value ?? '')
+                                            ->minValue(fn (Get $get) => $get('product_option') ? 1 : 3)
+                                            ->required()
+                                            ->live(debounce: 500)
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                $this->calculateItemSubtotal($get, $set);
+                                                $this->calculateTotal($get, $set);
+                                                $this->dispatchCartUpdatedEvent($get);
+                                            }),
+                                    ]),
+                                ])
+                                ->columns(1)
+                                ->addActionLabel('Adicionar outro item'),
+                        ]),
+                ])
+                    ->nextAction(fn ($action) => $action
+                        ->label('Próximo')
+                        ->color('primary')
+                        ->extraAttributes(['class' => '!bg-primary !text-primary-foreground hover:!bg-primary/90'])
+                    )
+                    ->previousAction(fn ($action) => $action
+                        ->label('Voltar')
+                        ->color('gray')
+                        ->extraAttributes(['class' => '!bg-gray-200 !text-gray-900 dark:!bg-gray-700 dark:!text-gray-100 hover:!opacity-90'])
+                    )
+                    ->submitAction(view('livewire.budget-wizard-submit')),
             ])
-            ->statePath('data')
-            ->extraAttributes([
-                'class' => 'font-mono'
-            ]);
+            ->statePath('data');
+    }
+
+    /**
+     * Regras de validação do CEP: obrigatório, 9 caracteres e dentro da área de operação.
+     */
+    protected function getPostcodeRules(): array
+    {
+        return [
+            'required',
+            'string',
+            'size:9',
+            new CepInOperationAreaRule,
+        ];
     }
 
     public function create(): void
     {
+        $this->form->validate();
         $budget = BudgetModel::create($this->form->getState());
         $user = new User();
         $user->first()->notify(new NewBudget($budget->toArray()));
@@ -254,6 +300,9 @@ class Budget extends Component implements HasForms
         }
     }
 
+    /**
+     * Mensagem de área de atendimento sem exibir valor de frete ao público.
+     */
     private function getShippingInfoContent(Get $get): string
     {
         $postcode = $get('content.postcode');
@@ -262,11 +311,7 @@ class Budget extends Component implements HasForms
         }
         $result = OperationAreaService::resultForCep($postcode);
         if ($result['in_area']) {
-            $suffix = env('CURRENCY_SUFFIX', 'R$');
-            $fee = $result['shipping_fee'] ?? 0;
-            return $fee > 0
-                ? "Frete para {$result['city']}: {$suffix} " . number_format($fee, 2, ',', '.')
-                : "Entrega em {$result['city']} sem custo adicional de frete.";
+            return __('Sua região está em nossa área de atendimento.');
         }
         return $result['message'] ?? '';
     }

@@ -1,9 +1,9 @@
 <section id="orcamento" class="bg-background py-20 lg:py-28">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <div class="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
-            <div class="grid lg:grid-cols-2">
-                <!-- Informações -->
-                <div class="bg-foreground p-8 lg:p-12">
+            <div class="grid lg:grid-cols-[minmax(0,20rem)_1fr]">
+                <!-- Informações (coluna mais enxuta) -->
+                <div class="bg-foreground p-6 lg:p-8">
                     <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">Atendimento Rápido</span>
                     <h2 class="font-mono text-3xl font-bold tracking-tight text-background md:text-4xl" style="text-wrap: balance;">Pronto para iniciar seu projeto?</h2>
                     <p class="mt-4 text-background/60">Nossa equipe está pronta para fornecer o melhor orçamento para sua obra. Resposta em até 2 horas em horário comercial.</p>
@@ -41,8 +41,8 @@
                     </div>
                 </div>
 
-                <!-- Formulário -->
-                <div class="p-8 lg:p-12">
+                <!-- Formulário (mais espaço) -->
+                <div class="min-w-0 p-6 lg:p-10">
                     <livewire:budget />
                 </div>
             </div>
