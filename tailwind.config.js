@@ -2,7 +2,7 @@
 const colors = require('tailwindcss/colors')
 
 // Altere a cor aqui para qualquer uma do Tailwind (ex: colors.zinc, colors.red, colors.orange)
-const themeColor = colors.red
+const themeColor = colors.orange
 
 export default {
     content: [

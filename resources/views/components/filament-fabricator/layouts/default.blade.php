@@ -23,6 +23,7 @@
 
     <x-site-footer />
     <x-site-whatsapp />
+    <x-site-alerts />
 
     @livewireScripts
 </body>
