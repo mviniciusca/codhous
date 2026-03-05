@@ -4,9 +4,8 @@
             <div class="grid lg:grid-cols-[minmax(0,20rem)_1fr]">
                 <!-- Informações (coluna mais enxuta) -->
                 <div class="bg-foreground p-6 lg:p-8">
-                    <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">Atendimento Rápido</span>
-                    <h2 class="font-mono text-3xl font-bold tracking-tight text-background md:text-4xl" style="text-wrap: balance;">Pronto para iniciar seu projeto?</h2>
-                    <p class="mt-4 text-background/60">Nossa equipe está pronta para fornecer o melhor orçamento para sua obra. Resposta em até 2 horas em horário comercial.</p>
+                    <h2 class="font-mono text-2xl font-bold tracking-tight text-background md:text-3xl" style="text-wrap: balance;">Solicite seu orçamento</h2>
+                    <p class="mt-3 text-background/70 text-sm md:text-base">Preencha os passos abaixo. Nossa equipe analisa e retorna em até 24 horas com uma proposta personalizada.</p>
 
                     <div class="mt-12 flex flex-col gap-8">
                         <div class="flex items-start gap-4">

@@ -1,5 +1,44 @@
 <div class="budget-wizard-wrap">
     <style>
+        /* Header do wizard sem scroll: colunas iguais e texto em uma linha */
+        .budget-wizard-wrap .fi-fo-wizard-header {
+            overflow: visible !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            margin: 0;
+            padding: 0;
+        }
+        .budget-wizard-wrap .fi-fo-wizard-header-step {
+            min-width: 0;
+            margin: 0;
+        }
+        .budget-wizard-wrap .fi-fo-wizard-header-step-button {
+            min-width: 0;
+            margin: 0;
+            padding: 0.75rem;
+            gap: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .budget-wizard-wrap .fi-fo-wizard-header-step-button .grid {
+            min-width: 0;
+            max-width: none;
+        }
+        .budget-wizard-wrap .fi-fo-wizard-header-step-label,
+        .budget-wizard-wrap .fi-fo-wizard-header-step-description {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .budget-wizard-wrap .fi-fo-wizard-header-step-icon-ctn {
+            width: 2.25rem;
+            height: 2.25rem;
+            flex-shrink: 0;
+        }
+        .budget-wizard-wrap .fi-fo-wizard-header-step-icon-ctn .fi-fo-wizard-header-step-icon {
+            width: 1.125rem;
+            height: 1.125rem;
+        }
+
         /* Scroll “sobe” mais para o passo ficar abaixo do menu fixo (navegador em direção ao header) */
         .budget-wizard-wrap .fi-fo-wizard-header-step,
         .budget-wizard-wrap .fi-fo-wizard-step {
@@ -25,15 +64,7 @@
         }
     </style>
     @if(!$isSubmitted)
-        <div class="rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm dark:border-gray-700/50 dark:bg-gray-900/50 sm:p-8">
-            <div class="mb-8 text-center">
-                <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
-                    Solicite seu orçamento
-                </h2>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 sm:text-base">
-                    Preencha os passos abaixo. Nossa equipe analisa e retorna em até 24 horas com uma proposta personalizada.
-                </p>
-            </div>
+        <div class="rounded-2xl bg-white p-6 dark:bg-gray-900/50 sm:p-8">
             <form wire:submit.prevent class="flex flex-col gap-6">
                 {{ $this->form }}
             </form>

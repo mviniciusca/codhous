@@ -61,7 +61,6 @@ class Budget extends Component implements HasForms
                 Wizard::make([
                     Step::make('Onde entregar')
                         ->icon('heroicon-o-map-pin')
-                        ->description('Confirme que atendemos sua região')
                         ->schema([
                             TextInput::make('content.postcode')
                                 ->label('CEP do local de entrega')
@@ -126,7 +125,6 @@ class Budget extends Component implements HasForms
                         ]),
                     Step::make('Seus dados')
                         ->icon('heroicon-o-user')
-                        ->description('Para contato e envio do orçamento')
                         ->schema([
                             TextInput::make('content.customer_name')
                                 ->label('Nome completo')
@@ -149,7 +147,6 @@ class Budget extends Component implements HasForms
                         ]),
                     Step::make('Seu pedido')
                         ->icon('heroicon-o-shopping-bag')
-                        ->description('Produtos, quantidades e local de aplicação')
                         ->schema([
                             Repeater::make('content.products')
                                 ->label('Itens do orçamento')
