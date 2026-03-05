@@ -92,5 +92,6 @@ class DatabaseSeeder extends Seeder
         Customer::factory(10)->create();
         $this->call(SettingSeeder::class);
         $this->call(PageSeeder::class);
+        $this->call(ContentSectionSeeder::class);
     }
 }

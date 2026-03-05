@@ -1,4 +1,7 @@
 @php
+    $section = \App\Models\ContentSection::getBySlug('cta_contact');
+    $ctaTitle = $section?->content['title'] ?? 'Fale conosco';
+    $ctaSubtitle = $section?->content['subtitle'] ?? 'Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.';
     $company = \App\Models\Setting::get('company', []);
     $companyPhone = data_get($company, 'phone', '(11) 99999-9999');
     $companyEmail = data_get($company, 'email', 'contato@exemplo.com.br');
@@ -13,8 +16,8 @@
         <div class="flex flex-col items-center gap-10 rounded-2xl border border-background/10 bg-background/5 px-6 py-12 text-center backdrop-blur-sm lg:flex-row lg:justify-between lg:gap-8 lg:px-12 lg:py-10 lg:text-left">
             <div class="max-w-xl">
                 <span class="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-primary">Atendimento</span>
-                <h2 class="font-mono text-2xl font-bold tracking-tight text-background md:text-3xl" style="text-wrap: balance;">Fale conosco</h2>
-                <p class="mt-3 text-background/60">Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.</p>
+                <h2 class="font-mono text-2xl font-bold tracking-tight text-background md:text-3xl" style="text-wrap: balance;">{{ $ctaTitle }}</h2>
+                <p class="mt-3 text-background/60">{{ $ctaSubtitle }}</p>
             </div>
 
             <div class="flex flex-wrap items-center justify-center gap-4 lg:gap-6">

@@ -13,6 +13,18 @@ class SectionHeroCep extends Component
     public $success = false;
     public $addressText = '';
 
+    /** Dados do slide (título/subtítulo) vindos da hero ativa ou do section-home */
+    public array $mainSlide = [];
+
+    /** Texto do badge (ex: Qualidade Certificada) */
+    public string $badge = 'Qualidade Certificada';
+
+    /** Layout: default (texto + CEP lado a lado) | whatsapp (destaque central + CEP abaixo) */
+    public string $layout = 'default';
+
+    /** Estatísticas exibidas na hero (value + label) */
+    public array $stats = [];
+
     public function updatedCep($value)
     {
         // Simple numeric cleanup, mask applied on frontend or let Livewire handle it
@@ -64,17 +76,21 @@ class SectionHeroCep extends Component
 
     public function render()
     {
-        $website = \App\Models\Setting::get('website', []);
-        $homepage = data_get($website, 'homepage', []);
-        $slideshow = data_get($homepage, 'slideshow', []);
-
-        $mainSlide = count($slideshow) > 0 ? $slideshow[0] : [
-            'title' => 'Concreto usinado com agilidade e precisao no traco',
-            'subtitle' => 'Entrega rapida, rastreamento em tempo real e suporte tecnico especializado para garantir o sucesso da sua obra do inicio ao fim.',
+        $mainSlide = $this->mainSlide ?: [
+            'title' => 'Concreto usinado com agilidade e precisão no traço',
+            'subtitle' => 'Entrega rápida, rastreamento em tempo real e suporte técnico especializado.',
+        ];
+        $stats = $this->stats ?: [
+            ['value' => '500+', 'label' => 'Obras atendidas'],
+            ['value' => '98%', 'label' => 'Pontualidade'],
+            ['value' => '15+', 'label' => 'Anos de experiência'],
         ];
 
         return view('livewire.section-hero-cep', [
             'mainSlide' => $mainSlide,
+            'badge' => $this->badge ?: 'Qualidade Certificada',
+            'layout' => $this->layout ?: 'default',
+            'stats' => $stats,
         ]);
     }
 }
