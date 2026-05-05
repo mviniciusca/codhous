@@ -94,6 +94,11 @@
                 </section>
                 @break
 
+            {{-- ──── CONTATO CTA ───────────────────────────────────────────── --}}
+            @case('cta_contact')
+                <x-section-cta-contact />
+                @break
+
             {{-- ──── FAQ ───────────────────────────────────────────────────── --}}
             @case('faq')
                 <x-section-faq
