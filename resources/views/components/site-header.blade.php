@@ -29,6 +29,7 @@
             
             @if(empty($navigation))
                 <a href="#servicos" class="text-sm font-medium text-zinc-950 transition-colors hover:text-primary">Serviços</a>
+                <a href="/nossas-obras" class="text-sm font-medium text-zinc-950 transition-colors hover:text-primary">Nossas Obras</a>
                 <a href="#calculadora" class="text-sm font-medium text-zinc-950 transition-colors hover:text-primary">Calculadora</a>
                 <a href="#orcamento" class="text-sm font-medium text-zinc-950 transition-colors hover:text-primary">Orçamento</a>
                 <a href="#diferenciais" class="text-sm font-medium text-zinc-950 transition-colors hover:text-primary">Diferenciais</a>
@@ -64,6 +65,7 @@
 
             @if(empty($navigation))
                 <a href="#servicos" onclick="closeMobileMenu()" class="rounded-md px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-muted hover:text-primary">Serviços</a>
+                <a href="/nossas-obras" onclick="closeMobileMenu()" class="rounded-md px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-muted hover:text-primary">Nossas Obras</a>
                 <a href="#calculadora" onclick="closeMobileMenu()" class="rounded-md px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-muted hover:text-primary">Calculadora</a>
                 <a href="#orcamento" onclick="closeMobileMenu()" class="rounded-md px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-muted hover:text-primary">Orçamento</a>
                 <a href="#diferenciais" onclick="closeMobileMenu()" class="rounded-md px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-muted hover:text-primary">Diferenciais</a>

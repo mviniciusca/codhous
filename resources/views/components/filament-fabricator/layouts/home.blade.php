@@ -15,7 +15,10 @@
     
 
     <main>
+        
+        <x-section-home />
         {{ $slot }}
+        
     </main>
 
     <x-site-footer />
