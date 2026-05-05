@@ -28,7 +28,7 @@
             <div class="swiper-wrapper flex items-center">
                 @foreach($brands as $brand)
                     <div class="swiper-slide flex items-center justify-center px-6">
-                        <div class="flex items-center opacity-40 grayscale transition-all duration-500 hover:opacity-100 hover:grayscale-0">
+                        <div class="flex items-center transition-all duration-300 hover:scale-110">
                             @if(!empty($brand->logo))
                                 <div class="flex h-14 w-full items-center justify-center">
                                     <img src="{{ Storage::url($brand->logo) }}" 
