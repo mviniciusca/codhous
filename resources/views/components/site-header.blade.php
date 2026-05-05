@@ -3,7 +3,6 @@
     $company  = \App\Models\Setting::get('company', []);
     $websiteName = data_get($website, 'name', 'ConcretoPro');
 
-    // Prioridade: navegação manual no Settings → páginas cadastradas no resource
     $navigation = data_get($website, 'navigation', []);
     if (empty($navigation)) {
         $dynamicPages = \App\Models\Page::visible()->inMenu()->orderBy('sort_order')->get();
@@ -19,63 +18,88 @@
         ? '55' . $companyPhoneDigits
         : $companyPhoneDigits;
 
+    $addr = data_get($company, 'address', []);
+    $addrStr = is_array($addr)
+        ? implode(', ', array_filter([
+            data_get($addr, 'street') . (data_get($addr, 'number') ? ', ' . data_get($addr, 'number') : ''),
+            data_get($addr, 'neighborhood'),
+            data_get($addr, 'city') . (data_get($addr, 'state') ? ' - ' . data_get($addr, 'state') : ''),
+          ]))
+        : (string) $addr;
+
     $currentPath = request()->path();
 @endphp
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-border" id="site-header">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
-
-        {{-- Logo --}}
-        <a href="/" class="flex items-center gap-2">
-            <div class="flex h-10 w-10 items-center justify-center rounded-md bg-primary">
-                <i data-lucide="truck" class="h-5 w-5 text-primary-foreground"></i>
+<header class="relative z-50 m-0 p-0 border-b border-border shadow-sm" id="site-header">
+    {{-- Top Bar --}}
+    <div class="bg-primary py-2.5">
+        <div class="mx-auto max-w-7xl px-4 lg:px-8 flex justify-between items-center text-[10px] lg:text-[11px] font-mono font-bold uppercase tracking-[0.15em] text-primary-foreground">
+            <div class="flex items-center gap-2">
+                <i data-lucide="map-pin" class="h-3.5 w-3.5 text-primary-foreground/70"></i>
+                <span>{{ $addrStr }}</span>
             </div>
-            <span class="font-mono text-xl font-bold tracking-tight text-foreground">{{ $websiteName }}</span>
-        </a>
-
-        {{-- Desktop nav --}}
-        <nav class="hidden items-center gap-8 md:flex">
-            @foreach($navigation as $item)
-                @php
-                    $href    = data_get($item, 'url', '/');
-                    $label   = data_get($item, 'label', '');
-                    $isActive = ('/' . $currentPath) === $href || $currentPath === ltrim($href, '/');
-                @endphp
-                <a href="{{ $href }}"
-                   class="text-sm font-medium transition-colors hover:text-primary {{ $isActive ? 'text-primary' : 'text-foreground' }}">
-                    {{ $label }}
-                </a>
-            @endforeach
-        </nav>
-
-        {{-- Desktop CTA --}}
-        <div class="hidden items-center gap-2 md:flex">
-            @if($companyPhoneTel)
-                <a href="tel:{{ $companyPhoneTel }}"
-                   class="inline-flex items-center gap-2 rounded-md border border-border bg-transparent px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-primary"
-                   aria-label="Ligar para a empresa">
-                    <i data-lucide="phone" class="h-4 w-4"></i>
-                    <span>Fale conosco</span>
-                </a>
-            @endif
-            <a href="#orcamento"
-               class="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-                Solicitar Orçamento
-            </a>
+            <div class="hidden md:flex items-center gap-8">
+                @if($companyPhone)
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="phone" class="h-3.5 w-3.5 text-primary-foreground/70"></i>
+                        <span>{{ $companyPhone }}</span>
+                    </div>
+                @endif
+                <div class="flex items-center gap-2">
+                    <i data-lucide="clock" class="h-3.5 w-3.5 text-primary-foreground/70"></i>
+                    <span>Seg - Sex: 08:00 - 18:00</span>
+                </div>
+            </div>
         </div>
+    </div>
 
-        {{-- Mobile burger --}}
-        <button onclick="toggleMobileMenu()"
-                class="inline-flex items-center justify-center rounded-md p-2 text-foreground md:hidden"
-                aria-label="Abrir menu" id="mobile-menu-btn">
-            <i data-lucide="menu" class="h-6 w-6" id="menu-icon-open"></i>
-            <i data-lucide="x"    class="h-6 w-6 hidden" id="menu-icon-close"></i>
-        </button>
+    {{-- Main Nav Bar --}}
+    <div class="bg-white">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 lg:px-8">
+            {{-- Logo --}}
+            <a href="/" class="flex items-center gap-2.5">
+                <div class="flex h-8 w-8 items-center justify-center rounded bg-primary">
+                    <i data-lucide="truck" class="h-4.5 w-4.5 text-primary-foreground"></i>
+                </div>
+                <span class="font-mono text-xl font-bold tracking-tighter text-zinc-950 uppercase">{{ $websiteName }}</span>
+            </a>
+
+            {{-- Desktop nav --}}
+            <nav class="hidden items-center gap-10 md:flex">
+                @foreach($navigation as $item)
+                    @php
+                        $href    = data_get($item, 'url', '/');
+                        $label   = data_get($item, 'label', '');
+                        $isActive = ('/' . $currentPath) === $href || $currentPath === ltrim($href, '/');
+                    @endphp
+                    <a href="{{ $href }}"
+                       class="font-mono text-[13px] font-bold uppercase tracking-widest transition-all hover:text-primary {{ $isActive ? 'text-primary' : 'text-zinc-600' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </nav>
+
+            {{-- Desktop CTA --}}
+            <div class="hidden items-center gap-4 md:flex">
+                <a href="#orcamento"
+                   class="font-mono rounded-md bg-primary px-6 py-2.5 text-[11px] font-bold uppercase tracking-widest text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-md">
+                    Orçamento
+                </a>
+            </div>
+
+            {{-- Mobile burger --}}
+            <button onclick="toggleMobileMenu()"
+                    class="inline-flex items-center justify-center rounded-md p-2 text-zinc-900 md:hidden"
+                    aria-label="Abrir menu" id="mobile-menu-btn">
+                <i data-lucide="menu" class="h-6 w-6" id="menu-icon-open"></i>
+                <i data-lucide="x"    class="h-6 w-6 hidden" id="menu-icon-close"></i>
+            </button>
+        </div>
     </div>
 
     {{-- Mobile menu --}}
-    <div class="hidden border-t border-border bg-card px-4 pb-4 md:hidden" id="mobile-menu">
-        <nav class="flex flex-col gap-1 pt-3">
+    <div class="hidden border-t border-border bg-white px-4 pb-6 md:hidden shadow-xl" id="mobile-menu">
+        <nav class="flex flex-col gap-2 pt-4">
             @foreach($navigation as $item)
                 @php
                     $href    = data_get($item, 'url', '/');
@@ -83,24 +107,19 @@
                     $isActive = ('/' . $currentPath) === $href || $currentPath === ltrim($href, '/');
                 @endphp
                 <a href="{{ $href }}" onclick="closeMobileMenu()"
-                   class="rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted hover:text-primary {{ $isActive ? 'text-primary bg-muted' : 'text-foreground' }}">
+                   class="font-mono rounded-md px-4 py-3 text-sm font-bold uppercase tracking-widest transition-all hover:bg-zinc-50 hover:text-primary {{ $isActive ? 'text-primary bg-zinc-50' : 'text-zinc-600' }}">
                     {{ $label }}
                 </a>
             @endforeach
 
-            <div class="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-                @if($companyPhoneTel)
-                    <a href="tel:{{ $companyPhoneTel }}" onclick="closeMobileMenu()"
-                       class="flex items-center justify-center gap-2 rounded-md border border-border bg-transparent px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-primary">
-                        <i data-lucide="phone" class="h-4 w-4"></i>
-                        Fale conosco: {{ $companyPhone }}
-                    </a>
-                @endif
+            <div class="mt-6 pt-6 border-t border-zinc-100">
                 <a href="#orcamento" onclick="closeMobileMenu()"
-                   class="rounded-md bg-primary px-5 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+                   class="font-mono rounded-md bg-primary block w-full py-4 text-center text-xs font-bold uppercase tracking-widest text-primary-foreground transition-all">
                     Solicitar Orçamento
                 </a>
             </div>
         </nav>
     </div>
 </header>
+
+

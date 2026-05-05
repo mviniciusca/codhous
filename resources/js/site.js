@@ -42,14 +42,5 @@ window.toggleFormFields = function (type) {
     }
 }
 
-// Global scroll effect for header
-window.addEventListener('scroll', () => {
-    const header = document.getElementById('site-header');
-    if (window.scrollY > 50) {
-        header.classList.add('py-2', 'bg-card/95', 'shadow-md');
-        header.classList.remove('py-3', 'bg-card/90');
-    } else {
-        header.classList.add('py-3', 'bg-card/90');
-        header.classList.remove('py-2', 'bg-card/95', 'shadow-md');
-    }
-});
+// Global scroll effect removed to maintain static header layout as requested.
+

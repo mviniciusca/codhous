@@ -23,10 +23,11 @@ class SettingFactory extends Factory
                     'title' => 'Codhous - Soluções Digitais sob Medida',
                     'description' => 'Especialistas em desenvolvimento web de alta performance, design UX/UI e marketing digital para impulsionar o seu negócio.',
                     'navigation' => [
-                        ['label' => 'Início', 'url' => '/'],
-                        ['label' => 'Serviços', 'url' => '/servicos'],
-                        ['label' => 'Sobre Nós', 'url' => '/sobre'],
-                        ['label' => 'Contato', 'url' => '/contato'],
+                        ['label' => 'Início',       'url' => '/'],
+                        ['label' => 'Serviços',      'url' => '/servicos'],
+                        ['label' => 'Nossas Obras',  'url' => '/nossas-obras'],
+                        ['label' => 'Sobre Nós',     'url' => '/sobre-nos'],
+                        ['label' => 'Contato',       'url' => '/contato'],
                     ],
                     'features' => [
                         'concrete_calculator' => true,

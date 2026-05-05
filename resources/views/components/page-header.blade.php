@@ -12,9 +12,9 @@
       - Título: font-mono text-3xl md:text-4xl font-bold tracking-tight text-foreground
       - Descrição: text-lg text-muted-foreground leading-relaxed
       - Container: max-w-7xl px-4 lg:px-8 mx-auto
-      - Espaçamento top: padding-top que respeita a altura do header fixo (header = ~64px → pt-24 lg:pt-28)
+      - Espaçamento top: padding-top reduzido
 --}}
-<section class="bg-background pt-24 pb-12 lg:pt-28 lg:pb-16">
+<section class="bg-background pt-10 pb-8 lg:pt-12 lg:pb-10">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <div class="max-w-2xl">
             @if($badge)
