@@ -1,32 +1,14 @@
 <x-layouts.app>
-    {{-- Header da Obra --}}
-    <section class="bg-background pt-12 pb-8 lg:pt-16 lg:pb-12 border-b border-border">
-        <div class="mx-auto max-w-7xl px-4 lg:px-8">
-            {{-- Breadcrumb Interno --}}
-            <nav class="mb-8 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                <a href="/" class="hover:text-primary">Início</a>
-                <i data-lucide="chevron-right" class="h-3 w-3"></i>
-                <a href="/nossas-obras" class="hover:text-primary">Nossas Obras</a>
-                <i data-lucide="chevron-right" class="h-3 w-3"></i>
-                <span class="text-foreground">{{ $showcase->title }}</span>
-            </nav>
-
-            <div class="max-w-3xl">
-                @if($showcase->location)
-                    <span class="mb-4 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-                        <i data-lucide="map-pin" class="h-3 w-3"></i>
-                        {{ $showcase->location }}
-                    </span>
-                @endif
-                <h1 class="font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl" style="text-wrap: balance;">
-                    {{ $showcase->title }}
-                </h1>
-                <p class="mt-6 text-xl leading-relaxed text-muted-foreground">
-                    {{ $showcase->description }}
-                </p>
-            </div>
-        </div>
-    </section>
+    {{-- Header da Obra Padronizado --}}
+    <x-page-header 
+        :title="$showcase->title" 
+        :description="$showcase->description" 
+        :badge="$showcase->location" 
+        :breadcrumbs="[
+            ['label' => 'Nossas Obras', 'url' => '/nossas-obras'],
+            ['label' => $showcase->title]
+        ]" 
+    />
 
     {{-- Galeria de Fotos e Vídeos --}}
     <section class="bg-muted/30 py-12 lg:py-20">
@@ -55,7 +37,9 @@
                 {{-- Fotos --}}
                 @if($showcase->images && count($showcase->images) > 0)
                     @foreach($showcase->images as $index => $image)
-                        @php $imageUrl = Storage::url($image); @endphp
+                        @php 
+                            $imageUrl = str_starts_with($image, 'http') ? $image : Storage::url($image);
+                        @endphp
                         <a href="{{ $imageUrl }}" 
                            class="glightbox group relative aspect-[4/5] overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-xl {{ ($index === 0 && empty($showcase->videos)) ? 'sm:col-span-2 sm:aspect-video' : '' }}"
                            data-gallery="showcase-gallery">

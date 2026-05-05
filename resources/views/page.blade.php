@@ -11,6 +11,9 @@
                     :badge="$block['data']['badge'] ?? null"
                     :title="$block['data']['title'] ?? null"
                     :description="$block['data']['description'] ?? null"
+                    :breadcrumbs="[
+                        ['label' => $block['data']['title'] ?? 'Página']
+                    ]"
                 />
                 @break
 
@@ -38,6 +41,7 @@
             @case('services')
                 <x-section-services
                     :title="$block['data']['title'] ?? null"
+                    :badge="$block['data']['badge'] ?? null"
                     :description="$block['data']['description'] ?? null"
                     :items="$block['data']['items'] ?? []"
                 />
@@ -53,28 +57,39 @@
 
             {{-- ──── GALERIA DE OBRAS (SHOWCASE) ──────────────────────────── --}}
             @case('showcase')
-                <section class="bg-background py-12 lg:py-16">
+                <section class="bg-background py-8 lg:py-12">
                     <div class="mx-auto max-w-7xl px-4 lg:px-8">
                         @if(!empty($block['data']['title']) || !empty($block['data']['badge']))
-                            <div class="mb-8 max-w-2xl">
-                                @if(!empty($block['data']['badge']))
-                                    <span class="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-primary">
-                                        {{ $block['data']['badge'] }}
-                                    </span>
-                                @endif
-                                @if(!empty($block['data']['title']))
-                                    <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                                        {{ $block['data']['title'] }}
-                                    </h2>
-                                @endif
-                                @if(!empty($block['data']['description']))
-                                    <p class="mt-3 text-lg leading-relaxed text-muted-foreground">
-                                        {{ $block['data']['description'] }}
-                                    </p>
+                            <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                                <div class="max-w-2xl">
+                                    @if(!empty($block['data']['badge']))
+                                        <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">
+                                            {{ $block['data']['badge'] }}
+                                        </span>
+                                    @endif
+                                    @if(!empty($block['data']['title']))
+                                        <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                                            {{ $block['data']['title'] }}
+                                        </h2>
+                                    @endif
+                                    @if(!empty($block['data']['description']))
+                                        <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                                            {{ $block['data']['description'] }}
+                                        </p>
+                                    @endif
+                                </div>
+                                
+                                @if($page->slug === '/')
+                                    <a href="/nossas-obras" class="group inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary transition-all hover:gap-3">
+                                        Ver todas <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                                    </a>
                                 @endif
                             </div>
                         @endif
-                        <livewire:showcase-feed :limit="$block['data']['limit'] ?? 4" />
+                        <livewire:showcase-feed 
+                            :limit="$block['data']['limit'] ?? 4" 
+                            :show-pagination="$page->slug === '/' ? false : true"
+                        />
                     </div>
                 </section>
                 @break
@@ -102,7 +117,7 @@
 
             {{-- ──── FORMULÁRIO DE ORÇAMENTO (WIZARD) ──────────────────────── --}}
             @case('budget_form')
-                <section id="orcamento" class="bg-muted/50 py-12 lg:py-16">
+                <section id="orcamento" class="bg-muted/50 py-8 lg:py-12">
                     <div class="mx-auto max-w-7xl px-4 lg:px-8">
                         @if(!empty($block['data']['title']))
                             <div class="mb-8 max-w-2xl">

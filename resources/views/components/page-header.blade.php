@@ -2,23 +2,36 @@
     'badge'       => null,
     'title'       => null,
     'description' => null,
+    'breadcrumbs' => [],
 ])
 
 {{--
     Template de Cabeçalho Padrão das Páginas Internas
-    Fiel ao padrão visual das seções da homepage (section-services):
-      - Fundo bg-background (branco)
-      - Badge: text-xs font-semibold uppercase tracking-widest text-primary (font-sans)
-      - Título: font-mono text-3xl md:text-4xl font-bold tracking-tight text-foreground
-      - Descrição: text-lg text-muted-foreground leading-relaxed
-      - Container: max-w-7xl px-4 lg:px-8 mx-auto
-      - Espaçamento top: padding-top reduzido
 --}}
-<section class="bg-background pt-10 pb-8 lg:pt-12 lg:pb-10">
+<section class="bg-background pt-6 pb-6 lg:pt-8 lg:pb-8 border-b border-border/50">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <div class="max-w-2xl">
+        
+        {{-- Breadcrumbs --}}
+        <nav class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground" aria-label="Breadcrumb">
+            <a href="/" class="hover:text-primary transition-colors">Início</a>
+            @if(!empty($breadcrumbs))
+                @foreach($breadcrumbs as $item)
+                    <i data-lucide="chevron-right" class="h-3 w-3 opacity-50"></i>
+                    @if(isset($item['url']))
+                        <a href="{{ $item['url'] }}" class="hover:text-primary transition-colors">{{ $item['label'] }}</a>
+                    @else
+                        <span class="text-foreground">{{ $item['label'] }}</span>
+                    @endif
+                @endforeach
+            @else
+                <i data-lucide="chevron-right" class="h-3 w-3 opacity-50"></i>
+                <span class="text-foreground">{{ $title }}</span>
+            @endif
+        </nav>
+
+        <div class="max-w-3xl">
             @if($badge)
-                <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">
+                <span class="mb-2 inline-block text-[10px] font-bold uppercase tracking-widest text-primary">
                     {{ $badge }}
                 </span>
             @endif
@@ -30,7 +43,7 @@
             @endif
 
             @if($description)
-                <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                <p class="mt-3 text-base leading-relaxed text-muted-foreground">
                     {{ $description }}
                 </p>
             @endif

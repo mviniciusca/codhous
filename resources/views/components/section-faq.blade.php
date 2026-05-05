@@ -18,9 +18,9 @@
         ];
     }
 @endphp
-<section id="faq" class="border-b border-border bg-muted/30 py-20 lg:py-28">
+<section id="faq" class="border-b border-border bg-muted/30 py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <div class="mb-16 text-center">
+        <div class="mb-12 text-center">
             @if(!empty($header['subtitle']))
                 <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $header['subtitle'] }}</span>
             @endif
