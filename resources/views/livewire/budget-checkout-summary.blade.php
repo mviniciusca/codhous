@@ -22,33 +22,23 @@
         @endforelse
     </div>
 
-    {{-- Totais --}}
-    <div class="space-y-2 border-t border-border pt-4">
-        <div class="flex justify-between text-sm">
-            <span class="text-muted-foreground">Subtotal</span>
-            <span class="font-mono font-bold">R$ {{ number_format($data['content']['subtotal'] ?? 0, 2, ',', '.') }}</span>
-        </div>
-        <div class="flex justify-between text-sm">
-            <span class="text-muted-foreground">Frete</span>
-            @if(($data['content']['shipping'] ?? 0) > 0)
-                <span class="font-mono font-bold text-primary">R$ {{ number_format($data['content']['shipping'], 2, ',', '.') }}</span>
-            @else
-                <span class="text-[10px] font-bold uppercase text-muted-foreground">A calcular</span>
-            @endif
-        </div>
-        <div class="flex justify-between border-t border-border pt-4 text-lg font-bold">
-            <span>Total Estimado</span>
-            <span class="font-mono text-primary">R$ {{ number_format($data['content']['total'] ?? 0, 2, ',', '.') }}</span>
+    {{-- Info de Orçamento --}}
+    <div class="space-y-4 border-t border-border pt-4">
+        <div class="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <i data-lucide="info" class="mt-0.5 h-4 w-4 text-primary"></i>
+            <p class="text-xs leading-relaxed text-primary/80">
+                Os valores e o custo de entrega serão calculados por nossa equipe técnica e enviados no seu WhatsApp em até 24h.
+            </p>
         </div>
     </div>
 
     {{-- Botão de Finalizar --}}
-    <div class="pt-4">
+    <div class="pt-2">
         <button type="submit" 
                 wire:loading.attr="disabled"
                 class="w-full rounded-md bg-primary py-4 px-6 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
-            <span wire:loading.remove>Finalizar Orçamento</span>
-            <span wire:loading>Processando...</span>
+            <span wire:loading.remove>Solicitar Orçamento</span>
+            <span wire:loading>Enviando...</span>
         </button>
     </div>
 

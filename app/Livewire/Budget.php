@@ -134,6 +134,7 @@ class Budget extends Component implements HasForms
                                 ->schema([
                                     Repeater::make('content.products')
                                         ->label('')
+                                        ->live()
                                         ->itemLabel(fn (array $state): ?string => $this->getItemLabel($state))
                                         ->schema([
                                             Grid::make(2)->schema([
@@ -180,7 +181,9 @@ class Budget extends Component implements HasForms
                                 ->schema([
                                     Placeholder::make('summary')
                                         ->label('')
-                                        ->content(view('livewire.budget-checkout-summary')),
+                                        ->content(fn (Get $get) => view('livewire.budget-checkout-summary', [
+                                            'data' => ['content' => $get('content')]
+                                        ])),
                                 ])
                                 ->extraAttributes(['class' => 'sticky top-24'])
                         ])->columnSpan(4),
