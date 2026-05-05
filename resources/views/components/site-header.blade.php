@@ -33,7 +33,7 @@
 <header class="relative z-50 m-0 p-0 border-b border-border shadow-sm" id="site-header">
     {{-- Top Bar --}}
     <div class="bg-primary py-2.5">
-        <div class="mx-auto max-w-7xl px-4 lg:px-8 flex justify-between items-center text-[10px] lg:text-[11px] font-mono font-bold uppercase tracking-[0.15em] text-primary-foreground">
+        <div class="mx-auto max-w-7xl px-4 lg:px-8 flex justify-between items-center text-[10px] lg:text-[11px] font-mono font-bold tracking-wide text-primary-foreground">
             <div class="flex items-center gap-2">
                 <i data-lucide="map-pin" class="h-3.5 w-3.5 text-primary-foreground/70"></i>
                 <span>{{ $addrStr }}</span>
@@ -61,7 +61,7 @@
                 <div class="flex h-8 w-8 items-center justify-center rounded bg-primary">
                     <i data-lucide="truck" class="h-4.5 w-4.5 text-primary-foreground"></i>
                 </div>
-                <span class="font-mono text-xl font-bold tracking-tighter text-zinc-950 uppercase">{{ $websiteName }}</span>
+                <span class="font-mono text-xl font-bold tracking-tighter text-zinc-950">{{ $websiteName }}</span>
             </a>
 
             {{-- Desktop nav --}}
@@ -73,7 +73,7 @@
                         $isActive = ('/' . $currentPath) === $href || $currentPath === ltrim($href, '/');
                     @endphp
                     <a href="{{ $href }}"
-                       class="font-mono text-[13px] font-bold uppercase tracking-widest transition-all hover:text-primary {{ $isActive ? 'text-primary' : 'text-zinc-600' }}">
+                       class="font-mono text-[13px] font-bold tracking-wide transition-all hover:text-primary {{ $isActive ? 'text-primary' : 'text-zinc-600' }}">
                         {{ $label }}
                     </a>
                 @endforeach
@@ -82,7 +82,7 @@
             {{-- Desktop CTA --}}
             <div class="hidden items-center gap-4 md:flex">
                 <a href="#orcamento"
-                   class="font-mono rounded-md bg-primary px-6 py-2.5 text-[11px] font-bold uppercase tracking-widest text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-md">
+                   class="font-mono rounded-md bg-primary px-6 py-2.5 text-[11px] font-bold tracking-wide text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-md">
                     Orçamento
                 </a>
             </div>
@@ -107,19 +107,17 @@
                     $isActive = ('/' . $currentPath) === $href || $currentPath === ltrim($href, '/');
                 @endphp
                 <a href="{{ $href }}" onclick="closeMobileMenu()"
-                   class="font-mono rounded-md px-4 py-3 text-sm font-bold uppercase tracking-widest transition-all hover:bg-zinc-50 hover:text-primary {{ $isActive ? 'text-primary bg-zinc-50' : 'text-zinc-600' }}">
+                   class="font-mono rounded-md px-4 py-3 text-sm font-bold tracking-wide transition-all hover:bg-zinc-50 hover:text-primary {{ $isActive ? 'text-primary bg-zinc-50' : 'text-zinc-600' }}">
                     {{ $label }}
                 </a>
             @endforeach
 
             <div class="mt-6 pt-6 border-t border-zinc-100">
                 <a href="#orcamento" onclick="closeMobileMenu()"
-                   class="font-mono rounded-md bg-primary block w-full py-4 text-center text-xs font-bold uppercase tracking-widest text-primary-foreground transition-all">
+                   class="font-mono rounded-md bg-primary block w-full py-4 text-center text-xs font-bold tracking-wide text-primary-foreground transition-all">
                     Solicitar Orçamento
                 </a>
             </div>
         </nav>
     </div>
 </header>
-
-

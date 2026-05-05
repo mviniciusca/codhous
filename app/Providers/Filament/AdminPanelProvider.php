@@ -25,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->breadcrumbs(false)
+            ->breadcrumbs(true)
             ->maxContentWidth('full')
             ->id('admin')
             ->path('admin')
