@@ -17,31 +17,36 @@ class ProductOptionRelationManager extends RelationManager
 {
     protected static string $relationship = 'productOption';
 
+    protected static ?string $title = 'Variações e Preços';
+
     public function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('name')
+                    ->label('Descrição da Variação')
+                    ->placeholder('Ex: FCK 25 ou Média')
                     ->required()
                     ->maxLength(255)
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn(\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
                     ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
                 TextInput::make('slug')
+                    ->label('Slug (Identificador)')
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
                 Select::make('unit')
-                    ->label(__('Unit'))
+                    ->label('Unidade de Medida')
                     ->required()
                     ->options(ProductUnit::class),
                 TextInput::make('price')
+                    ->label('Preço Base')
                     ->required()
                     ->numeric()
-                    ->prefix(env('CURRENCY_SUFFIX'))
+                    ->prefix('R$')
                     ->maxValue(42949672.95)
-                    ->label(__('Price'))
-                    ->helperText(__('Price per unity')),
+                    ->helperText('Preço por unidade (ex: preço por m³ ou kg)'),
             ]);
     }
 
@@ -49,39 +54,40 @@ class ProductOptionRelationManager extends RelationManager
     {
         return $table
             ->striped()
-            ->heading(__('Product Options'))
-            ->description(__('Variations for this product'))
+            ->heading('Variações de Produtos')
+            ->description('Gerencie os diferentes tipos, traços ou medidas deste produto.')
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Name')),
-                TextColumn::make('slug')
-                    ->label(__('Slug')),
+                    ->label('Variação'),
                 TextColumn::make('unit')
-                    ->label(__('Unit'))
+                    ->label('Unidade')
                     ->badge(),
                 TextColumn::make('price')
-                    ->label(__('Price per Unity'))
+                    ->label('Preço Unitário')
                     ->alignEnd()
-                    ->prefix(env('CURRENCY_SUFFIX') . ' '),
+                    ->money('BRL'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->label(__('New Option'))
+                    ->label('Nova Variação')
                     ->icon('heroicon-o-plus'),
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->label('Editar'),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Excluir'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Excluir Selecionados'),
                 ]),
             ]);
     }

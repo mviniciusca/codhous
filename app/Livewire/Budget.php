@@ -62,6 +62,7 @@ class Budget extends Component implements HasForms
                             Section::make('1. Local de Entrega')
                                 ->description('Onde o material deve ser entregue?')
                                 ->icon('heroicon-o-map-pin')
+                                ->extraAttributes(['class' => '!shadow-none'])
                                 ->schema([
                                     TextInput::make('content.postcode')
                                         ->label('CEP')
@@ -105,6 +106,7 @@ class Budget extends Component implements HasForms
                             Section::make('2. Seus Dados')
                                 ->description('Como podemos entrar em contato?')
                                 ->icon('heroicon-o-user')
+                                ->extraAttributes(['class' => 'shadow-none'])
                                 ->schema([
                                     TextInput::make('content.customer_name')
                                         ->label('Nome Completo')
@@ -131,6 +133,7 @@ class Budget extends Component implements HasForms
                             Section::make('3. Itens do Pedido')
                                 ->description('Quais produtos você precisa?')
                                 ->icon('heroicon-o-shopping-bag')
+                                ->extraAttributes(['class' => 'shadow-none'])
                                 ->schema([
                                     Repeater::make('content.products')
                                         ->label('')
@@ -178,6 +181,7 @@ class Budget extends Component implements HasForms
                         // Coluna da Direita (Resumo / Checkout Sidebar)
                         Group::make([
                             Section::make('Resumo do Pedido')
+                                ->extraAttributes(['class' => 'shadow-none'])
                                 ->schema([
                                     Placeholder::make('summary')
                                         ->label('')

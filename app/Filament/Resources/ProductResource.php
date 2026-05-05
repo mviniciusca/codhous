@@ -28,9 +28,21 @@ class ProductResource extends Resource
     protected static ?int $navigationSort = 2;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $breadcrumb = 'Produtos';
+
     public static function getNavigationLabel(): string
     {
-        return __('Products');
+        return 'Produtos';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Produto';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Produtos';
     }
 
     public static function count(): ?string
@@ -50,30 +62,31 @@ class ProductResource extends Resource
                 Group::make()
                     ->columnSpan(4)
                     ->schema([
-                        Section::make(__('Product'))
-                            ->description(__('Create or edit your product.'))
+                        Section::make('Produto')
+                            ->description('Crie ou edite as informações principais do seu produto.')
                             ->icon('heroicon-o-shopping-bag')
                             ->columns(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->required()
                                     ->maxLength(255)
-                                    ->label(__('Name'))
-                                    ->helperText(__('Product name')),
+                                    ->label('Nome do Produto')
+                                    ->placeholder('Ex: Concreto Usinado')
+                                    ->helperText('O nome que aparecerá para o cliente no site.'),
                             ]),
                     ]),
                 Group::make()
                     ->columnSpan(2)
                     ->schema([
-                        Section::make(__('Settings'))
-                            ->description(__('Create or edit your product.'))
+                        Section::make('Status')
+                            ->description('Controle de visibilidade.')
                             ->icon('heroicon-o-cog-6-tooth')
                             ->columns(2)
                             ->schema([
                                 Toggle::make('is_active')
-                                    ->label('Active')
+                                    ->label('Ativo')
                                     ->default(true)
-                                    ->helperText(__('Activate the product'))
+                                    ->helperText('Se desativado, o produto não aparecerá no site.')
                                     ->inline(),
                             ]),
                     ]),
@@ -86,15 +99,15 @@ class ProductResource extends Resource
         return $table
             ->striped()
             ->searchable()
-            ->searchPlaceholder(__('Search'))
+            ->searchPlaceholder('Pesquisar produtos...')
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Product'))
+                    ->label('Produto')
                     ->searchable(),
                 IconColumn::make('is_active')
                     ->boolean()
                     ->alignCenter()
-                    ->label(__('Status')),
+                    ->label('Status'),
             ])
             ->filters([
                 //
@@ -102,13 +115,15 @@ class ProductResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make()
-                        ->label(__('Edit Product')),
+                        ->label('Editar'),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Excluir'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->label(__('Delete')),
+                        ->label('Excluir Selecionados'),
                 ]),
             ]);
     }
