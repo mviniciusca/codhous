@@ -62,6 +62,21 @@ class ShowcaseResource extends Resource
                             ->reorderable()
                             ->directory('showcases')
                             ->columnSpanFull(),
+                        Forms\Components\Repeater::make('videos')
+                            ->label(__('Vídeos'))
+                            ->schema([
+                                Forms\Components\TextInput::make('title')
+                                    ->label(__('Título do Vídeo'))
+                                    ->placeholder(__('Ex: Drone da Obra')),
+                                Forms\Components\TextInput::make('url')
+                                    ->label(__('URL do Vídeo (YouTube, Vimeo ou .mp4)'))
+                                    ->required()
+                                    ->url()
+                                    ->placeholder(__('https://www.youtube.com/watch?v=...')),
+                            ])
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                            ->columnSpanFull(),
                         Forms\Components\Toggle::make('is_active')
                             ->label(__('Ativo'))
                             ->default(true),

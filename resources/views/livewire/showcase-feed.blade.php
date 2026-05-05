@@ -41,7 +41,7 @@
 
                         <div class="mt-8 pt-6 border-t border-border flex items-center justify-between">
                             <span class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Concluído</span>
-                            <a href="#" class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary transition-all hover:gap-3">
+                            <a href="{{ route('showcase.show', $showcase->id) }}" class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary transition-all hover:gap-3">
                                 Ver Detalhes <i data-lucide="arrow-right" class="h-4 w-4"></i>
                             </a>
                         </div>

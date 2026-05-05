@@ -53,12 +53,12 @@
 
             {{-- ──── GALERIA DE OBRAS (SHOWCASE) ──────────────────────────── --}}
             @case('showcase')
-                <section class="bg-background py-20 lg:py-28">
+                <section class="bg-background py-12 lg:py-16">
                     <div class="mx-auto max-w-7xl px-4 lg:px-8">
                         @if(!empty($block['data']['title']) || !empty($block['data']['badge']))
-                            <div class="mb-12 max-w-2xl">
+                            <div class="mb-8 max-w-2xl">
                                 @if(!empty($block['data']['badge']))
-                                    <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">
+                                    <span class="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-primary">
                                         {{ $block['data']['badge'] }}
                                     </span>
                                 @endif
@@ -68,7 +68,7 @@
                                     </h2>
                                 @endif
                                 @if(!empty($block['data']['description']))
-                                    <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                                    <p class="mt-3 text-lg leading-relaxed text-muted-foreground">
                                         {{ $block['data']['description'] }}
                                     </p>
                                 @endif
@@ -102,15 +102,15 @@
 
             {{-- ──── FORMULÁRIO DE ORÇAMENTO (WIZARD) ──────────────────────── --}}
             @case('budget_form')
-                <section id="orcamento" class="bg-muted/50 py-20 lg:py-28">
+                <section id="orcamento" class="bg-muted/50 py-12 lg:py-16">
                     <div class="mx-auto max-w-7xl px-4 lg:px-8">
                         @if(!empty($block['data']['title']))
-                            <div class="mb-12 max-w-2xl">
+                            <div class="mb-8 max-w-2xl">
                                 <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
                                     {{ $block['data']['title'] }}
                                 </h2>
                                 @if(!empty($block['data']['description']))
-                                    <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                                    <p class="mt-3 text-lg leading-relaxed text-muted-foreground">
                                         {{ $block['data']['description'] }}
                                     </p>
                                 @endif

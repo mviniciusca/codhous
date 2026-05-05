@@ -15,6 +15,7 @@ class Showcase extends Model
 
     protected $casts = [
         'images' => 'array',
+        'videos' => 'array',
         'is_active' => 'boolean',
     ];
 
