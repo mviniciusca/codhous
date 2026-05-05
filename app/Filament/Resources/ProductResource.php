@@ -28,21 +28,21 @@ class ProductResource extends Resource
     protected static ?int $navigationSort = 2;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $breadcrumb = 'Produtos';
+    protected static ?string $breadcrumb = 'Produtos e Serviços';
 
     public static function getNavigationLabel(): string
     {
-        return 'Produtos';
+        return 'Produtos e Serviços';
     }
 
     public static function getModelLabel(): string
     {
-        return 'Produto';
+        return 'Produto ou Serviço';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Produtos';
+        return 'Produtos e Serviços';
     }
 
     public static function count(): ?string
@@ -62,16 +62,16 @@ class ProductResource extends Resource
                 Group::make()
                     ->columnSpan(4)
                     ->schema([
-                        Section::make('Produto')
-                            ->description('Crie ou edite as informações principais do seu produto.')
+                        Section::make('Produto ou Serviço')
+                            ->description('Crie ou edite as informações principais do seu produto ou prestação de serviço.')
                             ->icon('heroicon-o-shopping-bag')
                             ->columns(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->required()
                                     ->maxLength(255)
-                                    ->label('Nome do Produto')
-                                    ->placeholder('Ex: Concreto Usinado')
+                                    ->label('Nome')
+                                    ->placeholder('Ex: Concreto Usinado ou Polimento de Piso')
                                     ->helperText('O nome que aparecerá para o cliente no site.'),
                             ]),
                     ]),
