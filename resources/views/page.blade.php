@@ -82,6 +82,32 @@
                 />
                 @break
 
+            {{-- ──── CALCULADORA ───────────────────────────────────────────── --}}
+            @case('calculator')
+                <livewire:calculator />
+                @break
+
+            {{-- ──── FORMULÁRIO DE ORÇAMENTO (WIZARD) ──────────────────────── --}}
+            @case('budget_form')
+                <section id="orcamento" class="bg-muted/50 py-20 lg:py-28">
+                    <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                        @if(!empty($block['data']['title']))
+                            <div class="mb-12 max-w-2xl">
+                                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                                    {{ $block['data']['title'] }}
+                                </h2>
+                                @if(!empty($block['data']['description']))
+                                    <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                                        {{ $block['data']['description'] }}
+                                    </p>
+                                @endif
+                            </div>
+                        @endif
+                        <livewire:budget />
+                    </div>
+                </section>
+                @break
+
             {{-- ──── ÁREA DE COBERTURA ─────────────────────────────────────── --}}
             @case('coverage')
                 <x-section-coverage
