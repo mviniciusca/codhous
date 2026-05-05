@@ -48,6 +48,7 @@ class PageResource extends Resource
                                 Forms\Components\Builder::make('content')
                                     ->label(__('Blocos de Conteúdo'))
                                     ->blocks([
+                                        self::getPageHeaderBlock(),
                                         self::getHeroBlock(),
                                         self::getPartnersBlock(),
                                         self::getServicesBlock(),
@@ -56,6 +57,8 @@ class PageResource extends Resource
                                         self::getFaqBlock(),
                                         self::getTestimonialsBlock(),
                                         self::getCoverageBlock(),
+                                        self::getContactFormBlock(),
+                                        self::getMapBlock(),
                                         self::getCtaBlock(),
                                         self::getRichTextBlock(),
                                     ])
@@ -299,6 +302,46 @@ class PageResource extends Resource
                 Forms\Components\Textarea::make('subtitle'),
                 Forms\Components\TextInput::make('button_label'),
                 Forms\Components\TextInput::make('button_url'),
+            ]);
+    }
+
+    protected static function getPageHeaderBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('page_header')
+            ->label(__('Cabeçalho da Página'))
+            ->icon('heroicon-o-document-text')
+            ->schema([
+                Forms\Components\TextInput::make('badge')->label('Texto de Apoio (Laranja)')->placeholder('NOSSOS SERVIÇOS'),
+                Forms\Components\TextInput::make('title')->label('Título Principal')->required(),
+                Forms\Components\Textarea::make('description')->label('Descrição'),
+                Forms\Components\Toggle::make('show_breadcrumbs')->label('Mostrar Breadcrumbs')->default(true),
+                Forms\Components\FileUpload::make('background_image')->image()->directory('headers')->label('Imagem de Fundo (Opcional)'),
+            ]);
+    }
+
+    protected static function getContactFormBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('contact_form')
+            ->label(__('Formulário de Contato'))
+            ->icon('heroicon-o-envelope')
+            ->schema([
+                Forms\Components\TextInput::make('title')->label('Título')->default('Entre em Contato'),
+                Forms\Components\Textarea::make('description')->label('Descrição'),
+                Forms\Components\TextInput::make('email_to')->label('Enviar para (e-mail)')->placeholder('contato@empresa.com'),
+            ]);
+    }
+
+    protected static function getMapBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('map')
+            ->label(__('Mapa (Google Maps)'))
+            ->icon('heroicon-o-map')
+            ->schema([
+                Forms\Components\TextInput::make('title')->label('Título'),
+                Forms\Components\Textarea::make('iframe_code')
+                    ->label('Código de Incorporação (iframe)')
+                    ->helperText('Cole aqui o <iframe> gerado pelo Google Maps')
+                    ->required(),
             ]);
     }
 

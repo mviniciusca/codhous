@@ -149,6 +149,12 @@ class DatabaseSeeder extends Seeder
             'is_visible' => true,
             'sort_order' => 3,
             'content' => [
+                ['type' => 'page_header', 'data' => [
+                    'badge' => 'PORTFÓLIO',
+                    'title' => 'Nossas Obras',
+                    'description' => 'Conheça alguns dos projetos realizados pela ConcretoPro em toda a região.',
+                    'show_breadcrumbs' => true
+                ]],
                 ['type' => 'showcase', 'data' => ['title' => 'Portfólio de Obras', 'limit' => 10]],
             ]
         ]);
@@ -161,7 +167,13 @@ class DatabaseSeeder extends Seeder
             'is_visible' => true,
             'sort_order' => 4,
             'content' => [
-                ['type' => 'rich_text', 'data' => ['content' => '<h2>Nossa História</h2><p>Há mais de 15 anos fornecendo concreto de alta qualidade...</p>']],
+                ['type' => 'page_header', 'data' => [
+                    'badge' => 'QUEM SOMOS',
+                    'title' => 'Sobre a Empresa',
+                    'description' => 'Compromisso com a qualidade e agilidade na entrega de concreto usinado.',
+                    'show_breadcrumbs' => true
+                ]],
+                ['type' => 'rich_text', 'data' => ['content' => '<h2>Nossa História</h2><p>Há mais de 15 anos fornecendo concreto de alta qualidade para pequenas e grandes obras. Nossa missão é garantir que cada cliente receba o traço exato com a pontualidade que o cronograma exige.</p><h3>Nossa Visão</h3><p>Ser referência em inovação logística no setor de construção civil.</p>']],
                 ['type' => 'timeline', 'data' => ['title' => 'Nossa Trajetória']],
             ]
         ]);
@@ -174,7 +186,21 @@ class DatabaseSeeder extends Seeder
             'is_visible' => true,
             'sort_order' => 5,
             'content' => [
-                ['type' => 'cta', 'data' => ['title' => 'Entre em Contato', 'subtitle' => 'Estamos prontos para atender seu projeto.']],
+                ['type' => 'page_header', 'data' => [
+                    'badge' => 'CONTATO',
+                    'title' => 'Fale Conosco',
+                    'description' => 'Tire suas dúvidas ou solicite uma visita técnica.',
+                    'show_breadcrumbs' => true
+                ]],
+                ['type' => 'contact_form', 'data' => [
+                    'title' => 'Envie sua Mensagem',
+                    'description' => 'Preencha o formulário abaixo e retornaremos o mais breve possível.',
+                    'email_to' => 'contato@concretopro.com.br'
+                ]],
+                ['type' => 'map', 'data' => [
+                    'title' => 'Nossa Localização',
+                    'iframe_code' => '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117506.31174624106!2d-43.342145!3d-22.913885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9bde559108a051%3A0xa9089ad1136e676!2sRio%20de%20Janeiro%2C%20RJ!5e0!3m2!1spt-BR!2sbr!4v1714930000000!5m2!1spt-BR!2sbr" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
+                ]],
             ]
         ]);
     }
