@@ -16,9 +16,9 @@
     }
 @endphp
 
-<section class="border-y border-border bg-muted/30 py-12 overflow-hidden">
+<section class="bg-white py-8 overflow-hidden">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <p class="mb-10 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
+        <p class="mb-8 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
             Empresas que confiam no nosso concreto
         </p>
     </div>
