@@ -60,6 +60,7 @@ class ShowcaseResource extends Resource
                             ->image()
                             ->multiple()
                             ->reorderable()
+                            ->imageEditor()
                             ->directory('showcases')
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('videos')

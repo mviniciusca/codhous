@@ -1,54 +1,80 @@
 @php
-    $section = \App\Models\ContentSection::getBySlug('partners');
-    $subtitle = $section?->content['header']['subtitle'] ?? 'Empresas que confiam no nosso concreto';
-    $items = $section?->content['items'] ?? null;
-    if (empty($items)) {
-        $items = [
-            ['name' => 'MRV Engenharia', 'icon' => 'building-2'],
-            ['name' => 'Construtora Tenda', 'icon' => 'hard-hat'],
-            ['name' => 'Cyrela Brazil', 'icon' => 'landmark'],
-            ['name' => 'Gafisa S.A.', 'icon' => 'factory'],
-            ['name' => 'Even Construtora', 'icon' => 'warehouse'],
-            ['name' => 'Direcional Eng.', 'icon' => 'hammer'],
-            ['name' => 'Cury Construtora', 'icon' => 'construction'],
-            ['name' => 'Plano & Plano', 'icon' => 'ruler'],
-        ];
+    $brands = \App\Models\Brand::where('is_active', true)->orderBy('sort_order')->get();
+    
+    // Fallback caso não existam marcas no banco
+    if ($brands->isEmpty()) {
+        $brands = collect([
+            (object)['name' => 'MRV Engenharia', 'logo' => null, 'icon' => 'building-2'],
+            (object)['name' => 'Construtora Tenda', 'logo' => null, 'icon' => 'hard-hat'],
+            (object)['name' => 'Cyrela Brazil', 'logo' => null, 'icon' => 'landmark'],
+            (object)['name' => 'Gafisa S.A.', 'logo' => null, 'icon' => 'factory'],
+            (object)['name' => 'Even Construtora', 'logo' => null, 'icon' => 'warehouse'],
+            (object)['name' => 'Direcional Eng.', 'logo' => null, 'icon' => 'hammer'],
+            (object)['name' => 'Cury Construtora', 'logo' => null, 'icon' => 'construction'],
+            (object)['name' => 'Plano & Plano', 'logo' => null, 'icon' => 'ruler'],
+        ]);
     }
 @endphp
-<section class="border-b border-border bg-muted/50 py-10 lg:py-12 overflow-hidden">
+
+<section class="border-y border-border bg-muted/30 py-12 overflow-hidden">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <p class="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">{{ $subtitle }}</p>
+        <p class="mb-10 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
+            Empresas que confiam no nosso concreto
+        </p>
     </div>
 
-    <style>
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-50% - 2rem)); }
-        }
-        .partners-track {
-            animation: marquee 30s linear infinite;
-            width: max-content;
-        }
-    </style>
-
-    <script>
-        function pauseMarquee() {
-            document.getElementById('partners-track').style.animationPlayState = 'paused';
-        }
-        function resumeMarquee() {
-            document.getElementById('partners-track').style.animationPlayState = 'running';
-        }
-    </script>
-
-    <div class="partners-marquee relative" onmouseenter="pauseMarquee()" onmouseleave="resumeMarquee()">
-        <div class="partners-track flex items-center gap-16" id="partners-track">
-            @foreach(array_merge($items, $items) as $partner)
-                @php $icon = $partner['icon'] ?? 'building-2'; @endphp
-                <div class="flex shrink-0 items-center gap-2 opacity-40 grayscale transition-all hover:opacity-100 hover:grayscale-0">
-                    <div class="flex h-10 w-10 items-center justify-center rounded bg-foreground/10"><i data-lucide="{{ $icon }}" class="h-5 w-5 text-foreground"></i></div>
-                    <span class="font-mono text-sm font-bold text-foreground whitespace-nowrap">{{ $partner['name'] ?? '' }}</span>
-                </div>
-            @endforeach
+    <!-- Swiper Container - Full Width -->
+    <div class="swiper partners-swiper w-full">
+            <div class="swiper-wrapper flex items-center">
+                @foreach($brands as $brand)
+                    <div class="swiper-slide flex items-center justify-center px-6">
+                        <div class="flex items-center opacity-40 grayscale transition-all duration-500 hover:opacity-100 hover:grayscale-0">
+                            @if(!empty($brand->logo))
+                                <div class="flex h-14 w-full items-center justify-center">
+                                    <img src="{{ Storage::url($brand->logo) }}" 
+                                         alt="{{ $brand->name }}" 
+                                         class="h-full max-w-[160px] object-contain">
+                                </div>
+                            @else
+                                <div class="flex h-14 w-14 items-center justify-center rounded bg-foreground/5">
+                                    <i data-lucide="{{ $brand->icon ?? 'building-2' }}" class="h-7 w-7 text-foreground/40"></i>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('livewire:navigated', initPartnersSwiper);
+        document.addEventListener('DOMContentLoaded', initPartnersSwiper);
+
+        function initPartnersSwiper() {
+            if (typeof Swiper !== 'undefined') {
+                new Swiper('.partners-swiper', {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                    loop: true,
+                    speed: 5000,
+                    autoplay: {
+                        delay: 0,
+                        disableOnInteraction: false,
+                    },
+                    breakpoints: {
+                        640: { slidesPerView: 5 },
+                        1024: { slidesPerView: 7 },
+                    },
+                });
+            }
+        }
+    </script>
+    
+    <style>
+        /* Efeito de movimento contínuo linear */
+        .partners-swiper .swiper-wrapper {
+            transition-timing-function: linear !important;
+        }
+    </style>
 </section>
