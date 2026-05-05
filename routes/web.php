@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BudgetDownloadController;
 use App\Http\Controllers\BudgetPdfController;
+use App\Http\Controllers\PageController;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,7 @@ Route::get('/budget/download/{budget}', [BudgetDownloadController::class, 'downl
 Route::get('/budget/pdf/{token}', [BudgetPdfController::class, 'download'])
     ->name('budget.pdf.download');
 
-Route::get('/nossas-obras', function () {
-    return view('showcase');
-})->name('showcase');
+// Dynamic Pages Catch-all (must be at the end)
+Route::get('/{slug?}', [PageController::class, 'show'])
+    ->name('page.show')
+    ->where('slug', '.*');

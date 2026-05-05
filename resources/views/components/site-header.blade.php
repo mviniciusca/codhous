@@ -3,6 +3,16 @@
     $company = \App\Models\Setting::get('company', []);
     $websiteName = data_get($website, 'name', 'ConcretoPro');
     $navigation = data_get($website, 'navigation', []);
+    
+    // Se a navegação manual estiver vazia, usamos as páginas cadastradas no resource de Páginas
+    if (empty($navigation)) {
+        $dynamicPages = \App\Models\Page::visible()->inMenu()->orderBy('sort_order')->get();
+        $navigation = $dynamicPages->map(fn($p) => [
+            'label' => $p->title,
+            'url' => $p->slug === '/' ? '/' : '/' . ltrim($p->slug, '/')
+        ])->toArray();
+    }
+
     $companyPhone = data_get($company, 'phone', '');
     $companyPhoneDigits = $companyPhone ? preg_replace('/\D/', '', $companyPhone) : '';
     $companyPhoneTel = $companyPhoneDigits && in_array(strlen($companyPhoneDigits), [10, 11], true)

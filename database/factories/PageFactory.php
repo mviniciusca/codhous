@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Page;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Z3d0X\FilamentFabricator\Models\Page;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Z3d0X\FilamentFabricator\Models\Page>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Page>
  */
 class PageFactory extends Factory
 {
@@ -20,14 +20,15 @@ class PageFactory extends Factory
     public function definition(): array
     {
         $title = fake()->unique()->words(3, true);
-        $slug = '/' . str($title)->slug();
+        $slug = str($title)->slug();
 
         return [
             'title' => $title,
             'slug' => $slug,
-            'layout' => 'default',
-            'blocks' => [],
-            'parent_id' => null,
+            'content' => [],
+            'is_active_in_menu' => true,
+            'is_visible' => true,
+            'sort_order' => 0,
         ];
     }
 
@@ -37,11 +38,10 @@ class PageFactory extends Factory
     public function index(): static
     {
         return $this->state(fn (array $attributes) => [
-            'title' => 'index',
+            'title' => 'Página Inicial',
             'slug' => '/',
-            'layout' => 'default',
-            'blocks' => [],
-            'parent_id' => null,
+            'is_active_in_menu' => true,
+            'is_visible' => true,
         ]);
     }
 }
