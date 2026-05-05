@@ -1,112 +1,36 @@
-<div class="budget-wizard-wrap">
-    <style>
-        /* Header do wizard sem scroll: colunas iguais e texto em uma linha */
-        .budget-wizard-wrap .fi-fo-wizard-header {
-            overflow: visible !important;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            margin: 0;
-            padding: 0;
-        }
-        .budget-wizard-wrap .fi-fo-wizard-header-step {
-            min-width: 0;
-            margin: 0;
-        }
-        .budget-wizard-wrap .fi-fo-wizard-header-step-button {
-            min-width: 0;
-            margin: 0;
-            padding: 0.75rem;
-            gap: 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-        .budget-wizard-wrap .fi-fo-wizard-header-step-button .grid {
-            min-width: 0;
-            max-width: none;
-        }
-        .budget-wizard-wrap .fi-fo-wizard-header-step-label,
-        .budget-wizard-wrap .fi-fo-wizard-header-step-description {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .budget-wizard-wrap .fi-fo-wizard-header-step-icon-ctn {
-            width: 2.25rem;
-            height: 2.25rem;
-            flex-shrink: 0;
-        }
-        .budget-wizard-wrap .fi-fo-wizard-header-step-icon-ctn .fi-fo-wizard-header-step-icon {
-            width: 1.125rem;
-            height: 1.125rem;
-        }
-
-        /* Scroll “sobe” mais para o passo ficar abaixo do menu fixo (navegador em direção ao header) */
-        .budget-wizard-wrap .fi-fo-wizard-header-step,
-        .budget-wizard-wrap .fi-fo-wizard-step {
-            scroll-margin-top: 10rem;
-        }
-
-        /* Botões do rodapé do wizard com cores neutras e legíveis (independente do tema) */
-        .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(1) .fi-btn {
-            /* Botão Voltar: cinza claro com texto escuro */
-            background-color: rgb(229 231 235) !important; /* gray-200 */
-            color: rgb(17 24 39) !important;               /* gray-900 */
-        }
-        .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(1) .fi-btn:hover {
-            background-color: rgb(209 213 219) !important; /* gray-300 */
-        }
-        .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(3) .fi-btn,
-        .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(4) .fi-btn {
-            /* Botão Próximo / Enviar: cinza bem escuro com texto claro */
-            background-color: rgb(17 24 39) !important;    /* gray-900 */
-            color: #ffffff !important;
-        }
-        .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(3) .fi-btn:hover,
-        .budget-wizard-wrap .fi-fo-wizard div.flex.items-center.justify-between span:nth-child(4) .fi-btn:hover {
-            background-color: rgb(31 41 55) !important;    /* gray-800 */
-        }
-    </style>
-    @if(!$isSubmitted)
-        <div class="rounded-2xl bg-white p-6 dark:bg-gray-900/50 sm:p-8">
-            <form wire:submit.prevent class="flex flex-col gap-6">
-                {{ $this->form }}
-            </form>
-        </div>
-    @else
-        <div class="mx-auto flex max-w-md flex-col items-center justify-center space-y-6 rounded-xl border border-background/10 bg-background/5 p-8 text-center animate-in fade-in zoom-in duration-700">
-            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary">
-                <span wire:ignore>
-                    <!-- inline check SVG (Lucide style) -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                </span>
+<div class="relative">
+    @if($isSubmitted)
+        <div class="rounded-3xl border border-primary/20 bg-primary/5 p-8 text-center md:p-12">
+            <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <i data-lucide="check" class="h-8 w-8"></i>
             </div>
-            
-            <div class="text-center space-y-3">
-                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground">
-                    Muito <span class="text-primary">Obrigado!</span>
-                </h2>
-                <p class="text-lg leading-relaxed text-foreground/70">
-                    Sua solicitação de orçamento foi recebida com sucesso.
-                </p>
-                
-                <div class="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-primary">Retorno em até 24 horas</p>
-                </div>
-            </div>
-
-            <div class="pt-4 flex justify-center">
-                <button
-                    wire:click="resetForm"
-                    type="button"
-                    class="inline-flex items-center justify-center gap-2 rounded-md border border-primary/20 bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                >
-                    <span wire:ignore>
-                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
-                    </span>
-                    Nova solicitação
+            <h3 class="font-mono text-2xl font-bold text-foreground">Pedido Recebido com Sucesso!</h3>
+            <p class="mt-4 text-muted-foreground">
+                Nossa equipe recebeu sua solicitação de orçamento. Em até 24 horas entraremos em contato via WhatsApp ou E-mail para finalizar os detalhes e agendar sua entrega.
+            </p>
+            <div class="mt-8">
+                <button wire:click="resetForm" class="text-sm font-bold uppercase tracking-widest text-primary hover:underline">
+                    Fazer outro pedido
                 </button>
             </div>
         </div>
+    @else
+        <form wire:submit="create" class="space-y-8">
+            {{ $this->form }}
+        </form>
     @endif
+
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        
+        document.addEventListener('livewire:navigated', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
 </div>
