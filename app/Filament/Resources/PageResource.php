@@ -243,7 +243,9 @@ class PageResource extends Resource
             ->label(__('Galeria de Obras (Showcase)'))
             ->icon('heroicon-o-camera')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+                Forms\Components\TextInput::make('badge')->label('Texto do Badge (Laranja)')->placeholder('NOSSAS OBRAS'),
+                Forms\Components\TextInput::make('title')->label('Título')->required(),
+                Forms\Components\Textarea::make('description')->label('Descrição'),
                 Forms\Components\TextInput::make('limit')->numeric()->default(4)->label('Limite de itens'),
             ]);
     }

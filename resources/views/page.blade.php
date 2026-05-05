@@ -17,6 +17,7 @@
             {{-- ──── HERO (só na homepage, mas disponível caso necessário) ─ --}}
             @case('hero')
                 <livewire:section-hero-cep
+                    :slides="$block['data']['slides'] ?? []"
                     :main-slide="$block['data']['slides'][0] ?? []"
                     :badge="$block['data']['badge'] ?? ''"
                     :layout="$block['data']['layout'] ?? 'default'"
@@ -50,15 +51,27 @@
                 />
                 @break
 
-            {{-- ──── SHOWCASE / GALERIA ────────────────────────────────────── --}}
+            {{-- ──── GALERIA DE OBRAS (SHOWCASE) ──────────────────────────── --}}
             @case('showcase')
                 <section class="bg-background py-20 lg:py-28">
                     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                        @if(!empty($block['data']['title']))
-                            <div class="mb-16 max-w-2xl">
-                                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                                    {{ $block['data']['title'] }}
-                                </h2>
+                        @if(!empty($block['data']['title']) || !empty($block['data']['badge']))
+                            <div class="mb-12 max-w-2xl">
+                                @if(!empty($block['data']['badge']))
+                                    <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">
+                                        {{ $block['data']['badge'] }}
+                                    </span>
+                                @endif
+                                @if(!empty($block['data']['title']))
+                                    <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                                        {{ $block['data']['title'] }}
+                                    </h2>
+                                @endif
+                                @if(!empty($block['data']['description']))
+                                    <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                                        {{ $block['data']['description'] }}
+                                    </p>
+                                @endif
                             </div>
                         @endif
                         <livewire:showcase-feed :limit="$block['data']['limit'] ?? 4" />

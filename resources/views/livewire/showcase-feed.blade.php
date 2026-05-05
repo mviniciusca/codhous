@@ -1,79 +1,71 @@
-<div class="container mx-auto px-4 py-12">
-    <div class="max-w-4xl mx-auto">
-        <header class="mb-12 text-center">
-            <h2 class="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
-                Nossas Obras
-            </h2>
-            <p class="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
-                Conheça alguns dos nossos projetos realizados com excelência e qualidade.
-            </p>
-        </header>
+@php
+    $items = $showcases->items();
+@endphp
 
-        <div class="space-y-16">
-            @forelse($showcases as $showcase)
-                <article class="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl">
-                    <!-- Gallery -->
+<div class="py-12 lg:py-20">
+    @if(count($items) > 0)
+        <div class="grid gap-8 md:grid-cols-2">
+            @foreach($items as $showcase)
+                <article class="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/40 hover:shadow-xl">
+                    {{-- Galeria de Imagens --}}
                     @if($showcase->images && count($showcase->images) > 0)
-                        <div class="relative">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
-                                @foreach(array_slice($showcase->images, 0, 2) as $index => $image)
-                                    <div class="relative h-72 overflow-hidden rounded-xl {{ count($showcase->images) === 1 ? 'md:col-span-2' : '' }}">
-                                        <img src="{{ Storage::url($image) }}" 
-                                             alt="{{ $showcase->title }} - {{ $index + 1 }}" 
-                                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                                        @if($index === 1 && count($showcase->images) > 2)
-                                            <div class="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px]">
-                                                <span class="text-white text-2xl font-bold">+{{ count($showcase->images) - 2 }} fotos</span>
-                                            </div>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
+                        <div class="relative aspect-video overflow-hidden">
+                            <img src="{{ Storage::url($showcase->images[0]) }}" 
+                                 alt="{{ $showcase->title }}" 
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            
+                            {{-- Overlay info --}}
+                            @if(count($showcase->images) > 1)
+                                <div class="absolute bottom-4 right-4 rounded-full bg-background/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-foreground backdrop-blur-sm">
+                                    +{{ count($showcase->images) - 1 }} fotos
+                                </div>
+                            @endif
+
+                            @if($showcase->location)
+                                <div class="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground shadow-lg">
+                                    <i data-lucide="map-pin" class="h-3 w-3"></i>
+                                    {{ $showcase->location }}
+                                </div>
+                            @endif
                         </div>
                     @endif
 
-                    <div class="p-8">
-                        <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
-                            <div>
-                                <h3 class="text-3xl font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                    {{ $showcase->title }}
-                                </h3>
-                                @if($showcase->location)
-                                    <div class="flex items-center mt-2 text-zinc-500 dark:text-zinc-400">
-                                        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        </svg>
-                                        <span class="text-sm font-medium">{{ $showcase->location }}</span>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
+                    <div class="flex flex-1 flex-col p-8">
+                        <h3 class="font-mono text-2xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
+                            {{ $showcase->title }}
+                        </h3>
                         
-                        <div class="prose prose-zinc dark:prose-invert max-w-none">
-                            <p class="text-zinc-600 dark:text-zinc-300 text-lg leading-relaxed">
-                                {{ $showcase->description }}
-                            </p>
+                        <p class="mt-4 flex-1 text-base leading-relaxed text-muted-foreground line-clamp-3">
+                            {{ $showcase->description }}
+                        </p>
+
+                        <div class="mt-8 pt-6 border-t border-border flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Concluído</span>
+                            <a href="#" class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary transition-all hover:gap-3">
+                                Ver Detalhes <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                            </a>
                         </div>
                     </div>
                 </article>
-            @empty
-                <div class="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border-2 border-dashed border-zinc-200 dark:border-zinc-800">
-                    <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p class="mt-4 text-xl font-medium text-zinc-900 dark:text-white">Nenhuma obra encontrada</p>
-                    <p class="mt-1 text-zinc-500">Em breve mostraremos nossos novos projetos aqui.</p>
-                </div>
-            @endforelse
-
-            @if($showcases->hasPages())
-                <div class="mt-12 flex justify-center">
-                    <div class="inline-flex rounded-xl shadow-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-1">
-                        {{ $showcases->links() }}
-                    </div>
-                </div>
-            @endif
+            @endforeach
         </div>
-    </div>
+
+        {{-- Paginação --}}
+        @if($showcases->hasPages())
+            <div class="mt-16 flex justify-center">
+                {{ $showcases->links() }}
+            </div>
+        @endif
+    @else
+        {{-- Empty State (Homepage Pattern) --}}
+        <div class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30 py-20 text-center">
+            <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-background shadow-sm">
+                <i data-lucide="camera" class="h-10 w-10 text-muted-foreground/40"></i>
+            </div>
+            <h3 class="font-mono text-2xl font-bold text-foreground">Nenhuma obra encontrada</h3>
+            <p class="mt-2 max-w-sm text-muted-foreground">
+                Estamos preparando o portfólio de novos projetos. Em breve você verá nossas obras de excelência aqui.
+            </p>
+        </div>
+    @endif
 </div>
