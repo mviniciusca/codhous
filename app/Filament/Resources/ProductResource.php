@@ -110,7 +110,7 @@ class ProductResource extends Resource
                     ->label('Status'),
             ])
             ->filters([
-                //
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 ActionGroup::make([
@@ -118,13 +118,29 @@ class ProductResource extends Resource
                         ->label('Editar'),
                     Tables\Actions\DeleteAction::make()
                         ->label('Excluir'),
+                    Tables\Actions\RestoreAction::make()
+                        ->label('Restaurar'),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->label('Excluir Permanentemente'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->label('Excluir Selecionados'),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label('Restaurar Selecionados'),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label('Excluir Permanentemente Selecionados'),
                 ]),
+            ]);
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
             ]);
     }
 
