@@ -23,30 +23,40 @@ class ProductOptionRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->label('Descrição da Variação')
-                    ->placeholder('Ex: FCK 25 ou Média')
-                    ->required()
-                    ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn(\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
-                    ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
-                TextInput::make('slug')
-                    ->label('Slug (Identificador)')
-                    ->required()
-                    ->maxLength(255)
-                    ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id)),
-                Select::make('unit')
-                    ->label('Unidade de Medida')
-                    ->required()
-                    ->options(ProductUnit::class),
-                TextInput::make('price')
-                    ->label('Preço Base')
-                    ->required()
-                    ->numeric()
-                    ->prefix('R$')
-                    ->maxValue(42949672.95)
-                    ->helperText('Preço por unidade (ex: preço por m³ ou kg)'),
+                Forms\Components\Section::make('Detalhes da Variação')
+                    ->description('Defina as especificações técnicas, unidade e preço para esta variação.')
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Descrição da Variação')
+                            ->placeholder('Ex: FCK 25 ou Média')
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn(\Filament\Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state)))
+                            ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id))
+                            ->helperText('O nome técnico da variação (ex: traço do concreto).'),
+                        TextInput::make('slug')
+                            ->label('Identificador (Slug)')
+                            ->required()
+                            ->maxLength(255)
+                            ->prefixIcon('heroicon-o-link')
+                            ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id))
+                            ->helperText('Usado internamente para identificação única na URL.'),
+                        Select::make('unit')
+                            ->label('Unidade de Medida')
+                            ->required()
+                            ->options(ProductUnit::class)
+                            ->helperText('Como este item será quantificado (m³, kg, dia).'),
+                        TextInput::make('price')
+                            ->label('Preço Base')
+                            ->required()
+                            ->numeric()
+                            ->prefix('R$')
+                            ->maxValue(42949672.95)
+                            ->helperText('Valor de referência por unidade para fins de orçamento.'),
+                    ])
             ]);
     }
 
@@ -74,12 +84,14 @@ class ProductOptionRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->label('Nova Variação')
+                    ->modalHeading('Nova Variação')
                     ->icon('heroicon-o-plus'),
             ])
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make()
-                        ->label('Editar'),
+                        ->label('Editar')
+                        ->modalHeading('Editar Variação'),
                     Tables\Actions\DeleteAction::make()
                         ->label('Excluir'),
                 ]),
