@@ -99,6 +99,10 @@ class DatabaseSeeder extends Seeder
         $this->call(ContentSectionSeeder::class);
         $this->call(OperationAreaSeeder::class);
         $this->call(AlertSeeder::class);
+        $this->call(MachinerySeeder::class);
+        $this->call(ConcreteSeeder::class);
+        $this->call(LocationSeeder::class);
+        $this->call(FloorPolishingSeeder::class);
     }
 
     protected function createInitialPages()
