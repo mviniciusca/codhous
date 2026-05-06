@@ -117,21 +117,21 @@ class MailResource extends Resource
             ])
             ->description('Gerencie as mensagens e e-mails recebidos através do site.')
             ->columns([
-                IconColumn::make('is_read')
-                    ->label('')
-                    ->boolean()
-                    ->trueIcon('')
-                    ->falseIcon('heroicon-s-circle-stack')
-                    ->falseColor('primary')
-                    ->tooltip('Não lida')
-                    ->grow(false),
-                Tables\Columns\ToggleColumn::make('is_favorite')
-                    ->label('')
-                    ->onIcon('heroicon-s-star')
-                    ->offIcon('heroicon-o-star')
-                    ->onColor('warning')
-                    ->grow(false),
                 Split::make([
+                    IconColumn::make('is_read')
+                        ->label('')
+                        ->boolean()
+                        ->trueIcon('')
+                        ->falseIcon('heroicon-s-circle-stack')
+                        ->falseColor('primary')
+                        ->tooltip('Não lida')
+                        ->grow(false),
+                    Tables\Columns\ToggleColumn::make('is_favorite')
+                        ->label('')
+                        ->onIcon('heroicon-s-star')
+                        ->offIcon('heroicon-o-star')
+                        ->onColor('warning')
+                        ->grow(false),
                     TextColumn::make('name')
                         ->weight('bold')
                         ->searchable()
@@ -150,7 +150,7 @@ class MailResource extends Resource
                         TextColumn::make('subject_message')
                             ->state(fn(Mail $record) => $record->subject . ' - ' . strip_tags($record->message))
                             ->searchable(['subject', 'message'])
-                            ->limit(150)
+                            ->limit(80)
                             ->weight(fn(Mail $record) => !$record->is_read ? 'bold' : 'normal')
                             ->html(),
                     ])->grow(true),
@@ -199,46 +199,46 @@ class MailResource extends Resource
             ], FiltersLayout::BelowContent)
             ->persistFiltersInSession()
             ->actions([
-                Tables\Actions\Action::make('reply')
-                    ->label('Responder')
-                    ->icon('heroicon-o-arrow-uturn-left')
-                    ->color('primary')
-                    ->modalHeading('Responder Mensagem')
-                    ->hidden(fn(Mail $record) => $record->is_sent)
-                    ->form([
-                        TextInput::make('email')
-                            ->label('Para:')
-                            ->helperText('Destinatário da resposta.')
-                            ->default(fn($record) => $record->email)
-                            ->readOnly(),
-                        TextInput::make('subject')
-                            ->label('Assunto:')
-                            ->helperText('Título da resposta.')
-                            ->default(fn($record) => "Re: " . $record->subject)
-                            ->required(),
-                        RichEditor::make('message')
-                            ->label('Mensagem:')
-                            ->helperText('Escreva sua resposta abaixo.')
-                            ->required(),
-                    ])
-                    ->action(function (Mail $record, array $data) {
-                        $data['name'] = env('MAIL_FROM_NAME') ?? 'Codhous Software';
-                        $service = new \App\Services\SendMailService($data);
-                        $service->send();
-                    }),
-                Tables\Actions\Action::make('mark_as_read')
-                    ->label('Marcar como Lida')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->hidden(fn(Mail $record) => $record->is_read)
-                    ->action(fn(Mail $record) => $record->update(['is_read' => true])),
-                Tables\Actions\Action::make('mark_as_unread')
-                    ->label('Marcar como Não Lida')
-                    ->icon('heroicon-o-envelope')
-                    ->color('gray')
-                    ->visible(fn(Mail $record) => $record->is_read)
-                    ->action(fn(Mail $record) => $record->update(['is_read' => false])),
                 ActionGroup::make([
+                    Tables\Actions\Action::make('reply')
+                        ->label('Responder')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('primary')
+                        ->modalHeading('Responder Mensagem')
+                        ->hidden(fn(Mail $record) => $record->is_sent)
+                        ->form([
+                            TextInput::make('email')
+                                ->label('Para:')
+                                ->helperText('Destinatário da resposta.')
+                                ->default(fn($record) => $record->email)
+                                ->readOnly(),
+                            TextInput::make('subject')
+                                ->label('Assunto:')
+                                ->helperText('Título da resposta.')
+                                ->default(fn($record) => "Re: " . $record->subject)
+                                ->required(),
+                            RichEditor::make('message')
+                                ->label('Mensagem:')
+                                ->helperText('Escreva sua resposta abaixo.')
+                                ->required(),
+                        ])
+                        ->action(function (Mail $record, array $data) {
+                            $data['name'] = env('MAIL_FROM_NAME') ?? 'Codhous Software';
+                            $service = new \App\Services\SendMailService($data);
+                            $service->send();
+                        }),
+                    Tables\Actions\Action::make('mark_as_read')
+                        ->label('Marcar como Lida')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->hidden(fn(Mail $record) => $record->is_read)
+                        ->action(fn(Mail $record) => $record->update(['is_read' => true])),
+                    Tables\Actions\Action::make('mark_as_unread')
+                        ->label('Marcar como Não Lida')
+                        ->icon('heroicon-o-envelope')
+                        ->color('gray')
+                        ->visible(fn(Mail $record) => $record->is_read)
+                        ->action(fn(Mail $record) => $record->update(['is_read' => false])),
                     Tables\Actions\DeleteAction::make()
                         ->label('Mover para Lixeira'),
                     Tables\Actions\ForceDeleteAction::make()
