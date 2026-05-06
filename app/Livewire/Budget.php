@@ -254,15 +254,9 @@ class Budget extends Component implements HasForms
             ]);
         }
 
-        $user = new User();
-        $user->first()?->notify(new NewBudget($budget->toArray()));
+        \Illuminate\Support\Facades\Mail::to(User::first()?->email ?? config('mail.from.address'))
+            ->send(new \App\Mail\AdminNewBudgetMail($budget));
         
-        Notification::make()
-            ->title('Pedido Enviado com Sucesso!')
-            ->body('Nossa equipe entrará em contato em breve.')
-            ->success()
-            ->send();
-            
         $this->isSubmitted = true;
     }
 
