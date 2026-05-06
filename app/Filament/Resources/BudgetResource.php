@@ -112,7 +112,9 @@ class BudgetResource extends Resource
                         Tabs\Tab::make('Informações do Cliente')
                             ->icon('heroicon-o-user')
                             ->schema([
-                                Section::make()
+                                Section::make('Dados do Cliente e Obra')
+                                    ->description('Informações detalhadas de contato do cliente e endereço de execução do serviço.')
+                                    ->icon('heroicon-o-user-circle')
                                     ->headerActions([
                                         Action::make('fill_all_fake_data')
                                             ->label('Preencher com Dados de Teste')
@@ -146,62 +148,55 @@ class BudgetResource extends Resource
                                                     ->send();
                                             }),
                                     ])
+                                    ->columns(3)
                                     ->schema([
-                                        Fieldset::make('Dados de Contato')
-                                            ->columns(3)
-                                            ->schema([
-                                                TextInput::make('content.customer_name')
-                                                    ->disabled()
-                                                    ->required()
-                                                    ->dehydrated()
-                                                    ->label('Nome do Cliente')
-                                                    ->helperText('Nome completo fornecido pelo cliente.'),
-                                                TextInput::make('content.customer_email')
-                                                    ->disabled()
-                                                    ->required()
-                                                    ->dehydrated()
-                                                    ->label('E-mail')
-                                                    ->helperText('Endereço de e-mail para contato.'),
-                                                TextInput::make('content.customer_phone')
-                                                    ->disabled()
-                                                    ->required()
-                                                    ->dehydrated()
-                                                    ->label('Telefone/WhatsApp')
-                                                    ->helperText('Número para comunicação direta.'),
-                                            ]),
-                                        Fieldset::make('Endereço da Obra')
-                                            ->columns(3)
-                                            ->schema([
-                                                TextInput::make('content.postcode')
-                                                    ->disabled()
-                                                    ->required()
-                                                    ->dehydrated()
-                                                    ->label('CEP'),
-                                                TextInput::make('content.street')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->required()
-                                                    ->label('Logradouro'),
-                                                TextInput::make('content.number')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->label('Número'),
-                                                TextInput::make('content.city')
-                                                    ->disabled()
-                                                    ->required()
-                                                    ->dehydrated()
-                                                    ->label('Cidade'),
-                                                TextInput::make('content.neighborhood')
-                                                    ->disabled()
-                                                    ->dehydrated()
-                                                    ->required()
-                                                    ->label('Bairro'),
-                                                TextInput::make('content.state')
-                                                    ->disabled()
-                                                    ->required()
-                                                    ->dehydrated()
-                                                    ->label('UF'),
-                                            ]),
+                                        TextInput::make('content.customer_name')
+                                            ->disabled()
+                                            ->required()
+                                            ->dehydrated()
+                                            ->label('Nome do Cliente')
+                                            ->helperText('Nome completo fornecido pelo cliente.'),
+                                        TextInput::make('content.customer_email')
+                                            ->disabled()
+                                            ->required()
+                                            ->dehydrated()
+                                            ->label('E-mail')
+                                            ->helperText('Endereço de e-mail para contato.'),
+                                        TextInput::make('content.customer_phone')
+                                            ->disabled()
+                                            ->required()
+                                            ->dehydrated()
+                                            ->label('Telefone/WhatsApp')
+                                            ->helperText('Número para comunicação direta.'),
+                                        TextInput::make('content.postcode')
+                                            ->disabled()
+                                            ->required()
+                                            ->dehydrated()
+                                            ->label('CEP'),
+                                        TextInput::make('content.street')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->required()
+                                            ->label('Logradouro'),
+                                        TextInput::make('content.number')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->label('Número'),
+                                        TextInput::make('content.city')
+                                            ->disabled()
+                                            ->required()
+                                            ->dehydrated()
+                                            ->label('Cidade'),
+                                        TextInput::make('content.neighborhood')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->required()
+                                            ->label('Bairro'),
+                                        TextInput::make('content.state')
+                                            ->disabled()
+                                            ->required()
+                                            ->dehydrated()
+                                            ->label('UF'),
                                     ]),
                             ]),
                         Tabs\Tab::make('Itens do Pedido')
