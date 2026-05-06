@@ -615,6 +615,7 @@ class BudgetResource extends Resource
                 TextColumn::make('code')
                     ->searchable()
                     ->label('Código')
+                    ->toggleable()
                     ->icon(fn(Budget $record) => $record->trashed() ? 'heroicon-o-trash' : null)
                     ->iconColor('danger'),
                 TextColumn::make('status')
@@ -647,19 +648,25 @@ class BudgetResource extends Resource
                     ->searchable()
                     ->label('Cliente'),
                 TextColumn::make('content.customer_phone')
-                    ->label('WhatsApp'),
+                    ->label('WhatsApp')
+                    ->icon('heroicon-m-phone')
+                    ->copyable()
+                    ->copyMessage('Telefone copiado!')
+                    ->searchable(),
                 TextColumn::make('content.total')
-                    ->label('Valor Total')
-                    ->money('BRL')
-                    ->toggleable(),
+                    ->label('Total')
+                    ->formatStateUsing(fn ($state) => 'R$ ' . number_format(floatval($state), 2, '.', ','))
+                    ->alignEnd()
+                    ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime('d/m/Y H:i')
+                    ->dateTime('d/m/y H:i')
                     ->sortable()
-                    ->label('Enviado em'),
+                    ->label('Data'),
                 IconColumn::make('is_active')
                     ->label('Ativo')
                     ->alignCenter()
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('id', 'desc')
             ->filters([
