@@ -160,6 +160,7 @@ class DatabaseSeeder extends Seeder
                 ]],
                 ['type' => 'partners', 'data' => ['title' => 'Nossos Parceiros']],
                 ['type' => 'services', 'data' => ['title' => 'Nossos Serviços']],
+                ['type' => 'cta_contact', 'data' => []],
                 ['type' => 'showcase', 'data' => [
                     'badge' => 'PORTFÓLIO',
                     'title' => 'Nossas Obras',
