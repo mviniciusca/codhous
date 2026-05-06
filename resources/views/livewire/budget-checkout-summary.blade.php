@@ -7,11 +7,16 @@
                 $option = \App\Models\ProductOption::find($item['product_option']);
             @endphp
             @if($product)
-                <div class="flex justify-between gap-4 text-sm">
-                    <div class="flex-1">
-                        <p class="font-bold text-foreground">{{ $product->name }}</p>
-                        <p class="text-xs text-muted-foreground">{{ $option?->name ?? 'Opção não selecionada' }}</p>
-                        <p class="text-[10px] text-muted-foreground italic mt-1">Qtde: {{ $item['quantity'] ?? 0 }} {{ $option?->unit?->value }}</p>
+                <div class="flex items-start gap-3 rounded-lg border border-border/50 bg-muted/20 p-3">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-foreground/5 text-foreground/40">
+                        <i data-lucide="package" class="h-5 w-5"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-foreground text-xs truncate">{{ $product->name }}</p>
+                        <p class="text-[10px] text-muted-foreground truncate">{{ $option?->name ?? 'Opção não selecionada' }}</p>
+                        <p class="text-[11px] font-mono font-bold text-primary mt-1">
+                            {{ $item['quantity'] ?? 0 }} {{ $option?->unit?->value }}
+                        </p>
                     </div>
                 </div>
             @endif
@@ -27,7 +32,7 @@
         <div class="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
             <i data-lucide="info" class="mt-0.5 h-4 w-4 text-primary"></i>
             <p class="text-xs leading-relaxed text-primary/80">
-                Os valores e o custo de entrega serão calculados por nossa equipe técnica e enviados no seu WhatsApp em até 24h.
+                Os valores e o custo de entrega serão calculados por nossa equipe técnica e enviados no seu WhatsApp e no seu E-mail em até 24h.
             </p>
         </div>
     </div>

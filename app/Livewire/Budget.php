@@ -66,9 +66,10 @@ class Budget extends Component implements HasForms
                                 ->schema([
                                     TextInput::make('content.postcode')
                                         ->label('CEP')
-                                        ->placeholder('Digite o CEP para localizar o endereço')
+                                        ->placeholder('00000-000')
                                         ->mask('99999-999')
                                         ->required()
+                                        ->validationAttribute('CEP')
                                         ->live(debounce: 500)
                                         ->extraInputAttributes(['class' => '!bg-white shadow-sm'])
                                         ->rules($this->getPostcodeRules())
@@ -92,6 +93,7 @@ class Budget extends Component implements HasForms
                                             TextInput::make('content.number')
                                                 ->label('Nº')
                                                 ->required()
+                                                ->validationAttribute('Número')
                                                 ->live(onBlur: true)
                                                 ->placeholder('Nº ou KM da obra')
                                                 ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
@@ -114,6 +116,7 @@ class Budget extends Component implements HasForms
                                     TextInput::make('content.customer_name')
                                         ->label('Nome Completo')
                                         ->required()
+                                        ->validationAttribute('Nome Completo')
                                         ->live(onBlur: true)
                                         ->placeholder('Nome do responsável pela obra')
                                         ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
@@ -123,6 +126,7 @@ class Budget extends Component implements HasForms
                                             ->tel()
                                             ->mask('(99)99999-9999')
                                             ->required()
+                                            ->validationAttribute('WhatsApp')
                                             ->live(onBlur: true)
                                             ->placeholder('(00) 00000-0000 - WhatsApp para retorno')
                                             ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
@@ -130,6 +134,7 @@ class Budget extends Component implements HasForms
                                             ->label('E-mail')
                                             ->email()
                                             ->required()
+                                            ->validationAttribute('E-mail')
                                             ->live(onBlur: true)
                                             ->placeholder('E-mail para envio da proposta')
                                             ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
@@ -151,12 +156,14 @@ class Budget extends Component implements HasForms
                                                     ->label('Produto')
                                                     ->options(Product::all()->pluck('name', 'id'))
                                                     ->required()
+                                                    ->validationAttribute('Produto')
                                                     ->live()
                                                     ->afterStateUpdated(fn (Set $set) => $set('product_option', null)),
                                                 Select::make('product_option')
                                                     ->label('Opção / Traço')
                                                     ->options(fn (Get $get) => $this->getProductOptions($get))
                                                     ->required(fn (Get $get) => $this->getProductOptions($get)->isNotEmpty())
+                                                    ->validationAttribute('Opção / Traço')
                                                     ->hidden(fn (Get $get) => $this->getProductOptions($get)->isEmpty())
                                                     ->live()
                                                     ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
@@ -166,11 +173,13 @@ class Budget extends Component implements HasForms
                                                     ->label('Local da Obra')
                                                     ->options(Location::all()->pluck('name', 'id'))
                                                     ->required()
+                                                    ->validationAttribute('Local da Obra')
                                                     ->live(),
                                                 TextInput::make('quantity')
                                                     ->label('Quantidade')
                                                     ->numeric()
                                                     ->minValue(0)
+                                                    ->validationAttribute('Quantidade')
                                                     ->suffix(fn (Get $get) => ProductOption::find($get('product_option'))?->unit?->value ?? '')
                                                     ->required()
                                                     ->live(debounce: 500)
@@ -181,7 +190,8 @@ class Budget extends Component implements HasForms
                                                     }),
                                             ]),
                                         ])
-                                        ->addActionLabel('Adicionar Produto')
+                                        ->addActionLabel('Adicionar Item')
+                                        ->cloneable()
                                         ->collapsible(),
                                 ])->collapsible(),
                         ])->columnSpan(8),
