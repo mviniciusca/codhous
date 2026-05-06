@@ -14,36 +14,40 @@ class BrandResource extends Resource
 {
     protected static ?string $model = Brand::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Website';
     
-    protected static ?string $navigationLabel = 'Slider de Logos';
+    protected static ?string $navigationLabel = 'Marcas e Parceiros';
     
-    protected static ?string $modelLabel = 'Logo';
+    protected static ?string $modelLabel = 'Marca/Parceiro';
     
-    protected static ?string $pluralModelLabel = 'Logos dos Parceiros';
+    protected static ?string $pluralModelLabel = 'Marcas e Parceiros';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Section::make('Informações do Parceiro')
+                    ->description('Cadastre a logo e o nome das empresas parceiras que aparecerão no site.')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Nome da Empresa')
+                            ->placeholder('Ex: Gerdau, Holcim...')
                             ->required()
                             ->maxLength(255),
                         Forms\Components\FileUpload::make('logo')
-                            ->label('Logo (SVG ou PNG transparente recomendado)')
+                            ->label('Logo')
+                            ->helperText('Use preferencialmente arquivos SVG ou PNG com fundo transparente.')
                             ->image()
                             ->imageEditor()
                             ->directory('brands')
                             ->required(),
                         Forms\Components\Toggle::make('is_active')
-                            ->label('Ativo')
+                            ->label('Exibir no Site')
                             ->default(true)
                             ->required(),
                         Forms\Components\TextInput::make('sort_order')
                             ->label('Ordem de Exibição')
+                            ->helperText('Números menores aparecem primeiro.')
                             ->numeric()
                             ->default(0)
                             ->required(),
@@ -54,6 +58,7 @@ class BrandResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
                 Tables\Columns\ImageColumn::make('logo')
                     ->label('Logo'),

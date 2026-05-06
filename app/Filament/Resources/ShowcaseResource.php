@@ -23,40 +23,44 @@ class ShowcaseResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Nossas Obras');
+        return 'Nossas Obras';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Obra');
+        return 'Obra';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Nossas Obras');
+        return 'Nossas Obras';
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('Detalhes da Obra'))
+                Forms\Components\Section::make('Detalhes da Obra')
+                    ->description('Cadastre as informações, fotos e vídeos das obras concluídas para o seu portfólio.')
                     ->schema([
                         Forms\Components\TextInput::make('title')
-                            ->label(__('Título'))
+                            ->label('Título da Obra')
+                            ->placeholder('Ex: Residencial Alphaville, Pavimentação BR-101...')
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('location')
-                            ->label(__('Localização'))
-                            ->placeholder(__('Ex: São Paulo, SP'))
+                            ->label('Localização')
+                            ->placeholder('Ex: São Paulo, SP')
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description')
-                            ->label(__('Descrição'))
+                            ->label('Descrição')
+                            ->helperText('Conte um pouco sobre o desafio e o resultado da obra.')
                             ->rows(3)
                             ->maxLength(65535)
                             ->columnSpanFull(),
                         Forms\Components\FileUpload::make('images')
-                            ->label(__('Galeria de Fotos'))
+                            ->label('Galeria de Fotos')
+                            ->helperText('Arraste as fotos para mudar a ordem de exibição.')
                             ->image()
                             ->multiple()
                             ->reorderable()
@@ -64,25 +68,25 @@ class ShowcaseResource extends Resource
                             ->directory('showcases')
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('videos')
-                            ->label(__('Vídeos'))
+                            ->label('Vídeos da Obra')
                             ->schema([
                                 Forms\Components\TextInput::make('title')
-                                    ->label(__('Título do Vídeo'))
-                                    ->placeholder(__('Ex: Drone da Obra')),
+                                    ->label('Título do Vídeo')
+                                    ->placeholder('Ex: Drone da Obra, Depoimento do Cliente'),
                                 Forms\Components\TextInput::make('url')
-                                    ->label(__('URL do Vídeo (YouTube, Vimeo ou .mp4)'))
+                                    ->label('URL do Vídeo (YouTube, Vimeo ou .mp4)')
                                     ->required()
                                     ->url()
-                                    ->placeholder(__('https://www.youtube.com/watch?v=...')),
+                                    ->placeholder('https://www.youtube.com/watch?v=...'),
                             ])
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
                             ->columnSpanFull(),
                         Forms\Components\Toggle::make('is_active')
-                            ->label(__('Ativo'))
+                            ->label('Exibir no Site')
                             ->default(true),
                         Forms\Components\TextInput::make('sort_order')
-                            ->label(__('Ordem'))
+                            ->label('Ordem de Exibição')
                             ->numeric()
                             ->default(0),
                     ])->columns(2),
@@ -94,26 +98,26 @@ class ShowcaseResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('images')
-                    ->label(__('Foto'))
+                    ->label('Foto')
                     ->circular()
                     ->limit(1)
                     ->stacked(),
                 Tables\Columns\TextColumn::make('title')
-                    ->label(__('Título'))
+                    ->label('Título')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('location')
-                    ->label(__('Localização'))
+                    ->label('Localização')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('Ativo'))
+                    ->label('Ativo')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('sort_order')
-                    ->label(__('Ordem'))
+                    ->label('Ordem')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Criado em'))
-                    ->dateTime()
+                    ->label('Criado em')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -121,19 +125,22 @@ class ShowcaseResource extends Resource
             ->reorderable('sort_order')
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label(__('Status'))
+                    ->label('Status')
                     ->boolean()
-                    ->trueLabel(__('Ativo'))
-                    ->falseLabel(__('Inativo'))
+                    ->trueLabel('Ativo')
+                    ->falseLabel('Inativo')
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Editar'),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Excluir'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Excluir Selecionados'),
                 ]),
             ]);
     }

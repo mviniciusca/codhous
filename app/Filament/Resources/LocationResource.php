@@ -62,8 +62,6 @@ class LocationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->heading('Locais e Áreas Operacionais')
-            ->description('Gerencie os pontos de aplicação e locais atendidos pela empresa.')
             ->striped()
             ->searchable()
             ->searchPlaceholder('Pesquisar locais...')
