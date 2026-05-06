@@ -38,62 +38,74 @@ class ContactAgendaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('Informações do contato'))
-                    ->description(__('Dados principais para identificação e comunicação.'))
-                    ->icon('heroicon-o-user')
+                Forms\Components\Section::make('Dados Principais')
+                    ->description('Insira as informações básicas para identificar e entrar em contato com a pessoa ou empresa.')
+                    ->icon('heroicon-o-user-circle')
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label(__('Nome'))
+                            ->label('Nome Completo / Razão Social')
+                            ->helperText('Nome da pessoa ou nome fantasia da empresa.')
                             ->required()
                             ->maxLength(255)
                             ->columnSpan(2),
                         Forms\Components\TextInput::make('email')
-                            ->label(__('E-mail'))
+                            ->label('E-mail de Contato')
+                            ->helperText('Endereço de correio eletrônico principal.')
                             ->email()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('phone')
-                            ->label(__('Telefone'))
+                            ->label('Telefone / WhatsApp')
+                            ->helperText('Número com DDD para contato rápido.')
                             ->tel()
                             ->maxLength(255)
-                            ->placeholder('(21) 99999-9999'),
+                            ->placeholder('(00) 00000-0000'),
                         Forms\Components\TextInput::make('company')
-                            ->label(__('Empresa'))
+                            ->label('Empresa')
+                            ->helperText('Nome da organização à qual o contato pertence.')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('position')
-                            ->label(__('Cargo / Função'))
+                            ->label('Cargo ou Função')
+                            ->helperText('Cargo ocupado pela pessoa na empresa.')
                             ->maxLength(255),
                         Forms\Components\Toggle::make('is_favorite')
-                            ->label(__('Favorito'))
+                            ->label('Favoritar Contato')
+                            ->helperText('Marque como favorito para acesso rápido na agenda.')
                             ->inline(false)
                             ->default(false),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make(__('Classificação'))
-                    ->description(__('Organize por tipo e origem do contato.'))
+                Forms\Components\Section::make('Classificação e Organização')
+                    ->description('Defina como este contato deve ser agrupado e de onde ele veio.')
+                    ->icon('heroicon-o-tag')
                     ->schema([
                         Forms\Components\Select::make('category')
-                            ->label(__('Categoria'))
+                            ->label('Categoria do Contato')
+                            ->helperText('Ex: Cliente, Fornecedor, Lead, Parceiro.')
                             ->options(ContactAgenda::categoryLabels())
                             ->default(ContactAgenda::CATEGORY_CONTACT)
                             ->required()
                             ->native(false),
                         Forms\Components\Select::make('source')
-                            ->label(__('Origem'))
+                            ->label('Origem do Contato')
+                            ->helperText('Como este contato chegou até você (ex: Site, Indicação).')
                             ->options(ContactAgenda::sourceLabels())
                             ->native(false)
-                            ->placeholder(__('—')),
+                            ->placeholder('Selecione a origem'),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make(__('Anotações'))
+                Forms\Components\Section::make('Anotações e Histórico')
+                    ->description('Espaço para detalhar conversas ou informações adicionais importantes.')
+                    ->icon('heroicon-o-pencil-square')
                     ->schema([
                         Forms\Components\Textarea::make('notes')
-                            ->label(__('Observações'))
+                            ->label('Observações Adicionais')
+                            ->helperText('Registro de informações extras que não se encaixam nos outros campos.')
                             ->rows(4)
                             ->columnSpanFull(),
                     ])
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

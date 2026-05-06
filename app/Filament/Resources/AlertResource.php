@@ -142,20 +142,6 @@ class AlertResource extends Resource
                             ->visible(fn (Forms\Get $get) => (bool) $get('use_cookie')),
                     ])
                     ->columns(2),
-
-                Forms\Components\Section::make('Agendamento')
-                    ->description('Defina um período específico para exibição automática.')
-                    ->icon('heroicon-o-calendar-days')
-                    ->schema([
-                        Forms\Components\DateTimePicker::make('start_at')
-                            ->label('Início da Exibição')
-                            ->helperText('Data e hora para o alerta começar a aparecer.'),
-                        Forms\Components\DateTimePicker::make('end_at')
-                            ->label('Fim da Exibição')
-                            ->helperText('Data e hora para o alerta ser removido automaticamente.'),
-                    ])
-                    ->columns(2)
-                    ->collapsed(),
             ]);
     }
 
