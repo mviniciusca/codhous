@@ -204,60 +204,28 @@ class BudgetResource extends Resource
                         Tabs\Tab::make('Itens do Pedido')
                             ->icon('heroicon-o-shopping-bag')
                             ->schema([
-                                Section::make('O que o cliente solicitou')
-                                    ->description('Referência dos itens enviados no formulário original.')
-                                    ->collapsed()
-                                    ->headerActions([
-                                        Action::make('import_request')
-                                            ->label('Importar para o Orçamento')
-                                            ->icon('heroicon-o-arrow-down-tray')
-                                            ->color('primary')
-                                            ->requiresConfirmation()
-                                            ->action(function (Set $set, Get $get) {
-                                                $requested = $get('content.products') ?? [];
-                                                $items = $get('content.items') ?? [];
-                                                
-                                                foreach ($requested as $req) {
-                                                    $option = \App\Models\ProductOption::find($req['product_option'] ?? 0);
-                                                    $items[] = [
-                                                        'product_id' => $req['product'] ?? null,
-                                                        'product_option_id' => $req['product_option'] ?? null,
-                                                        'quantity' => $req['quantity'] ?? 1,
-                                                        'unit_price' => $option?->price ?? 0,
-                                                    ];
-                                                }
-                                                
-                                                $set('content.items', $items);
-                                                self::calculateTotalFromRepeater($get, $set);
-                                                
-                                                Notification::make()
-                                                    ->title('Itens importados!')
-                                                    ->success()
-                                                    ->send();
-                                            })
-                                    ])
-                                    ->schema([
-                                        Placeholder::make('requested_items')
-                                            ->label('')
-                                            ->content(function (Budget $record): string|Htmlable {
-                                                $products = $record->content['products'] ?? [];
-                                                if (empty($products)) return 'Nenhum item informado.';
-
-                                                $html = '<ul class="list-disc ml-4 space-y-1">';
-                                                foreach ($products as $item) {
-                                                    $productName = \App\Models\Product::find($item['product'] ?? 0)?->name ?? 'Produto';
-                                                    $unit = \App\Models\ProductOption::find($item['product_option'] ?? 0)?->unit?->value ?? '';
-                                                    $html .= "<li><strong>{$productName}</strong>: {$item['quantity']} {$unit}</li>";
-                                                }
-                                                $html .= '</ul>';
-
-                                                return new \Illuminate\Support\HtmlString($html);
-                                            }),
-                                    ]),
 
                                 Repeater::make('content.items')
                                     ->label('Itens do Orçamento')
                                     ->helperText('Adicione aqui os itens que farão parte do orçamento final.')
+                                    ->afterStateHydrated(function (Repeater $component, $state, ?Budget $record, Set $set, Get $get) {
+                                        if (empty($state) && $record && !empty($record->content['products'] ?? [])) {
+                                            $items = [];
+                                            foreach ($record->content['products'] as $req) {
+                                                $option = \App\Models\ProductOption::find($req['product_option'] ?? 0);
+                                                $items[] = [
+                                                    'product_id' => $req['product'] ?? null,
+                                                    'product_option_id' => $req['product_option'] ?? null,
+                                                    'quantity' => $req['quantity'] ?? 1,
+                                                    'unit_price' => $option?->price ?? 0,
+                                                ];
+                                            }
+                                            $component->state($items);
+                                            
+                                            // Trigger total calculation after auto-filling
+                                            self::calculateTotalFromRepeater($get, $set);
+                                        }
+                                    })
                                     ->schema([
                                         Select::make('product_id')
                                             ->label('Produto')
@@ -292,17 +260,12 @@ class BudgetResource extends Resource
                                             ->required()
                                             ->reactive()
                                             ->step(0.01),
-                                        TextInput::make('total_item')
+                                        Placeholder::make('total_item')
                                             ->label('Total Item')
-                                            ->disabled()
-                                            ->dehydrated()
-                                            ->numeric()
-                                            ->prefix('R$')
-                                            ->placeholder('0.00')
-                                            ->state(function (Get $get) {
+                                            ->content(function (Get $get) {
                                                 $qty = floatval($get('quantity') ?? 0);
                                                 $price = floatval($get('unit_price') ?? 0);
-                                                return number_format($qty * $price, 2, '.', '');
+                                                return 'R$ ' . number_format($qty * $price, 2, ',', '.');
                                             }),
                                     ])
                                     ->columns(5)
