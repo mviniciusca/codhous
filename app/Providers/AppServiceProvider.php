@@ -18,17 +18,6 @@ use Illuminate\Support\ServiceProvider;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * The policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
-     */
-    protected $policies = [
-        Budget::class   => BudgetPolicy::class,
-        Mail::class     => MailPolicy::class,
-        Customer::class => CustomerPolicy::class,
-    ];
-
-    /**
      * Register any application services.
      */
     public function register(): void
@@ -43,11 +32,6 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register observers
         Budget::observe(BudgetObserver::class);
-
-        // Register policies
-        foreach ($this->policies as $model => $policy) {
-            Gate::policy($model, $policy);
-        }
 
         // Verifica se a tabela settings existe (para evitar erros durante migrações)
         if (Schema::hasTable('settings')) {

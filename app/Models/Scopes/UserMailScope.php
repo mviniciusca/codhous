@@ -21,19 +21,7 @@ class UserMailScope implements Scope
             return;
         }
 
-        // Super admin and admin see all mails
-        if ($user->hasRole(['super_admin', 'admin'])) {
-            return;
-        }
-
-        // Vendedor and atendimento see only their own mails
-        if ($user->hasRole(['vendedor', 'atendimento'])) {
-            $builder->where('user_id', $user->id);
-        }
-
-        // Financeiro has no access to mails
-        if ($user->hasRole('financeiro')) {
-            $builder->whereRaw('1 = 0'); // Never show any mails
-        }
+        // Se o sistema de roles foi removido, permitimos a visualização por enquanto
+        return;
     }
 }

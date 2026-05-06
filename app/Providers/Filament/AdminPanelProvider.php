@@ -40,7 +40,7 @@ class AdminPanelProvider extends PanelProvider
                 config('filament-logger.activity_resource'),
             ])
             ->plugins([
-                FilamentShieldPlugin::make(),
+                // FilamentShieldPlugin::make(),
             ])
             ->login()
             ->colors([

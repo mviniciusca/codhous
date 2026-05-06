@@ -21,14 +21,8 @@ class UserBudgetScope implements Scope
             return;
         }
 
-        // Super admin and admin see all budgets
-        if ($user->hasRole(['super_admin', 'admin', 'financeiro', 'atendimento'])) {
-            return;
-        }
-
-        // Vendedor sees only their own budgets
-        if ($user->hasRole('vendedor')) {
-            $builder->where('user_id', $user->id);
-        }
+        // Se o sistema de roles foi removido, permitimos a visualização por enquanto
+        // ou você pode implementar uma nova lógica aqui futuramente.
+        return;
     }
 }
