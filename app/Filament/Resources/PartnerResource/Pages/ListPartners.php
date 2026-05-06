@@ -10,12 +10,22 @@ class ListPartners extends ListRecords
 {
     protected static string $resource = PartnerResource::class;
 
+    public function getTitle(): string 
+    {
+        return 'Parceiros e Empresas';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie as empresas parceiras e prestadores de serviço cadastrados no sistema.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-                ->label(__('New Partner'))
-                ->icon('heroicon-o-building-office'),
+                ->label('Novo Parceiro')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }

@@ -40,7 +40,17 @@ class PartnerResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Partners');
+        return 'Parceiros';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Parceiro';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Parceiros';
     }
 
     public static function form(Form $form): Form
@@ -51,9 +61,9 @@ class PartnerResource extends Resource
                 Group::make()
                     ->columns(5)
                     ->schema([
-                        Section::make(__('Partner'))
-                            ->icon('heroicon-o-cube')
-                            ->description(__('Add or control your partner'))
+                        Section::make('Informações do Parceiro')
+                            ->icon('heroicon-o-briefcase')
+                            ->description('Dados cadastrais e de contato da empresa parceira.')
                             ->columnSpan(4)
                             ->columns(3)
                             ->schema([
@@ -62,7 +72,8 @@ class PartnerResource extends Resource
                                     ->required(),
                                 Forms\Components\TextInput::make('name')
                                     ->required()
-                                    ->label(__('Company'))
+                                    ->label('Nome da Empresa')
+                                    ->helperText('Razão social ou nome fantasia do parceiro.')
                                     ->lazy()
                                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state)))
                                     ->maxLength(255),
@@ -70,58 +81,50 @@ class PartnerResource extends Resource
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('Slug')),
+                                    ->label('Slug'),
                                 Forms\Components\TextInput::make('email')
                                     ->email()
-                                    ->label(__('Email'))
+                                    ->label('E-mail')
+                                    ->helperText('Endereço de e-mail para comunicações oficiais.')
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.phone')
                                     ->required()
-                                    ->helperText(__('Phone Number'))
                                     ->tel()
-                                    ->mask('(99)99999-9999')
-                                    ->placeholder(_('(xx) XXXX-XXXX'))
-                                    ->helperText(__('Your phone with local area'))
-                                    ->label(__('Phone')),
+                                    ->mask('(99) 99999-9999')
+                                    ->placeholder('(00) 00000-0000')
+                                    ->helperText('Telefone de contato com DDD.')
+                                    ->label('Telefone'),
                                 Forms\Components\TextInput::make('postcode')
+                                    ->label('CEP')
+                                    ->helperText('Digite o CEP para buscar o endereço.')
                                     ->required()
                                     ->minLength(9)
                                     ->mask('99999-999')
-                                    ->placeholder('22022-000')
+                                    ->placeholder('00000-000')
                                     ->maxLength(9)
-                                    ->helperText(__('Postcode'))
-                                    ->label(__('Postcode'))
                                     ->suffixAction(
-                                        fn ($state, Set $set, $livewire) => Action::make('search-action')
+                                        fn ($state, Set $set, $livewire) => Action::make('search-cep')
                                             ->icon('heroicon-o-magnifying-glass')
-                                            ->tooltip(__('Search address by postcode'))
+                                            ->tooltip('Buscar endereço pelo CEP')
                                             ->action(function () use ($state, $livewire, $set) {
                                                 try {
-                                                    // Validar o formato do CEP antes de fazer a busca
                                                     $livewire->validateOnly('data.postcode');
-
-                                                    // Criar mapeamento de campos da API para campos do formulário
                                                     $fieldMap = [
                                                         'logradouro' => 'content.address',
                                                         'bairro'     => 'content.neighborhood',
                                                         'localidade' => 'content.city',
                                                         'uf'         => 'content.state',
                                                     ];
-
-                                                    // Instanciar e executar a busca de CEP
                                                     $finder = new AddressFinder($state, $set, $fieldMap, 'data.postcode');
                                                     $finder->find();
-
-                                                    // Notificação de sucesso
                                                     \Filament\Notifications\Notification::make()
                                                         ->title('CEP encontrado!')
                                                         ->success()
                                                         ->send();
                                                 } catch (\Exception $e) {
-                                                    // Em caso de erro, exibir notificação
                                                     \Filament\Notifications\Notification::make()
-                                                        ->title('Erro')
+                                                        ->title('Erro ao buscar CEP')
                                                         ->body($e->getMessage())
                                                         ->danger()
                                                         ->send();
@@ -129,47 +132,51 @@ class PartnerResource extends Resource
                                             })
                                     ),
                                 Forms\Components\TextInput::make('content.address')
+                                    ->label('Logradouro')
+                                    ->helperText('Rua, Avenida, etc. (Preenchido via CEP).')
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('Street'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.number')
-                                    ->label(__('Number'))
+                                    ->label('Número')
+                                    ->helperText('Número do imóvel ou S/N.')
                                     ->columnSpan(1)
                                     ->maxLength(140),
                                 Forms\Components\TextInput::make('content.neighborhood')
+                                    ->label('Bairro')
+                                    ->helperText('Bairro da localização.')
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('Neighborhood'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.city')
+                                    ->label('Cidade')
+                                    ->helperText('Cidade do parceiro.')
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('City'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('content.state')
+                                    ->label('UF')
+                                    ->helperText('Estado/Província.')
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('State'))
                                     ->maxLength(255),
                             ]),
-                        Section::make(__('Status & Control'))
-                            ->description(_(''))
+                        Section::make('Status e Visibilidade')
+                            ->description('Controle o status do parceiro.')
                             ->columnSpan(1)
                             ->icon('heroicon-o-eye')
                             ->schema([
                                 Forms\Components\Toggle::make('is_active')
                                     ->default(true)
-                                    ->label(__('Status'))
-                                    ->helperText(__('Active or disable this Partner'))
+                                    ->label('Ativo')
+                                    ->helperText('Define se o parceiro será exibido no site.')
                                     ->inline(),
                             ]),
                     ]),
-
             ]);
     }
 
@@ -179,43 +186,44 @@ class PartnerResource extends Resource
             ->columns([
                 Tables\Columns\IconColumn::make('is_active')
                     ->alignCenter()
-                    ->label(__('Active'))
+                    ->label('Ativo')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('Company'))
-                    ->searchable(),
+                    ->label('Empresa')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('content.phone')
-                    ->label(__('Phone'))
-                    ->label(__('Phone'))
+                    ->label('Telefone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label(__('Email'))
+                    ->label('E-mail')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Criado em')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
                     ->default(true)
-                    ->label(__('Status'))
-                    ->placeholder(__('Show All'))
-                    ->trueLabel(__('Active'))
-                    ->falseLabel(__('Inactive')),
+                    ->label('Status')
+                    ->placeholder('Todos')
+                    ->trueLabel('Ativos')
+                    ->falseLabel('Inativos'),
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->label('Editar'),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Excluir'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Excluir Selecionados'),
                 ]),
             ]);
     }

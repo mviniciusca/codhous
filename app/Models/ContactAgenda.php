@@ -36,22 +36,22 @@ class ContactAgenda extends Model
     public static function categoryLabels(): array
     {
         return [
-            self::CATEGORY_CONTACT => __('Contact'),
-            self::CATEGORY_LEAD => __('Lead'),
-            self::CATEGORY_CLIENT => __('Client'),
-            self::CATEGORY_SUPPLIER => __('Supplier'),
-            self::CATEGORY_PARTNER => __('Partner'),
+            self::CATEGORY_CONTACT => 'Contato Geral',
+            self::CATEGORY_LEAD => 'Lead / Interesse',
+            self::CATEGORY_CLIENT => 'Cliente',
+            self::CATEGORY_SUPPLIER => 'Fornecedor',
+            self::CATEGORY_PARTNER => 'Parceiro / Colaborador',
         ];
     }
 
     public static function sourceLabels(): array
     {
         return [
-            'website' => __('Website'),
-            'manual' => __('Manual'),
-            'referral' => __('Referral'),
-            'budget' => __('Budget form'),
-            'other' => __('Other'),
+            'website' => 'Site / Portal',
+            'manual' => 'Cadastro Manual',
+            'referral' => 'Indicação',
+            'budget' => 'Formulário de Orçamento',
+            'other' => 'Outro',
         ];
     }
 
