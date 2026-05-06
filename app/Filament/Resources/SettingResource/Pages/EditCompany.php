@@ -128,4 +128,12 @@ class EditCompany extends EditRecord
     {
         return static::getUrl(['record' => $this->getRecord()]);
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $currentSettings = $this->getRecord()->settings ?? [];
+        $data['settings'] = array_replace_recursive($currentSettings, $data['settings']);
+        
+        return $data;
+    }
 }

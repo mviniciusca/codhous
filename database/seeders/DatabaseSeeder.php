@@ -29,10 +29,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Criar o usuário super admin
-        $user = User::factory()->create([
-            'name'  => 'Codhous Software',
-            'email' => 'codhous@codhous.app',
-        ]);
+        $user = User::updateOrCreate(
+            ['email' => 'codhous@codhous.app'],
+            [
+                'name'  => 'Codhous Software',
+                'password' => bcrypt('password'), // Adicionando uma senha padrão
+            ]
+        );
 
         // Criar a role super_admin usando Filament Shield com guard 'web'
         $role = Role::firstOrCreate(
