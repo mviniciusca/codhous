@@ -13,7 +13,7 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         // Garante que existe apenas um registro de configurações
-        Setting::truncate();
+        Setting::query()->delete();
         Setting::factory()->create();
     }
 }
