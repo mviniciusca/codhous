@@ -32,91 +32,110 @@ class AlertResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Identificação')
+                    ->description('Defina como este alerta será identificado internamente.')
+                    ->icon('heroicon-o-identification')
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label('Nome (admin)')
+                            ->label('Nome Interno')
+                            ->helperText('Nome para identificação administrativa (ex: Promoção Verão 2024).')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Ex: Banner promo Black Friday'),
+                            ->placeholder('Ex: Banner Black Friday'),
                         Forms\Components\Toggle::make('is_active')
-                            ->label('Ativo')
+                            ->label('Alerta Ativo')
+                            ->helperText('Define se o alerta será exibido no site imediatamente.')
                             ->default(true)
                             ->inline(),
                         Forms\Components\TextInput::make('sort_order')
-                            ->label('Ordem')
+                            ->label('Ordem de Exibição')
+                            ->helperText('Define a prioridade caso existam múltiplos alertas ativos.')
                             ->numeric()
                             ->default(0)
                             ->minValue(0),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Tipo e estilo')
+                Forms\Components\Section::make('Configurações de Estilo')
+                    ->description('Personalize a aparência e o local onde o alerta será exibido.')
+                    ->icon('heroicon-o-swatch')
                     ->schema([
                         Forms\Components\Select::make('type')
-                            ->label('Tipo')
+                            ->label('Tipo de Alerta')
+                            ->helperText('Define o propósito do alerta (ex: Aviso, Promoção).')
                             ->options(Alert::typeLabels())
                             ->required()
                             ->live()
                             ->native(false),
                         Forms\Components\Select::make('style')
-                            ->label('Estilo')
+                            ->label('Cores e Estilo')
+                            ->helperText('Esquema de cores do alerta (Sucesso, Atenção, Erro).')
                             ->options(Alert::styleLabels())
                             ->default(Alert::STYLE_INFO)
                             ->required()
                             ->native(false),
                         Forms\Components\Select::make('position')
-                            ->label('Posição')
+                            ->label('Posição na Tela')
+                            ->helperText('Onde o alerta aparecerá (Topo, Rodapé, Flutuante).')
                             ->options(Alert::positionLabels())
                             ->default(Alert::POSITION_TOP)
                             ->required()
-                            ->native(false)
-                            ->helperText('Onde o alerta aparece na tela (topo, rodapé, cantos, centro).'),
+                            ->native(false),
                     ])
                     ->columns(3),
 
-                Forms\Components\Section::make('Conteúdo')
+                Forms\Components\Section::make('Conteúdo da Mensagem')
+                    ->description('Escreva o texto que será exibido para os usuários.')
+                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
                     ->schema([
                         Forms\Components\TextInput::make('title')
-                            ->label('Título')
+                            ->label('Título do Alerta')
+                            ->helperText('Título em destaque (opcional).')
                             ->maxLength(255)
-                            ->placeholder('Opcional'),
+                            ->placeholder('Ex: Atenção!'),
                         Forms\Components\Textarea::make('message')
-                            ->label('Mensagem')
+                            ->label('Mensagem Principal')
+                            ->helperText('Texto descritivo que o usuário irá ler.')
                             ->required()
                             ->rows(3)
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('cta_label')
-                            ->label('Texto do botão (CTA)')
+                            ->label('Texto do Botão')
+                            ->helperText('Texto de ação (ex: Saiba Mais, Ver Oferta).')
                             ->maxLength(255)
-                            ->placeholder('Ex: Saiba mais'),
+                            ->placeholder('Ex: Clique aqui'),
                         Forms\Components\TextInput::make('cta_url')
-                            ->label('Link do botão (URL)')
+                            ->label('Link de Destino (URL)')
+                            ->helperText('Endereço para onde o usuário será levado ao clicar.')
                             ->url()
                             ->maxLength(500)
                             ->placeholder('https://...'),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Comportamento')
+                Forms\Components\Section::make('Comportamento e Cookies')
+                    ->description('Controle como o usuário interage e fecha o alerta.')
+                    ->icon('heroicon-o-cog-8-tooth')
                     ->schema([
                         Forms\Components\Toggle::make('is_dismissible')
-                            ->label('Permitir fechar')
+                            ->label('Permitir Fechar')
+                            ->helperText('Exibe um botão "X" para o usuário ocultar o alerta.')
                             ->default(true)
-                            ->inline()
-                            ->helperText('Usuário pode dispensar o alerta.'),
+                            ->inline(),
                         Forms\Components\Toggle::make('use_cookie')
-                            ->label('Usar cookie ao fechar')
+                            ->label('Lembrar Fechamento')
+                            ->helperText('Se ativado, o alerta não aparecerá novamente após ser fechado.')
                             ->default(false)
                             ->live()
-                            ->inline()
-                            ->helperText('Ao dispensar, não exibe de novo por X dias (útil para consentimento de cookies).'),
+                            ->inline(),
                         Forms\Components\TextInput::make('cookie_key')
-                            ->label('Chave do cookie')
+                            ->label('Chave do Cookie')
+                            ->helperText('Identificador único para o cookie. Deixe vazio para automático.')
                             ->maxLength(100)
-                            ->placeholder('Deixe vazio para usar alert_{id}')
+                            ->placeholder('alert_black_friday')
                             ->visible(fn (Forms\Get $get) => (bool) $get('use_cookie')),
                         Forms\Components\TextInput::make('cookie_duration_days')
-                            ->label('Duração do cookie (dias)')
+                            ->label('Duração (Dias)')
+                            ->helperText('Por quantos dias o alerta ficará oculto após o fechamento.')
                             ->numeric()
                             ->minValue(1)
                             ->default(30)
@@ -124,13 +143,16 @@ class AlertResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Período')
-                    ->description('Opcional: exibir apenas em um intervalo de datas.')
+                Forms\Components\Section::make('Agendamento')
+                    ->description('Defina um período específico para exibição automática.')
+                    ->icon('heroicon-o-calendar-days')
                     ->schema([
                         Forms\Components\DateTimePicker::make('start_at')
-                            ->label('Exibir a partir de'),
+                            ->label('Início da Exibição')
+                            ->helperText('Data e hora para o alerta começar a aparecer.'),
                         Forms\Components\DateTimePicker::make('end_at')
-                            ->label('Exibir até'),
+                            ->label('Fim da Exibição')
+                            ->helperText('Data e hora para o alerta ser removido automaticamente.'),
                     ])
                     ->columns(2)
                     ->collapsed(),
