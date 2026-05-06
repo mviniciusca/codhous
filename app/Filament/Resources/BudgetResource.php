@@ -205,19 +205,27 @@ class BudgetResource extends Resource
                             ->icon('heroicon-o-shopping-bag')
                             ->schema([
 
-                                Repeater::make('content.items')
+                                Repeater::make('budgetItems')
+                                    ->relationship()
                                     ->label('Itens do Orçamento')
                                     ->helperText('Adicione aqui os itens que farão parte do orçamento final.')
                                     ->afterStateHydrated(function (Repeater $component, $state, ?Budget $record, Set $set, Get $get) {
                                         if (empty($state) && $record && !empty($record->content['products'] ?? [])) {
                                             $items = [];
                                             foreach ($record->content['products'] as $req) {
-                                                $option = \App\Models\ProductOption::find($req['product_option'] ?? 0);
+                                                // Prioritize the price from the request (snapshot)
+                                                $snapshotPrice = $req['price'] ?? null;
+                                                
+                                                if ($snapshotPrice === null) {
+                                                    $option = \App\Models\ProductOption::find($req['product_option'] ?? 0);
+                                                    $snapshotPrice = $option?->price ?? 0;
+                                                }
+
                                                 $items[] = [
                                                     'product_id' => $req['product'] ?? null,
                                                     'product_option_id' => $req['product_option'] ?? null,
                                                     'quantity' => $req['quantity'] ?? 1,
-                                                    'unit_price' => $option?->price ?? 0,
+                                                    'price' => $snapshotPrice,
                                                 ];
                                             }
                                             $component->state($items);
@@ -242,7 +250,7 @@ class BudgetResource extends Resource
                                             ->afterStateUpdated(function (Set $set, $state) {
                                                 if ($state) {
                                                     $option = \App\Models\ProductOption::find($state);
-                                                    $set('unit_price', $option?->price ?? 0);
+                                                    $set('price', $option?->price ?? 0);
                                                 }
                                             })
                                             ->searchable(),
@@ -253,7 +261,7 @@ class BudgetResource extends Resource
                                             ->default(1)
                                             ->reactive()
                                             ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? ''),
-                                        TextInput::make('unit_price')
+                                        TextInput::make('price')
                                             ->label('Preço Unit.')
                                             ->numeric()
                                             ->prefix('R$')
@@ -264,7 +272,7 @@ class BudgetResource extends Resource
                                             ->label('Total Item')
                                             ->content(function (Get $get) {
                                                 $qty = floatval($get('quantity') ?? 0);
-                                                $price = floatval($get('unit_price') ?? 0);
+                                                $price = floatval($get('price') ?? 0);
                                                 return 'R$ ' . number_format($qty * $price, 2, ',', '.');
                                             }),
                                     ])
@@ -339,12 +347,12 @@ class BudgetResource extends Resource
 
     public static function calculateTotalFromRepeater(Get $get, Set $set): void
     {
-        $items = $get('content.items') ?? [];
+        $items = $get('budgetItems') ?? [];
         $subtotal = 0;
 
         foreach ($items as $item) {
             $qty = floatval($item['quantity'] ?? 0);
-            $price = floatval($item['unit_price'] ?? 0);
+            $price = floatval($item['price'] ?? 0);
             $subtotal += ($qty * $price);
         }
 

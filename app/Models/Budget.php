@@ -73,6 +73,11 @@ class Budget extends Model
         return $this->hasMany(BudgetPdf::class);
     }
 
+    public function budgetItems()
+    {
+        return $this->hasMany(BudgetItem::class);
+    }
+
     public function documents()
     {
         return $this->hasMany(BudgetDocument::class);

@@ -188,6 +188,7 @@ class Budget extends Component implements HasForms
                                                         $this->calculateItemSubtotal($get, $set);
                                                         $this->calculateTotal($get, $set);
                                                     }),
+                                                Hidden::make('price'),
                                             ]),
                                         ])
                                         ->addActionLabel('Adicionar Item')
@@ -233,7 +234,25 @@ class Budget extends Component implements HasForms
     public function create(): void
     {
         $this->form->validate();
-        $budget = BudgetModel::create($this->form->getState());
+        $state = $this->form->getState();
+        
+        // Extract products for pivot table sync
+        $products = $state['content']['products'] ?? [];
+        
+        $budget = BudgetModel::create($state);
+        
+        // Save items to the pivot table (snapshot)
+        foreach ($products as $req) {
+            $budget->budgetItems()->create([
+                'product_id' => $req['product'] ?? null,
+                'product_option_id' => $req['product_option'] ?? null,
+                'location_id' => $req['location'] ?? null,
+                'quantity' => $req['quantity'] ?? 1,
+                'price' => $req['price'] ?? 0,
+                'subtotal' => $req['subtotal'] ?? 0,
+            ]);
+        }
+
         $user = new User();
         $user->first()?->notify(new NewBudget($budget->toArray()));
         
