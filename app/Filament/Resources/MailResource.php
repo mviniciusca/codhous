@@ -117,44 +117,51 @@ class MailResource extends Resource
             ])
             ->description('Gerencie as mensagens e e-mails recebidos através do site.')
             ->columns([
-                Split::make([
-                    TextColumn::make('name')
-                        ->label('Nome')
-                        ->weight('bold')
-                        ->searchable()
-                        ->formatStateUsing(fn($state) => self::normalizeText($state))
-                        ->description(fn(Mail $record) => $record->email)
-                        ->grow(false),
-                    Stack::make([
-                        TextColumn::make('subject')
-                            ->label('Assunto')
-                            ->weight('semibold')
-                            ->searchable()
-                            ->limit(100),
-                        TextColumn::make('message')
-                            ->label('Mensagem')
-                            ->limit(150)
-                            ->color('gray')
-                            ->wrap()
-                            ->html(),
-                    ]),
-                    TextColumn::make('created_at')
-                        ->label('Enviado em')
-                        ->dateTime('d/m/y H:i')
-                        ->color('gray')
-                        ->alignEnd()
-                        ->description(fn(Mail $record) => $record->created_at->diffForHumans()),
-                ])->extraAttributes([
-                    'class' => 'py-3',
-                ]),
                 IconColumn::make('is_read')
                     ->label('')
                     ->boolean()
                     ->trueIcon('')
-                    ->falseIcon('heroicon-m-sparkles')
+                    ->falseIcon('heroicon-s-circle-stack')
                     ->falseColor('primary')
-                    ->alignCenter()
+                    ->tooltip('Não lida')
                     ->grow(false),
+                Tables\Columns\ToggleColumn::make('is_favorite')
+                    ->label('')
+                    ->onIcon('heroicon-s-star')
+                    ->offIcon('heroicon-o-star')
+                    ->onColor('warning')
+                    ->grow(false),
+                Split::make([
+                    TextColumn::make('name')
+                        ->weight('bold')
+                        ->searchable()
+                        ->formatStateUsing(fn($state) => self::normalizeText($state))
+                        ->grow(false)
+                        ->width('180px'),
+                    TextColumn::make('is_new_badge')
+                        ->state('')
+                        ->badge()
+                        ->label('')
+                        ->color('primary')
+                        ->formatStateUsing(fn() => 'Nova')
+                        ->visible(fn(?Mail $record) => $record && !$record->is_read)
+                        ->grow(false),
+                    Stack::make([
+                        TextColumn::make('subject_message')
+                            ->state(fn(Mail $record) => $record->subject . ' - ' . strip_tags($record->message))
+                            ->searchable(['subject', 'message'])
+                            ->limit(150)
+                            ->weight(fn(Mail $record) => !$record->is_read ? 'bold' : 'normal')
+                            ->html(),
+                    ])->grow(true),
+                    TextColumn::make('created_at')
+                        ->dateTime('d/m/y')
+                        ->color('gray')
+                        ->alignEnd()
+                        ->grow(false),
+                ])->extraAttributes([
+                    'class' => 'py-2',
+                ]),
             ])
             ->recordAction('view')
             ->recordClasses(fn(Mail $record) => match ($record->is_read) {

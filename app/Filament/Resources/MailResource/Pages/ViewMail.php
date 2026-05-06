@@ -22,23 +22,26 @@ class ViewMail extends ViewRecord
     {
         return [
             Actions\Action::make('reply')
-                ->label(__('Reply'))
+                ->label('Responder')
                 ->icon('heroicon-o-arrow-uturn-left')
                 ->color('primary')
-                ->modalHeading(__('Reply to Message'))
-                ->modalSubmitActionLabel(__('Send Message'))
+                ->modalHeading('Responder Mensagem')
+                ->modalSubmitActionLabel('Enviar Resposta')
                 ->hidden(fn(Mail $record) => $record->is_sent)
                 ->form([
                     TextInput::make('email')
-                        ->label(__('To:'))
+                        ->label('Para:')
+                        ->helperText('Destinatário da resposta.')
                         ->default(fn($record) => $record->email)
                         ->readOnly(),
                     TextInput::make('subject')
-                        ->label(__('Subject:'))
+                        ->label('Assunto:')
+                        ->helperText('Título da resposta.')
                         ->default(fn($record) => "Re: " . $record->subject)
                         ->required(),
                     RichEditor::make('message')
-                        ->label(__('Message:'))
+                        ->label('Mensagem:')
+                        ->helperText('Escreva sua resposta abaixo.')
                         ->required(),
                 ])
                 ->action(function (Mail $record, array $data) {
@@ -47,7 +50,7 @@ class ViewMail extends ViewRecord
                     $service->send();
                 }),
             Actions\DeleteAction::make()
-                ->label('Move')
+                ->label('Mover para Lixeira')
                 ->icon('heroicon-o-trash'),
         ];
     }
@@ -66,52 +69,55 @@ class ViewMail extends ViewRecord
 
     public function getTitle(): Htmlable|string
     {
-        return __('Mail');
+        return 'Visualizar Mensagem';
     }
 
     public function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                Section::make(__('Message'))
+                Section::make('Detalhes da Mensagem')
                     ->icon('heroicon-o-envelope')
                     ->columns(3)
                     ->schema([
                         TextEntry::make('name')
-                            ->label(new \Illuminate\Support\HtmlString(__('<strong>From:</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString('<strong>De:</strong>')),
                         TextEntry::make('email')
-                            ->label(new \Illuminate\Support\HtmlString(__('<strong>Email:</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString('<strong>E-mail:</strong>')),
                         TextEntry::make('created_at')
                             ->dateTime('d/m/y H:i')
-                            ->label(new \Illuminate\Support\HtmlString(__('<strong>Received At</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString('<strong>Recebido em:</strong>')),
                         TextEntry::make('subject')
                             ->columnSpanFull()
-                            ->label(new \Illuminate\Support\HtmlString(__('<strong>Subject:</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString('<strong>Assunto:</strong>')),
                         TextEntry::make('message')
                             ->columnSpanFull()
                             ->html()
-                            ->label(new \Illuminate\Support\HtmlString(__('<strong>Message:</strong>'))),
+                            ->label(new \Illuminate\Support\HtmlString('<strong>Mensagem:</strong>')),
                     ])
                     ->footerActions([
                         InfolistAction::make('reply_infolist')
-                            ->label(__('Reply to Message'))
+                            ->label('Responder Mensagem')
                             ->icon('heroicon-o-arrow-uturn-left')
                             ->color('primary')
                             ->button()
-                            ->modalHeading(__('Reply to Message'))
-                            ->modalSubmitActionLabel(__('Send Message'))
+                            ->modalHeading('Responder Mensagem')
+                            ->modalSubmitActionLabel('Enviar Resposta')
                             ->hidden(fn(Mail $record) => $record->is_sent)
                             ->form([
                                 TextInput::make('email')
-                                    ->label(__('To:'))
+                                    ->label('Para:')
+                                    ->helperText('Destinatário da resposta.')
                                     ->default(fn($record) => $record->email)
                                     ->readOnly(),
                                 TextInput::make('subject')
-                                    ->label(__('Subject:'))
+                                    ->label('Assunto:')
+                                    ->helperText('Título da resposta.')
                                     ->default(fn($record) => "Re: " . $record->subject)
                                     ->required(),
                                 RichEditor::make('message')
-                                    ->label(__('Message:'))
+                                    ->label('Mensagem:')
+                                    ->helperText('Escreva sua resposta abaixo.')
                                     ->required(),
                             ])
                             ->action(function (Mail $record, array $data) {
