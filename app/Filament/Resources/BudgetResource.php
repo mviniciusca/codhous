@@ -55,8 +55,8 @@ class BudgetResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
-            __('Customer') => $record->content['customer_name'],
-            __('Code')     => $record->code,
+            'Cliente' => $record->content['customer_name'] ?? 'N/A',
+            'Código'  => $record->code,
         ];
     }
 
@@ -74,40 +74,41 @@ class BudgetResource extends Resource
                 Group::make()
                     ->columnSpanFull()
                     ->schema([
-                        Section::make(__('Budget Overview'))
+                        Section::make('Visão Geral do Orçamento')
                             ->columns(4)
-                            ->description(__('Organize your budget report'))
+                            ->description('Informações básicas e status atual do pedido.')
                             ->icon('heroicon-o-document')
                             ->schema([
                                 Toggle::make('is_active')
-                                    ->helperText(__('Enable or disable this budget from the dashboard view'))
-                                    ->label(__('Active'))
+                                    ->helperText('Define se este orçamento deve ser exibido nos relatórios ativos.')
+                                    ->label('Ativo')
                                     ->inline(),
                                 Select::make('status')
-                                    ->helperText(__('Set the budget status'))
+                                    ->label('Status')
+                                    ->helperText('Estado atual do atendimento.')
                                     ->options([
-                                        'pending'  => __('Pending'),
-                                        'on going' => __('On Going'),
-                                        'done'     => __('Done'),
-                                        'ignored'  => __('Ignored'),
+                                        'pending'  => 'Pendente',
+                                        'on going' => 'Em Andamento',
+                                        'done'     => 'Concluído',
+                                        'ignored'  => 'Arquivado/Ignorado',
                                     ]),
                                 TextInput::make('code')
-                                    ->label(__('Budget Code'))
-                                    ->helperText(__('Use this code to search'))
+                                    ->label('Código do Orçamento')
+                                    ->helperText('Identificador único gerado automaticamente.')
                                     ->disabled(),
                                 DateTimePicker::make('created_at')
-                                    ->format('d/m/Y H:i')
-                                    ->label(__('Date'))
+                                    ->displayFormat('d/m/Y H:i')
+                                    ->label('Data de Criação')
                                     ->disabled()
-                                    ->helperText(__('When this budget was created')),
+                                    ->helperText('Data e hora em que o cliente enviou o pedido.'),
                             ]),
                     ]),
-                Section::make('Budget Content')
-                    ->description(__('Here is the content from your budget'))
+                Section::make('Conteúdo do Pedido')
+                    ->description('Detalhes dos produtos, serviços e informações do cliente.')
                     ->icon('heroicon-o-shopping-bag')
                     ->headerActions([
                         Action::make('fill_all_fake_data')
-                            ->label(__('Fill All with Fake Data'))
+                            ->label('Preencher com Dados de Teste')
                             ->icon('heroicon-o-sparkles')
                             ->color('success')
                             ->action(function (Set $set, Get $get) {
@@ -119,39 +120,26 @@ class BudgetResource extends Resource
                                 }
 
                                 Notification::make()
-                                    ->title(__('Fake data generated!'))
-                                    ->body(__('All fields have been filled with test data'))
+                                    ->title('Dados de teste gerados!')
+                                    ->body('Todos os campos foram preenchidos para validação.')
                                     ->success()
                                     ->send();
                             }),
                         Action::make('clear_all_fields')
-                            ->label(__('Clear All'))
+                            ->label('Limpar Tudo')
                             ->icon('heroicon-o-trash')
                             ->color('danger')
                             ->requiresConfirmation()
                             ->action(function (Set $set) {
-                                // Clear customer fields
-                                $set('content.customer_name', '');
-                                $set('content.customer_email', '');
-                                $set('content.customer_phone', '');
-
-                                // Clear address fields
-                                $set('content.postcode', '');
-                                $set('content.street', '');
-                                $set('content.number', '');
-                                $set('content.city', '');
-                                $set('content.neighborhood', '');
-                                $set('content.state', '');
-                                $set('content.shipping', '0');
-
+                                $set('content', []);
                                 Notification::make()
-                                    ->title(__('All fields cleared!'))
+                                    ->title('Campos limpos!')
                                     ->success()
                                     ->send();
                             }),
                     ])
                     ->schema([
-                        Fieldset::make(__('Customer Information'))
+                        Fieldset::make('Informações do Cliente')
                             ->columns(3)
                             ->schema([
                                 Group::make()
@@ -162,87 +150,87 @@ class BudgetResource extends Resource
                                             ->disabled()
                                             ->required()
                                             ->dehydrated()
-                                            ->label(__('Customer Name')),
+                                            ->label('Nome do Cliente'),
                                         TextInput::make('content.customer_email')
                                             ->disabled()
                                             ->required()
                                             ->dehydrated()
-                                            ->label(__('Email')),
+                                            ->label('E-mail'),
                                         TextInput::make('content.customer_phone')
                                             ->disabled()
                                             ->required()
                                             ->dehydrated()
-                                            ->label(__('Phone')),
+                                            ->label('Telefone/WhatsApp'),
                                     ]),
                                 TextInput::make('content.postcode')
                                     ->disabled()
                                     ->required()
                                     ->dehydrated()
-                                    ->label(__('CEP')),
+                                    ->label('CEP'),
                                 TextInput::make('content.street')
                                     ->disabled()
                                     ->dehydrated()
                                     ->required()
-                                    ->label(__('Street')),
+                                    ->label('Logradouro'),
                                 TextInput::make('content.number')
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('Number')),
+                                    ->label('Número'),
                                 TextInput::make('content.city')
                                     ->disabled()
                                     ->required()
                                     ->dehydrated()
-                                    ->label(__('City')),
+                                    ->label('Cidade'),
                                 TextInput::make('content.neighborhood')
                                     ->disabled()
                                     ->dehydrated()
                                     ->required()
-                                    ->label(__('Neighborhood')),
+                                    ->label('Bairro'),
                                 TextInput::make('content.state')
                                     ->disabled()
                                     ->required()
                                     ->dehydrated()
-                                    ->label(__('State')),
+                                    ->label('UF'),
                             ]),
-                        Fieldset::make('Construction Components')
+                        Fieldset::make('Componentes da Obra')
                             ->columns(4)
                             ->schema([
                                 TextInput::make('content.quantity')
                                     ->required()
-                                    ->label(__('Quantity m³'))
-                                    ->suffix(__('m³'))
-                                    ->helperText(__('Min value is 3 (ABNT NBR 7212)'))
-                                    ->afterStateHydrated(fn(Set $set, string $state) => $set('quantity', $state))
+                                    ->label('Volume Estimado')
+                                    ->suffix('m³')
+                                    ->helperText('Volume solicitado para concretagem.')
                                     ->disabled()
                                     ->dehydrated(),
                                 TextInput::make('content.location')
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->label(__('Location / Area'))
-                                    ->helperText(__('Local or area to be concreted')),
+                                    ->label('Local da Obra')
+                                    ->helperText('Área ou elemento a ser concretado.'),
                                 TextInput::make('content.fck')
                                     ->required()
-                                    ->label(__('FCK'))
-                                    ->helperText(__('Feature Compression Know'))
+                                    ->label('FCK Solicitado')
+                                    ->helperText('Resistência característica do concreto.')
                                     ->disabled()
                                     ->dehydrated(),
                                 TextInput::make('content.product')
                                     ->required()
-                                    ->label(__('Product'))
-                                    ->helperText(__('Type of Concrete'))
+                                    ->label('Tipo de Concreto')
+                                    ->helperText('Descrição do produto/serviço.')
                                     ->disabled()
                                     ->dehydrated(),
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('Pricing'))
+                Section::make('Precificação e Custos')
                     ->icon('heroicon-o-currency-dollar')
-                    ->description(__('Pricing Definition & Total Cost'))
+                    ->description('Definição de valores, impostos e descontos.')
                     ->collapsible()
                     ->columns(6)
                     ->schema([
                         TextInput::make('content.quantity')
+                            ->label('Qtd (m³)')
                             ->live()
                             ->dehydrated()
                             ->readonly()
@@ -255,8 +243,8 @@ class BudgetResource extends Resource
                         TextInput::make('content.price')
                             ->live()
                             ->dehydrated()
-                            ->prefix(env('CURRENCY_SUFFIX'))
-                            ->label(__('Price per Unity (m³)'))
+                            ->prefix('R$')
+                            ->label('Preço Unit. (m³)')
                             ->required()
                             ->numeric()
                             ->step(0.01)
@@ -267,14 +255,15 @@ class BudgetResource extends Resource
                             ->live()
                             ->dehydrated()
                             ->readonly()
-                            ->label(__('Subtotal'))
-                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->label('Subtotal')
+                            ->prefix('R$')
                             ->numeric()
                             ->step(0.01),
                         TextInput::make('content.tax')
+                            ->label('Taxas/Frete')
                             ->live()
                             ->dehydrated()
-                            ->prefix('+' . env('CURRENCY_SUFFIX'))
+                            ->prefix('+ R$')
                             ->numeric()
                             ->required()
                             ->default(0)
@@ -283,22 +272,24 @@ class BudgetResource extends Resource
                                 self::calculateTotal($get, $set);
                             }),
                         TextInput::make('content.discount')
+                            ->label('Desconto')
                             ->live()
                             ->dehydrated()
                             ->numeric()
                             ->required()
-                            ->prefix('-' . env('CURRENCY_SUFFIX'))
+                            ->prefix('- R$')
                             ->step(0.01)
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 self::calculateTotal($get, $set);
                             }),
                         TextInput::make('content.total')
+                            ->label('Valor Total')
                             ->live()
                             ->dehydrated()
                             ->disabled()
                             ->numeric()
                             ->required()
-                            ->prefix(env('CURRENCY_SUFFIX'))
+                            ->prefix('R$')
                             ->step(0.01),
                     ]),
             ]);
@@ -312,12 +303,6 @@ class BudgetResource extends Resource
         ];
     }
 
-    /**
-     * Summary of calculateTotal
-     * @param Get $get
-     * @param Set $set
-     * @return void
-     */
     public static function calculateTotal(Get $get, Set $set): void
     {
         $quantity = floatval($get('content.quantity') ?? 0);
@@ -332,35 +317,34 @@ class BudgetResource extends Resource
         $set('content.total', number_format($total, 2, '.', ''));
     }
 
-    /**
-     * Summary of table
-     * @param Table $table
-     * @return Table
-     */
     public static function table(Table $table): Table
     {
         return $table
             ->recordAction(null)
             ->recordUrl(fn(Budget $record): ?string => $record->trashed() ? null : BudgetResource::getUrl('edit', ['record' => $record]))
             ->recordClasses(fn(Budget $record) => match (true) {
-                // Deletado: bem apagado com linha atravessada
                 $record->trashed() => 'opacity-40 dark:opacity-40 hover:opacity-70 dark:hover:opacity-70 [&_*]:line-through',
-                // Ignorado: muito apagado (não é mais relevante)
                 $record->status === 'ignored' => 'opacity-40 dark:opacity-40 hover:opacity-90 dark:hover:opacity-90',
-                // Finalizado: levemente apagado (já foi concluído)
                 $record->status === 'done' => 'opacity-70 dark:opacity-70 hover:opacity-100 dark:hover:opacity-100',
-                // Em andamento e Pendente: totalmente visíveis (100%)
                 default => null,
             })
             ->columns([
                 TextColumn::make('code')
                     ->searchable()
-                    ->label(__('Code'))
+                    ->label('Código')
                     ->icon(fn(Budget $record) => $record->trashed() ? 'heroicon-o-trash' : null)
                     ->iconColor('danger'),
                 TextColumn::make('status')
+                    ->label('Status')
                     ->sortable()
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending'  => 'Pendente',
+                        'on going' => 'Em Andamento',
+                        'done'     => 'Concluído',
+                        'ignored'  => 'Arquivado',
+                        default    => $state,
+                    })
                     ->icon(fn(Budget $record, string $state): string => $record->trashed() ? 'heroicon-o-trash' : match ($state) {
                         'pending'  => 'heroicon-o-clock',
                         'on going' => 'heroicon-o-arrow-path',
@@ -372,21 +356,22 @@ class BudgetResource extends Resource
                         'pending'  => 'primary',
                         'on going' => 'warning',
                         'done'     => 'success',
-                        'ignored'  => 'danger'
+                        'ignored'  => 'danger',
+                        default    => 'gray',
                     }),
                 TextColumn::make('content.customer_name')
                     ->sortable()
                     ->searchable()
-                    ->label(__('Name')),
+                    ->label('Cliente'),
                 TextColumn::make('products_display')
-                    ->label(__('Products & Units'))
+                    ->label('Itens Solicitados')
                     ->state(function (Budget $record): string {
                         $products = $record->content['products'] ?? [];
                         if (empty($products)) return '-';
 
                         $lines = [];
                         foreach ($products as $item) {
-                            $productName = \App\Models\Product::find($item['product'] ?? 0)?->name ?? 'Product';
+                            $productName = \App\Models\Product::find($item['product'] ?? 0)?->name ?? 'Produto';
                             $unit = \App\Models\ProductOption::find($item['product_option'] ?? 0)?->unit?->value ?? '';
                             $lines[] = "{$productName} ({$item['quantity']} {$unit})";
                         }
@@ -395,78 +380,75 @@ class BudgetResource extends Resource
                     })
                     ->wrap()
                     ->limit(50),
-                TextColumn::make('content.customer_email')
-                    ->label(__('Email')),
                 TextColumn::make('content.customer_phone')
-                    ->label(__('Phone')),
-                TextColumn::make('content.shipping')
-                    ->label(__('Frete'))
-                    ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? (env('CURRENCY_SUFFIX', 'R$') . ' ' . number_format((float) $state, 2, ',', '.')) : '–')
+                    ->label('WhatsApp'),
+                TextColumn::make('content.total')
+                    ->label('Valor Total')
+                    ->money('BRL')
                     ->toggleable(),
                 TextColumn::make('documents_count')
                     ->counts('documents')
-                    ->label(__('Documents'))
+                    ->label('Anexos')
                     ->badge()
                     ->color(fn($state) => $state > 0 ? 'success' : 'gray')
                     ->icon(fn($state) => $state > 0 ? 'heroicon-o-paper-clip' : 'heroicon-o-document')
-                    ->formatStateUsing(fn($state) => $state > 0 ? $state : __('None'))
+                    ->formatStateUsing(fn($state) => $state > 0 ? $state : 'Nenhum')
                     ->sortable()
                     ->alignCenter()
                     ->toggleable(),
                 TextColumn::make('created_at')
-                    ->date('d/m/Y H:i')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
-                    ->label(__('Date')),
+                    ->label('Enviado em'),
                 IconColumn::make('is_active')
-                    ->label(__('Active'))
+                    ->label('Ativo')
                     ->alignCenter()
                     ->boolean(),
             ])
             ->defaultSort('id', 'desc')
             ->filters([
                 Tables\Filters\TrashedFilter::make()
-                    ->label(__('Trash'))
-                    ->placeholder(__('Without trashed'))
-                    ->trueLabel(__('Only trashed'))
-                    ->falseLabel(__('With trashed'))
+                    ->label('Lixeira')
+                    ->placeholder('Sem excluídos')
+                    ->trueLabel('Apenas excluídos')
+                    ->falseLabel('Com excluídos')
                     ->native(false),
                 TernaryFilter::make('is_active')
-                    ->placeholder(__('Default'))
+                    ->placeholder('Padrão')
                     ->default(true)
-                    ->label(__('Show Budgets'))
-                    ->trueLabel(__('Active'))
-                    ->falseLabel(__('Inactive')),
+                    ->label('Exibição')
+                    ->trueLabel('Ativos')
+                    ->falseLabel('Inativos'),
                 SelectFilter::make('status')
-                    ->placeholder(__('All Status'))
-                    ->label(__('Status'))
+                    ->placeholder('Todos os Status')
+                    ->label('Status')
                     ->options([
-                        'pending'  => __('Pending'),
-                        'on going' => __('On Going'),
-                        'done'     => __('Done'),
-                        'ignored'  => __('Ignored'),
+                        'pending'  => 'Pendente',
+                        'on going' => 'Em Andamento',
+                        'done'     => 'Concluído',
+                        'ignored'  => 'Arquivado',
                     ])
                     ->searchable(),
             ], FiltersLayout::AboveContent)
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\Action::make('copy_link')
-                        ->label(__('Copy PDF Link'))
+                        ->label('Copiar Link do PDF')
                         ->icon('heroicon-o-clipboard-document')
                         ->color('success')
                         ->visible(fn(Budget $record) => ! $record->trashed() && ! empty($record->content['share_link']))
                         ->action(function (Budget $record) {
                             Notification::make()
-                                ->title(__('PDF link copied!'))
+                                ->title('Link copiado para a área de transferência!')
                                 ->success()
                                 ->send();
                         }),
                     Tables\Actions\Action::make('generate_link')
-                        ->label(__('Generate PDF Link'))
+                        ->label('Gerar Link do PDF')
                         ->icon('heroicon-o-link')
                         ->color('primary')
                         ->visible(fn(Budget $record) => ! $record->trashed() && empty($record->content['share_link']))
                         ->action(function (Budget $record) {
-                            // Generate new link
                             $pdfService = new \App\Services\BudgetPdfService();
                             $pdfModel = $pdfService->generatePdf($record, true);
 
@@ -477,18 +459,13 @@ class BudgetResource extends Resource
                                 $record->update(['content' => $content]);
 
                                 Notification::make()
-                                    ->title(__('PDF share link generated successfully'))
+                                    ->title('Link do PDF gerado com sucesso')
                                     ->success()
-                                    ->send();
-                            } else {
-                                Notification::make()
-                                    ->title(__('Error generating PDF share link'))
-                                    ->danger()
                                     ->send();
                             }
                         }),
                     Tables\Actions\Action::make('download_pdf')
-                        ->label(__('Download PDF'))
+                        ->label('Baixar PDF')
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('warning')
                         ->visible(fn(Budget $record) => ! $record->trashed())
@@ -499,19 +476,12 @@ class BudgetResource extends Resource
                             if ($pdfModel && $pdfModel->fileExists()) {
                                 return response()->download(
                                     $pdfModel->getFullPath(),
-                                    'Budget_' . $record->code . '.pdf',
-                                    ['Content-Type' => 'application/pdf']
+                                    'Orcamento_' . $record->code . '.pdf'
                                 );
                             }
-
-                            Notification::make()
-                                ->title(__('Error generating PDF'))
-                                ->body(__('Could not generate PDF file. Please try again.'))
-                                ->danger()
-                                ->send();
                         }),
                     Tables\Actions\Action::make('send_email')
-                        ->label(__('Send Email'))
+                        ->label('Enviar por E-mail')
                         ->icon('heroicon-o-envelope')
                         ->color('primary')
                         ->visible(fn(Budget $record) => ! $record->trashed())
@@ -525,28 +495,25 @@ class BudgetResource extends Resource
                                 $mail->dispatch();
 
                                 Notification::make()
-                                    ->title(__('Email sent successfully'))
+                                    ->title('E-mail enviado com sucesso')
                                     ->success()
                                     ->send();
                             } catch (\Exception $e) {
                                 Notification::make()
-                                    ->title(__('Error sending email'))
-                                    ->body($e->getMessage())
+                                    ->title('Erro ao enviar e-mail')
                                     ->danger()
                                     ->send();
                             }
                         }),
                     Tables\Actions\Action::make('share_whatsapp')
-                        ->label(__('Share on WhatsApp'))
+                        ->label('Compartilhar WhatsApp')
                         ->icon('heroicon-o-phone')
                         ->color('success')
                         ->visible(fn(Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
-                            // Generate PDF and share link if not exists
                             if (empty($record->content['share_link'] ?? null)) {
                                 $pdfService = new \App\Services\BudgetPdfService();
                                 $pdfModel = $pdfService->generatePdf($record, true);
-
                                 if ($pdfModel) {
                                     $url = $pdfModel->getDownloadUrl();
                                     $content = $record->content;
@@ -556,7 +523,7 @@ class BudgetResource extends Resource
                             }
 
                             $whatsApp = new \App\Services\WhatsAppShare();
-                            $message = __("Hello! Here's your budget link: ") . ($record->content['share_link'] ?? '');
+                            $message = "Olá! Segue o link do seu orçamento: " . ($record->content['share_link'] ?? '');
                             $url = $whatsApp->generateUrl(
                                 $record->content['customer_phone'] ?? '',
                                 $message
@@ -565,26 +532,27 @@ class BudgetResource extends Resource
                             return redirect()->away($url);
                         }),
                     Tables\Actions\EditAction::make('edit')
+                        ->label('Editar')
                         ->visible(fn(Budget $record) => ! $record->trashed()),
                     Tables\Actions\DeleteAction::make()
-                        ->label(__('Delete'))
+                        ->label('Excluir')
                         ->visible(fn(Budget $record) => ! $record->trashed()),
                     Tables\Actions\ForceDeleteAction::make()
-                        ->label(__('Force Delete'))
+                        ->label('Excluir Permanente')
                         ->visible(fn(Budget $record) => $record->trashed()),
                     Tables\Actions\RestoreAction::make()
-                        ->label(__('Restore'))
+                        ->label('Restaurar')
                         ->visible(fn(Budget $record) => $record->trashed()),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->label(__('Delete Selected')),
+                        ->label('Excluir Selecionados'),
                     Tables\Actions\ForceDeleteBulkAction::make()
-                        ->label(__('Force Delete Selected')),
+                        ->label('Excluir Permanente Selecionados'),
                     Tables\Actions\RestoreBulkAction::make()
-                        ->label(__('Restore Selected')),
+                        ->label('Restaurar Selecionados'),
                 ]),
             ]);
     }

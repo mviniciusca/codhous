@@ -3,28 +3,29 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 use App\Filament\Resources\BudgetResource;
-use App\Models\Budget;
-use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListBudgets extends ListRecords
 {
     protected static string $resource = BudgetResource::class;
 
+    public function getTitle(): string 
+    {
+        return 'Orçamentos Recebidos';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Acompanhe e gerencie todos os pedidos de orçamento enviados pelos clientes através do site.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make('new_budget')
-                ->color('primary')
-                ->icon('heroicon-o-currency-dollar')
-                ->label(__('New Budget')),
-            Action::make('view_trash')
-                ->color('gray')
-                ->icon('heroicon-o-trash')
-                ->url(route('filament.admin.resources.budgets.bin'))
-                ->badge(fn () => Budget::onlyTrashed()->count() ?: null)
-                ->label(__('Trash')),
+            Actions\CreateAction::make()
+                ->label('Novo Orçamento')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }
