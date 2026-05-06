@@ -295,4 +295,32 @@
 
         @endswitch
     @endforeach
+
+    {{-- ──── SEÇÕES FIXAS DA HOMEPAGE (Core) ─────────────────────────── --}}
+    @if($page->slug === '/')
+        {{-- Calculadora --}}
+        <livewire:calculator />
+
+        {{-- Formulário de Orçamento --}}
+        <section id="orcamento" class="bg-muted/50 py-8 lg:py-12">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                <div class="mb-10">
+                    <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
+                        <span class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
+                        <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Orçamento Online</span>
+                    </div>
+                    <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                        Solicitar Orçamento Grátis
+                    </h2>
+                    <p class="mt-3 text-lg leading-relaxed text-muted-foreground">
+                        Preencha os dados abaixo e receba uma proposta personalizada em até 24h.
+                    </p>
+                </div>
+                <livewire:budget />
+            </div>
+        </section>
+
+        {{-- CTA de Contato --}}
+        <x-section-cta-contact />
+    @endif
 </x-layouts.app>

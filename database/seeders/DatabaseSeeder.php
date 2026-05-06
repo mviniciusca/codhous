@@ -166,12 +166,6 @@ class DatabaseSeeder extends Seeder
                     'description' => 'Conheça alguns dos projetos realizados pela Codhous em toda a região.',
                     'limit' => 4
                 ]],
-                ['type' => 'calculator', 'data' => []],
-                ['type' => 'budget_form', 'data' => [
-                    'title' => 'Solicitar Orçamento Grátis',
-                    'description' => 'Preencha os dados abaixo e receba uma proposta personalizada em até 24h.'
-                ]],
-                ['type' => 'cta', 'data' => ['title' => 'Pronto para começar?', 'button_label' => 'Solicitar Orçamento']],
             ]
         ]);
 
