@@ -9,7 +9,7 @@ use Flowframe\Trend\TrendValue;
 
 class NewsletterOverwview extends ChartWidget
 {
-    protected static ?string $heading = 'Chart';
+    protected static ?string $heading = 'Crescimento de Inscritos';
     protected int|string|array $columnSpan = 'full';
     protected static ?string $maxHeight = '320px';
 
@@ -26,7 +26,7 @@ class NewsletterOverwview extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('Subscribers'),
+                    'label' => 'Novos Inscritos',
                     'data' => $data->map(fn(TrendValue $value) => $value->aggregate),
                 ]
             ],

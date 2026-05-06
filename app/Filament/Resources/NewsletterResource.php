@@ -38,7 +38,17 @@ class NewsletterResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Subscribers');
+        return 'Inscritos na Newsletter';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Inscrito';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Inscritos na Newsletter';
     }
 
     public static function form(Form $form): Form
@@ -47,18 +57,18 @@ class NewsletterResource extends Resource
             ->columns(6)
             ->schema([
                 Toggle::make('is_active')
-                    ->label(__('Status'))
-                    ->helperText(__('Subscriber status'))
+                    ->label('Status')
+                    ->helperText('Define se o inscrito está ativo para receber e-mails.')
                     ->columnSpan(1)
                     ->inline(false),
                 TextInput::make('name')
-                    ->label(__('Name'))
-                    ->helperText(__('Subscriber username'))
+                    ->label('Nome')
+                    ->helperText('Nome fornecido pelo usuário.')
                     ->columnSpan(3)
                     ->disabled(),
                 TextInput::make('email')
-                    ->label(__('Email'))
-                    ->helperText(__('Subscriber email'))
+                    ->label('E-mail')
+                    ->helperText('Endereço de e-mail do inscrito.')
                     ->columnSpan(2)
                     ->disabled(),
             ]);
@@ -69,30 +79,40 @@ class NewsletterResource extends Resource
         return $table
             ->columns([
                 IconColumn::make('is_active')
-                    ->label(__('Status'))
+                    ->label('Ativo')
                     ->boolean()
                     ->alignCenter(),
                 TextColumn::make('name')
-                    ->label(__('Name')),
+                    ->label('Nome')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('email')
-                    ->label(__('Email')),
+                    ->label('E-mail')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label('Inscrito em')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label(__('Status'))
-                    ->placeholder(__('Show All'))
-                    ->trueLabel(__('Active'))
-                    ->falseLabel(__('Inactive'))
+                    ->label('Status')
+                    ->placeholder('Todos')
+                    ->trueLabel('Ativos')
+                    ->falseLabel('Inativos')
                     ->default(true),
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Remover Inscrito'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Remover Selecionados'),
                 ]),
             ]);
     }
