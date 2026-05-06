@@ -59,6 +59,27 @@ class EditCompany extends EditRecord
                     ->icon('heroicon-o-map-pin')
                     ->description('Endereço físico e links para mapas.')
                     ->schema([
+                        TextInput::make('settings.company.address.zip_code')
+                            ->label('CEP')
+                            ->helperText('Código de Endereçamento Postal.')
+                            ->mask('99999-999')
+                            ->placeholder('00000-000')
+                            ->live()
+                            ->afterStateUpdated(function ($state, \Filament\Forms\Set $set) {
+                                if (strlen($state ?? '') === 9) {
+                                    (new \App\Services\AddressFinderService(
+                                        $state,
+                                        $set,
+                                        [
+                                            'logradouro' => 'settings.company.address.street',
+                                            'bairro' => 'settings.company.address.neighborhood',
+                                            'localidade' => 'settings.company.address.city',
+                                            'uf' => 'settings.company.address.state',
+                                        ],
+                                        'settings.company.address.zip_code'
+                                    ))->find();
+                                }
+                            }),
                         Grid::make(3)
                             ->schema([
                                 TextInput::make('settings.company.address.street')
@@ -74,15 +95,10 @@ class EditCompany extends EditRecord
                                     ->helperText('Nome do bairro.'),
                                 TextInput::make('settings.company.address.city')
                                     ->label('Cidade')
-                                    ->helperText('Cidade da sede.'),
+                                    ->helperText('Cidade da seu sede.'),
                                 TextInput::make('settings.company.address.state')
                                     ->label('Estado/UF')
                                     ->helperText('Sigla do estado (Ex: SP).'),
-                                TextInput::make('settings.company.address.zip_code')
-                                    ->label('CEP')
-                                    ->helperText('Código de Endereçamento Postal.')
-                                    ->mask('99999-999')
-                                    ->placeholder('00000-000'),
                             ]),
                         TextInput::make('settings.company.maps_link')
                             ->label('Link do Google Maps')
