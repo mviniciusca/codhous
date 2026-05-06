@@ -90,7 +90,7 @@ class Budget extends Component implements HasForms
                                             TextInput::make('content.number')
                                                 ->label('Nº')
                                                 ->required()
-                                                ->live()
+                                                ->live(onBlur: true)
                                                 ->placeholder('123'),
                                         ])
                                         ->visible(fn (Get $get) => filled($get('content.street'))),
@@ -111,21 +111,20 @@ class Budget extends Component implements HasForms
                                     TextInput::make('content.customer_name')
                                         ->label('Nome Completo')
                                         ->required()
-                                        ->live()
+                                        ->live(onBlur: true)
                                         ->placeholder('João Silva'),
                                     Grid::make(2)->schema([
                                         TextInput::make('content.customer_phone')
                                             ->label('WhatsApp')
                                             ->tel()
-                                            ->mask('(99) 99999-9999')
                                             ->required()
-                                            ->live()
-                                            ->placeholder('(11) 98888-7777'),
+                                            ->live(onBlur: true)
+                                            ->placeholder('(11) 99999-9999'),
                                         TextInput::make('content.customer_email')
                                             ->label('E-mail')
                                             ->email()
                                             ->required()
-                                            ->live()
+                                            ->live(onBlur: true)
                                             ->placeholder('joao@email.com'),
                                     ]),
                                 ])->collapsible(),

@@ -37,8 +37,8 @@
         <button type="submit" 
                 wire:loading.attr="disabled"
                 class="w-full rounded-md bg-primary py-4 px-6 text-sm font-bold uppercase tracking-widest text-primary-foreground transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
-            <span wire:loading.remove>Solicitar Orçamento Grátis</span>
-            <span wire:loading>Enviando...</span>
+            <span wire:loading.remove wire:target="create">Solicitar Orçamento Grátis</span>
+            <span wire:loading wire:target="create">Enviando...</span>
         </button>
     </div>
 
