@@ -55,15 +55,18 @@ class OperationAreaResource extends Resource
         return $form
             ->schema([
                 Section::make('Informações Gerais')
-                    ->description('Defina a cidade, estado e prefixo de CEP para esta área operacional')
+                    ->icon('heroicon-o-map-pin')
+                    ->description('Identifique a localização geográfica e a abrangência postal desta área.')
                     ->columns(2)
                     ->schema([
                         TextInput::make('city')
                             ->label('Cidade')
+                            ->helperText('Nome da cidade onde a operação ocorre.')
                             ->required()
                             ->maxLength(255),
                         Select::make('state')
                             ->label('Estado')
+                            ->helperText('Sigla do estado da federação.')
                             ->required()
                             ->options([
                                 'AC' => 'AC',
@@ -115,18 +118,22 @@ class OperationAreaResource extends Resource
                             ->helperText('Fim da faixa (5 dígitos). CEP é considerado na área se estiver entre início e fim.'),
                     ]),
                 Section::make('Configurações')
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->description('Ajuste o comportamento operacional e custos associados a esta localidade.')
                     ->columns(2)
                     ->schema([
                         Toggle::make('is_active')
                             ->label('Ativo')
+                            ->helperText('Se desativado, esta área não aparecerá nas opções de orçamento.')
                             ->default(true)
                             ->inline(),
                         Toggle::make('is_base')
                             ->label('Base')
-                            ->helperText('Marque esta área como uma base da empresa (uma ou mais)')
+                            ->helperText('Marque esta área como uma base da empresa (uma ou mais).')
                             ->inline(),
                         TextInput::make('shipping_fee')
                             ->label('Taxa de Entrega')
+                            ->helperText('Valor fixo cobrado para entregas nesta região.')
                             ->numeric()
                             ->prefix('R$')
                             ->required()
