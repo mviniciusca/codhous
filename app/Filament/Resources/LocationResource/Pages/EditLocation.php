@@ -10,10 +10,16 @@ class EditLocation extends EditRecord
 {
     protected static string $resource = LocationResource::class;
 
+    public function getTitle(): string 
+    {
+        return 'Editar Local da Obra';
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->label('Excluir'),
         ];
     }
 }

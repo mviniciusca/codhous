@@ -27,23 +27,34 @@ class LocationResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Locations');
+        return 'Locais da Obra';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Local da Obra';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Locais da Obra';
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make(__('Location'))
-                    ->description(__('Manager your location / operational area'))
-                    ->icon('heroicon-o-map')
+                Section::make('Local da Obra')
+                    ->description('Gerencie os locais e áreas operacionais onde os serviços serão realizados.')
+                    ->icon('heroicon-o-map-pin')
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Location or operational area'))
+                            ->label('Nome do Local / Área')
                             ->required()
                             ->maxLength(255)
-                            ->helperText(__('Ex.: street, school ...')),
+                            ->placeholder('Ex: Laje, Piso Industrial, Fundação...')
+                            ->helperText('O nome que aparecerá na seleção do orçamento.'),
                     ]),
             ]);
     }
@@ -51,26 +62,36 @@ class LocationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->heading(__('Locations & Operational Areas'))
-            ->description('Manage your clients Locations & Operational Areas here.')
+            ->heading('Locais e Áreas Operacionais')
+            ->description('Gerencie os pontos de aplicação e locais atendidos pela empresa.')
             ->striped()
             ->searchable()
-            ->searchPlaceholder(__('Search'))
+            ->searchPlaceholder('Pesquisar locais...')
             ->columns([
                 TextColumn::make('name')
+                    ->label('Local / Área Operacional')
                     ->searchable(),
+                TextColumn::make('created_at')
+                    ->label('Criado em')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->label('Editar'),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Excluir'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Excluir Selecionados'),
                 ]),
             ]);
     }

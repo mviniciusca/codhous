@@ -15,6 +15,11 @@ class ListProducts extends ListRecords
         return 'Produtos e Serviços';
     }
 
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie seu catálogo completo de materiais, locação de equipamentos e serviços especializados.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

@@ -97,6 +97,8 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Catálogo de Produtos e Serviços')
+            ->description('Visualize e gerencie todos os itens disponíveis para orçamento no site.')
             ->striped()
             ->searchable()
             ->searchPlaceholder('Pesquisar produtos...')
