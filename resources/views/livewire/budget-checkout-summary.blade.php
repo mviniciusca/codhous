@@ -23,7 +23,7 @@
     </div>
 
     {{-- Info de Orçamento --}}
-    <div class="space-y-4 border-t border-border pt-4">
+    <div class="space-y-4">
         <div class="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
             <i data-lucide="info" class="mt-0.5 h-4 w-4 text-primary"></i>
             <p class="text-xs leading-relaxed text-primary/80">
@@ -37,7 +37,7 @@
         <button type="submit" 
                 wire:loading.attr="disabled"
                 class="w-full rounded-md bg-primary py-4 px-6 text-sm font-bold uppercase tracking-widest text-primary-foreground transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
-            <span wire:loading.remove>Solicitar Orçamento</span>
+            <span wire:loading.remove>Solicitar Orçamento Grátis</span>
             <span wire:loading>Enviando...</span>
         </button>
     </div>
