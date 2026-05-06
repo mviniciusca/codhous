@@ -68,6 +68,26 @@
                     <li class="flex items-center gap-2"><i data-lucide="mail" class="h-4 w-4 text-primary"></i>{{ $companyEmail }}</li>
                     <li class="flex items-start gap-2"><i data-lucide="map-pin" class="mt-0.5 h-4 w-4 shrink-0 text-primary"></i>{{ $companyAddress }}</li>
                 </ul>
+
+                <h4 class="mt-8 mb-4 font-mono text-sm font-bold uppercase tracking-wider text-foreground">Redes Sociais</h4>
+                <div class="flex gap-4">
+                    @php
+                        $networks = [
+                            'instagram' => 'logo-instagram',
+                            'facebook'  => 'logo-facebook',
+                            'linkedin'  => 'logo-linkedin',
+                            'twitter'   => 'logo-twitter',
+                            'whatsapp'  => 'logo-whatsapp',
+                        ];
+                    @endphp
+                    @foreach($networks as $key => $iconName)
+                        @if($url = data_get($website, "social_networks.$key"))
+                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="text-foreground transition-all hover:scale-110 hover:text-primary">
+                                <ion-icon name="{{ $iconName }}" class="h-6 w-6"></ion-icon>
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
             </div>
         </div>
 

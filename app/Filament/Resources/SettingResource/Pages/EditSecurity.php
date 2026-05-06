@@ -30,7 +30,6 @@ class EditSecurity extends EditRecord
                 Section::make('Controle de Acesso e Manutenção')
                     ->icon('heroicon-o-lock-closed')
                     ->description('Gerencie a visibilidade do site e restrições de IP.')
-                    ->aside()
                     ->schema([
                         Toggle::make('settings.security.maintenance_mode')
                             ->label('Modo Manutenção')

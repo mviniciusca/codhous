@@ -50,10 +50,11 @@ class SettingFactory extends Factory
                         'footer' => '<!-- Custom Footer Scripts -->',
                     ],
                     'social_networks' => [
-                        'instagram' => 'https://instagram.com/codhous',
-                        'facebook' => 'https://facebook.com/codhous',
-                        'linkedin' => 'https://linkedin.com/company/codhous',
-                        'whatsapp' => 'https://wa.me/5500000000000',
+                        'instagram' => 'https://instagram.com/codhoussoftware',
+                        'facebook' => 'https://facebook.com/codhoussoftware',
+                        'linkedin' => 'https://linkedin.com/company/codhoussoftware',
+                        'twitter' => 'https://twitter.com/codhoussoftware',
+                        'whatsapp' => 'https://wa.me/5511999999999',
                     ],
                 ],
                 'company' => [

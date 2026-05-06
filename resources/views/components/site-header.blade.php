@@ -81,9 +81,15 @@
 
             {{-- Desktop CTA --}}
             <div class="hidden items-center gap-4 md:flex">
+                <a href="/#calculadora"
+                   class="flex items-center gap-2 font-mono rounded-md border-2 border-primary px-4 py-2 text-[11px] font-bold tracking-wide text-primary transition-all hover:bg-primary hover:text-primary-foreground hover:scale-105 active:scale-95">
+                    <i data-lucide="calculator" class="h-4 w-4"></i>
+                    Calculadora
+                </a>
                 <a href="#orcamento"
-                   class="font-mono rounded-md bg-primary px-6 py-2.5 text-[11px] font-bold tracking-wide text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-md">
-                    Orçamento
+                   class="flex items-center gap-2 font-mono rounded-md bg-primary px-5 py-2.5 text-[11px] font-bold tracking-wide text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-md">
+                    <i data-lucide="file-text" class="h-4 w-4"></i>
+                    Orçamento Grátis
                 </a>
             </div>
 

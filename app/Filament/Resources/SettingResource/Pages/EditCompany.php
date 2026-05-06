@@ -29,7 +29,6 @@ class EditCompany extends EditRecord
                 Section::make('Dados Institucionais')
                     ->icon('heroicon-o-building-office')
                     ->description('Informações legais e comerciais da sua empresa.')
-                    ->aside()
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -59,7 +58,6 @@ class EditCompany extends EditRecord
                 Section::make('Localização')
                     ->icon('heroicon-o-map-pin')
                     ->description('Endereço físico e links para mapas.')
-                    ->aside()
                     ->schema([
                         Grid::make(3)
                             ->schema([
@@ -95,7 +93,6 @@ class EditCompany extends EditRecord
                 Section::make('Horário de Atendimento')
                     ->icon('heroicon-o-clock')
                     ->description('Defina os períodos em que sua empresa está aberta ao público.')
-                    ->aside()
                     ->schema([
                         TextInput::make('settings.company.opening_hours')
                             ->label('Horário de Funcionamento')

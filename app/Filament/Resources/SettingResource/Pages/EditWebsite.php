@@ -33,7 +33,6 @@ class EditWebsite extends EditRecord
                 Section::make('Identidade e SEO')
                     ->icon('heroicon-o-information-circle')
                     ->description('Configure as informações básicas e metatags para motores de busca.')
-                    ->aside()
                     ->schema([
                         TextInput::make('settings.website.name')
                             ->label('Nome do Website')
@@ -52,7 +51,6 @@ class EditWebsite extends EditRecord
                 Section::make('Navegação e Menus')
                     ->icon('heroicon-o-bars-3')
                     ->description('Gerencie os links que compõem o menu principal do site.')
-                    ->aside()
                     ->schema([
                         Repeater::make('settings.website.navigation')
                             ->label('Links do Menu')
@@ -74,7 +72,6 @@ class EditWebsite extends EditRecord
                 Section::make('Ferramentas Ativas')
                     ->icon('heroicon-o-cpu-chip')
                     ->description('Habilite ou desabilite módulos específicos do seu website.')
-                    ->aside()
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -92,7 +89,6 @@ class EditWebsite extends EditRecord
                 Section::make('Atendimento via WhatsApp')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->description('Configure o widget flutuante de atendimento direto.')
-                    ->aside()
                     ->schema([
                         Toggle::make('settings.website.features.whatsapp_widget.enabled')
                             ->label('Habilitar Widget')
@@ -113,39 +109,10 @@ class EditWebsite extends EditRecord
                             ]),
                     ]),
 
-                Section::make('Banners da Página Inicial')
-                    ->icon('heroicon-o-home')
-                    ->description('Gerencie o slideshow principal que os visitantes veem ao entrar.')
-                    ->aside()
-                    ->schema([
-                        Repeater::make('settings.website.homepage.slideshow')
-                            ->label('Slides')
-                            ->helperText('Recomendado: Imagens em alta resolução.')
-                            ->schema([
-                                FileUpload::make('image')
-                                    ->label('Imagem')
-                                    ->helperText('Arraste ou clique para selecionar.')
-                                    ->image()
-                                    ->directory('slideshow')
-                                    ->required(),
-                                TextInput::make('title')
-                                    ->label('Título do Slide')
-                                    ->helperText('Título principal sobreposto à imagem.'),
-                                TextInput::make('subtitle')
-                                    ->label('Subtítulo')
-                                    ->helperText('Descrição curta do slide.'),
-                                TextInput::make('link')
-                                    ->label('Link do Botão')
-                                    ->helperText('URL para onde o botão do slide irá apontar.'),
-                            ])
-                            ->columns(2)
-                            ->itemLabel(fn(array $state): ?string => $state['title'] ?? null),
-                    ]),
 
                 Section::make('Redes Sociais')
                     ->icon('heroicon-o-share')
                     ->description('Links para as redes sociais da sua empresa.')
-                    ->aside()
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -161,6 +128,10 @@ class EditWebsite extends EditRecord
                                     ->label('LinkedIn')
                                     ->helperText('Link do perfil profissional ou empresa.')
                                     ->prefix('linkedin.com/in/'),
+                                TextInput::make('settings.website.social_networks.twitter')
+                                    ->label('Twitter / X')
+                                    ->helperText('Link do seu perfil no Twitter/X.')
+                                    ->prefix('x.com/'),
                                 TextInput::make('settings.website.social_networks.whatsapp')
                                     ->label('Link Direto WhatsApp')
                                     ->helperText('URL gerada (ex: wa.me/...).')
@@ -171,7 +142,6 @@ class EditWebsite extends EditRecord
                 Section::make('Integrações e Scripts')
                     ->icon('heroicon-o-code-bracket')
                     ->description('Insira códigos de rastreamento, fontes ou scripts externos.')
-                    ->aside()
                     ->schema([
                         TextInput::make('settings.website.scripts.google_fonts')
                             ->label('URL Google Fonts')
