@@ -35,11 +35,7 @@
         </span>
     </a>
 
-    {{-- Badge opcional "Atendimento" --}}
-    <span class="mt-1.5 flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-[#059669]">
-        <span class="h-1.5 w-1.5 rounded-full bg-[#25D366]"></span>
-        Atendimento
-    </span>
+    {{-- Badge removido --}}
 </div>
 
 <style>
