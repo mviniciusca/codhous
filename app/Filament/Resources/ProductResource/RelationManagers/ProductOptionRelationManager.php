@@ -85,13 +85,17 @@ class ProductOptionRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->label('Nova Variação')
                     ->modalHeading('Nova Variação')
+                    ->modalSubmitActionLabel('Criar Variação')
+                    ->modalCancelActionLabel('Cancelar')
                     ->icon('heroicon-o-plus'),
             ])
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make()
                         ->label('Editar')
-                        ->modalHeading('Editar Variação'),
+                        ->modalHeading('Editar Variação')
+                        ->modalSubmitActionLabel('Salvar Alterações')
+                        ->modalCancelActionLabel('Cancelar'),
                     Tables\Actions\DeleteAction::make()
                         ->label('Excluir'),
                 ]),
