@@ -32,7 +32,17 @@ class OperationAreaResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Operation Areas');
+        return 'Áreas de Operação';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Área de Operação';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Áreas de Operação';
     }
 
     public static function getNavigationBadge(): ?string
@@ -44,16 +54,16 @@ class OperationAreaResource extends Resource
     {
         return $form
             ->schema([
-                Section::make(__('General Information'))
-                    ->description(__('Define the city, state and CEP prefix for this operational area'))
+                Section::make('Informações Gerais')
+                    ->description('Defina a cidade, estado e prefixo de CEP para esta área operacional')
                     ->columns(2)
                     ->schema([
                         TextInput::make('city')
-                            ->label(__('City'))
+                            ->label('Cidade')
                             ->required()
                             ->maxLength(255),
                         Select::make('state')
-                            ->label(__('State'))
+                            ->label('Estado')
                             ->required()
                             ->options([
                                 'AC' => 'AC',
@@ -86,37 +96,37 @@ class OperationAreaResource extends Resource
                             ])
                             ->default('RJ'),
                         TextInput::make('postcode_prefix')
-                            ->label(__('CEP prefix (representativo)'))
+                            ->label('Prefixo de CEP (representativo)')
                             ->required()
                             ->maxLength(5)
                             ->mask('99999')
-                            ->helperText(__('Primeiros 5 dígitos representativos (ex: 25000). Use a faixa abaixo para cobrir toda a cidade.')),
+                            ->helperText('Primeiros 5 dígitos representativos (ex: 25000). Use a faixa abaixo para cobrir toda a cidade.'),
                         TextInput::make('postcode_start')
-                            ->label(__('Início da faixa de CEP'))
+                            ->label('Início da faixa de CEP')
                             ->maxLength(5)
                             ->mask('99999')
                             ->placeholder('20000')
-                            ->helperText(__('Início da faixa (5 dígitos). Ex: Rio de Janeiro usa 20000 a 23999.')),
+                            ->helperText('Início da faixa (5 dígitos). Ex: Rio de Janeiro usa 20000 a 23999.'),
                         TextInput::make('postcode_end')
-                            ->label(__('Fim da faixa de CEP'))
+                            ->label('Fim da faixa de CEP')
                             ->maxLength(5)
                             ->mask('99999')
                             ->placeholder('23999')
-                            ->helperText(__('Fim da faixa (5 dígitos). CEP é considerado na área se estiver entre início e fim.')),
+                            ->helperText('Fim da faixa (5 dígitos). CEP é considerado na área se estiver entre início e fim.'),
                     ]),
-                Section::make(__('Settings'))
+                Section::make('Configurações')
                     ->columns(2)
                     ->schema([
                         Toggle::make('is_active')
-                            ->label(__('Active'))
+                            ->label('Ativo')
                             ->default(true)
                             ->inline(),
                         Toggle::make('is_base')
-                            ->label(__('Base'))
-                            ->helperText(__('Mark this area as a company base (one or more)'))
+                            ->label('Base')
+                            ->helperText('Marque esta área como uma base da empresa (uma ou mais)')
                             ->inline(),
                         TextInput::make('shipping_fee')
-                            ->label(__('Shipping Fee'))
+                            ->label('Taxa de Entrega')
                             ->numeric()
                             ->prefix('R$')
                             ->required()
@@ -128,28 +138,28 @@ class OperationAreaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->heading(__('Operation Areas'))
-            ->description(__('Manage the list of operational areas and the CEP prefixes they cover'))
             ->striped()
             ->searchable()
-            ->searchPlaceholder(__('Search by city or CEP prefix'))
+            ->searchPlaceholder('Buscar por cidade ou prefixo de CEP')
             ->columns([
                 IconColumn::make('is_active')
-                    ->label(__('Active'))
+                    ->label('Ativo')
                     ->boolean()
                     ->alignCenter(),
                 TextColumn::make('city')
+                    ->label('Cidade')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('state')
+                    ->label('Estado')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('postcode_prefix')
-                    ->label(__('CEP prefix'))
+                    ->label('Prefixo de CEP')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('postcode_start')
-                    ->label(__('Faixa CEP'))
+                    ->label('Faixa CEP')
                     ->formatStateUsing(fn ($record) => $record->postcode_start && $record->postcode_end
                         ? "{$record->postcode_start} – {$record->postcode_end}"
                         : '–')
@@ -157,23 +167,23 @@ class OperationAreaResource extends Resource
                 Tables\Columns\BadgeColumn::make('is_base')
                     // only render text when value is truthy - otherwise badge will
                     // be empty and visually absent
-                    ->formatStateUsing(fn($state) => $state ? __('Base') : '')
+                    ->formatStateUsing(fn($state) => $state ? 'Base' : '')
                     ->colors([
                         'success' => true,
                     ])
                     ->sortable(),
                 TextColumn::make('shipping_fee')
-                    ->label(__('Shipping Fee'))
+                    ->label('Taxa de Entrega')
                     ->money('BRL', true)
                     ->sortable(),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
                     ->default(true)
-                    ->label(__('Status'))
-                    ->placeholder(__('Show All'))
-                    ->trueLabel(__('Active'))
-                    ->falseLabel(__('Inactive')),
+                    ->label('Status')
+                    ->placeholder('Mostrar Todos')
+                    ->trueLabel('Ativo')
+                    ->falseLabel('Inativo'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

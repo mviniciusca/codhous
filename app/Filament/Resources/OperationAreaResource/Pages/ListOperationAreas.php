@@ -9,6 +9,16 @@ use Filament\Resources\Pages\ListRecords;
 class ListOperationAreas extends ListRecords
 {
     protected static string $resource = OperationAreaResource::class;
+    
+    public function getTitle(): string
+    {
+        return 'Áreas de Operação';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie as regiões de atendimento e as faixas de CEP cobertas por sua operação.';
+    }
 
     protected function getHeaderActions(): array
     {
@@ -16,7 +26,7 @@ class ListOperationAreas extends ListRecords
             Actions\CreateAction::make()
                 // use a supported icon to avoid SvgNotFound exception
                 ->icon('heroicon-o-map')
-                ->label(__('New Operation Area')),
+                ->label('Nova Área de Operação'),
         ];
     }
 }
