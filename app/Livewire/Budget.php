@@ -66,10 +66,11 @@ class Budget extends Component implements HasForms
                                 ->schema([
                                     TextInput::make('content.postcode')
                                         ->label('CEP')
-                                        ->placeholder('00000-000')
+                                        ->placeholder('Digite o CEP para localizar o endereço')
                                         ->mask('99999-999')
                                         ->required()
                                         ->live(debounce: 500)
+                                        ->extraInputAttributes(['class' => '!bg-white shadow-sm'])
                                         ->rules($this->getPostcodeRules())
                                         ->afterStateUpdated(function ($state, Set $set, $livewire) {
                                             if (strlen($state ?? '') === 9) {
@@ -86,19 +87,21 @@ class Budget extends Component implements HasForms
                                                 ->label('Rua/Av')
                                                 ->columnSpan(2)
                                                 ->disabled()
-                                                ->dehydrated(),
+                                                ->dehydrated()
+                                                ->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
                                             TextInput::make('content.number')
                                                 ->label('Nº')
                                                 ->required()
                                                 ->live(onBlur: true)
-                                                ->placeholder('123'),
+                                                ->placeholder('Nº ou KM da obra')
+                                                ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
                                         ])
                                         ->visible(fn (Get $get) => filled($get('content.street'))),
 
                                     Grid::make(2)
                                         ->schema([
-                                            TextInput::make('content.neighborhood')->label('Bairro')->disabled()->dehydrated(),
-                                            TextInput::make('content.city')->label('Cidade')->disabled()->dehydrated(),
+                                            TextInput::make('content.neighborhood')->label('Bairro')->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                            TextInput::make('content.city')->label('Cidade')->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
                                         ])
                                         ->visible(fn (Get $get) => filled($get('content.street'))),
                                 ])->collapsible(),
@@ -112,20 +115,23 @@ class Budget extends Component implements HasForms
                                         ->label('Nome Completo')
                                         ->required()
                                         ->live(onBlur: true)
-                                        ->placeholder('João Silva'),
+                                        ->placeholder('Nome do responsável pela obra')
+                                        ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
                                     Grid::make(2)->schema([
                                         TextInput::make('content.customer_phone')
                                             ->label('WhatsApp')
                                             ->tel()
                                             ->required()
                                             ->live(onBlur: true)
-                                            ->placeholder('(11) 99999-9999'),
+                                            ->placeholder('(00) 00000-0000 - WhatsApp para retorno')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
                                         TextInput::make('content.customer_email')
                                             ->label('E-mail')
                                             ->email()
                                             ->required()
                                             ->live(onBlur: true)
-                                            ->placeholder('joao@email.com'),
+                                            ->placeholder('E-mail para envio da proposta')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
                                     ]),
                                 ])->collapsible(),
 
@@ -163,9 +169,11 @@ class Budget extends Component implements HasForms
                                                 TextInput::make('quantity')
                                                     ->label('Quantidade')
                                                     ->numeric()
+                                                    ->minValue(0)
                                                     ->suffix(fn (Get $get) => ProductOption::find($get('product_option'))?->unit?->value ?? '')
                                                     ->required()
                                                     ->live(debounce: 500)
+                                                    ->placeholder('Ex: 5')
                                                     ->afterStateUpdated(function (Get $get, Set $set) {
                                                         $this->calculateItemSubtotal($get, $set);
                                                         $this->calculateTotal($get, $set);
