@@ -94,6 +94,35 @@ class DatabaseSeeder extends Seeder
         Newsletter::factory(20)->create();
         Mail::factory(20)->create();
         Customer::factory(10)->create();
+
+        // Criar 3 obras de exemplo para o portfólio
+        \App\Models\Showcase::create([
+            'title' => 'Residencial Bela Vista',
+            'description' => 'Fornecimento de 150m³ de concreto usinado para lajes e vigas com suporte técnico integral.',
+            'location' => 'São Paulo, SP',
+            'images' => ['https://images.unsplash.com/photo-1590059132718-5a8a9a1c6175?auto=format&fit=crop&q=80&w=800'],
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
+        \App\Models\Showcase::create([
+            'title' => 'Pátio Industrial Logix',
+            'description' => 'Execução de 2.000m² de piso de concreto polido de alta resistência para tráfego pesado.',
+            'location' => 'Barueri, SP',
+            'images' => ['https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=800'],
+            'is_active' => true,
+            'sort_order' => 2,
+        ]);
+
+        \App\Models\Showcase::create([
+            'title' => 'Edifício Horizonte',
+            'description' => 'Locação de bomba estacionária e fornecimento de concreto para bombeamento em grandes alturas.',
+            'location' => 'Rio de Janeiro, RJ',
+            'images' => ['https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=800'],
+            'is_active' => true,
+            'sort_order' => 3,
+        ]);
+
         $this->call(SettingSeeder::class);
         
         // Criar as páginas iniciais
@@ -131,7 +160,12 @@ class DatabaseSeeder extends Seeder
                 ]],
                 ['type' => 'partners', 'data' => ['title' => 'Nossos Parceiros']],
                 ['type' => 'services', 'data' => ['title' => 'Nossos Serviços']],
-                ['type' => 'showcase', 'data' => ['title' => 'Nossas Obras', 'limit' => 4]],
+                ['type' => 'showcase', 'data' => [
+                    'badge' => 'PORTFÓLIO',
+                    'title' => 'Nossas Obras',
+                    'description' => 'Conheça alguns dos projetos realizados pela Codhous em toda a região.',
+                    'limit' => 4
+                ]],
                 ['type' => 'cta', 'data' => ['title' => 'Pronto para começar?', 'button_label' => 'Solicitar Orçamento']],
             ]
         ]);
