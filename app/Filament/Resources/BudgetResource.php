@@ -104,6 +104,9 @@ class BudgetResource extends Resource
                     ]),
 
                 Tabs::make('Conteúdo do Orçamento')
+                    ->afterStateHydrated(function (Get $get, Set $set) {
+                        self::calculateTotalFromRepeater($get, $set);
+                    })
                     ->columnSpanFull()
                     ->tabs([
                         Tabs\Tab::make('Informações do Cliente')
@@ -325,7 +328,7 @@ class BudgetResource extends Resource
                                             ->label('Valor Total Final')
                                             ->live()
                                             ->dehydrated()
-                                            ->disabled()
+                                            ->readonly()
                                             ->numeric()
                                             ->required()
                                             ->prefix('R$')
