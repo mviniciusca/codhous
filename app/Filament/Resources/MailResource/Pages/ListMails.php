@@ -3,42 +3,27 @@
 namespace App\Filament\Resources\MailResource\Pages;
 
 use App\Filament\Resources\MailResource;
-use App\Models\Mail;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Components\Tab;
-use Illuminate\Database\Eloquent\Builder;
 
 class ListMails extends ListRecords
 {
     protected static string $resource = MailResource::class;
 
-    public function getTabs(): array
+    public function getTitle(): string 
+    {
+        return 'Caixa de Entrada e Mensagens';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie as comunicações recebidas através do seu site e responda aos seus clientes.';
+    }
+
+    protected function getHeaderActions(): array
     {
         return [
-            'inbox' => Tab::make(__('Inbox'))
-                ->icon('heroicon-m-inbox')
-                ->badge(Mail::query()->where('is_sent', false)->where('is_read', false)->where('is_spam', false)->count())
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_sent', false)->where('is_spam', false)->withoutTrashed()),
-            'sent' => Tab::make(__('Sent'))
-                ->icon('heroicon-m-paper-airplane')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_sent', true)->withoutTrashed()),
-            'starred' => Tab::make(__('Starred'))
-                ->icon('heroicon-m-star')
-                ->badge(Mail::query()->where('is_favorite', true)->count())
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_favorite', true)->withoutTrashed()),
-            'trash' => Tab::make(__('Trash'))
-                ->icon('heroicon-m-trash')
-                ->modifyQueryUsing(fn(Builder $query) => $query->onlyTrashed()),
+            // O botão de Nova Mensagem já está definido no headerActions da tabela no Resource
         ];
-    }
-
-    public function getDefaultActiveTab(): string | int | null
-    {
-        return 'inbox';
-    }
-
-    public function getHeaderActions(): array
-    {
-        return [];
     }
 }
