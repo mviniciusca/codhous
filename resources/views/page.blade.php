@@ -45,6 +45,11 @@
                     :description="$block['data']['description'] ?? null"
                     :items="$block['data']['items'] ?? []"
                 />
+                
+                {{-- CTA de Contato (Core Homepage - Entre Serviços e Obras) --}}
+                @if($page->slug === '/')
+                    <x-section-cta-contact />
+                @endif
                 @break
 
             {{-- ──── LINHA DO TEMPO ────────────────────────────────────────── --}}
@@ -319,8 +324,5 @@
                 <livewire:budget />
             </div>
         </section>
-
-        {{-- CTA de Contato --}}
-        <x-section-cta-contact />
     @endif
 </x-layouts.app>
