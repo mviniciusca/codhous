@@ -216,18 +216,18 @@
             </td>
             <td style="width: 20%;">
                 <span class="label">Valor do Frete</span>
-                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, '.', ',') }}</span>
             </td>
             <td style="width: 20%;">
                 <span class="label">Desconto / Taxas</span>
                 @php
                     $adj = floatval(data_get($state['content'], 'tax', 0)) - floatval(data_get($state['content'], 'discount', 0));
                 @endphp
-                <span class="value text-right">{{ number_format($adj, 2, ',', '.') }}</span>
+                <span class="value text-right">{{ number_format($adj, 2, '.', ',') }}</span>
             </td>
             <td style="width: 20%;" class="total-box">
                 <span class="label">Valor Total do Orçamento</span>
-                <span class="value text-right bold" style="font-size: 11px;">R$ {{ number_format(floatval(data_get($state['content'], 'total', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right bold" style="font-size: 11px;">R$ {{ number_format(floatval(data_get($state['content'], 'total', 0)), 2, '.', ',') }}</span>
             </td>
         </tr>
     </table>
@@ -264,9 +264,9 @@
                     <td class="text-center">000</td>
                     <td class="text-center">5102</td>
                     <td class="text-center">{{ $item->productOption?->unit?->value ?? 'UN' }}</td>
-                    <td class="text-center">{{ number_format($item->quantity, 2, ',', '.') }}</td>
-                    <td class="text-right">{{ number_format($item->price, 2, ',', '.') }}</td>
-                    <td class="text-right">{{ number_format($item->subtotal, 2, ',', '.') }}</td>
+                    <td class="text-center">{{ $item->productOption?->unit?->isDecimal() ? number_format($item->quantity, 2, '.', ',') : number_format($item->quantity, 0, '.', ',') }}</td>
+                    <td class="text-right">{{ number_format($item->price, 2, '.', ',') }}</td>
+                    <td class="text-right">{{ number_format($item->subtotal, 2, '.', ',') }}</td>
                 </tr>
             @endforeach
             @for($i = count($items); $i < 10; $i++)

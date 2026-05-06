@@ -278,6 +278,7 @@ class BudgetResource extends Resource
                                                     ->default(1)
                                                     ->reactive()
                                                     ->columnSpan(2)
+                                                    ->step(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->isDecimal() ? 0.01 : 1)
                                                     ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? ''),
                                                 TextInput::make('price')
                                                     ->label('Preço Unit.')
@@ -293,7 +294,7 @@ class BudgetResource extends Resource
                                                     ->content(function (Get $get) {
                                                         $qty = floatval($get('quantity') ?? 0);
                                                         $price = floatval($get('price') ?? 0);
-                                                        return 'R$ ' . number_format($qty * $price, 2, ',', '.');
+                                                        return 'R$ ' . number_format($qty * $price, 2, '.', ',');
                                                     }),
                                             ]),
                                     ])

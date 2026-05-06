@@ -28,4 +28,12 @@ enum ProductUnit: string implements HasLabel
             self::MONTH => 'Mês',
         };
     }
+
+    public function isDecimal(): bool
+    {
+        return match ($this) {
+            self::M3, self::KG, self::M2 => true,
+            default => false,
+        };
+    }
 }

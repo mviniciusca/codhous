@@ -179,10 +179,11 @@ class Budget extends Component implements HasForms
                                                 TextInput::make('quantity')
                                                     ->label('Quantidade')
                                                     ->numeric()
-                                                    ->minValue(0)
-                                                    ->validationAttribute('Quantidade')
-                                                    ->suffix(fn (Get $get) => ProductOption::find($get('product_option'))?->unit?->value ?? '')
                                                     ->required()
+                                                    ->default(1)
+                                                    ->validationAttribute('Quantidade')
+                                                    ->step(fn (Get $get) => \App\Models\ProductOption::find($get('product_option'))?->unit?->isDecimal() ? 0.01 : 1)
+                                                    ->suffix(fn (Get $get) => $this->getUnitSuffix($get))
                                                     ->live(debounce: 500)
                                                     ->placeholder('Ex: 5')
                                                     ->afterStateUpdated(function (Get $get, Set $set) {
@@ -316,9 +317,14 @@ class Budget extends Component implements HasForms
         $this->calculateTotal($get, $set);
     }
 
+    private function getUnitSuffix(Get $get): string
+    {
+        return ProductOption::find($get('product_option'))?->unit?->value ?? '';
+    }
+
     private function calculateItemSubtotal(Get $get, Set $set): void
     {
-        $quantity = intval($get('quantity') ?? 0);
+        $quantity = floatval($get('quantity') ?? 0);
         $price = floatval($get('price') ?? 0);
         $set('subtotal', BudgetCalculatorService::calculateItemSubtotal($quantity, $price));
     }
