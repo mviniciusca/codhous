@@ -215,8 +215,14 @@ class BudgetResource extends Resource
                                 Repeater::make('budgetItems')
                                     ->relationship()
                                     ->label('Itens do Orçamento')
+                                    ->itemLabel(fn (array $state): ?string => 
+                                        ($state['product_id'] ? \App\Models\Product::find($state['product_id'])?->name : 'Novo Item') . 
+                                        ($state['quantity'] ? " - Qtd: {$state['quantity']}" : "")
+                                    )
+                                    ->collapsible()
                                     ->helperText('Adicione aqui os itens que farão parte do orçamento final.')
                                     ->afterStateHydrated(function (Repeater $component, $state, ?Budget $record, Set $set, Get $get) {
+                                        // ... existing hydrated logic ...
                                         if (empty($state) && $record && !empty($record->content['products'] ?? [])) {
                                             $items = [];
                                             foreach ($record->content['products'] as $req) {
@@ -242,48 +248,56 @@ class BudgetResource extends Resource
                                         }
                                     })
                                     ->schema([
-                                        Select::make('product_id')
-                                            ->label('Produto')
-                                            ->options(\App\Models\Product::pluck('name', 'id'))
-                                            ->searchable()
-                                            ->required()
-                                            ->reactive()
-                                            ->afterStateUpdated(fn (Set $set) => $set('product_option_id', null)),
-                                        Select::make('product_option_id')
-                                            ->label('Opção/Resistência')
-                                            ->options(fn (Get $get) => \App\Models\ProductOption::where('product_id', $get('product_id'))->get()->pluck('name', 'id'))
-                                            ->required()
-                                            ->reactive()
-                                            ->afterStateUpdated(function (Set $set, $state) {
-                                                if ($state) {
-                                                    $option = \App\Models\ProductOption::find($state);
-                                                    $set('price', $option?->price ?? 0);
-                                                }
-                                            })
-                                            ->searchable(),
-                                        TextInput::make('quantity')
-                                            ->label('Quantidade')
-                                            ->numeric()
-                                            ->required()
-                                            ->default(1)
-                                            ->reactive()
-                                            ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? ''),
-                                        TextInput::make('price')
-                                            ->label('Preço Unit.')
-                                            ->numeric()
-                                            ->prefix('R$')
-                                            ->required()
-                                            ->reactive()
-                                            ->step(0.01),
-                                        Placeholder::make('total_item')
-                                            ->label('Total Item')
-                                            ->content(function (Get $get) {
-                                                $qty = floatval($get('quantity') ?? 0);
-                                                $price = floatval($get('price') ?? 0);
-                                                return 'R$ ' . number_format($qty * $price, 2, ',', '.');
-                                            }),
+                                        \Filament\Forms\Components\Grid::make(12)
+                                            ->schema([
+                                                Select::make('product_id')
+                                                    ->label('Produto')
+                                                    ->options(\App\Models\Product::pluck('name', 'id'))
+                                                    ->searchable()
+                                                    ->required()
+                                                    ->reactive()
+                                                    ->columnSpan(3)
+                                                    ->afterStateUpdated(fn (Set $set) => $set('product_option_id', null)),
+                                                Select::make('product_option_id')
+                                                    ->label('Opção/Resistência')
+                                                    ->options(fn (Get $get) => \App\Models\ProductOption::where('product_id', $get('product_id'))->get()->pluck('name', 'id'))
+                                                    ->required()
+                                                    ->reactive()
+                                                    ->columnSpan(4)
+                                                    ->afterStateUpdated(function (Set $set, $state) {
+                                                        if ($state) {
+                                                            $option = \App\Models\ProductOption::find($state);
+                                                            $set('price', $option?->price ?? 0);
+                                                        }
+                                                    })
+                                                    ->searchable(),
+                                                TextInput::make('quantity')
+                                                    ->label('Quantidade')
+                                                    ->numeric()
+                                                    ->required()
+                                                    ->default(1)
+                                                    ->reactive()
+                                                    ->columnSpan(2)
+                                                    ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? ''),
+                                                TextInput::make('price')
+                                                    ->label('Preço Unit.')
+                                                    ->numeric()
+                                                    ->prefix('R$')
+                                                    ->required()
+                                                    ->reactive()
+                                                    ->columnSpan(2)
+                                                    ->step(0.01),
+                                                Placeholder::make('total_item')
+                                                    ->label('Total Item')
+                                                    ->columnSpan(1)
+                                                    ->content(function (Get $get) {
+                                                        $qty = floatval($get('quantity') ?? 0);
+                                                        $price = floatval($get('price') ?? 0);
+                                                        return 'R$ ' . number_format($qty * $price, 2, ',', '.');
+                                                    }),
+                                            ]),
                                     ])
-                                    ->columns(5)
+                                    ->columns(1)
                                     ->live()
                                     ->afterStateUpdated(function (Get $get, Set $set) {
                                         self::calculateTotalFromRepeater($get, $set);
