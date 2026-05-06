@@ -250,31 +250,26 @@
         </thead>
         <tbody>
             @php
-                $products = data_get($state['content'], 'products', []);
+                $items = $budget->budgetItems()->with(['product', 'productOption', 'location'])->get();
             @endphp
-            @foreach($products as $product)
-                @php
-                    $productObj = \App\Models\Product::find($product['product'] ?? 0);
-                    $productOption = \App\Models\ProductOption::find($product['product_option'] ?? 0);
-                    $location = \App\Models\Location::find($product['location'] ?? 0);
-                @endphp
+            @foreach($items as $item)
                 <tr>
-                    <td class="text-center">{{ $product['product'] ?? '-' }}</td>
+                    <td class="text-center">{{ $item->product_id ?? '-' }}</td>
                     <td>
-                        {{ $productObj ? $productObj->name : 'Produto' }}
-                        @if($productOption) ({{ $productOption->name }}) @endif
-                        @if($location) - Local: {{ $location->name }} @endif
+                        {{ $item->product?->name ?? 'Produto' }}
+                        @if($item->productOption) ({{ $item->productOption->name }}) @endif
+                        @if($item->location) - Local: {{ $item->location->name }} @endif
                     </td>
                     <td class="text-center">0000.00.00</td>
                     <td class="text-center">000</td>
                     <td class="text-center">5102</td>
-                    <td class="text-center">UN</td>
-                    <td class="text-center">{{ $product['quantity'] ?? 0 }}</td>
-                    <td class="text-right">{{ number_format($product['price'] ?? 0, 2, ',', '.') }}</td>
-                    <td class="text-right">{{ number_format($product['subtotal'] ?? 0, 2, ',', '.') }}</td>
+                    <td class="text-center">{{ $item->productOption?->unit?->value ?? 'UN' }}</td>
+                    <td class="text-center">{{ number_format($item->quantity, 2, ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($item->price, 2, ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($item->subtotal, 2, ',', '.') }}</td>
                 </tr>
             @endforeach
-            @for($i = count($products); $i < 10; $i++)
+            @for($i = count($items); $i < 10; $i++)
                 <tr>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>

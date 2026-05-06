@@ -33,4 +33,9 @@ class BudgetItem extends Model
     {
         return $this->belongsTo(ProductOption::class);
     }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
 }
