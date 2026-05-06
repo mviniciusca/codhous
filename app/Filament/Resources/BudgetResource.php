@@ -36,7 +36,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BudgetResource extends Resource
 {
-    protected static ?string $recordTitleAttribute = 'Budget';
+    protected static ?string $recordTitleAttribute = 'Orçamento';
 
     protected static ?string $model = Budget::class;
 
@@ -44,7 +44,7 @@ class BudgetResource extends Resource
 
     public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
     {
-        return __('Budget');
+        return 'Orçamento';
     }
 
     protected static ?string $navigationGroup = 'Orçamentos';

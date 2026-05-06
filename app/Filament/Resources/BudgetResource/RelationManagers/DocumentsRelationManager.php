@@ -17,7 +17,7 @@ class DocumentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'documents';
 
-    protected static ?string $title = 'Documents';
+    protected static ?string $title = 'Documentos';
 
     public function form(Form $form): Form
     {
@@ -25,17 +25,17 @@ class DocumentsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\TextInput::make('title')
                     ->required()
-                    ->label(__('Title'))
-                    ->helperText(__('Document title or identifier'))
+                    ->label('Título')
+                    ->helperText('Título ou identificador do documento')
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
-                    ->label(__('Description'))
-                    ->helperText(__('Optional description about this document'))
+                    ->label('Descrição')
+                    ->helperText('Descrição opcional sobre este documento')
                     ->rows(3)
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('file_path')
-                    ->label(__('Document File'))
-                    ->helperText(__('Upload PDF, images, or other document types'))
+                    ->label('Arquivo do Documento')
+                    ->helperText('Faça o upload de PDF, imagens ou outros tipos de documentos')
                     ->disk('public')
                     ->directory('budget-documents')
                     ->acceptedFileTypes(['application/pdf', 'image/*', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
@@ -71,28 +71,28 @@ class DocumentsRelationManager extends RelationManager
             ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label(__('Title'))
+                    ->label('Título')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
                 Tables\Columns\TextColumn::make('description')
-                    ->label(__('Description'))
+                    ->label('Descrição')
                     ->limit(50)
                     ->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('file_name')
-                    ->label(__('File Name'))
+                    ->label('Nome do Arquivo')
                     ->searchable()
                     ->icon('heroicon-o-document')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('file_type')
-                    ->label(__('Type'))
+                    ->label('Tipo')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match (true) {
                         str_contains($state, 'pdf')   => 'PDF',
-                        str_contains($state, 'image') => 'Image',
+                        str_contains($state, 'image') => 'Imagem',
                         str_contains($state, 'word')  => 'Word',
-                        default                       => 'Other',
+                        default                       => 'Outro',
                     })
                     ->color(fn (string $state): string => match (true) {
                         str_contains($state, 'pdf')   => 'danger',
@@ -102,16 +102,16 @@ class DocumentsRelationManager extends RelationManager
                     })
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('file_size')
-                    ->label(__('Size'))
+                    ->label('Tamanho')
                     ->formatStateUsing(fn ($state) => number_format($state / 1024, 2).' KB')
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('uploader.name')
-                    ->label(__('Uploaded By'))
+                    ->label('Enviado por')
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Upload Date'))
+                    ->label('Data de Upload')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(),
@@ -121,7 +121,7 @@ class DocumentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->label(__('Upload Document'))
+                    ->label('Enviar Documento')
                     ->icon('heroicon-o-arrow-up-tray')
                     ->mutateFormDataUsing(function (array $data): array {
                         // Ensure uploaded_by is set
@@ -131,7 +131,7 @@ class DocumentsRelationManager extends RelationManager
                     })
                     ->after(function () {
                         Notification::make()
-                            ->title(__('Document uploaded successfully'))
+                            ->title('Documento enviado com sucesso')
                             ->success()
                             ->send();
                     }),
@@ -139,7 +139,7 @@ class DocumentsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('download')
-                        ->label(__('Download'))
+                        ->label('Baixar')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('primary')
                         ->action(function ($record) {
@@ -150,26 +150,26 @@ class DocumentsRelationManager extends RelationManager
                                 );
                             } else {
                                 Notification::make()
-                                    ->title(__('File not found'))
-                                    ->body(__('The file does not exist in storage.'))
+                                    ->title('Arquivo não encontrado')
+                                    ->body('O arquivo não existe no armazenamento.')
                                     ->danger()
                                     ->send();
                             }
                         }),
                     Tables\Actions\Action::make('preview')
-                        ->label(__('Preview'))
+                        ->label('Visualizar')
                         ->icon('heroicon-o-eye')
                         ->color('info')
                         ->url(fn ($record) => $record->getDownloadUrl())
                         ->openUrlInNewTab()
                         ->visible(fn ($record) => $record->fileExists()),
                     Tables\Actions\EditAction::make()
-                        ->label(__('Edit')),
+                        ->label('Editar'),
                     Tables\Actions\DeleteAction::make()
-                        ->label(__('Delete'))
+                        ->label('Excluir')
                         ->after(function () {
                             Notification::make()
-                                ->title(__('Document deleted successfully'))
+                                ->title('Documento excluído com sucesso')
                                 ->success()
                                 ->send();
                         }),
@@ -181,8 +181,8 @@ class DocumentsRelationManager extends RelationManager
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
-            ->emptyStateHeading(__('No documents yet'))
-            ->emptyStateDescription(__('Upload documents related to this budget'))
+            ->emptyStateHeading('Nenhum documento ainda')
+            ->emptyStateDescription('Faça o upload de documentos relacionados a este orçamento')
             ->emptyStateIcon('heroicon-o-document');
     }
 }

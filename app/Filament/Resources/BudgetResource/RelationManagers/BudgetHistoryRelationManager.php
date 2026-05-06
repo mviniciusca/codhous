@@ -30,13 +30,13 @@ class BudgetHistoryRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('Version History & Changes'))
-            ->description(__('Track all modifications made to this budget with detailed before/after comparison'))
+            ->heading('Histórico de Versões e Alterações')
+            ->description('Acompanhe todas as modificações feitas neste orçamento com comparação detalhada de antes/depois')
             ->defaultSort('created_at', 'desc')
             ->poll('30s')
             ->columns([
                 TextColumn::make('description')
-                    ->label(__('Action'))
+                    ->label('Ação')
                     ->badge()
                     ->icon(fn (string $state): string => match (true) {
                         $state === 'created'                       => 'heroicon-o-plus-circle',
@@ -61,27 +61,27 @@ class BudgetHistoryRelationManager extends RelationManager
                         default                                    => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match (true) {
-                        $state === 'created'                                                  => __('Created'),
-                        $state === 'updated'                                                  => __('Updated'),
-                        $state === 'deleted'                                                  => __('Deleted'),
-                        str_contains($state, 'price_updated')                                 => __('Price Updated'),
-                        str_contains($state, 'document_attached')                             => __('Document Attached'),
-                        str_contains($state, 'document_removed')                              => __('Document Removed'),
-                        str_contains($state, 'Documento') && str_contains($state, 'anexado')  => __('Document Attached'),
-                        str_contains($state, 'Documento') && str_contains($state, 'removido') => __('Document Removed'),
-                        str_contains($state, 'Preços atualizados')                            => __('Price Updated'),
+                        $state === 'created'                                                  => 'Criado',
+                        $state === 'updated'                                                  => 'Atualizado',
+                        $state === 'deleted'                                                  => 'Excluído',
+                        str_contains($state, 'price_updated')                                 => 'Preço Atualizado',
+                        str_contains($state, 'document_attached')                             => 'Documento Anexado',
+                        str_contains($state, 'document_removed')                              => 'Documento Removido',
+                        str_contains($state, 'Documento') && str_contains($state, 'anexado')  => 'Documento Anexado',
+                        str_contains($state, 'Documento') && str_contains($state, 'removido') => 'Documento Removido',
+                        str_contains($state, 'Preços atualizados')                            => 'Preço Atualizado',
                         default                                                               => ucfirst($state),
                     })
                     ->wrap(),
 
                 TextColumn::make('causer.name')
-                    ->label(__('Modified By'))
-                    ->default(__('System'))
+                    ->label('Modificado por')
+                    ->default('Sistema')
                     ->icon('heroicon-o-user')
                     ->searchable(),
 
                 TextColumn::make('changes_summary')
-                    ->label(__('What Changed'))
+                    ->label('O que mudou')
                     ->html()
                     ->wrap()
                     ->getStateUsing(function (Activity $record): string {
@@ -141,7 +141,7 @@ class BudgetHistoryRelationManager extends RelationManager
                     }),
 
                 TextColumn::make('created_at')
-                    ->label(__('When'))
+                    ->label('Quando')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->since()
@@ -150,7 +150,7 @@ class BudgetHistoryRelationManager extends RelationManager
             ])
             ->filters([
                 SelectFilter::make('causer_id')
-                    ->label(__('User'))
+                    ->label('Usuário')
                     ->options(function () {
                         return \App\Models\User::query()
                             ->whereIn('id', function ($query) {
@@ -166,23 +166,23 @@ class BudgetHistoryRelationManager extends RelationManager
                     ->searchable(),
 
                 SelectFilter::make('description')
-                    ->label(__('Action Type'))
+                    ->label('Tipo de Ação')
                     ->options([
-                        'created' => __('Created'),
-                        'updated' => __('Updated'),
-                        'deleted' => __('Deleted'),
+                        'created' => 'Criado',
+                        'updated' => 'Atualizado',
+                        'deleted' => 'Excluído',
                     ]),
             ])
             ->actions([
                 Action::make('view_changes')
-                    ->label(__('View Details'))
+                    ->label('Ver Detalhes')
                     ->icon('heroicon-o-eye')
                     ->color('primary')
-                    ->modalHeading(fn (Activity $record): string => __('Changes Made').' - '.$record->created_at->format('d/m/Y H:i:s'))
+                    ->modalHeading(fn (Activity $record): string => 'Alterações Realizadas'.' - '.$record->created_at->format('d/m/Y H:i:s'))
                     ->modalWidth('5xl')
                     ->infolist(fn (Activity $record): array => $this->getChangeDetailsInfolist($record))
                     ->modalSubmitAction(false)
-                    ->modalCancelActionLabel(__('Close')),
+                    ->modalCancelActionLabel('Fechar'),
             ])
             ->bulkActions([
                 // Sem bulk actions para histórico
@@ -196,16 +196,16 @@ class BudgetHistoryRelationManager extends RelationManager
         $old = $properties['old'] ?? [];
 
         $infolist = [
-            Section::make(__('Activity Information'))
+            Section::make('Informações da Atividade')
                 ->schema([
                     Grid::make(3)
                         ->schema([
                             TextEntry::make('action')
-                                ->label(__('Action'))
+                                ->label('Ação')
                                 ->state(match ($record->description) {
-                                    'created' => '✓ Created',
-                                    'updated' => '✎ Updated',
-                                    'deleted' => '✗ Deleted',
+                                    'created' => '✓ Criado',
+                                    'updated' => '✎ Atualizado',
+                                    'deleted' => '✗ Excluído',
                                     default   => ucfirst($record->description),
                                 })
                                 ->badge()
@@ -217,12 +217,12 @@ class BudgetHistoryRelationManager extends RelationManager
                                 }),
 
                             TextEntry::make('user')
-                                ->label(__('Modified By'))
-                                ->state($record->causer?->name ?? __('System'))
+                                ->label('Modificado por')
+                                ->state($record->causer?->name ?? 'Sistema')
                                 ->icon('heroicon-o-user'),
 
                             TextEntry::make('date')
-                                ->label(__('When'))
+                                ->label('Quando')
                                 ->state($record->created_at->format('d/m/Y H:i:s'))
                                 ->icon('heroicon-o-clock'),
                         ]),
@@ -231,16 +231,16 @@ class BudgetHistoryRelationManager extends RelationManager
 
         // Se foi criação, mostrar dados iniciais
         if ($record->description === 'created' && ! empty($attributes)) {
-            $infolist[] = Section::make(__('Initial Data'))
-                ->description(__('Data when the budget was created'))
+            $infolist[] = Section::make('Dados Iniciais')
+                ->description('Dados de quando o orçamento foi criado')
                 ->schema($this->buildAttributesSchema($attributes))
                 ->collapsible();
         }
 
         // Se foi atualização, mostrar comparação before/after
         if ($record->description === 'updated' || str_contains($record->description, 'price_updated')) {
-            $infolist[] = Section::make(__('Changes Comparison'))
-                ->description(__('Compare previous values with the current active snapshot'))
+            $infolist[] = Section::make('Comparação de Alterações')
+                ->description('Compare os valores anteriores com o snapshot ativo atual')
                 ->schema($this->buildComparisonSchema($old, $attributes))
                 ->collapsible();
         }
@@ -290,7 +290,7 @@ class BudgetHistoryRelationManager extends RelationManager
                         $schema[] = Grid::make(2)
                             ->schema([
                                 TextEntry::make('old_content_'.$contentKey)
-                                    ->label('⬅️ '.$this->getContentFieldLabel($contentKey).' '.__('(Previous)'))
+                                    ->label('⬅️ '.$this->getContentFieldLabel($contentKey).' '.'(Anterior)')
                                     ->state($this->formatContentValue($contentKey, $values['old']))
                                     ->color('gray')
                                     ->icon('heroicon-o-clock')
@@ -298,7 +298,7 @@ class BudgetHistoryRelationManager extends RelationManager
                                     ->badge(),
 
                                 TextEntry::make('new_content_'.$contentKey)
-                                    ->label('✅ '.$this->getContentFieldLabel($contentKey).' '.__('(Current)').' '.$trend)
+                                    ->label('✅ '.$this->getContentFieldLabel($contentKey).' '.'(Atual)'.' '.$trend)
                                     ->state($this->formatContentValue($contentKey, $values['new']))
                                     ->color('success')
                                     ->icon('heroicon-o-check-circle')
@@ -312,7 +312,7 @@ class BudgetHistoryRelationManager extends RelationManager
             }            $schema[] = Grid::make(2)
                 ->schema([
                     TextEntry::make('old_'.$key)
-                        ->label('⬅️ '.$this->getFieldLabel($key).' '.__('(Previous)'))
+                        ->label('⬅️ '.$this->getFieldLabel($key).' '.'(Anterior)')
                         ->state($this->formatValue($key, $oldValue))
                         ->color('gray')
                         ->icon('heroicon-o-clock')
@@ -320,7 +320,7 @@ class BudgetHistoryRelationManager extends RelationManager
                         ->badge(),
 
                     TextEntry::make('new_'.$key)
-                        ->label('✅ '.$this->getFieldLabel($key).' '.__('(Current)'))
+                        ->label('✅ '.$this->getFieldLabel($key).' '.'(Atual)')
                         ->state($this->formatValue($key, $newValue))
                         ->color('success')
                         ->icon('heroicon-o-check-circle')
@@ -359,18 +359,18 @@ class BudgetHistoryRelationManager extends RelationManager
     protected function getContentFieldLabel(string $key): string
     {
         return match ($key) {
-            'price'          => __('Price'),
-            'tax'            => __('Tax'),
-            'discount'       => __('Discount'),
-            'total'          => __('Total'),
-            'quantity'       => __('Quantity'),
-            'shipping'       => __('Shipping'),
-            'customer_name'  => __('Customer Name'),
-            'customer_email' => __('Customer Email'),
-            'customer_phone' => __('Customer Phone'),
-            'status'         => __('Status'),
-            'location'       => __('Location'),
-            'product'        => __('Product'),
+            'price'          => 'Preço',
+            'tax'            => 'Taxas',
+            'discount'       => 'Desconto',
+            'total'          => 'Total',
+            'quantity'       => 'Quantidade',
+            'shipping'       => 'Frete',
+            'customer_name'  => 'Nome do Cliente',
+            'customer_email' => 'E-mail do Cliente',
+            'customer_phone' => 'Telefone do Cliente',
+            'status'         => 'Status',
+            'location'       => 'Localização',
+            'product'        => 'Produto',
             default          => ucfirst(str_replace('_', ' ', $key)),
         };
     }
@@ -452,13 +452,13 @@ class BudgetHistoryRelationManager extends RelationManager
     protected function getFieldLabel(string $key): string
     {
         return match ($key) {
-            'code'       => __('Code'),
-            'status'     => __('Status'),
-            'is_active'  => __('Active'),
-            'content'    => __('Content'),
-            'created_at' => __('Created At'),
-            'updated_at' => __('Updated At'),
-            'user_id'    => __('User'),
+            'code'       => 'Código',
+            'status'     => 'Status',
+            'is_active'  => 'Ativo',
+            'content'    => 'Conteúdo',
+            'created_at' => 'Criado em',
+            'updated_at' => 'Atualizado em',
+            'user_id'    => 'Usuário',
             default      => ucfirst(str_replace('_', ' ', $key)),
         };
     }
@@ -470,7 +470,7 @@ class BudgetHistoryRelationManager extends RelationManager
         }
 
         if (is_bool($value)) {
-            return $value ? __('Yes') : __('No');
+            return $value ? 'Sim' : 'Não';
         }
 
         if (is_array($value)) {
@@ -499,7 +499,7 @@ class BudgetHistoryRelationManager extends RelationManager
             if (is_array($v)) {
                 $items[] = "{$indent}<strong>{$k}:</strong><br>".$this->formatArrayValue($v, $depth + 1);
             } else {
-                $formattedValue = is_bool($v) ? ($v ? 'Yes' : 'No') : $v;
+                $formattedValue = is_bool($v) ? ($v ? 'Sim' : 'Não') : $v;
                 $items[] = "{$indent}<strong>{$k}:</strong> {$formattedValue}";
             }
         }
