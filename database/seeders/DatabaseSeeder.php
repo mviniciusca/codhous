@@ -28,26 +28,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Criar o usuário super admin
-        $user = User::updateOrCreate(
-            ['email' => 'codhous@codhous.app'],
-            [
-                'name'  => 'Codhous Software',
-                'password' => bcrypt('password'), // Adicionando uma senha padrão
-            ]
-        );
+        // 1. Carregar Dados Estruturais e Configurações via DataSeeder
+        $this->call(DataSeeder::class);
 
-        // Criar a role super_admin usando Filament Shield com guard 'web'
-        $role = Role::firstOrCreate(
-            ['name' => 'super_admin', 'guard_name' => 'web']
-        );
-
-        // Sincronizar todas as permissões existentes com a role super_admin
-        $role->syncPermissions(\Spatie\Permission\Models\Permission::all());
-
-        // Atribuir a role ao usuário
-        $user->assignRole($role);
-
+        // 2. Criar dados de exemplo para desenvolvimento (opcional se for produção)
+        
         // Criar produtos e opções de produtos específicos
         Product::factory()->concreto()->create();
         Product::factory()->polimento()->create();
@@ -81,13 +66,12 @@ class DatabaseSeeder extends Seeder
 
             // Criar histórico para cada orçamento
             BudgetHistory::factory()
-                ->state(function (array $attributes) use ($user, $budget) {
+                ->state(function (array $attributes) {
                     return [
-                        'budget_id' => $budget->id,
-                        'user_id'   => $user->id,
+                        'user_id'   => 1, // Codhous Admin criado no DataSeeder
                     ];
                 })
-                ->create();
+                ->create(['budget_id' => $budget->id]);
         }
 
         // Criar outros dados
@@ -95,6 +79,20 @@ class DatabaseSeeder extends Seeder
         Mail::factory(20)->create();
         Customer::factory(10)->create();
 
+        // Criar obras de exemplo para o portfólio
+        $this->seedShowcases();
+        
+        $this->call([
+            AlertSeeder::class,
+            MachinerySeeder::class,
+            ConcreteSeeder::class,
+            LocationSeeder::class,
+            FloorPolishingSeeder::class,
+        ]);
+    }
+
+    protected function seedShowcases()
+    {
         // Criar 3 obras de exemplo para o portfólio
         \App\Models\Showcase::create([
             'title' => 'Residencial Bela Vista',
@@ -122,19 +120,6 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
             'sort_order' => 3,
         ]);
-
-        $this->call(SettingSeeder::class);
-        
-        // Criar as páginas iniciais
-        $this->createInitialPages();
-        
-        $this->call(ContentSectionSeeder::class);
-        $this->call(OperationAreaSeeder::class);
-        $this->call(AlertSeeder::class);
-        $this->call(MachinerySeeder::class);
-        $this->call(ConcreteSeeder::class);
-        $this->call(LocationSeeder::class);
-        $this->call(FloorPolishingSeeder::class);
     }
 
     protected function createInitialPages()

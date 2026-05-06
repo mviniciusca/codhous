@@ -58,7 +58,9 @@ class SettingFactory extends Factory
                     ],
                 ],
                 'company' => [
-                    'cnpj' => '00.000.000/0001-00',
+                    'document' => '00.000.000/0001-00',
+                    'ie' => '000.000.000.000',
+                    'im' => '000.000-0',
                     'trade_name' => 'Codhous',
                     'legal_name' => 'Codhous Soluções Tecnológicas LTDA',
                     'email' => 'contato@codhous.com.br',
@@ -69,15 +71,19 @@ class SettingFactory extends Factory
                         'neighborhood' => 'Parque Tecnológico',
                         'city' => 'São Paulo',
                         'state' => 'SP',
-                        'zip_code' => '01234-567',
+                        'postcode' => '01234-567',
                     ],
                     'maps_link' => 'https://goo.gl/maps/example',
                     'opening_hours' => 'Segunda a Sexta, 08:00 às 18:00',
+                    'budget_information' => 'Pagamento em até 10x sem juros no cartão de crédito. Entrega em 5 dias úteis.',
                 ],
                 'security' => [
                     'maintenance_mode' => false,
                     'maintenance_message' => 'Estamos realizando algumas melhorias. Voltaremos em instantes!',
                     'allowed_ips' => [],
+                ],
+                'layout' => [
+                    'logo' => 'logos/logo.png',
                 ],
             ],
         ];

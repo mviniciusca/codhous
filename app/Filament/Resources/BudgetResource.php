@@ -31,6 +31,15 @@ use Filament\Tables\Table;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Actions;
+use Filament\Support\Enums\Alignment;
+use App\Services\PdfGeneratorService;
+use App\Services\SendBudgetMailService;
+use App\Services\WhatsappService;
+use App\Models\BudgetPdf;
+use App\Models\Setting;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -331,6 +340,86 @@ class BudgetResource extends Resource
                                             ->helperText('Valor final do orçamento.'),
                                     ]),
                             ]),
+                        Tabs\Tab::make('Ações')
+                            ->icon('heroicon-o-bolt')
+                            ->visible(fn ($livewire) => $livewire instanceof Pages\EditBudget)
+                            ->schema([
+                                Section::make('Comunicação com o Cliente')
+                                    ->description('Gere o documento oficial e notifique o cliente pelos canais disponíveis.')
+                                    ->schema([
+                                        Actions::make([
+                                            Actions\Action::make('pdf_and_email')
+                                                ->label('Gerar PDF e Enviar por E-mail')
+                                                ->icon('heroicon-o-envelope')
+                                                ->color('primary')
+                                                ->requiresConfirmation()
+                                                ->action(function (Budget $record) {
+                                                    $pdfModel = self::generatePdfModel($record);
+
+                                                    if ($pdfModel) {
+                                                        $url = $pdfModel->getDownloadUrl();
+                                                        $content = $record->content;
+                                                        $content['share_link'] = $url;
+                                                        $record->update([
+                                                            'content' => $content,
+                                                            'pdf_document' => $pdfModel->path
+                                                        ]);
+
+                                                        try {
+                                                            $mailService = new SendBudgetMailService(
+                                                                $record->toArray(),
+                                                                $record->content['customer_email'] ?? '',
+                                                                new \App\Mail\BudgetMail($record->toArray())
+                                                            );
+                                                            $mailService->dispatch();
+
+                                                            Notification::make()
+                                                                ->title('Sucesso!')
+                                                                ->body('PDF gerado e e-mail enviado.')
+                                                                ->success()
+                                                                ->send();
+                                                        } catch (\Exception $e) {
+                                                            Notification::make()
+                                                                ->title('Erro ao enviar e-mail')
+                                                                ->body($e->getMessage())
+                                                                ->danger()
+                                                                ->send();
+                                                        }
+                                                    }
+                                                }),
+
+                                            Actions\Action::make('pdf_and_whatsapp')
+                                                ->label('Gerar PDF e Enviar via WhatsApp')
+                                                ->icon('heroicon-o-chat-bubble-left-right')
+                                                ->color('success')
+                                                ->requiresConfirmation()
+                                                ->action(function (Budget $record) {
+                                                    $pdfModel = self::generatePdfModel($record);
+
+                                                    if ($pdfModel) {
+                                                        $url = $pdfModel->getDownloadUrl();
+                                                        $content = $record->content;
+                                                        $content['share_link'] = $url;
+                                                        $record->update([
+                                                            'content' => $content,
+                                                            'pdf_document' => $pdfModel->path
+                                                        ]);
+
+                                                        $whatsappService = new WhatsappService();
+                                                        $message = "Olá! Segue o link do seu orçamento: " . $url;
+                                                        $waUrl = $whatsappService->generateUrl(
+                                                            $record->content['customer_phone'] ?? '',
+                                                            $message
+                                                        );
+
+                                                        return redirect()->away($waUrl);
+                                                    }
+                                                }),
+                                        ])
+                                        ->alignment(Alignment::Center)
+                                        ->fullWidth(),
+                                ]),
+                            ]),
                     ]),
             ]);
     }
@@ -366,6 +455,52 @@ class BudgetResource extends Resource
     {
         // deprecated by calculateTotalFromRepeater but kept for backward compatibility if needed
         self::calculateTotalFromRepeater($get, $set);
+    }
+
+    public static function generatePdfModel(Budget $record): ?BudgetPdf
+    {
+        try {
+            $pdfService = new PdfGeneratorService();
+            $filename = 'budget-' . $record->code . '-' . time() . '.pdf';
+            $relativePath = 'budgets/' . $filename;
+            $fullPath = storage_path('app/public/' . $relativePath);
+
+            // Garantir diretório
+            if (!file_exists(dirname($fullPath))) {
+                mkdir(dirname($fullPath), 0755, true);
+            }
+
+            $settings = Setting::first();
+            $company = $settings?->companySetting;
+            $layout = $settings?->layoutSetting;
+
+            $pdfService->saveFromView(
+                'pdf.invoice',
+                [
+                    'state' => $record->toArray(),
+                    'budget' => $record,
+                    'company' => $company,
+                    'layout' => $layout,
+                ],
+                $fullPath
+            );
+
+            return BudgetPdf::create([
+                'budget_id' => $record->id,
+                'filename' => $filename,
+                'path' => $relativePath,
+                'download_token' => Str::random(64),
+                'token_expires_at' => now()->addDays(30),
+                'is_active' => true,
+            ]);
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Erro ao gerar PDF')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+            return null;
+        }
     }
 
     public static function table(Table $table): Table
@@ -473,14 +608,16 @@ class BudgetResource extends Resource
                         ->color('primary')
                         ->visible(fn(Budget $record) => ! $record->trashed() && empty($record->content['share_link']))
                         ->action(function (Budget $record) {
-                            $pdfService = new \App\Services\BudgetPdfService();
-                            $pdfModel = $pdfService->generatePdf($record, true);
+                            $pdfModel = self::generatePdfModel($record);
 
                             if ($pdfModel) {
                                 $url = $pdfModel->getDownloadUrl();
                                 $content = $record->content;
                                 $content['share_link'] = $url;
-                                $record->update(['content' => $content]);
+                                $record->update([
+                                    'content' => $content,
+                                    'pdf_document' => $pdfModel->path
+                                ]);
 
                                 Notification::make()
                                     ->title('Link do PDF gerado com sucesso')
@@ -494,8 +631,7 @@ class BudgetResource extends Resource
                         ->color('warning')
                         ->visible(fn(Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
-                            $pdfService = new \App\Services\BudgetPdfService();
-                            $pdfModel = $pdfService->generatePdf($record, true);
+                            $pdfModel = self::generatePdfModel($record);
 
                             if ($pdfModel && $pdfModel->fileExists()) {
                                 return response()->download(
@@ -511,12 +647,23 @@ class BudgetResource extends Resource
                         ->visible(fn(Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             try {
-                                $mail = new \App\Services\SendBudgetMail(
+                                $pdfModel = self::generatePdfModel($record);
+                                
+                                if ($pdfModel) {
+                                    $content = $record->content;
+                                    $content['share_link'] = $pdfModel->getDownloadUrl();
+                                    $record->update([
+                                        'content' => $content,
+                                        'pdf_document' => $pdfModel->path
+                                    ]);
+                                }
+
+                                $mailService = new SendBudgetMailService(
                                     $record->toArray(),
                                     $record->content['customer_email'] ?? '',
                                     new \App\Mail\BudgetMail($record->toArray())
                                 );
-                                $mail->dispatch();
+                                $mailService->dispatch();
 
                                 Notification::make()
                                     ->title('E-mail enviado com sucesso')
@@ -536,19 +683,21 @@ class BudgetResource extends Resource
                         ->visible(fn(Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             if (empty($record->content['share_link'] ?? null)) {
-                                $pdfService = new \App\Services\BudgetPdfService();
-                                $pdfModel = $pdfService->generatePdf($record, true);
+                                $pdfModel = self::generatePdfModel($record);
                                 if ($pdfModel) {
                                     $url = $pdfModel->getDownloadUrl();
                                     $content = $record->content;
                                     $content['share_link'] = $url;
-                                    $record->update(['content' => $content]);
+                                    $record->update([
+                                        'content' => $content,
+                                        'pdf_document' => $pdfModel->path
+                                    ]);
                                 }
                             }
 
-                            $whatsApp = new \App\Services\WhatsAppShare();
+                            $whatsappService = new WhatsappService();
                             $message = "Olá! Segue o link do seu orçamento: " . ($record->content['share_link'] ?? '');
-                            $url = $whatsApp->generateUrl(
+                            $url = $whatsappService->generateUrl(
                                 $record->content['customer_phone'] ?? '',
                                 $message
                             );

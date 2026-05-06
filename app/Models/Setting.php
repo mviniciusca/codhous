@@ -55,4 +55,22 @@ class Setting extends Model
     {
         return $this->settings['security'] ?? [];
     }
+
+    /**
+     * Get company settings as an object for easier access in views
+     */
+    public function getCompanySettingAttribute(): ?object
+    {
+        $company = $this->settings['company'] ?? null;
+        return $company ? json_decode(json_encode($company)) : null;
+    }
+
+    /**
+     * Get layout settings as an object for easier access in views
+     */
+    public function getLayoutSettingAttribute(): ?object
+    {
+        $layout = $this->settings['layout'] ?? null;
+        return $layout ? json_decode(json_encode($layout)) : null;
+    }
 }

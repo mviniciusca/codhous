@@ -257,10 +257,17 @@ class BudgetHistoryRelationManager extends RelationManager
                 continue;
             }
 
-            $schema[] = TextEntry::make($key)
+            $entry = TextEntry::make($key)
                 ->label($this->getFieldLabel($key))
                 ->state($this->formatValue($key, $value))
+                ->html()
                 ->copyable();
+
+            if ($key === 'content') {
+                $entry->columnSpanFull();
+            }
+
+            $schema[] = $entry;
         }
 
         return [Grid::make(2)->schema($schema)];
@@ -295,6 +302,7 @@ class BudgetHistoryRelationManager extends RelationManager
                                     ->color('gray')
                                     ->icon('heroicon-o-clock')
                                     ->copyable()
+                                    ->html()
                                     ->badge(),
 
                                 TextEntry::make('new_content_'.$contentKey)
@@ -304,6 +312,7 @@ class BudgetHistoryRelationManager extends RelationManager
                                     ->icon('heroicon-o-check-circle')
                                     ->copyable()
                                     ->badge()
+                                    ->html()
                                     ->columnSpan(1),
                             ]);
                     }
@@ -317,6 +326,7 @@ class BudgetHistoryRelationManager extends RelationManager
                         ->color('gray')
                         ->icon('heroicon-o-clock')
                         ->copyable()
+                        ->html()
                         ->badge(),
 
                     TextEntry::make('new_'.$key)
@@ -325,6 +335,7 @@ class BudgetHistoryRelationManager extends RelationManager
                         ->color('success')
                         ->icon('heroicon-o-check-circle')
                         ->copyable()
+                        ->html()
                         ->badge(),
                 ]);
         }
@@ -371,6 +382,10 @@ class BudgetHistoryRelationManager extends RelationManager
             'status'         => 'Status',
             'location'       => 'Localização',
             'product'        => 'Produto',
+            'products'       => 'Produtos',
+            'product_option' => 'Opção do Produto',
+            'product_id'     => 'Produto',
+            'product_option_id' => 'Opção/Resistência',
             default          => ucfirst(str_replace('_', ' ', $key)),
         };
     }
@@ -496,11 +511,18 @@ class BudgetHistoryRelationManager extends RelationManager
         $indent = str_repeat('  ', $depth);
 
         foreach ($value as $k => $v) {
+            $label = $this->getContentFieldLabel((string)$k);
             if (is_array($v)) {
-                $items[] = "{$indent}<strong>{$k}:</strong><br>".$this->formatArrayValue($v, $depth + 1);
+                $items[] = "{$indent}<div class='mb-1 mt-2'><strong>{$label}:</strong></div><div class='ml-4 border-l-2 border-gray-200 dark:border-gray-700 pl-4'>".$this->formatArrayValue($v, $depth + 1)."</div>";
             } else {
                 $formattedValue = is_bool($v) ? ($v ? 'Sim' : 'Não') : $v;
-                $items[] = "{$indent}<strong>{$k}:</strong> {$formattedValue}";
+                
+                // Formatar valores monetários se a chave sugerir
+                if (in_array($k, ['price', 'tax', 'discount', 'total', 'subtotal'])) {
+                    $formattedValue = 'R$ ' . number_format((float)$v, 2, ',', '.');
+                }
+
+                $items[] = "{$indent}<div class='flex gap-2 mb-1'><strong>{$label}:</strong> <span>{$formattedValue}</span></div>";
             }
         }
 

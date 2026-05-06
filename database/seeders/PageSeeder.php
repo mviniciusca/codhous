@@ -12,6 +12,9 @@ class PageSeeder extends Seeder
      */
     public function run(): void
     {
+        if (\App\Models\Page::where('slug', '/')->exists()) {
+            return;
+        }
         PageFactory::new()->index()->create();
     }
 }

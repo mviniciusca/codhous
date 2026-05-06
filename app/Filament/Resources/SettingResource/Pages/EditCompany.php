@@ -39,11 +39,17 @@ class EditCompany extends EditRecord
                                 TextInput::make('settings.company.legal_name')
                                     ->label('Razão Social')
                                     ->helperText('Nome oficial registrado em cartório.'),
-                                TextInput::make('settings.company.cnpj')
+                                TextInput::make('settings.company.document')
                                     ->label('CNPJ')
                                     ->helperText('Cadastro Nacional da Pessoa Jurídica.')
                                     ->mask('99.999.999/9999-99')
                                     ->placeholder('00.000.000/0000-00'),
+                                TextInput::make('settings.company.ie')
+                                    ->label('Inscrição Estadual')
+                                    ->helperText('Registro de contribuinte do ICMS.'),
+                                TextInput::make('settings.company.im')
+                                    ->label('Inscrição Municipal')
+                                    ->helperText('Registro de contribuinte municipal (ISS).'),
                                 TextInput::make('settings.company.email')
                                     ->label('E-mail Comercial')
                                     ->helperText('Endereço de e-mail para contatos oficiais.')
@@ -59,7 +65,7 @@ class EditCompany extends EditRecord
                     ->icon('heroicon-o-map-pin')
                     ->description('Endereço físico e links para mapas.')
                     ->schema([
-                        TextInput::make('settings.company.address.zip_code')
+                        TextInput::make('settings.company.address.postcode')
                             ->label('CEP')
                             ->helperText('Código de Endereçamento Postal.')
                             ->mask('99999-999')
@@ -76,7 +82,7 @@ class EditCompany extends EditRecord
                                             'localidade' => 'settings.company.address.city',
                                             'uf' => 'settings.company.address.state',
                                         ],
-                                        'settings.company.address.zip_code'
+                                        'settings.company.address.postcode'
                                     ))->find();
                                 }
                             }),
@@ -115,6 +121,16 @@ class EditCompany extends EditRecord
                             ->helperText('Descreva o horário de atendimento (Ex: Segunda a Sexta, 08:00 às 18:00).')
                             ->placeholder('Segunda a Sexta, 08:00 às 18:00')
                             ->required(),
+                    ]),
+
+                Section::make('Informações de Orçamento')
+                    ->icon('heroicon-o-document-text')
+                    ->description('Textos padrões que aparecem nos orçamentos gerados.')
+                    ->schema([
+                        \Filament\Forms\Components\Textarea::make('settings.company.budget_information')
+                            ->label('Informações Adicionais')
+                            ->helperText('Ex: Condições de pagamento, prazos de entrega, etc.')
+                            ->rows(4),
                     ]),
             ]);
     }

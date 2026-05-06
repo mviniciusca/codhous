@@ -278,6 +278,8 @@
                             {{ $company->address->city ?? $company->address['city'] ?? '' }}/{{ $company->address->state ?? $company->address['state'] ?? '' }} - {{ $company->address->postcode ?? $company->address['postcode'] ?? '' }}<br>
                             Tel: {{ $company->phone }} | {{ $company->email }}<br>
                             @if($company->document) CNPJ: {{ $company->document }} @endif
+                            @if(isset($company->ie) && $company->ie) | IE: {{ $company->ie }} @endif
+                            @if(isset($company->im) && $company->im) | IM: {{ $company->im }} @endif
                         </div>
                     </td>
                     <td class="header-budget-cell">
