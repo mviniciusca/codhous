@@ -36,83 +36,78 @@ class CustomerResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Customers');
+        return 'Clientes';
     }
 
-    protected static ?string $navigationIcon = 'heroicon-o-user';
-
-    public static function count(): ?string
+    public static function getModelLabel(): string
     {
-        $count = Customer::withoutTrashed()->count();
-
-        return $count !== 0 ? $count : null;
+        return 'Cliente';
     }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Clientes';
+    }
+
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make(__('Customer'))
-                    ->description(__('Manager your Customer List'))
+                Section::make('Informações do Cliente')
+                    ->description('Gerencie os dados cadastrais e o endereço dos seus clientes.')
                     ->columns(3)
                     ->icon('heroicon-o-user')
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label(__('Customer Name'))
-                            ->helperText(__('Set the customer name'))
+                            ->label('Nome Completo')
+                            ->helperText('Informe o nome ou razão social.')
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('email')
-                            ->label(__('Email Address'))
-                            ->helperText(__('Place here the email address from your customer'))
+                            ->label('E-mail')
+                            ->helperText('Endereço de e-mail principal para contato.')
                             ->email()
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('phone')
-                            ->label(__('Phone'))
-                            ->helperText(__('Customer Phone number'))
+                            ->label('Telefone/WhatsApp')
+                            ->helperText('Número de contato com DDD.')
                             ->tel()
-                            ->mask('(99)99999-9999')
+                            ->mask('(99) 99999-9999')
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('postcode')
-                            ->label(__('Postcode'))
-                            ->helperText(__('Customer Postcode'))
+                            ->label('CEP')
+                            ->helperText('Digite o CEP para buscar o endereço.')
                             ->required()
                             ->mask('99999-999')
                             ->prefixIcon('heroicon-o-map-pin')
-                            ->placeholder('----- ---')
+                            ->placeholder('00000-000')
                             ->maxLength(255)
                             ->suffixAction(
                                 fn ($state, Set $set, $livewire) => Action::make('search-cep')
                                     ->icon('heroicon-o-magnifying-glass')
-                                    ->tooltip(__('Search address by postcode'))
+                                    ->tooltip('Buscar endereço pelo CEP')
                                     ->action(function () use ($state, $livewire, $set) {
                                         try {
-                                            // Validar o formato do CEP antes de fazer a busca
                                             $livewire->validateOnly('data.postcode');
-
-                                            // Criar mapeamento de campos da API para campos do formulário
                                             $fieldMap = [
                                                 'logradouro' => 'address.street',
                                                 'bairro'     => 'address.neighborhood',
                                                 'localidade' => 'address.city',
                                                 'uf'         => 'address.state',
                                             ];
-
-                                            // Instanciar e executar a busca de CEP
                                             $finder = new AddressFinderService($state, $set, $fieldMap, 'data.postcode');
                                             $finder->find();
-
-                                            // Notificação de sucesso
                                             \Filament\Notifications\Notification::make()
                                                 ->title('CEP encontrado!')
                                                 ->success()
                                                 ->send();
                                         } catch (\Exception $e) {
-                                            // Em caso de erro, exibir notificação
                                             \Filament\Notifications\Notification::make()
-                                                ->title('Erro')
+                                                ->title('Erro ao buscar CEP')
                                                 ->body($e->getMessage())
                                                 ->danger()
                                                 ->send();
@@ -120,23 +115,23 @@ class CustomerResource extends Resource
                                     })
                             ),
                         Forms\Components\TextInput::make('address.street')
-                            ->label(__('Address Street'))
-                            ->helperText(__('Address Street'))
+                            ->label('Logradouro')
+                            ->helperText('Rua, Avenida, etc.')
                             ->required(),
                         Forms\Components\TextInput::make('address.number')
-                            ->label(__('Address Number'))
-                            ->helperText(__('Address Number')),
+                            ->label('Número')
+                            ->helperText('Número ou S/N.'),
                         Forms\Components\TextInput::make('address.neighborhood')
-                            ->label(__('Neighborhood'))
-                            ->helperText(__('Neighborhood'))
+                            ->label('Bairro')
+                            ->helperText('Bairro ou Distrito.')
                             ->required(),
                         Forms\Components\TextInput::make('address.city')
-                            ->label(__('City'))
-                            ->helperText(__('City'))
+                            ->label('Cidade')
+                            ->helperText('Cidade do cliente.')
                             ->required(),
                         Forms\Components\TextInput::make('address.state')
-                            ->label(__('State'))
-                            ->helperText(__('State'))
+                            ->label('UF')
+                            ->helperText('Estado (Ex: SP, RJ).')
                             ->required(),
                     ]),
             ]);
@@ -147,38 +142,49 @@ class CustomerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Nome')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                    ->label('E-mail')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('phone')
+                    ->label('Telefone')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('postcode')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('address.city')
+                    ->label('Cidade')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Cadastrado em')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\TrashedFilter::make()
+                    ->label('Lixeira'),
             ])
             ->actions([
                 ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->label('Editar'),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Excluir'),
+                    Tables\Actions\RestoreAction::make()
+                        ->label('Restaurar'),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->label('Excluir Permanente'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Excluir Selecionados'),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label('Restaurar Selecionados'),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label('Excluir Permanente Selecionados'),
                 ]),
             ]);
     }
