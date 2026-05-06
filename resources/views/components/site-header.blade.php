@@ -45,9 +45,12 @@
                         <span>{{ $companyPhone }}</span>
                     </div>
                 @endif
+                @php
+                    $mainHours = data_get($company, 'opening_hours', 'Seg - Sex: 08:00 - 18:00');
+                @endphp
                 <div class="flex items-center gap-2">
                     <i data-lucide="clock" class="h-3.5 w-3.5 text-primary-foreground/70"></i>
-                    <span>Seg - Sex: 08:00 - 18:00</span>
+                    <span>{{ $mainHours }}</span>
                 </div>
             </div>
         </div>
