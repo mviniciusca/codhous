@@ -43,6 +43,8 @@ class AdminPanelProvider extends PanelProvider
                 // FilamentShieldPlugin::make(),
             ])
             ->login()
+            ->passwordReset()
+            ->profile()
             ->colors([
                 'danger'  => Color::Rose,
                 'gray'    => Color::Zinc,
