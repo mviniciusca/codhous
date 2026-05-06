@@ -121,6 +121,7 @@ class Budget extends Component implements HasForms
                                         TextInput::make('content.customer_phone')
                                             ->label('WhatsApp')
                                             ->tel()
+                                            ->mask('(99)99999-9999')
                                             ->required()
                                             ->live(onBlur: true)
                                             ->placeholder('(00) 00000-0000 - WhatsApp para retorno')
@@ -136,7 +137,7 @@ class Budget extends Component implements HasForms
                                 ])->collapsible(),
 
                             Section::make('3. Itens do Pedido')
-                                ->description('Quais produtos você precisa?')
+                                ->description('Quais produtos ou serviços você precisa?')
                                 ->icon('heroicon-o-shopping-bag')
                                 ->extraAttributes(['class' => 'shadow-none'])
                                 ->schema([
@@ -187,7 +188,9 @@ class Budget extends Component implements HasForms
 
                         // Coluna da Direita (Resumo / Checkout Sidebar)
                         Group::make([
-                            Section::make('Resumo do Pedido')
+                            Section::make('Resumo do Orçamento')
+                                ->description('Confira os itens selecionados para sua obra.')
+                                ->icon('heroicon-o-shopping-cart')
                                 ->extraAttributes(['class' => 'shadow-none'])
                                 ->schema([
                                     Placeholder::make('summary')
