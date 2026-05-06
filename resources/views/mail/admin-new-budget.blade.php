@@ -64,7 +64,7 @@
                                             </tr>
                                             <tr>
                                                 <td style="padding: 20px 0;">
-                                                    <span style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Valor Estimado</span>
+                                                    <span style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Valor Estimado <small style="font-weight: 400; text-transform: none; color: #cbd5e1;">(Sem frete e outras despesas)</small></span>
                                                     <span style="font-size: 24px; font-weight: 800; color: #0284c7;">R$ {{ number_format($totalValue, 2, ',', '.') }}</span>
                                                 </td>
                                             </tr>
