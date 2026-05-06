@@ -125,12 +125,20 @@ class EditCompany extends EditRecord
 
                 Section::make('Informações de Orçamento')
                     ->icon('heroicon-o-document-text')
-                    ->description('Textos padrões que aparecem nos orçamentos gerados.')
+                    ->description('Personalize como as informações da sua empresa aparecem nos orçamentos e notas gerados.')
                     ->schema([
+                        \Filament\Forms\Components\FileUpload::make('settings.company.invoice_logo')
+                            ->label('Logo para Documentos (PDF)')
+                            ->helperText('Logo que aparecerá no topo dos orçamentos e notas. Use formatos transparentes (PNG/SVG) para melhor resultado.')
+                            ->image()
+                            ->directory('logos')
+                            ->visibility('public')
+                            ->columnSpanFull(),
                         \Filament\Forms\Components\Textarea::make('settings.company.budget_information')
-                            ->label('Informações Adicionais')
-                            ->helperText('Ex: Condições de pagamento, prazos de entrega, etc.')
-                            ->rows(4),
+                            ->label('Textos Padrões e Termos')
+                            ->helperText('Condições de pagamento, validade, prazos e observações legais que aparecerão no rodapé do PDF.')
+                            ->rows(6)
+                            ->columnSpanFull(),
                     ]),
             ]);
     }

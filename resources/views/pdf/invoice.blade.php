@@ -7,476 +7,310 @@
     <title>Orçamento {{ $state['code'] ?? '' }}</title>
     <style>
         @page {
-            margin: 0cm;
+            margin: 1cm;
         }
         body {
-            margin: 1.5cm; /* Margem aumentada para respiro */
-            font-family: 'DejaVu Sans', sans-serif;
-            font-size: 10px; /* Fonte base aumentada */
-            line-height: 1.5;
-            color: #1f2937; /* Cinza chumbo suave em vez de preto total */
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 8px;
+            line-height: 1.2;
+            color: #000000;
             background-color: #ffffff;
+            margin: 0;
+            padding: 0;
         }
-        .container {
-            width: 100%;
-        }
-        
-        /* --- HEADER MODERNIZADO --- */
-        .header {
-            width: 100%;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #000000; /* Linha forte apenas na base */
-            padding-bottom: 15px;
-        }
-        .header-table {
+        table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: -1px; /* Overlap borders */
         }
-        .header-logo-cell {
-            width: 25%;
-            vertical-align: middle;
+        td {
+            border: 1px solid #000000;
+            padding: 2px 4px;
+            vertical-align: top;
         }
-        .header-company-cell {
-            width: 45%;
-            vertical-align: middle;
-            padding-left: 15px;
+        .label {
+            display: block;
+            font-size: 6px;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 1px;
         }
-        .header-budget-cell {
+        .value {
+            display: block;
+            font-size: 9px;
+            font-weight: normal;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        
+        /* --- HEADER --- */
+        .header-logo {
             width: 30%;
+            text-align: center;
             vertical-align: middle;
-            text-align: right;
         }
-
-        .logo {
-            max-width: 140px;
-            max-height: 70px;
-            /* Removi o grayscale para ficar mais moderno, se quiser voltar descomente: */
-            /* filter: grayscale(100%); */ 
-        }
-
-        .company-name {
-            font-size: 12px;
-            font-weight: 700;
-            color: #000000;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-        .company-info {
-            font-size: 9px;
-            color: #4b5563;
-            line-height: 1.4;
-        }
-
-        .budget-box {
-            background-color: #f3f4f6;
-            padding: 10px;
-            border-radius: 4px;
-            text-align: center;
-            border: 1px solid #e5e7eb;
-        }
-        .budget-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: #000000;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-        }
-        .budget-number {
-            font-size: 12px;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 5px;
-        }
-        .budget-date {
-            font-size: 8px;
-            color: #6b7280;
-        }
-
-        /* --- STATUS BADGES COLORIDOS --- */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 8px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-top: 6px;
-        }
-        .status-pending { background-color: #fef3c7; color: #92400e; border: 1px solid #f59e0b; } /* Amarelo */
-        .status-approved { background-color: #dcfce7; color: #166534; border: 1px solid #22c55e; } /* Verde */
-        .status-rejected { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; } /* Vermelho */
-
-        /* --- INFO CLIENTE --- */
-        .info-wrapper {
-            width: 100%;
-            margin-bottom: 25px;
-        }
-        .info-table {
-            width: 100%;
-            border-collapse: separate; 
-            border-spacing: 10px 0; /* Espaço entre as células */
-            margin: 0 -10px; /* Compensar margem */
-        }
-        .info-box {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            padding: 12px;
-            vertical-align: top;
-            width: 50%;
-            border-radius: 4px;
-        }
-        .info-title {
-            font-size: 9px;
-            font-weight: 700;
-            color: #111827;
-            text-transform: uppercase;
-            border-bottom: 1px solid #d1d5db;
-            padding-bottom: 5px;
-            margin-bottom: 8px;
-        }
-        .info-line {
-            font-size: 9px;
-            margin-bottom: 3px;
-            color: #374151;
-        }
-        .info-line strong { color: #000000; }
-
-        /* --- TABELA DE PRODUTOS --- */
-        .section-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #000000;
-            text-transform: uppercase;
-            margin: 0 0 8px 0;
-            padding-left: 5px;
-            border-left: 4px solid #000000;
-        }
-        
-        .products-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        .products-table th {
-            background-color: #111827; /* Preto quase total */
-            color: #ffffff;
-            font-weight: 600;
-            text-align: left;
-            padding: 8px 6px;
-            font-size: 9px;
-            text-transform: uppercase;
-        }
-        .products-table th:last-child { text-align: right; }
-        
-        .products-table td {
-            padding: 8px 6px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 9px;
-            color: #374151;
-        }
-        .products-table td:last-child { text-align: right; font-weight: 600; }
-        /* Zebra Striping */
-        .products-table tr:nth-child(even) td { background-color: #f9fafb; }
-
-        /* --- SUMMARY & TOTALS --- */
-        .summary-table {
-            width: 100%;
-            margin-top: 10px;
-            border-collapse: collapse;
-        }
-        .summary-notes-cell {
-            width: 60%;
-            vertical-align: top;
-            padding-right: 20px;
-        }
-        .summary-totals-cell {
+        .header-company {
             width: 40%;
-            vertical-align: top;
         }
-
-        .notes-content {
-            font-size: 8px;
-            color: #6b7280;
-            line-height: 1.5;
-            background: #fff;
-            border: 1px dashed #d1d5db;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .notes-list { padding-left: 15px; margin: 5px 0; }
-
-        .totals-box {
-            background-color: #ffffff;
-            border: 2px solid #000000;
-            border-radius: 4px;
-            overflow: hidden; /* Para o background do total final não vazar */
-        }
-        .total-row {
-            display: table;
-            width: 100%;
-            padding: 6px 10px;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .total-label { display: table-cell; font-size: 9px; font-weight: 600; color: #4b5563; }
-        .total-value { display: table-cell; text-align: right; font-size: 9px; font-weight: 600; color: #111827; }
-        
-        .total-final {
-            background-color: #000000;
-            color: #ffffff;
-            padding: 10px;
-            border-bottom: none;
-        }
-        .total-final .total-label { color: #ffffff; font-size: 10px; vertical-align: middle; }
-        .total-final .total-value { color: #ffffff; font-size: 14px; font-weight: 800; vertical-align: middle; }
-
-        /* --- SIGNATURES --- */
-        .signatures-table {
-            width: 100%;
-            margin-top: 60px;
-        }
-        .signature-col {
-            width: 45%;
+        .header-danfe {
+            width: 30%;
             text-align: center;
         }
-        .signature-space { width: 10%; }
-        
-        .signature-line {
-            border-top: 1px solid #000000;
-            padding-top: 8px;
-            font-size: 9px;
-            font-weight: 700;
-            color: #000000;
+        .logo-img {
+            max-width: 150px;
+            max-height: 60px;
         }
-        .signature-sub { font-size: 8px; color: #6b7280; margin-top: 2px; }
 
-        /* --- FOOTER --- */
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 10px;
-            border-top: 1px solid #e5e7eb;
+        /* --- SECTIONS --- */
+        .section-title {
+            background-color: #f3f4f6;
+            font-weight: bold;
+            padding: 3px 5px;
+            border: 1px solid #000000;
+            text-transform: uppercase;
             font-size: 7px;
-            color: #9ca3af;
+        }
+
+        /* --- PRODUCTS TABLE --- */
+        .products-table th {
+            border: 1px solid #000000;
+            background-color: #f3f4f6;
+            font-size: 7px;
+            text-transform: uppercase;
+            padding: 3px;
+        }
+        .products-table td {
+            font-size: 8px;
+            padding: 3px;
+        }
+
+        /* --- TOTALS --- */
+        .total-box {
+            background-color: #f3f4f6;
+            font-weight: bold;
+        }
+        
+        .footer {
+            margin-top: 10px;
+            font-size: 6px;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <table class="header-table">
-                <tr>
-                    <td class="header-logo-cell">
-                        @if(isset($layout) && $layout->logo)
-                            <img src="{{ Storage::url($layout->logo) }}" alt="Logo" class="logo">
-                        @endif
-                    </td>
-                    <td class="header-company-cell">
-                        <div class="company-name">{{ $company->trade_name }}</div>
-                        <div class="company-info">
-                            {{ $company->address->street ?? $company->address['street'] ?? '' }}, {{ $company->address->number ?? $company->address['number'] ?? '' }}<br>
-                            {{ $company->address->city ?? $company->address['city'] ?? '' }}/{{ $company->address->state ?? $company->address['state'] ?? '' }} - {{ $company->address->postcode ?? $company->address['postcode'] ?? '' }}<br>
-                            Tel: {{ $company->phone }} | {{ $company->email }}<br>
-                            @if($company->document) CNPJ: {{ $company->document }} @endif
-                            @if(isset($company->ie) && $company->ie) | IE: {{ $company->ie }} @endif
-                            @if(isset($company->im) && $company->im) | IM: {{ $company->im }} @endif
-                        </div>
-                    </td>
-                    <td class="header-budget-cell">
-                        <div class="budget-box">
-                            <div class="budget-title">ORÇAMENTO</div>
-                            <div class="budget-number"># {{ $state['code'] ?? '0000' }}</div>
-                            <div class="budget-date">{{ date('d/m/Y', strtotime($state['created_at'] ?? now())) }}</div>
-                            
-                            @php
-                                $statusClass = 'status-pending';
-                                if(isset($state['status'])) {
-                                    if($state['status'] == 'aprovado') $statusClass = 'status-approved';
-                                    elseif($state['status'] == 'rejeitado') $statusClass = 'status-rejected';
-                                }
-                            @endphp
-                            <div class="status-badge {{ $statusClass }}">
-                                {{ $state['status'] ?? 'Pendente' }}
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="info-wrapper">
-            <table class="info-table">
-                <tr>
-                    <td class="info-box">
-                        <div class="info-title">Dados do Cliente</div>
-                        <div class="info-line"><strong>Nome:</strong> {{ data_get($state['content'], 'customer_name', 'Consumidor Final') }}</div>
-                        <div class="info-line"><strong>E-mail:</strong> {{ data_get($state['content'], 'customer_email', '-') }}</div>
-                        <div class="info-line"><strong>Tel:</strong> {{ data_get($state['content'], 'customer_phone', '-') }}</div>
-                        @if(data_get($state['content'], 'street'))
-                        <div class="info-line">
-                            <strong>End:</strong> {{ data_get($state['content'], 'street') }}, {{ data_get($state['content'], 'number') }} - {{ data_get($state['content'], 'city') }}/{{ data_get($state['content'], 'state') }}
-                        </div>
-                        @endif
-                    </td>
-                    <td class="info-box">
-                        <div class="info-title">Observações</div>
-                        <div class="info-line">
-                            @if(data_get($state['content'], 'observation'))
-                                {{ data_get($state['content'], 'observation') }}
-                            @else
-                                <span style="color: #9ca3af; font-style: italic;">Nenhuma observação adicional registrada para este orçamento.</span>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="section-title">Itens do Orçamento</div>
-        <table class="products-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">#</th>
-                    <th style="width: 35%;">Produto/Serviço</th>
-                    <th style="width: 15%;">Opção</th>
-                    <th style="width: 15%;">Local</th>
-                    <th style="width: 10%;">Qtd</th>
-                    <th style="width: 10%;">Un.</th>
-                    <th style="width: 10%;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
+    <!-- Cabeçalho Principal -->
+    <table>
+        <tr>
+            <td class="header-logo" rowspan="2">
                 @php
-                    $products = data_get($state['content'], 'products', []);
-                    $productsList = [];
-                    $totalItems = 0;
-
-                    // Lógica original de extração de produtos mantida
-                    if (isset($products[0]) && is_array($products[0]) && !isset($products[0]['product'])) {
-                        foreach ($products as $productGroup) {
-                            if (is_array($productGroup) && isset($productGroup[0])) {
-                                foreach ($productGroup as $p) {
-                                    if (is_array($p) && isset($p['product'])) {
-                                        $productsList[] = $p;
-                                        $totalItems++;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        $productsList = $products;
-                        $totalItems = count($productsList);
-                    }
+                    $logoPath = data_get($company, 'invoice_logo');
+                    $fullLogoPath = $logoPath ? storage_path('app/public/' . $logoPath) : null;
                 @endphp
-
-                @foreach($productsList as $index => $product)
-                    @php
-                        $productObj = \App\Models\Product::find($product['product'] ?? 0);
-                        $productName = $productObj ? $productObj->name : 'Produto Indefinido';
-                        $productOption = \App\Models\ProductOption::find($product['product_option'] ?? 0);
-                        $location = \App\Models\Location::find($product['location'] ?? 0);
-                    @endphp
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>
-                            <strong>{{ $productName }}</strong>
-                        </td>
-                        <td>{{ $productOption ? $productOption->name : '-' }}</td>
-                        <td>{{ $location ? $location->name : '-' }}</td>
-                        <td>{{ $product['quantity'] ?? 0 }}</td>
-                        <td>{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($product['price'] ?? 0),2,',','.') }}</td>
-                        <td>{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($product['subtotal'] ?? 0),2,',','.') }}</td>
-                    </tr>
-                @endforeach
-
-                @if($totalItems == 0)
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px; color: #9ca3af;">Nenhum item adicionado.</td>
-                </tr>
+                @if($fullLogoPath && file_exists($fullLogoPath))
+                    <img src="{{ $fullLogoPath }}" class="logo-img">
+                @else
+                    <div style="font-size: 14px; font-weight: bold;">{{ $company->trade_name ?? 'LOGO' }}</div>
                 @endif
-            </tbody>
-        </table>
+            </td>
+            <td class="header-company">
+                <span class="label">Emitente</span>
+                <span class="value bold">{{ $company->legal_name ?? $company->trade_name }}</span>
+                <span class="value">
+                    {{ data_get($company, 'address.street') }}, {{ data_get($company, 'address.number') }}<br>
+                    {{ data_get($company, 'address.neighborhood') }} - {{ data_get($company, 'address.city') }}/{{ data_get($company, 'address.state') }}<br>
+                    CEP: {{ data_get($company, 'address.postcode') }} - Tel: {{ $company->phone }}
+                </span>
+            </td>
+            <td class="header-danfe">
+                <span style="font-size: 12px; font-weight: bold;">ORÇAMENTO</span>
+                <br>
+                <span style="font-size: 10px;">Nº {{ $state['code'] ?? '0000' }}</span>
+                <br>
+                <span style="font-size: 8px;">FOLHA 1 / 1</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table style="margin: -2px -4px;">
+                    <tr>
+                        <td style="border: none; width: 50%;">
+                            <span class="label">CNPJ / CPF</span>
+                            <span class="value">{{ $company->document }}</span>
+                        </td>
+                        <td style="border: none; border-left: 1px solid #000; width: 50%;">
+                            <span class="label">Inscrição Estadual</span>
+                            <span class="value">{{ $company->ie ?? '-' }}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="text-center" style="vertical-align: middle;">
+                <span class="label">Data de Emissão</span>
+                <span class="value">{{ date('d/m/Y', strtotime($state['created_at'] ?? now())) }}</span>
+            </td>
+        </tr>
+    </table>
 
-        <table class="summary-table">
+    <!-- Dados do Cliente -->
+    <div class="section-title">Destinatário / Remetente</div>
+    <table>
+        <tr>
+            <td colspan="3" style="width: 70%;">
+                <span class="label">Nome / Razão Social</span>
+                <span class="value">{{ data_get($state['content'], 'customer_name', 'Consumidor Final') }}</span>
+            </td>
+            <td style="width: 30%;">
+                <span class="label">CNPJ / CPF</span>
+                <span class="value">{{ data_get($state['content'], 'customer_document', '-') }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 50%;">
+                <span class="label">Endereço</span>
+                <span class="value">{{ data_get($state['content'], 'street', '-') }}, {{ data_get($state['content'], 'number', 'S/N') }}</span>
+            </td>
+            <td style="width: 25%;">
+                <span class="label">Bairro / Distrito</span>
+                <span class="value">{{ data_get($state['content'], 'neighborhood', '-') }}</span>
+            </td>
+            <td style="width: 15%;">
+                <span class="label">CEP</span>
+                <span class="value">{{ data_get($state['content'], 'postcode', '-') }}</span>
+            </td>
+            <td style="width: 10%;">
+                <span class="label">Data Saída</span>
+                <span class="value">{{ date('d/m/Y') }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 50%;">
+                <span class="label">Município</span>
+                <span class="value">{{ data_get($state['content'], 'city', '-') }}</span>
+            </td>
+            <td style="width: 10%;">
+                <span class="label">UF</span>
+                <span class="value text-center">{{ data_get($state['content'], 'state', '-') }}</span>
+            </td>
+            <td colspan="2" style="width: 40%;">
+                <span class="label">Telefone / WhatsApp</span>
+                <span class="value">{{ data_get($state['content'], 'customer_phone', '-') }}</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Cálculo do Imposto / Totais -->
+    <div class="section-title">Cálculo do Orçamento</div>
+    <table>
+        <tr>
+            <td style="width: 20%;">
+                <span class="label">Base de Cálculo</span>
+                <span class="value text-right">0,00</span>
+            </td>
+            <td style="width: 20%;">
+                <span class="label">Valor do Imposto</span>
+                <span class="value text-right">0,00</span>
+            </td>
+            <td style="width: 20%;">
+                <span class="label">Valor do Frete</span>
+                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, ',', '.') }}</span>
+            </td>
+            <td style="width: 20%;">
+                <span class="label">Desconto / Taxas</span>
+                @php
+                    $adj = floatval(data_get($state['content'], 'tax', 0)) - floatval(data_get($state['content'], 'discount', 0));
+                @endphp
+                <span class="value text-right">{{ number_format($adj, 2, ',', '.') }}</span>
+            </td>
+            <td style="width: 20%;" class="total-box">
+                <span class="label">Valor Total do Orçamento</span>
+                <span class="value text-right bold" style="font-size: 11px;">R$ {{ number_format(floatval(data_get($state['content'], 'total', 0)), 2, ',', '.') }}</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Itens do Orçamento -->
+    <div class="section-title">Dados dos Produtos / Serviços</div>
+    <table class="products-table">
+        <thead>
             <tr>
-                <td class="summary-notes-cell">
-                    <div class="notes-content">
-                        <strong>Termos e Condições:</strong>
-                        <ul class="notes-list">
-                            <li>Validade da proposta: <strong>15 dias</strong>.</li>
-                            <li>Documento sem valor fiscal.</li>
-                            @if(isset($company->budget_information) && $company->budget_information)
-                                <li>{{ $company->budget_information }}</li>
-                            @endif
-                        </ul>
-                    </div>
-                </td>
-                
-                <td class="summary-totals-cell">
-                    <div class="totals-box">
-                        <div class="total-row">
-                            <div class="total-label">Volume Total</div>
-                            <div class="total-value">{{ data_get($state['content'], 'quantity', 0) }} m³</div>
-                        </div>
-                        <div class="total-row">
-                            <div class="total-label">Subtotal Itens</div>
-                            @php
-                                $subtotal = floatval(data_get($state['content'], 'total', 0)) 
-                                            + floatval(data_get($state['content'], 'discount', 0)) 
-                                            - floatval(data_get($state['content'], 'tax', 0))
-                                            - floatval(data_get($state['content'], 'shipping', 0));
-                            @endphp
-                            <div class="total-value">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format($subtotal, 2, ',', '.') }}</div>
-                        </div>
-                        
-                        @if(floatval(data_get($state['content'], 'shipping', 0)) > 0)
-                        <div class="total-row">
-                            <div class="total-label">Frete</div>
-                            <div class="total-value">+ {{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, ',', '.') }}</div>
-                        </div>
-                        @endif
-
-                        @if(floatval(data_get($state['content'], 'tax', 0)) > 0)
-                        <div class="total-row">
-                            <div class="total-label">Taxas/Adicionais</div>
-                            <div class="total-value" style="color: #dc2626;">+ {{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(floatval(data_get($state['content'], 'tax', 0)), 2, ',', '.') }}</div>
-                        </div>
-                        @endif
-
-                        @if(floatval(data_get($state['content'], 'discount', 0)) > 0)
-                        <div class="total-row">
-                            <div class="total-label">Descontos</div>
-                            <div class="total-value" style="color: #166534;">- {{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(floatval(data_get($state['content'], 'discount', 0)), 2, ',', '.') }}</div>
-                        </div>
-                        @endif
-
-                        <div class="total-row total-final">
-                            <div class="total-label">TOTAL A PAGAR</div>
-                            <div class="total-value">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(floatval(data_get($state['content'], 'total', 0)), 2, ',', '.') }}</div>
-                        </div>
-                    </div>
-                </td>
+                <th style="width: 10%;">Cód. Prod.</th>
+                <th style="width: 40%;">Descrição do Produto / Serviço</th>
+                <th style="width: 10%;">NCM/SH</th>
+                <th style="width: 5%;">CST</th>
+                <th style="width: 5%;">CFOP</th>
+                <th style="width: 5%;">UNID.</th>
+                <th style="width: 5%;">QTD.</th>
+                <th style="width: 10%;">V. UNIT.</th>
+                <th style="width: 10%;">V. TOTAL</th>
             </tr>
-        </table>
+        </thead>
+        <tbody>
+            @php
+                $products = data_get($state['content'], 'products', []);
+            @endphp
+            @foreach($products as $product)
+                @php
+                    $productObj = \App\Models\Product::find($product['product'] ?? 0);
+                    $productOption = \App\Models\ProductOption::find($product['product_option'] ?? 0);
+                    $location = \App\Models\Location::find($product['location'] ?? 0);
+                @endphp
+                <tr>
+                    <td class="text-center">{{ $product['product'] ?? '-' }}</td>
+                    <td>
+                        {{ $productObj ? $productObj->name : 'Produto' }}
+                        @if($productOption) ({{ $productOption->name }}) @endif
+                        @if($location) - Local: {{ $location->name }} @endif
+                    </td>
+                    <td class="text-center">0000.00.00</td>
+                    <td class="text-center">000</td>
+                    <td class="text-center">5102</td>
+                    <td class="text-center">UN</td>
+                    <td class="text-center">{{ $product['quantity'] ?? 0 }}</td>
+                    <td class="text-right">{{ number_format($product['price'] ?? 0, 2, ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($product['subtotal'] ?? 0, 2, ',', '.') }}</td>
+                </tr>
+            @endforeach
+            @for($i = count($products); $i < 10; $i++)
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            @endfor
+        </tbody>
+    </table>
 
-        <table class="signatures-table">
-            <tr>
-                <td class="signature-col">
-                    <div class="signature-line">{{ $company->trade_name }}</div>
-                    <div class="signature-sub">Responsável Técnico / Vendas</div>
-                </td>
-                <td class="signature-space"></td>
-                <td class="signature-col">
-                    <div class="signature-line">Aceite do Cliente</div>
-                    <div class="signature-sub">{{ $state['content'][0]['customer_name'] ?? 'Cliente' }}</div>
-                </td>
-            </tr>
-        </table>
+    <!-- Dados Adicionais -->
+    <div class="section-title">Dados Adicionais</div>
+    <table>
+        <tr>
+            <td style="width: 70%; height: 60px;">
+                <span class="label">Informações Complementares</span>
+                <span class="value" style="font-size: 7px;">
+                    {{ $company->budget_information }}
+                    <br><br>
+                    <strong>OBSERVAÇÕES:</strong> {{ data_get($state['content'], 'observation', 'Nenhuma') }}
+                </span>
+            </td>
+            <td style="width: 30%;">
+                <span class="label">Reservado ao Fisco</span>
+            </td>
+        </tr>
+    </table>
 
-        <div class="footer">
-            Este documento foi gerado eletronicamente em {{ date('d/m/Y \à\s H:i') }}.<br>
-            &copy; {{ date('Y') }} {{ $company->trade_name }}. Todos os direitos reservados.
-        </div>
+    <div class="footer">
+        Este documento é uma proposta comercial e não possui valor de nota fiscal eletrônica.<br>
+        Gerado em {{ date('d/m/Y H:i') }} &bull; {{ $company->trade_name }}
     </div>
 </body>
 </html>
