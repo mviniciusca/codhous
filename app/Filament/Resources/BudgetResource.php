@@ -28,6 +28,9 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Placeholder;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -71,226 +74,294 @@ class BudgetResource extends Resource
     {
         return $form
             ->schema([
-                Group::make()
-                    ->columnSpanFull()
+                Section::make('Visão Geral do Orçamento')
+                    ->columns(4)
+                    ->description('Informações básicas e status atual do pedido.')
+                    ->icon('heroicon-o-document')
                     ->schema([
-                        Section::make('Visão Geral do Orçamento')
-                            ->columns(4)
-                            ->description('Informações básicas e status atual do pedido.')
-                            ->icon('heroicon-o-document')
-                            ->schema([
-                                Toggle::make('is_active')
-                                    ->helperText('Define se este orçamento deve ser exibido nos relatórios ativos.')
-                                    ->label('Ativo')
-                                    ->inline(),
-                                Select::make('status')
-                                    ->label('Status')
-                                    ->helperText('Estado atual do atendimento.')
-                                    ->options([
-                                        'pending'  => 'Pendente',
-                                        'on going' => 'Em Andamento',
-                                        'done'     => 'Concluído',
-                                        'ignored'  => 'Arquivado/Ignorado',
-                                    ]),
-                                TextInput::make('code')
-                                    ->label('Código do Orçamento')
-                                    ->helperText('Identificador único gerado automaticamente.')
-                                    ->disabled(),
-                                DateTimePicker::make('created_at')
-                                    ->displayFormat('d/m/Y H:i')
-                                    ->label('Data de Criação')
-                                    ->disabled()
-                                    ->helperText('Data e hora em que o cliente enviou o pedido.'),
+                        Toggle::make('is_active')
+                            ->helperText('Define se este orçamento deve ser exibido nos relatórios ativos.')
+                            ->label('Ativo')
+                            ->inline(),
+                        Select::make('status')
+                            ->label('Status')
+                            ->helperText('Estado atual do atendimento.')
+                            ->options([
+                                'pending'  => 'Pendente',
+                                'on going' => 'Em Andamento',
+                                'done'     => 'Concluído',
+                                'ignored'  => 'Arquivado/Ignorado',
                             ]),
-                    ]),
-                Section::make('Conteúdo do Pedido')
-                    ->description('Detalhes dos produtos, serviços e informações do cliente.')
-                    ->icon('heroicon-o-shopping-bag')
-                    ->headerActions([
-                        Action::make('fill_all_fake_data')
-                            ->label('Preencher com Dados de Teste')
-                            ->icon('heroicon-o-sparkles')
-                            ->color('success')
-                            ->action(function (Set $set, Get $get) {
-                                $fakeService = new FakeBudgetDataService();
-                                $fakeData = $fakeService->generateCompleteBudgetData();
-
-                                foreach ($fakeData as $key => $value) {
-                                    $set('content.' . $key, $value);
-                                }
-
-                                Notification::make()
-                                    ->title('Dados de teste gerados!')
-                                    ->body('Todos os campos foram preenchidos para validação.')
-                                    ->success()
-                                    ->send();
-                            }),
-                        Action::make('clear_all_fields')
-                            ->label('Limpar Tudo')
-                            ->icon('heroicon-o-trash')
-                            ->color('danger')
-                            ->requiresConfirmation()
-                            ->action(function (Set $set) {
-                                $set('content', []);
-                                Notification::make()
-                                    ->title('Campos limpos!')
-                                    ->success()
-                                    ->send();
-                            }),
-                    ])
-                    ->schema([
-                        Fieldset::make('Informações do Cliente')
-                            ->columns(3)
-                            ->schema([
-                                Group::make()
-                                    ->columns(3)
-                                    ->columnSpanFull()
-                                    ->schema([
-                                        TextInput::make('content.customer_name')
-                                            ->disabled()
-                                            ->required()
-                                            ->dehydrated()
-                                            ->label('Nome do Cliente'),
-                                        TextInput::make('content.customer_email')
-                                            ->disabled()
-                                            ->required()
-                                            ->dehydrated()
-                                            ->label('E-mail'),
-                                        TextInput::make('content.customer_phone')
-                                            ->disabled()
-                                            ->required()
-                                            ->dehydrated()
-                                            ->label('Telefone/WhatsApp'),
-                                    ]),
-                                TextInput::make('content.postcode')
-                                    ->disabled()
-                                    ->required()
-                                    ->dehydrated()
-                                    ->label('CEP'),
-                                TextInput::make('content.street')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->label('Logradouro'),
-                                TextInput::make('content.number')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->label('Número'),
-                                TextInput::make('content.city')
-                                    ->disabled()
-                                    ->required()
-                                    ->dehydrated()
-                                    ->label('Cidade'),
-                                TextInput::make('content.neighborhood')
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->required()
-                                    ->label('Bairro'),
-                                TextInput::make('content.state')
-                                    ->disabled()
-                                    ->required()
-                                    ->dehydrated()
-                                    ->label('UF'),
-                            ]),
-                        Fieldset::make('Componentes da Obra')
-                            ->columns(4)
-                            ->schema([
-                                TextInput::make('content.quantity')
-                                    ->required()
-                                    ->label('Volume Estimado')
-                                    ->suffix('m³')
-                                    ->helperText('Volume solicitado para concretagem.')
-                                    ->disabled()
-                                    ->dehydrated(),
-                                TextInput::make('content.location')
-                                    ->required()
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->label('Local da Obra')
-                                    ->helperText('Área ou elemento a ser concretado.'),
-                                TextInput::make('content.fck')
-                                    ->required()
-                                    ->label('FCK Solicitado')
-                                    ->helperText('Resistência característica do concreto.')
-                                    ->disabled()
-                                    ->dehydrated(),
-                                TextInput::make('content.product')
-                                    ->required()
-                                    ->label('Tipo de Concreto')
-                                    ->helperText('Descrição do produto/serviço.')
-                                    ->disabled()
-                                    ->dehydrated(),
-                            ]),
-                    ])
-                    ->collapsible(),
-                Section::make('Precificação e Custos')
-                    ->icon('heroicon-o-currency-dollar')
-                    ->description('Definição de valores, impostos e descontos.')
-                    ->collapsible()
-                    ->columns(6)
-                    ->schema([
-                        TextInput::make('content.quantity')
-                            ->label('Qtd (m³)')
-                            ->live()
-                            ->dehydrated()
-                            ->readonly()
-                            ->required()
-                            ->suffix('m³')
-                            ->afterStateHydrated(function (Get $get, Set $set, ?string $state) {
-                                self::calculateTotal($get, $set);
-                            })
-                            ->numeric(),
-                        TextInput::make('content.price')
-                            ->live()
-                            ->dehydrated()
-                            ->prefix('R$')
-                            ->label('Preço Unit. (m³)')
-                            ->required()
-                            ->numeric()
-                            ->step(0.01)
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                self::calculateTotal($get, $set);
-                            }),
-                        TextInput::make('content.subtotal')
-                            ->live()
-                            ->dehydrated()
-                            ->readonly()
-                            ->label('Subtotal')
-                            ->prefix('R$')
-                            ->numeric()
-                            ->step(0.01),
-                        TextInput::make('content.tax')
-                            ->label('Taxas/Frete')
-                            ->live()
-                            ->dehydrated()
-                            ->prefix('+ R$')
-                            ->numeric()
-                            ->required()
-                            ->default(0)
-                            ->step(0.01)
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                self::calculateTotal($get, $set);
-                            }),
-                        TextInput::make('content.discount')
-                            ->label('Desconto')
-                            ->live()
-                            ->dehydrated()
-                            ->numeric()
-                            ->required()
-                            ->prefix('- R$')
-                            ->step(0.01)
-                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                self::calculateTotal($get, $set);
-                            }),
-                        TextInput::make('content.total')
-                            ->label('Valor Total')
-                            ->live()
-                            ->dehydrated()
+                        TextInput::make('code')
+                            ->label('Código do Orçamento')
+                            ->helperText('Identificador único gerado automaticamente.')
+                            ->disabled(),
+                        DateTimePicker::make('created_at')
+                            ->displayFormat('d/m/Y H:i')
+                            ->label('Data de Criação')
                             ->disabled()
-                            ->numeric()
-                            ->required()
-                            ->prefix('R$')
-                            ->step(0.01),
+                            ->helperText('Data e hora em que o cliente enviou o pedido.'),
+                    ]),
+
+                Tabs::make('Conteúdo do Orçamento')
+                    ->columnSpanFull()
+                    ->tabs([
+                        Tabs\Tab::make('Informações do Cliente')
+                            ->icon('heroicon-o-user')
+                            ->schema([
+                                Section::make()
+                                    ->headerActions([
+                                        Action::make('fill_all_fake_data')
+                                            ->label('Preencher com Dados de Teste')
+                                            ->icon('heroicon-o-sparkles')
+                                            ->color('success')
+                                            ->visible(fn ($livewire) => $livewire instanceof Pages\CreateBudget)
+                                            ->action(function (Set $set, Get $get) {
+                                                $fakeService = new FakeBudgetDataService();
+                                                $fakeData = $fakeService->generateCompleteBudgetData();
+
+                                                foreach ($fakeData as $key => $value) {
+                                                    $set('content.' . $key, $value);
+                                                }
+
+                                                Notification::make()
+                                                    ->title('Dados de teste gerados!')
+                                                    ->success()
+                                                    ->send();
+                                            }),
+                                        Action::make('clear_all_fields')
+                                            ->label('Limpar Tudo')
+                                            ->icon('heroicon-o-trash')
+                                            ->color('danger')
+                                            ->visible(fn ($livewire) => $livewire instanceof Pages\CreateBudget)
+                                            ->requiresConfirmation()
+                                            ->action(function (Set $set) {
+                                                $set('content', []);
+                                                Notification::make()
+                                                    ->title('Campos limpos!')
+                                                    ->success()
+                                                    ->send();
+                                            }),
+                                    ])
+                                    ->schema([
+                                        Fieldset::make('Dados de Contato')
+                                            ->columns(3)
+                                            ->schema([
+                                                TextInput::make('content.customer_name')
+                                                    ->disabled()
+                                                    ->required()
+                                                    ->dehydrated()
+                                                    ->label('Nome do Cliente')
+                                                    ->helperText('Nome completo fornecido pelo cliente.'),
+                                                TextInput::make('content.customer_email')
+                                                    ->disabled()
+                                                    ->required()
+                                                    ->dehydrated()
+                                                    ->label('E-mail')
+                                                    ->helperText('Endereço de e-mail para contato.'),
+                                                TextInput::make('content.customer_phone')
+                                                    ->disabled()
+                                                    ->required()
+                                                    ->dehydrated()
+                                                    ->label('Telefone/WhatsApp')
+                                                    ->helperText('Número para comunicação direta.'),
+                                            ]),
+                                        Fieldset::make('Endereço da Obra')
+                                            ->columns(3)
+                                            ->schema([
+                                                TextInput::make('content.postcode')
+                                                    ->disabled()
+                                                    ->required()
+                                                    ->dehydrated()
+                                                    ->label('CEP'),
+                                                TextInput::make('content.street')
+                                                    ->disabled()
+                                                    ->dehydrated()
+                                                    ->required()
+                                                    ->label('Logradouro'),
+                                                TextInput::make('content.number')
+                                                    ->disabled()
+                                                    ->dehydrated()
+                                                    ->label('Número'),
+                                                TextInput::make('content.city')
+                                                    ->disabled()
+                                                    ->required()
+                                                    ->dehydrated()
+                                                    ->label('Cidade'),
+                                                TextInput::make('content.neighborhood')
+                                                    ->disabled()
+                                                    ->dehydrated()
+                                                    ->required()
+                                                    ->label('Bairro'),
+                                                TextInput::make('content.state')
+                                                    ->disabled()
+                                                    ->required()
+                                                    ->dehydrated()
+                                                    ->label('UF'),
+                                            ]),
+                                    ]),
+                            ]),
+                        Tabs\Tab::make('Itens do Pedido')
+                            ->icon('heroicon-o-shopping-bag')
+                            ->schema([
+                                Section::make('O que o cliente solicitou')
+                                    ->description('Referência dos itens enviados no formulário original.')
+                                    ->collapsed()
+                                    ->headerActions([
+                                        Action::make('import_request')
+                                            ->label('Importar para o Orçamento')
+                                            ->icon('heroicon-o-arrow-down-tray')
+                                            ->color('primary')
+                                            ->requiresConfirmation()
+                                            ->action(function (Set $set, Get $get) {
+                                                $requested = $get('content.products') ?? [];
+                                                $items = $get('content.items') ?? [];
+                                                
+                                                foreach ($requested as $req) {
+                                                    $option = \App\Models\ProductOption::find($req['product_option'] ?? 0);
+                                                    $items[] = [
+                                                        'product_id' => $req['product'] ?? null,
+                                                        'product_option_id' => $req['product_option'] ?? null,
+                                                        'quantity' => $req['quantity'] ?? 1,
+                                                        'unit_price' => $option?->price ?? 0,
+                                                    ];
+                                                }
+                                                
+                                                $set('content.items', $items);
+                                                self::calculateTotalFromRepeater($get, $set);
+                                                
+                                                Notification::make()
+                                                    ->title('Itens importados!')
+                                                    ->success()
+                                                    ->send();
+                                            })
+                                    ])
+                                    ->schema([
+                                        Placeholder::make('requested_items')
+                                            ->label('')
+                                            ->content(function (Budget $record): string|Htmlable {
+                                                $products = $record->content['products'] ?? [];
+                                                if (empty($products)) return 'Nenhum item informado.';
+
+                                                $html = '<ul class="list-disc ml-4 space-y-1">';
+                                                foreach ($products as $item) {
+                                                    $productName = \App\Models\Product::find($item['product'] ?? 0)?->name ?? 'Produto';
+                                                    $unit = \App\Models\ProductOption::find($item['product_option'] ?? 0)?->unit?->value ?? '';
+                                                    $html .= "<li><strong>{$productName}</strong>: {$item['quantity']} {$unit}</li>";
+                                                }
+                                                $html .= '</ul>';
+
+                                                return new \Illuminate\Support\HtmlString($html);
+                                            }),
+                                    ]),
+
+                                Repeater::make('content.items')
+                                    ->label('Itens do Orçamento')
+                                    ->helperText('Adicione aqui os itens que farão parte do orçamento final.')
+                                    ->schema([
+                                        Select::make('product_id')
+                                            ->label('Produto')
+                                            ->options(\App\Models\Product::pluck('name', 'id'))
+                                            ->searchable()
+                                            ->required()
+                                            ->reactive()
+                                            ->afterStateUpdated(fn (Set $set) => $set('product_option_id', null)),
+                                        Select::make('product_option_id')
+                                            ->label('Opção/Resistência')
+                                            ->options(fn (Get $get) => \App\Models\ProductOption::where('product_id', $get('product_id'))->get()->pluck('name', 'id'))
+                                            ->required()
+                                            ->reactive()
+                                            ->afterStateUpdated(function (Set $set, $state) {
+                                                if ($state) {
+                                                    $option = \App\Models\ProductOption::find($state);
+                                                    $set('unit_price', $option?->price ?? 0);
+                                                }
+                                            })
+                                            ->searchable(),
+                                        TextInput::make('quantity')
+                                            ->label('Quantidade')
+                                            ->numeric()
+                                            ->required()
+                                            ->default(1)
+                                            ->reactive()
+                                            ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? ''),
+                                        TextInput::make('unit_price')
+                                            ->label('Preço Unit.')
+                                            ->numeric()
+                                            ->prefix('R$')
+                                            ->required()
+                                            ->reactive()
+                                            ->step(0.01),
+                                        TextInput::make('total_item')
+                                            ->label('Total Item')
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->numeric()
+                                            ->prefix('R$')
+                                            ->placeholder('0.00')
+                                            ->state(function (Get $get) {
+                                                $qty = floatval($get('quantity') ?? 0);
+                                                $price = floatval($get('unit_price') ?? 0);
+                                                return number_format($qty * $price, 2, '.', '');
+                                            }),
+                                    ])
+                                    ->columns(5)
+                                    ->live()
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        self::calculateTotalFromRepeater($get, $set);
+                                    }),
+
+                                Section::make('Precificação e Custos')
+                                    ->icon('heroicon-o-currency-dollar')
+                                    ->description('Definição de valores, impostos e descontos.')
+                                    ->columns(4)
+                                    ->schema([
+                                        TextInput::make('content.subtotal')
+                                            ->live()
+                                            ->dehydrated()
+                                            ->readonly()
+                                            ->label('Subtotal de Itens')
+                                            ->helperText('Soma dos itens acima.')
+                                            ->prefix('R$')
+                                            ->numeric()
+                                            ->step(0.01),
+                                        TextInput::make('content.tax')
+                                            ->label('Taxas/Frete')
+                                            ->live()
+                                            ->dehydrated()
+                                            ->prefix('+ R$')
+                                            ->numeric()
+                                            ->required()
+                                            ->default(0)
+                                            ->step(0.01)
+                                            ->helperText('Custos adicionais.')
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                self::calculateTotalFromRepeater($get, $set);
+                                            }),
+                                        TextInput::make('content.discount')
+                                            ->label('Desconto')
+                                            ->live()
+                                            ->dehydrated()
+                                            ->numeric()
+                                            ->required()
+                                            ->prefix('- R$')
+                                            ->step(0.01)
+                                            ->helperText('Valor a subtrair.')
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                self::calculateTotalFromRepeater($get, $set);
+                                            }),
+                                        TextInput::make('content.total')
+                                            ->label('Valor Total Final')
+                                            ->live()
+                                            ->dehydrated()
+                                            ->disabled()
+                                            ->numeric()
+                                            ->required()
+                                            ->prefix('R$')
+                                            ->step(0.01)
+                                            ->helperText('Valor final do orçamento.'),
+                                    ]),
+                            ]),
                     ]),
             ]);
     }
@@ -303,18 +374,29 @@ class BudgetResource extends Resource
         ];
     }
 
-    public static function calculateTotal(Get $get, Set $set): void
+    public static function calculateTotalFromRepeater(Get $get, Set $set): void
     {
-        $quantity = floatval($get('content.quantity') ?? 0);
-        $price = floatval($get('content.price') ?? 0);
+        $items = $get('content.items') ?? [];
+        $subtotal = 0;
+
+        foreach ($items as $item) {
+            $qty = floatval($item['quantity'] ?? 0);
+            $price = floatval($item['unit_price'] ?? 0);
+            $subtotal += ($qty * $price);
+        }
+
         $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
-
-        $subtotal = $quantity * $price;
         $total = $subtotal + $tax - $discount;
 
         $set('content.subtotal', number_format($subtotal, 2, '.', ''));
         $set('content.total', number_format($total, 2, '.', ''));
+    }
+
+    public static function calculateTotal(Get $get, Set $set): void
+    {
+        // deprecated by calculateTotalFromRepeater but kept for backward compatibility if needed
+        self::calculateTotalFromRepeater($get, $set);
     }
 
     public static function table(Table $table): Table
@@ -363,38 +445,11 @@ class BudgetResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->label('Cliente'),
-                TextColumn::make('products_display')
-                    ->label('Itens Solicitados')
-                    ->state(function (Budget $record): string {
-                        $products = $record->content['products'] ?? [];
-                        if (empty($products)) return '-';
-
-                        $lines = [];
-                        foreach ($products as $item) {
-                            $productName = \App\Models\Product::find($item['product'] ?? 0)?->name ?? 'Produto';
-                            $unit = \App\Models\ProductOption::find($item['product_option'] ?? 0)?->unit?->value ?? '';
-                            $lines[] = "{$productName} ({$item['quantity']} {$unit})";
-                        }
-
-                        return implode(', ', $lines);
-                    })
-                    ->wrap()
-                    ->limit(50),
                 TextColumn::make('content.customer_phone')
                     ->label('WhatsApp'),
                 TextColumn::make('content.total')
                     ->label('Valor Total')
                     ->money('BRL')
-                    ->toggleable(),
-                TextColumn::make('documents_count')
-                    ->counts('documents')
-                    ->label('Anexos')
-                    ->badge()
-                    ->color(fn($state) => $state > 0 ? 'success' : 'gray')
-                    ->icon(fn($state) => $state > 0 ? 'heroicon-o-paper-clip' : 'heroicon-o-document')
-                    ->formatStateUsing(fn($state) => $state > 0 ? $state : 'Nenhum')
-                    ->sortable()
-                    ->alignCenter()
                     ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime('d/m/Y H:i')
