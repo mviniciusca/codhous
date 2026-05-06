@@ -30,17 +30,17 @@ class UserResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Team Management');
+        return 'Gestão da Equipe';
     }
 
     public static function getModelLabel(): string
     {
-        return __('User');
+        return 'Usuário';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Users');
+        return 'Usuários';
     }
 
     public static function getNavigationBadge(): ?string
@@ -52,28 +52,28 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Section::make(__('User Information'))
+                Section::make('Informações do Usuário')
                     ->icon('heroicon-o-user')
-                    ->description(__('Basic user information and credentials'))
+                    ->description('Dados básicos e credenciais de acesso ao sistema.')
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Full Name'))
-                            ->helperText(__('User full name'))
+                            ->label('Nome Completo')
+                            ->helperText('Nome que aparecerá no sistema e orçamentos.')
                             ->prefixIcon('heroicon-o-user')
                             ->required()
                             ->maxLength(255),
                         TextInput::make('email')
-                            ->label(__('Email'))
-                            ->helperText(__('User email for login'))
+                            ->label('E-mail de Acesso')
+                            ->helperText('Utilizado para login e notificações.')
                             ->prefixIcon('heroicon-o-envelope')
                             ->email()
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
                         TextInput::make('password')
-                            ->label(__('Password'))
-                            ->helperText(__('Minimum 8 characters'))
+                            ->label('Senha')
+                            ->helperText('Mínimo 8 caracteres. Deixe em branco para manter a atual.')
                             ->prefixIcon('heroicon-o-key')
                             ->password()
                             ->revealable()
@@ -83,34 +83,13 @@ class UserResource extends Resource
                             ->minLength(8),
                         TextInput::make('password_confirmation')
                             ->prefixIcon('heroicon-o-key')
-                            ->helperText(__('Confirm the password'))
-                            ->label(__('Confirm Password'))
+                            ->helperText('Confirme a nova senha digitada ao lado.')
+                            ->label('Confirmar Senha')
                             ->password()
                             ->revealable()
                             ->same('password')
                             ->required(fn(string $context): bool => $context === 'create')
                             ->dehydrated(false),
-                    ]),
-
-                Section::make(__('Role & Permissions'))
-                    ->icon('heroicon-o-shield-check')
-                    ->description(__('Assign role to user'))
-                    ->schema([
-                        Select::make('roles')
-                            ->label(__('User Role'))
-                            ->helperText(__('Select the role for this user. Super Admin: Full access | Admin: Manager | Vendedor: Sales | Financeiro: Financial | Atendimento: Customer Service'))
-                            ->relationship('roles', 'name')
-                            ->preload()
-                            ->searchable()
-                            ->required()
-                            ->native(false)
-                            ->options([
-                                'super_admin' => '🔴 Super Admin (Full Access)',
-                                'admin'       => '🟡 Admin (Manager/Supervisor)',
-                                'vendedor'    => '🟢 Vendedor (Sales Team)',
-                                'financeiro'  => '🔵 Financeiro (Financial)',
-                                'atendimento' => '🟣 Atendimento (Customer Service)',
-                            ]),
                     ]),
             ]);
     }
@@ -120,47 +99,26 @@ class UserResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Name'))
+                    ->label('Nome')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
 
                 TextColumn::make('email')
-                    ->label(__('Email'))
+                    ->label('E-mail')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-envelope')
                     ->copyable(),
 
-                TextColumn::make('roles.name')
-                    ->label(__('Role'))
-                    ->badge()
-                    ->colors([
-                        'danger'  => 'super_admin',
-                        'warning' => 'admin',
-                        'success' => 'vendedor',
-                        'info'    => 'financeiro',
-                        'primary' => 'atendimento',
-                    ])
-                    ->formatStateUsing(function ($state) {
-                        return match ($state) {
-                            'super_admin' => 'Super Admin',
-                            'admin'       => 'Admin',
-                            'vendedor'    => 'Vendedor',
-                            'financeiro'  => 'Financeiro',
-                            'atendimento' => 'Atendimento',
-                            default       => $state,
-                        };
-                    }),
-
                 TextColumn::make('created_at')
-                    ->label(__('Created At'))
+                    ->label('Cadastrado em')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('budgets_count')
-                    ->label(__('Budgets'))
+                    ->label('Orçamentos')
                     ->counts('budgets')
                     ->badge()
                     ->color('success')
@@ -168,18 +126,7 @@ class UserResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                SelectFilter::make('role')
-                    ->label(__('Filter by Role'))
-                    ->relationship('roles', 'name')
-                    ->preload()
-                    ->multiple()
-                    ->options([
-                        'super_admin' => 'Super Admin',
-                        'admin'       => 'Admin',
-                        'vendedor'    => 'Vendedor',
-                        'financeiro'  => 'Financeiro',
-                        'atendimento' => 'Atendimento',
-                    ]),
+                // Filtros removidos por simplicidade
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -192,8 +139,8 @@ class UserResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->emptyStateHeading(__('No users yet'))
-            ->emptyStateDescription(__('Create your first team member'))
+            ->emptyStateHeading('Nenhum usuário encontrado')
+            ->emptyStateDescription('Crie o seu primeiro membro de equipe agora mesmo.')
             ->emptyStateIcon('heroicon-o-users');
     }
 
@@ -201,7 +148,6 @@ class UserResource extends Resource
     {
         return [
             UserResource\RelationManagers\BudgetsRelationManager::class,
-            UserResource\RelationManagers\ActivitiesRelationManager::class,
         ];
     }
 

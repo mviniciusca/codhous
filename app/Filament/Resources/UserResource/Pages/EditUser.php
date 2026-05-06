@@ -13,13 +13,14 @@ class EditUser extends EditRecord
 
     public function getTitle(): string
     {
-        return 'User Overview & Management';
+        return 'Visão Geral e Gestão do Usuário';
     }
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->label('Excluir Usuário'),
         ];
     }
 

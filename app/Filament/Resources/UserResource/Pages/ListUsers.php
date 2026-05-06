@@ -17,41 +17,8 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label(__('New Team Member'))
+                ->label('Novo Usuário')
                 ->icon('heroicon-o-user-plus'),
-        ];
-    }
-
-    public function getTabs(): array
-    {
-        return [
-            'all' => Tab::make(__('All Users'))
-                ->badge(User::count()),
-
-            'super_admins' => Tab::make(__('Super Admins'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('roles', fn ($q) => $q->where('name', 'super_admin')))
-                ->badge(User::whereHas('roles', fn ($q) => $q->where('name', 'super_admin'))->count())
-                ->badgeColor('danger'),
-
-            'admins' => Tab::make(__('Admins'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('roles', fn ($q) => $q->where('name', 'admin')))
-                ->badge(User::whereHas('roles', fn ($q) => $q->where('name', 'admin'))->count())
-                ->badgeColor('warning'),
-
-            'vendedores' => Tab::make(__('Sales Team'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('roles', fn ($q) => $q->where('name', 'vendedor')))
-                ->badge(User::whereHas('roles', fn ($q) => $q->where('name', 'vendedor'))->count())
-                ->badgeColor('success'),
-
-            'financeiro' => Tab::make(__('Financial'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('roles', fn ($q) => $q->where('name', 'financeiro')))
-                ->badge(User::whereHas('roles', fn ($q) => $q->where('name', 'financeiro'))->count())
-                ->badgeColor('info'),
-
-            'atendimento' => Tab::make(__('Customer Service'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('roles', fn ($q) => $q->where('name', 'atendimento')))
-                ->badge(User::whereHas('roles', fn ($q) => $q->where('name', 'atendimento'))->count())
-                ->badgeColor('primary'),
         ];
     }
 }

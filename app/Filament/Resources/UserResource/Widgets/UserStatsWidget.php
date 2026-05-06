@@ -42,24 +42,24 @@ class UserStatsWidget extends BaseWidget
             ->count();
 
         return [
-            Stat::make('Total Budgets', $totalBudgets)
-                ->description('All budgets created by this user')
+            Stat::make('Total de Orçamentos', $totalBudgets)
+                ->description('Todos os orçamentos criados por este usuário')
                 ->descriptionIcon('heroicon-o-currency-dollar')
                 ->color('primary'),
 
-            Stat::make('Completed Budgets', $doneBudgets)
-                ->description('Budgets with status "Done"')
+            Stat::make('Orçamentos Concluídos', $doneBudgets)
+                ->description('Orçamentos com status "Concluído"')
                 ->descriptionIcon('heroicon-o-check-circle')
                 ->color('success'),
 
-            Stat::make('Potential Revenue', 'R$ '.number_format($totalValue, 2, ',', '.'))
-                ->description('Total value of completed budgets')
+            Stat::make('Receita Gerada', 'R$ '.number_format($totalValue, 2, '.', ','))
+                ->description('Valor total de orçamentos concluídos')
                 ->descriptionIcon('heroicon-o-banknotes')
                 ->color('success')
                 ->chart([7, 12, 5, 18, 15, 23, $doneBudgets]),
 
-            Stat::make('Pending Budgets', $pendingBudgets)
-                ->description('Budgets awaiting approval')
+            Stat::make('Orçamentos Pendentes', $pendingBudgets)
+                ->description('Orçamentos aguardando aprovação')
                 ->descriptionIcon('heroicon-o-clock')
                 ->color('warning'),
         ];
