@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -12,6 +13,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -57,6 +59,13 @@ class UserResource extends Resource
                     ->description('Dados básicos e credenciais de acesso ao sistema.')
                     ->columns(2)
                     ->schema([
+                        FileUpload::make('avatar_url')
+                            ->label('Foto de Perfil')
+                            ->avatar()
+                            ->image()
+                            ->directory('avatars')
+                            ->columnSpanFull()
+                            ->alignCenter(),
                         TextInput::make('name')
                             ->label('Nome Completo')
                             ->helperText('Nome que aparecerá no sistema e orçamentos.')
@@ -98,6 +107,10 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('avatar_url')
+                    ->label('Foto')
+                    ->circular(),
+
                 TextColumn::make('name')
                     ->label('Nome')
                     ->searchable()
