@@ -6,6 +6,8 @@ use Z3d0X\FilamentLogger\Resources\ActivityResource as BaseActivityResource;
 
 class ActivityResource extends BaseActivityResource
 {
-    protected static ?string $navigationGroup = 'Configurações';
-    protected static ?int $navigationSort = 3;
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Configurações';
+    }
 }

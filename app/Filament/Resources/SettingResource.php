@@ -13,7 +13,10 @@ class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
 
-    protected static ?string $navigationGroup = 'Administração';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Configurações';
+    }
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
