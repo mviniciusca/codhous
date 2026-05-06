@@ -72,20 +72,12 @@ class SettingFactory extends Factory
                         'zip_code' => '01234-567',
                     ],
                     'maps_link' => 'https://goo.gl/maps/example',
-                    'opening_hours' => [
-                        ['day' => 'Segunda-feira', 'hours' => '09:00 - 18:00'],
-                        ['day' => 'Terça-feira', 'hours' => '09:00 - 18:00'],
-                        ['day' => 'Quarta-feira', 'hours' => '09:00 - 18:00'],
-                        ['day' => 'Quinta-feira', 'hours' => '09:00 - 18:00'],
-                        ['day' => 'Sexta-feira', 'hours' => '09:00 - 18:00'],
-                        ['day' => 'Sábado', 'hours' => '09:00 - 13:00'],
-                        ['day' => 'Domingo', 'hours' => 'Fechado'],
-                    ],
+                    'opening_hours' => 'Segunda a Sexta, 08:00 às 18:00',
                 ],
                 'security' => [
                     'maintenance_mode' => false,
                     'maintenance_message' => 'Estamos realizando algumas melhorias. Voltaremos em instantes!',
-                    'allowed_ips' => ['127.0.0.1'],
+                    'allowed_ips' => [],
                 ],
             ],
         ];

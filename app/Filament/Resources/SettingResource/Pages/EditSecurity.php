@@ -33,7 +33,7 @@ class EditSecurity extends EditRecord
                     ->schema([
                         Toggle::make('settings.security.maintenance_mode')
                             ->label('Modo Manutenção')
-                            ->helperText('Quando ativado, apenas usuários com IPs permitidos verão o site.')
+                            ->helperText('Quando ativado, os visitantes verão apenas a página de manutenção.')
                             ->reactive()
                             ->inline(false),
                         Textarea::make('settings.security.maintenance_message')
@@ -41,13 +41,6 @@ class EditSecurity extends EditRecord
                             ->helperText('Texto exibido para os visitantes enquanto o site estiver em manutenção.')
                             ->visible(fn($get) => $get('settings.security.maintenance_mode'))
                             ->rows(3),
-                        TagsInput::make('settings.security.allowed_ips')
-                            ->label('Lista de IPs Permitidos')
-                            ->helperText('Adicione os endereços IP que devem ter acesso total, ignorando o modo manutenção.')
-                            ->placeholder('Ex: 192.168.1.1')
-                            ->suggestions([
-                                request()->ip(),
-                            ]),
                     ]),
             ]);
     }
