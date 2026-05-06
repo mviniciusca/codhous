@@ -236,6 +236,16 @@ class Budget extends Component implements HasForms
     {
         $this->form->validate();
         $state = $this->form->getState();
+
+        // Garantir que os totais estejam corretos antes de salvar e enviar e-mail
+        $products = $state['content']['products'] ?? [];
+        $shipping = (float) ($state['content']['shipping'] ?? 0);
+        $result = BudgetCalculatorService::calculateTotal($products, $shipping, 0, 0);
+        
+        $state['content']['quantity'] = $result['quantity'];
+        $state['content']['price'] = $result['price'];
+        $state['content']['subtotal'] = $result['subtotal'];
+        $state['content']['total'] = $result['total'];
         
         // Extract products for pivot table sync
         $products = $state['content']['products'] ?? [];
