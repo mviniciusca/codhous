@@ -100,10 +100,11 @@ class Budget extends Component implements HasForms
                                         ])
                                         ->visible(fn (Get $get) => filled($get('content.street'))),
 
-                                    Grid::make(2)
+                                    Grid::make(12)
                                         ->schema([
-                                            TextInput::make('content.neighborhood')->label('Bairro')->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
-                                            TextInput::make('content.city')->label('Cidade')->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                            TextInput::make('content.neighborhood')->label('Bairro')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                            TextInput::make('content.city')->label('Cidade')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                            TextInput::make('content.state')->label('UF')->columnSpan(2)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200 text-center']),
                                         ])
                                         ->visible(fn (Get $get) => filled($get('content.street'))),
                                 ])->collapsible(),

@@ -354,37 +354,18 @@ class BudgetResource extends Resource
                                                 ->color('primary')
                                                 ->requiresConfirmation()
                                                 ->action(function (Budget $record) {
-                                                    $pdfModel = self::generatePdfModel($record);
-
-                                                    if ($pdfModel) {
-                                                        $url = $pdfModel->getDownloadUrl();
-                                                        $content = $record->content;
-                                                        $content['share_link'] = $url;
-                                                        $record->update([
-                                                            'content' => $content,
-                                                            'pdf_document' => $pdfModel->path
-                                                        ]);
-
-                                                        try {
-                                                            $mailService = new SendBudgetMailService(
-                                                                $record->toArray(),
-                                                                $record->content['customer_email'] ?? '',
-                                                                new \App\Mail\BudgetMail($record->toArray())
-                                                            );
-                                                            $mailService->dispatch();
-
-                                                            Notification::make()
-                                                                ->title('Sucesso!')
-                                                                ->body('PDF gerado e e-mail enviado.')
-                                                                ->success()
-                                                                ->send();
-                                                        } catch (\Exception $e) {
-                                                            Notification::make()
-                                                                ->title('Erro ao enviar e-mail')
-                                                                ->body($e->getMessage())
-                                                                ->danger()
-                                                                ->send();
-                                                        }
+                                                    try {
+                                                        $mailService = new SendBudgetMailService(
+                                                            $record,
+                                                            $record->content['customer_email'] ?? ''
+                                                        );
+                                                        $mailService->dispatch();
+                                                    } catch (\Exception $e) {
+                                                        Notification::make()
+                                                            ->title('Erro ao enviar e-mail')
+                                                            ->body($e->getMessage())
+                                                            ->danger()
+                                                            ->send();
                                                     }
                                                 }),
 
@@ -647,31 +628,15 @@ class BudgetResource extends Resource
                         ->visible(fn(Budget $record) => ! $record->trashed())
                         ->action(function (Budget $record) {
                             try {
-                                $pdfModel = self::generatePdfModel($record);
-                                
-                                if ($pdfModel) {
-                                    $content = $record->content;
-                                    $content['share_link'] = $pdfModel->getDownloadUrl();
-                                    $record->update([
-                                        'content' => $content,
-                                        'pdf_document' => $pdfModel->path
-                                    ]);
-                                }
-
                                 $mailService = new SendBudgetMailService(
-                                    $record->toArray(),
-                                    $record->content['customer_email'] ?? '',
-                                    new \App\Mail\BudgetMail($record->toArray())
+                                    $record,
+                                    $record->content['customer_email'] ?? ''
                                 );
                                 $mailService->dispatch();
-
-                                Notification::make()
-                                    ->title('E-mail enviado com sucesso')
-                                    ->success()
-                                    ->send();
                             } catch (\Exception $e) {
                                 Notification::make()
                                     ->title('Erro ao enviar e-mail')
+                                    ->body($e->getMessage())
                                     ->danger()
                                     ->send();
                             }

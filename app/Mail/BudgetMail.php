@@ -2,27 +2,30 @@
 
 namespace App\Mail;
 
+use App\Models\Budget;
 use App\Models\Setting;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 
 class BudgetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $companySetting;
+    public $company;
+    public $layout;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public array $budgetData = [], public ?string $pdfPath = null)
+    public function __construct(public Budget $budget, public ?string $pdfPath = null)
     {
-        $this->companySetting = Setting::first()->companySetting ?? config('app.name', 'Codhous Software');
+        $settings = Setting::first();
+        $this->company = $settings?->companySetting ?? (object)[];
+        $this->layout = $settings?->layoutSetting ?? (object)[];
     }
 
     /**
@@ -30,13 +33,8 @@ class BudgetMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $budget = $this->budgetData;       
-  
-        $code = $budget['code'] ?? '';
-   
-
         return new Envelope(
-            subject: "Orçamento #{$code} - ".env('APP_NAME'),
+            subject: "Orçamento #{$this->budget->code} - " . ($this->company->trade_name ?? config('app.name')),
         );
     }
 
@@ -47,6 +45,11 @@ class BudgetMail extends Mailable
     {
         return new Content(
             view: 'mail.budget',
+            with: [
+                'budget' => $this->budget,
+                'company' => $this->company,
+                'layout' => $this->layout,
+            ],
         );
     }
 
@@ -60,25 +63,11 @@ class BudgetMail extends Mailable
         if ($this->pdfPath && file_exists($this->pdfPath)) {
             return [
                 Attachment::fromPath($this->pdfPath)
-                    ->as(basename($this->pdfPath))
+                    ->as('orcamento-' . $this->budget->code . '.pdf')
                     ->withMime('application/pdf'),
             ];
         }
 
         return [];
-    }
-
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->view('mail.budget')
-            ->with([
-                'budget'  => $this->budgetData,
-                'company' => $this->companySetting,    
-            ]);
     }
 }

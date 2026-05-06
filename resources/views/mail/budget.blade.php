@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <title>Orçamento #{{ $budget['code'] ?? '' }}</title>
+    <title>Orçamento #{{ $budget->code ?? '' }}</title>
     <style>
-        /* Resets básicos para garantir compatibilidade entre clientes de e-mail */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-        img { -ms-interpolation-mode: bicubic; }
-        
-        /* Estilos Responsivos */
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
         @media screen and (max-width: 600px) {
             .container { width: 100% !important; }
             .content-padding { padding: 20px !important; }
@@ -20,56 +20,100 @@
     </style>
 </head>
 
-<body style="background-color: #f3f4f6; margin: 0; padding: 0; font-family: 'Inter', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+<body style="background-color: #f4f4f5; margin: 0; padding: 0; font-family: 'Inter', Helvetica, Arial, sans-serif;">
     
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
-            <td style="padding: 40px 20px;">
+            <td style="padding: 40px 20px;" align="center">
                 
-                <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="container" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" class="container" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e4e4e7;">
                     
+                    <!-- Header -->
                     <tr>
-                        <td style="background-color: #18181b; padding: 30px 40px; text-align: center;">
-                            @if(isset($layout) && $layout->logo)
-                                <img src="{{ Storage::url($layout->logo) }}" alt="Logo" style="max-height: 50px; max-width: 150px; display: block; margin: 0 auto;">
+                        <td style="background-color: #000000; padding: 40px; text-align: center;">
+                            @if(isset($layout->logo) && $layout->logo)
+                                <img src="{{ $message->embed(storage_path('app/public/' . $layout->logo)) }}" alt="Logo" style="max-height: 60px; width: auto;">
                             @else
-                                <h1 style="color: #ffffff; font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.5px;">{{ $company->trade_name }}</h1>
+                                <h1 style="color: #ffffff; font-size: 24px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 2px;">{{ $company->trade_name ?? config('app.name') }}</h1>
                             @endif
                         </td>
                     </tr>
 
+                    <!-- Body -->
                     <tr>
-                        <td class="content-padding" style="padding: 40px 40px 30px;">
+                        <td class="content-padding" style="padding: 50px 50px 40px;">
                             
-                            <p style="margin: 0 0 20px; color: #374151; font-size: 16px; line-height: 1.6;">
-                                Olá, <strong>{{ $budget['content']['customer_name'] ?? 'Cliente' }}</strong>.
-                            </p>
-                            <p style="margin: 0 0 30px; color: #6b7280; font-size: 15px; line-height: 1.6;">
-                                Conforme solicitado, segue em anexo o detalhamento do seu orçamento. Abaixo estão os dados principais para sua conferência:
+                            <h2 style="margin: 0 0 20px; color: #18181b; font-size: 22px; font-weight: 700; line-height: 1.2;">Olá, {{ data_get($budget->content, 'customer_name', 'Cliente') }}!</h2>
+                            
+                            <p style="margin: 0 0 30px; color: #52525b; font-size: 16px; line-height: 1.6;">
+                                Conforme conversamos, preparamos o orçamento detalhado para o seu projeto. Abaixo você encontra um resumo da proposta:
                             </p>
 
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
+                            <!-- Items Table -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th align="left" style="padding: 12px 10px; border-bottom: 2px solid #f4f4f5; font-size: 12px; color: #71717a; text-transform: uppercase;">Item</th>
+                                        <th align="center" style="padding: 12px 10px; border-bottom: 2px solid #f4f4f5; font-size: 12px; color: #71717a; text-transform: uppercase;">Qtd</th>
+                                        <th align="right" style="padding: 12px 10px; border-bottom: 2px solid #f4f4f5; font-size: 12px; color: #71717a; text-transform: uppercase;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(data_get($budget->content, 'products', []) as $product)
+                                        @php
+                                            $productObj = \App\Models\Product::find($product['product'] ?? 0);
+                                        @endphp
+                                        <tr>
+                                            <td style="padding: 12px 10px; border-bottom: 1px solid #f4f4f5; font-size: 14px; color: #18181b;">
+                                                {{ $productObj ? $productObj->name : 'Produto' }}
+                                            </td>
+                                            <td align="center" style="padding: 12px 10px; border-bottom: 1px solid #f4f4f5; font-size: 14px; color: #18181b;">
+                                                {{ $product['quantity'] ?? 0 }}
+                                            </td>
+                                            <td align="right" style="padding: 12px 10px; border-bottom: 1px solid #f4f4f5; font-size: 14px; color: #18181b; font-weight: 600;">
+                                                {{ env('CURRENCY_SYMBOL', 'R$') }} {{ number_format($product['subtotal'] ?? 0, 2, ',', '.') }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                            <!-- Financial Summary Card -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fafafa; border: 1px solid #f4f4f5; border-radius: 8px; margin-bottom: 30px;">
                                 <tr>
-                                    <td style="padding: 25px;">
+                                    <td style="padding: 30px;">
                                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            @if(floatval(data_get($budget->content, 'shipping', 0)) > 0)
                                             <tr>
-                                                <td valign="top" style="padding-bottom: 15px;">
-                                                    <p style="margin: 0 0 5px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Código</p>
-                                                    <p style="margin: 0; font-size: 16px; color: #111827; font-weight: 500;">#{{ $budget['code'] ?? 'N/A' }}</p>
-                                                </td>
-                                                <td valign="top" style="padding-bottom: 15px;">
-                                                    <p style="margin: 0 0 5px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Data</p>
-                                                    <p style="margin: 0; font-size: 16px; color: #111827; font-weight: 500;">
-                                                        {{ isset($budget['created_at']) ? date('d/m/Y', strtotime($budget['created_at'])) : date('d/m/Y') }}
-                                                    </p>
-                                                </td>
+                                                <td style="padding-bottom: 10px; font-size: 14px; color: #71717a;">Frete/Entrega</td>
+                                                <td align="right" style="padding-bottom: 10px; font-size: 14px; color: #18181b;">+ {{ env('CURRENCY_SYMBOL', 'R$') }} {{ number_format(data_get($budget->content, 'shipping', 0), 2, ',', '.') }}</td>
                                             </tr>
+                                            @endif
+                                            
+                                            @if(floatval(data_get($budget->content, 'tax', 0)) > 0)
                                             <tr>
-                                                <td colspan="2" style="padding-top: 15px; border-top: 1px dashed #d1d5db;">
-                                                    <p style="margin: 0 0 5px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Valor Total</p>
-                                                    <p style="margin: 0; font-size: 24px; color: #111827; font-weight: 700; letter-spacing: -0.5px;">
-                                                        {{ env('CURRENCY_SUFFIX', 'R$') }} {{ $budget['content']['products'][0]['subtotal'] ?? '0,00' }}
-                                                    </p>
+                                                <td style="padding-bottom: 10px; font-size: 14px; color: #71717a;">Taxas/Adicionais</td>
+                                                <td align="right" style="padding-bottom: 10px; font-size: 14px; color: #18181b; color: #dc2626;">+ {{ env('CURRENCY_SYMBOL', 'R$') }} {{ number_format(data_get($budget->content, 'tax', 0), 2, ',', '.') }}</td>
+                                            </tr>
+                                            @endif
+
+                                            @if(floatval(data_get($budget->content, 'discount', 0)) > 0)
+                                            <tr>
+                                                <td style="padding-bottom: 10px; font-size: 14px; color: #71717a;">Descontos</td>
+                                                <td align="right" style="padding-bottom: 10px; font-size: 14px; color: #166534;">- {{ env('CURRENCY_SYMBOL', 'R$') }} {{ number_format(data_get($budget->content, 'discount', 0), 2, ',', '.') }}</td>
+                                            </tr>
+                                            @endif
+
+                                            <tr>
+                                                <td style="padding-top: 15px; border-top: 1px solid #e4e4e7;">
+                                                    <span style="display: block; font-size: 12px; color: #71717a; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Investimento Total</span>
+                                                    <span style="font-size: 32px; color: #000000; font-weight: 800; letter-spacing: -1px;">
+                                                        {{ env('CURRENCY_SYMBOL', 'R$') }} {{ number_format(data_get($budget->content, 'total', 0), 2, ',', '.') }}
+                                                    </span>
+                                                </td>
+                                                <td align="right" style="padding-top: 15px; border-top: 1px solid #e4e4e7; vertical-align: bottom;">
+                                                    <span style="display: block; font-size: 12px; color: #71717a; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Ref. Orçamento</span>
+                                                    <span style="font-size: 16px; color: #18181b; font-weight: 600;">#{{ $budget->code }}</span>
                                                 </td>
                                             </tr>
                                         </table>
@@ -77,21 +121,21 @@
                                 </tr>
                             </table>
 
-                            <p style="margin: 30px 0 10px; color: #374151; font-size: 15px; line-height: 1.6;">
-                                O arquivo PDF com todos os detalhes técnicos e condições de pagamento encontra-se em anexo.
-                            </p>
-                            <p style="margin: 0 0 30px; color: #374151; font-size: 15px; line-height: 1.6;">
-                                Ficamos à disposição para quaisquer dúvidas.
+                            <p style="margin: 0 0 40px; color: #52525b; font-size: 15px; line-height: 1.6;">
+                                O arquivo em anexo contém todas as especificações técnicas e validade desta proposta. Caso tenha qualquer dúvida, basta responder a este e-mail.
                             </p>
 
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <!-- Contact Info -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #e4e4e7; padding-top: 30px;">
                                 <tr>
-                                    <td style="padding: 15px; background-color: #f3f4f6; border-radius: 6px; text-align: center;">
-                                        <p style="margin: 0; font-size: 14px; color: #4b5563;">
-                                            <strong style="color: #111827;">Dúvidas? Fale conosco:</strong><br>
-                                            <span style="display: inline-block; margin-top: 5px;">
-                                                📞 {{ $company->phone }} &nbsp;|&nbsp; ✉️ {{ $company->email }}
-                                            </span>
+                                    <td>
+                                        <p style="margin: 0; font-size: 14px; color: #18181b; font-weight: 700;">Atenciosamente,</p>
+                                        <p style="margin: 4px 0 0; font-size: 14px; color: #71717a;">Equipe {{ $company->trade_name ?? config('app.name') }}</p>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <p style="margin: 0; font-size: 13px; color: #71717a;">
+                                            📞 {{ $company->phone }}<br>
+                                            ✉️ {{ $company->email }}
                                         </p>
                                     </td>
                                 </tr>
@@ -100,18 +144,22 @@
                         </td>
                     </tr>
 
+                    <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0 0 5px; font-size: 12px; color: #9ca3af;">
-                                {{ $company->trade_name }} &copy; {{ date('Y') }}
-                            </p>
-                            <p style="margin: 0; font-size: 11px; color: #d1d5db;">
-                                Este é um e-mail automático, por favor não responda.
+                        <td style="background-color: #fafafa; padding: 30px; text-align: center; border-top: 1px solid #e4e4e7;">
+                            <p style="margin: 0; font-size: 12px; color: #a1a1aa; line-height: 1.5;">
+                                <strong>{{ $company->legal_name ?? $company->trade_name }}</strong><br>
+                                {{ $company->address->street ?? '' }}, {{ $company->address->number ?? '' }} - {{ $company->address->city ?? '' }}/{{ $company->address->state ?? '' }}
                             </p>
                         </td>
                     </tr>
 
                 </table>
+                
+                <p style="margin: 30px 0 0; font-size: 11px; color: #a1a1aa; text-align: center;">
+                    Este é um e-mail gerado automaticamente pelo sistema de orçamentos da {{ config('app.name') }}.
+                </p>
+
             </td>
         </tr>
     </table>

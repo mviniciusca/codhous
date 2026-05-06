@@ -309,20 +309,20 @@
                 <tr>
                     <td class="info-box">
                         <div class="info-title">Dados do Cliente</div>
-                        <div class="info-line"><strong>Nome:</strong> {{ $state['content'][0]['customer_name'] ?? 'Consumidor Final' }}</div>
-                        <div class="info-line"><strong>E-mail:</strong> {{ $state['content'][0]['customer_email'] ?? '-' }}</div>
-                        <div class="info-line"><strong>Tel:</strong> {{ $state['content'][0]['customer_phone'] ?? '-' }}</div>
-                        @if(isset($state['content'][0]['street']))
+                        <div class="info-line"><strong>Nome:</strong> {{ data_get($state['content'], 'customer_name', 'Consumidor Final') }}</div>
+                        <div class="info-line"><strong>E-mail:</strong> {{ data_get($state['content'], 'customer_email', '-') }}</div>
+                        <div class="info-line"><strong>Tel:</strong> {{ data_get($state['content'], 'customer_phone', '-') }}</div>
+                        @if(data_get($state['content'], 'street'))
                         <div class="info-line">
-                            <strong>End:</strong> {{ $state['content'][0]['street'] }}, {{ $state['content'][0]['number'] }} - {{ $state['content'][0]['city'] }}/{{ $state['content'][0]['state'] }}
+                            <strong>End:</strong> {{ data_get($state['content'], 'street') }}, {{ data_get($state['content'], 'number') }} - {{ data_get($state['content'], 'city') }}/{{ data_get($state['content'], 'state') }}
                         </div>
                         @endif
                     </td>
                     <td class="info-box">
                         <div class="info-title">Observações</div>
                         <div class="info-line">
-                            @if(isset($state['content'][0]['observation']) && !empty($state['content'][0]['observation']))
-                                {{ $state['content'][0]['observation'] }}
+                            @if(data_get($state['content'], 'observation'))
+                                {{ data_get($state['content'], 'observation') }}
                             @else
                                 <span style="color: #9ca3af; font-style: italic;">Nenhuma observação adicional registrada para este orçamento.</span>
                             @endif
@@ -347,7 +347,7 @@
             </thead>
             <tbody>
                 @php
-                    $products = $state['content'][0]['products'] ?? [];
+                    $products = data_get($state['content'], 'products', []);
                     $productsList = [];
                     $totalItems = 0;
 
@@ -372,7 +372,7 @@
                 @foreach($productsList as $index => $product)
                     @php
                         $productObj = \App\Models\Product::find($product['product'] ?? 0);
-                        $productName = $productObj ? $productObj->name : ($product_name->name ?? 'Produto Indefinido');
+                        $productName = $productObj ? $productObj->name : 'Produto Indefinido';
                         $productOption = \App\Models\ProductOption::find($product['product_option'] ?? 0);
                         $location = \App\Models\Location::find($product['location'] ?? 0);
                     @endphp
@@ -416,27 +416,43 @@
                     <div class="totals-box">
                         <div class="total-row">
                             <div class="total-label">Volume Total</div>
-                            <div class="total-value">{{ $state['content'][0]['quantity'] ?? 0 }} m³</div>
+                            <div class="total-value">{{ data_get($state['content'], 'quantity', 0) }} m³</div>
                         </div>
                         <div class="total-row">
-                            <div class="total-label">Subtotal</div>
-                            <div class="total-value">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($state['content'][0]['total'] ?? 0) + ($state['content'][0]['discount'] ?? 0) - ($state['content'][0]['tax'] ?? 0), 2, ',', '.') }}</div>
+                            <div class="total-label">Subtotal Itens</div>
+                            @php
+                                $subtotal = floatval(data_get($state['content'], 'total', 0)) 
+                                            + floatval(data_get($state['content'], 'discount', 0)) 
+                                            - floatval(data_get($state['content'], 'tax', 0))
+                                            - floatval(data_get($state['content'], 'shipping', 0));
+                            @endphp
+                            <div class="total-value">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format($subtotal, 2, ',', '.') }}</div>
                         </div>
-                        @if(isset($state['content'][0]['tax']) && $state['content'][0]['tax'] > 0)
+                        
+                        @if(floatval(data_get($state['content'], 'shipping', 0)) > 0)
+                        <div class="total-row">
+                            <div class="total-label">Frete</div>
+                            <div class="total-value">+ {{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, ',', '.') }}</div>
+                        </div>
+                        @endif
+
+                        @if(floatval(data_get($state['content'], 'tax', 0)) > 0)
                         <div class="total-row">
                             <div class="total-label">Taxas/Adicionais</div>
-                            <div class="total-value" style="color: #dc2626;">+ {{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($state['content'][0]['tax'] ?? 0),2,',','.') }}</div>
+                            <div class="total-value" style="color: #dc2626;">+ {{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(floatval(data_get($state['content'], 'tax', 0)), 2, ',', '.') }}</div>
                         </div>
                         @endif
-                        @if(isset($state['content'][0]['discount']) && $state['content'][0]['discount'] > 0)
+
+                        @if(floatval(data_get($state['content'], 'discount', 0)) > 0)
                         <div class="total-row">
                             <div class="total-label">Descontos</div>
-                            <div class="total-value" style="color: #166534;">- {{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($state['content'][0]['discount'] ?? 0),2,',','.') }}</div>
+                            <div class="total-value" style="color: #166534;">- {{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(floatval(data_get($state['content'], 'discount', 0)), 2, ',', '.') }}</div>
                         </div>
                         @endif
+
                         <div class="total-row total-final">
                             <div class="total-label">TOTAL A PAGAR</div>
-                            <div class="total-value">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(($state['content'][0]['total'] ?? 0),2,',','.') }}</div>
+                            <div class="total-value">{{ env('CURRENCY_SUFFIX','R$') }} {{ number_format(floatval(data_get($state['content'], 'total', 0)), 2, ',', '.') }}</div>
                         </div>
                     </div>
                 </td>
