@@ -23,8 +23,6 @@ class EditBudget extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()
-                ->label('Excluir'),
             Actions\ForceDeleteAction::make()
                 ->label('Excluir Permanente'),
             Actions\RestoreAction::make()

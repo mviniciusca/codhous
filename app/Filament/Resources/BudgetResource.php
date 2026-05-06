@@ -369,6 +369,49 @@ class BudgetResource extends Resource
                                                     }
                                                 }),
 
+                                            Actions\Action::make('generate_pdf_share')
+                                                ->label('Gerar PDF e Link de Compartilhamento')
+                                                ->icon('heroicon-o-share')
+                                                ->color('info')
+                                                ->requiresConfirmation()
+                                                ->modalHeading('Gerar Link de Compartilhamento')
+                                                ->modalDescription('O PDF será gerado e um link de download será criado.')
+                                                ->modalSubmitActionLabel('Gerar Agora')
+                                                ->action(function (Budget $record) {
+                                                    $pdfModel = self::generatePdfModel($record);
+                                                    
+                                                    if ($pdfModel) {
+                                                        $url = $pdfModel->getDownloadUrl();
+                                                        
+                                                        // Salva o link no content para referência futura
+                                                        $content = $record->content;
+                                                        $content['share_link'] = $url;
+                                                        $record->update([
+                                                            'content' => $content,
+                                                            'pdf_document' => $pdfModel->path
+                                                        ]);
+
+                                                        Notification::make()
+                                                            ->title('PDF Gerado com Sucesso!')
+                                                            ->success()
+                                                            ->body("O documento foi gerado e está pronto para compartilhamento.")
+                                                            ->persistent()
+                                                            ->actions([
+                                                                \Filament\Notifications\Actions\Action::make('download')
+                                                                    ->label('Baixar PDF')
+                                                                    ->button()
+                                                                    ->url($url, shouldOpenInNewTab: true),
+                                                                \Filament\Notifications\Actions\Action::make('copy')
+                                                                    ->label('Copiar Link')
+                                                                    ->color('gray')
+                                                                    ->extraAttributes([
+                                                                        'onclick' => "navigator.clipboard.writeText('{$url}'); window.Filament.notifications.notify({ title: 'Copiado!', status: 'success' })"
+                                                                    ]),
+                                                            ])
+                                                            ->send();
+                                                    }
+                                                }),
+
                                             Actions\Action::make('pdf_and_whatsapp')
                                                 ->label('Gerar PDF e Enviar via WhatsApp')
                                                 ->icon('heroicon-o-chat-bubble-left-right')
@@ -400,6 +443,64 @@ class BudgetResource extends Resource
                                         ->alignment(Alignment::Center)
                                         ->fullWidth(),
                                 ]),
+
+                                Section::make('Zona de Perigo')
+                                    ->icon('heroicon-o-exclamation-triangle')
+                                    ->description('Ações críticas e irreversíveis relacionadas a este orçamento.')
+                                    ->schema([
+                                        Actions::make([
+                                            Actions\Action::make('delete_budget')
+                                                ->label('Mover para Lixeira')
+                                                ->icon('heroicon-o-trash')
+                                                ->color('danger')
+                                                ->requiresConfirmation()
+                                                ->modalHeading('Confirmar Exclusão')
+                                                ->modalDescription('Esta ação enviará o orçamento para a lixeira. Para confirmar que deseja realizar esta ação, digite "DELETAR" no campo abaixo.')
+                                                ->modalSubmitActionLabel('Confirmar Exclusão')
+                                                ->form([
+                                                    TextInput::make('confirm_text')
+                                                        ->label('Confirmação de Segurança')
+                                                        ->placeholder('Digite DELETAR')
+                                                        ->required()
+                                                        ->rules(['in:DELETAR']),
+                                                ])
+                                                ->action(function (Budget $record) {
+                                                    $record->delete();
+                                                    
+                                                    Notification::make()
+                                                        ->title('Orçamento enviado para a lixeira!')
+                                                        ->success()
+                                                        ->send();
+                                                        
+                                                    return redirect()->to(BudgetResource::getUrl('index'));
+                                                }),
+                                        ]),
+                                    ]),
+
+                                Section::make('Link de Compartilhamento Ativo')
+                                    ->icon('heroicon-o-link')
+                                    ->description('Este orçamento já possui um documento gerado e pronto para compartilhamento.')
+                                    ->visible(fn(Budget $record) => !empty($record->content['share_link'] ?? null))
+                                    ->schema([
+                                        TextInput::make('content.share_link')
+                                            ->label('URL do Documento (PDF)')
+                                            ->readOnly()
+                                            ->suffixAction(
+                                                \Filament\Forms\Components\Actions\Action::make('copyLink')
+                                                    ->icon('heroicon-m-clipboard')
+                                                    ->color('success')
+                                                    ->tooltip('Copiar link')
+                                                    ->action(function ($state) {
+                                                        Notification::make()
+                                                            ->title('Link copiado!')
+                                                            ->success()
+                                                            ->send();
+                                                    })
+                                                    ->extraAttributes([
+                                                        'onclick' => "navigator.clipboard.writeText(\$el.closest('.fi-fo-text-input').querySelector('input').value)"
+                                                    ])
+                                            ),
+                                    ]),
                             ]),
                     ]),
             ]);
