@@ -444,6 +444,31 @@ class BudgetResource extends Resource
                                         ->fullWidth(),
                                 ]),
 
+                                Section::make('Link de Compartilhamento Ativo')
+                                    ->icon('heroicon-o-link')
+                                    ->description('Este orçamento já possui um documento gerado e pronto para compartilhamento.')
+                                    ->visible(fn(Budget $record) => !empty($record->content['share_link'] ?? null))
+                                    ->schema([
+                                        TextInput::make('content.share_link')
+                                            ->label('URL do Documento (PDF)')
+                                            ->readOnly()
+                                            ->suffixAction(
+                                                \Filament\Forms\Components\Actions\Action::make('copyLink')
+                                                    ->icon('heroicon-m-clipboard')
+                                                    ->color('success')
+                                                    ->tooltip('Copiar link')
+                                                    ->action(function ($state) {
+                                                        Notification::make()
+                                                            ->title('Link copiado!')
+                                                            ->success()
+                                                            ->send();
+                                                    })
+                                                    ->extraAttributes([
+                                                        'onclick' => "navigator.clipboard.writeText(\$el.closest('.fi-fo-text-input').querySelector('input').value)"
+                                                    ])
+                                            ),
+                                    ]),
+
                                 Section::make('Zona de Perigo')
                                     ->icon('heroicon-o-exclamation-triangle')
                                     ->description('Ações críticas e irreversíveis relacionadas a este orçamento.')
@@ -475,31 +500,6 @@ class BudgetResource extends Resource
                                                     return redirect()->to(BudgetResource::getUrl('index'));
                                                 }),
                                         ]),
-                                    ]),
-
-                                Section::make('Link de Compartilhamento Ativo')
-                                    ->icon('heroicon-o-link')
-                                    ->description('Este orçamento já possui um documento gerado e pronto para compartilhamento.')
-                                    ->visible(fn(Budget $record) => !empty($record->content['share_link'] ?? null))
-                                    ->schema([
-                                        TextInput::make('content.share_link')
-                                            ->label('URL do Documento (PDF)')
-                                            ->readOnly()
-                                            ->suffixAction(
-                                                \Filament\Forms\Components\Actions\Action::make('copyLink')
-                                                    ->icon('heroicon-m-clipboard')
-                                                    ->color('success')
-                                                    ->tooltip('Copiar link')
-                                                    ->action(function ($state) {
-                                                        Notification::make()
-                                                            ->title('Link copiado!')
-                                                            ->success()
-                                                            ->send();
-                                                    })
-                                                    ->extraAttributes([
-                                                        'onclick' => "navigator.clipboard.writeText(\$el.closest('.fi-fo-text-input').querySelector('input').value)"
-                                                    ])
-                                            ),
                                     ]),
                             ]),
                     ]),
