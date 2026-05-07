@@ -74,11 +74,23 @@ class Budget extends Component implements HasForms
                                         ->extraInputAttributes(['class' => '!bg-white shadow-sm'])
                                         ->rules($this->getPostcodeRules())
                                         ->afterStateUpdated(function ($state, Set $set, $livewire) {
+                                            // Limpa campos para evitar dados residuais de CEPs anteriores
+                                            $set('content.street', null);
+                                            $set('content.neighborhood', null);
+                                            $set('content.city', null);
+                                            $set('content.state', null);
+                                            $set('content.shipping', 0);
+
                                             if (strlen($state ?? '') === 9) {
-                                                $livewire->validateOnly('data.content.postcode');
-                                                $postcode = new PostcodeFinderService($state, $set);
-                                                $postcode->find();
-                                                $livewire->applyShippingFromCep($state, $set);
+                                                try {
+                                                    $livewire->validateOnly('data.content.postcode');
+                                                    $postcode = new \App\Services\PostcodeFinderService($state, $set);
+                                                    $postcode->find();
+                                                    $livewire->applyShippingFromCep($state, $set);
+                                                } catch (\Illuminate\Validation\ValidationException $e) {
+                                                    // Se falhar a validação (ex: fora da área), os campos permanecem limpos
+                                                    throw $e;
+                                                }
                                             }
                                         }),
                                     
@@ -113,6 +125,8 @@ class Budget extends Component implements HasForms
                                 ->description('Como podemos entrar em contato?')
                                 ->icon('heroicon-o-user')
                                 ->extraAttributes(['class' => 'shadow-none'])
+                                ->visible(fn (Get $get) => filled($get('content.street')))
+                                ->disabled(fn (Get $get) => ! \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode')))
                                 ->schema([
                                     TextInput::make('content.customer_name')
                                         ->label('Nome Completo')
@@ -146,6 +160,8 @@ class Budget extends Component implements HasForms
                                 ->description('Quais produtos ou serviços você precisa?')
                                 ->icon('heroicon-o-shopping-bag')
                                 ->extraAttributes(['class' => 'shadow-none'])
+                                ->visible(fn (Get $get) => filled($get('content.street')))
+                                ->disabled(fn (Get $get) => ! \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode')))
                                 ->schema([
                                     Repeater::make('content.products')
                                         ->label('')
@@ -209,7 +225,8 @@ class Budget extends Component implements HasForms
                                     Placeholder::make('summary')
                                         ->label('')
                                         ->content(fn (Get $get) => view('livewire.budget-checkout-summary', [
-                                            'data' => ['content' => $get('content')]
+                                            'data' => ['content' => $get('content')],
+                                            'canSubmit' => \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode'))
                                         ])),
                                 ])
                                 ->extraAttributes(['class' => 'sticky top-24'])

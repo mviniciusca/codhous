@@ -18,7 +18,7 @@ class CepInOperationAreaRule implements ValidationRule
             return;
         }
         if (! OperationAreaService::isCepInOperationArea($value)) {
-            $fail(__('Este CEP está fora da nossa área de atendimento. No momento atendemos apenas a região do Rio de Janeiro e Grande Rio.'));
+            $fail(__('Este CEP está fora da nossa área de atendimento.'));
         }
     }
 }
