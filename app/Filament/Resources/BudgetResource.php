@@ -48,6 +48,10 @@ class BudgetResource extends Resource
     protected static ?string $recordTitleAttribute = 'Orçamento';
 
     protected static ?string $model = Budget::class;
+    
+    protected static ?string $modelLabel = 'Orçamento';
+    
+    protected static ?string $pluralModelLabel = 'Orçamentos';
 
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
