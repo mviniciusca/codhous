@@ -36,7 +36,7 @@ jobs:
     - name: Generate key
       run: php artisan key:generate
     - name: Install Node Dependencies
-      run: npm install
+      run: npm install --force
     - name: Build Assets
       run: npm run build
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
