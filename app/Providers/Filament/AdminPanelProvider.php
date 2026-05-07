@@ -46,12 +46,12 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->profile()
             ->colors([
-                'danger'  => Color::Rose,
+                'danger'  => Color::Red,
                 'gray'    => Color::Zinc,
                 'info'    => Color::Blue,
-                'primary' => Color::Indigo,
+                'primary' => Color::Red,
                 'success' => Color::Emerald,
-                'warning' => Color::Orange,
+                'warning' => Color::Yellow,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

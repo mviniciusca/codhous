@@ -20,6 +20,8 @@ class SettingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $navigationLabel = 'Configurações';
 
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
