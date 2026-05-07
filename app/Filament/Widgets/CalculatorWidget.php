@@ -319,10 +319,16 @@ class CalculatorWidget extends Widget implements HasForms
                                         ->color('success')
                                         ->url(function () {
                                             if (empty($this->cart)) return route('filament.admin.resources.budgets.create');
-                                            $productsJson = json_encode($this->cart);
+                                            
+                                            $data = [
+                                                'items' => $this->cart,
+                                                'tax' => floatval($this->data['content']['tax'] ?? 0),
+                                                'discount' => floatval($this->data['content']['discount'] ?? 0),
+                                            ];
+                                            
                                             return route('filament.admin.resources.budgets.create', [
-                                                'activeTab' => 'shopping_bag',
-                                                'products'  => base64_encode($productsJson),
+                                                'source' => 'calculator',
+                                                'payload' => base64_encode(json_encode($data)),
                                             ]);
                                         })
                                         ->disabled(fn (): bool => empty($this->cart)),
