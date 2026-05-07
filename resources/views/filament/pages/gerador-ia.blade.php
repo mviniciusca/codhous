@@ -14,7 +14,7 @@
             width: 100vw;
             height: 100vh;
             display: grid;
-            grid-template-columns: 320px 1fr 100px;
+            grid-template-columns: 260px 1fr 100px;
             gap: 0;
             background: #ffffff;
             overflow: hidden;
@@ -354,17 +354,29 @@
                 <hr class="border-gray-200 dark:border-white/5">
 
                 <div class="space-y-3" wire:poll.5s>
-                    <label class="studio-label">Fila de Geração</label>
-                    <div class="space-y-2">
+                    <label class="studio-label">Artes Recentes</label>
+                    <div class="grid grid-cols-2 gap-2">
                         @foreach($this->recentPosts as $p)
-                            <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 shadow-sm group">
-                                <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden border border-gray-50 dark:border-white/5">
-                                    @if($p->isGenerated()) <img src="{{ $p->output_url }}" class="w-full h-full object-cover"> @else <div class="w-full h-full flex items-center justify-center"><x-heroicon-o-arrow-path class="w-4 h-4 text-gray-400 animate-spin" /></div> @endif
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-[11px] text-gray-900 dark:text-white truncate font-bold leading-tight">{{ $p->title }}</p>
-                                    <p class="text-[9px] text-gray-500 uppercase font-black tracking-tighter">{{ $p->status }}</p>
-                                </div>
+                            <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 group shadow-sm">
+                                @if($p->isGenerated()) 
+                                    <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
+                                    
+                                    {{-- Barra de Ações (Sempre Visível no fundo da miniatura) --}}
+                                    <div class="absolute bottom-0 inset-x-0 bg-black/40 backdrop-blur-md p-1.5 flex items-center justify-center gap-2">
+                                        <a href="{{ $p->output_url }}" target="_blank" title="Visualizar" class="p-1 hover:text-amber-500 transition-colors text-white">
+                                            <x-heroicon-m-eye class="w-3.5 h-3.5" />
+                                        </a>
+                                        <div class="w-px h-3 bg-white/20"></div>
+                                        <a href="{{ $p->output_url }}" download="arte-{{ $p->id }}.png" title="Baixar" class="p-1 hover:text-amber-500 transition-colors text-white">
+                                            <x-heroicon-m-arrow-down-tray class="w-3.5 h-3.5" />
+                                        </a>
+                                    </div>
+                                @else 
+                                    <div class="w-full h-full flex flex-col items-center justify-center gap-1">
+                                        <x-heroicon-o-arrow-path class="w-5 h-5 text-amber-500 animate-spin" />
+                                        <span class="text-[8px] font-black uppercase text-gray-400">Gerando</span>
+                                    </div> 
+                                @endif
                             </div>
                         @endforeach
                     </div>
@@ -418,11 +430,6 @@
                          :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%); font-family: '${@this.fontFamily.replace('+', ' ')}', sans-serif; text-align: {{ $textAlign }};`"
                          style="position: absolute; cursor: move; z-index: 100; width: auto; max-width: 90%;">
                         
-                        @if($postTitle) 
-                            <span class="title-text block" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '900' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-family: inherit; text-align: inherit;">
-                                {{ $postTitle }}
-                            </span> 
-                        @endif
 
                         @if(trim($quote)) 
                             <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: inherit; text-align: inherit;">

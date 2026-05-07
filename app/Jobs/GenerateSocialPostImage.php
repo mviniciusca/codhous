@@ -120,24 +120,13 @@ class GenerateSocialPostImage implements ShouldQueue
                 $finalTextColor = "#{$finalTextColor}";
             }
 
-            // Render Title (Label)
-            if ($title) {
-                $image->text($title, $xPos, $yPos - 80, function ($font) use ($fontPath, $finalTextColor, $align) {
-                    $font->filename($fontPath);
-                    $font->size(25);
-                    $font->color($finalTextColor);
-                    $font->align($align);
-                    $font->valign('bottom');
-                });
-            }
 
             // Render Quote (Main Text)
             $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $finalTextColor, $align, $style) {
                 $font->filename($fontPath);
                 $font->size(55);
                 $font->color($finalTextColor);
-                $font->align($align);
-                $font->valign('middle');
+                $font->align($align, 'center');
                 $font->lineHeight(1.2);
                 $font->wrap(1000); // Increased wrap width for straighter lines
             });

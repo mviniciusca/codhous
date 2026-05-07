@@ -44,7 +44,7 @@ class GeradorIa extends Page implements HasActions, HasForms
     public string $textColor    = '#ffffff';
     public string $overlayColor = '#000000';
     public int    $overlayOpacity = 40;
-    public string $preset         = 'bottom_right';
+    public string $preset         = 'max';
     public float  $textX          = 50.0;
     public float  $textY          = 50.0;
     public string $textAlign      = 'center';
