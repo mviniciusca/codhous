@@ -582,10 +582,7 @@ class BudgetResource extends Resource
                                                             ->performedOn($record)
                                                             ->log('Enviou orçamento por e-mail para ' . ($record->content['customer_email'] ?? 'cliente'));
 
-                                                        Notification::make()
-                                                            ->title('E-mail enviado com sucesso!')
-                                                            ->success()
-                                                            ->send();
+                                                        // Notificação removida aqui pois o MailService ou o Save já notificam
                                                     } catch (\Exception $e) {
                                                         Notification::make()
                                                             ->title('Erro ao enviar e-mail')
@@ -636,7 +633,7 @@ class BudgetResource extends Resource
                                                             $message
                                                         );
 
-                                                        return redirect()->away($waUrl);
+                                                        $livewire->js("window.open('{$waUrl}', '_blank')");
                                                     }
                                                 }),
                                         ])
