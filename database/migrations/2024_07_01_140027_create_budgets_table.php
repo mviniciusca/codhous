@@ -20,6 +20,8 @@ return new class extends Migration {
             $table->string('code');
             $table->string('status')->default('pending');
             $table->boolean('is_active')->default(true);
+            $table->boolean('notified_via_email')->default(false);
+            $table->boolean('notified_via_whatsapp')->default(false);
             $table->json('content');
             $table->string('pdf_document')->nullable();
             $table->softDeletes();

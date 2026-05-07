@@ -104,6 +104,7 @@ class BudgetResource extends Resource
                             ->default('pending')
                             ->options([
                                 'pending'  => 'Pendente',
+                                'notified' => 'Cliente Notificado',
                                 'on going' => 'Em Andamento',
                                 'done'     => 'Concluído',
                                 'ignored'  => 'Arquivado/Ignorado',
@@ -420,14 +421,40 @@ class BudgetResource extends Resource
                             ->icon('heroicon-o-bolt')
                             ->visible(fn ($livewire) => $livewire instanceof Pages\EditBudget)
                             ->schema([
+                                Placeholder::make('pricing_warning')
+                                    ->label('')
+                                    ->content(new \Illuminate\Support\HtmlString('
+                                        <div class="rounded-xl border border-warning-600/20 bg-warning-500/5 p-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="rounded-full bg-warning-500 p-1 text-white">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                                </div>
+                                                <div>
+                                                    <h4 class="text-sm font-bold text-warning-600 uppercase tracking-wider">Atenção: Precificação Pendente</h4>
+                                                    <p class="text-xs text-warning-600/80">Você precisa preencher os campos de Frete, Taxas e Desconto na aba anterior e <b>SALVAR</b> o orçamento antes de emitir o documento.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    '))
+                                    ->visible(fn (Budget $record) => 
+                                        !isset($record->content['tax']) || 
+                                        !isset($record->content['discount']) || 
+                                        !isset($record->content['shipping'])
+                                    ),
+
                                 Section::make('Comunicação com o Cliente')
                                     ->description('Gere o documento oficial e notifique o cliente pelos canais disponíveis.')
                                     ->schema([
                                         Actions::make([
                                             Actions\Action::make('pdf_and_email')
-                                                ->label('Gerar PDF e Enviar por E-mail')
+                                                ->label(fn (Budget $record) => 'Gerar PDF e Enviar por E-mail' . ($record->notified_via_email ? ' ✅' : ''))
                                                 ->icon('heroicon-o-envelope')
                                                 ->color('primary')
+                                                ->disabled(fn (Budget $record) => 
+                                                    !isset($record->content['tax']) || 
+                                                    !isset($record->content['discount']) || 
+                                                    !isset($record->content['shipping'])
+                                                )
                                                 ->requiresConfirmation()
                                                 ->action(function (Budget $record) {
                                                     try {
@@ -436,6 +463,16 @@ class BudgetResource extends Resource
                                                             $record->content['customer_email'] ?? ''
                                                         );
                                                         $mailService->dispatch();
+                                                        
+                                                        $record->update([
+                                                            'notified_via_email' => true,
+                                                            'status' => $record->status === 'pending' ? 'notified' : $record->status
+                                                        ]);
+
+                                                        Notification::make()
+                                                            ->title('E-mail enviado com sucesso!')
+                                                            ->success()
+                                                            ->send();
                                                     } catch (\Exception $e) {
                                                         Notification::make()
                                                             ->title('Erro ao enviar e-mail')
@@ -449,6 +486,11 @@ class BudgetResource extends Resource
                                                 ->label('Gerar PDF e Link de Compartilhamento')
                                                 ->icon('heroicon-o-share')
                                                 ->color('info')
+                                                ->disabled(fn (Budget $record) => 
+                                                    !isset($record->content['tax']) || 
+                                                    !isset($record->content['discount']) || 
+                                                    !isset($record->content['shipping'])
+                                                )
                                                 ->requiresConfirmation()
                                                 ->modalHeading('Gerar Link de Compartilhamento')
                                                 ->modalDescription('O PDF será gerado e um link de download será criado.')
@@ -457,6 +499,10 @@ class BudgetResource extends Resource
                                                     $pdfModel = self::generatePdfModel($record);
                                                     
                                                     if ($pdfModel) {
+                                                        $record->update([
+                                                            'notified_via_whatsapp' => true,
+                                                            'status' => $record->status === 'pending' ? 'notified' : $record->status
+                                                        ]);
                                                         $url = $pdfModel->getDownloadUrl();
                                                         
                                                         // Salva o link no content para referência futura
@@ -489,14 +535,23 @@ class BudgetResource extends Resource
                                                 }),
 
                                             Actions\Action::make('pdf_and_whatsapp')
-                                                ->label('Gerar PDF e Enviar via WhatsApp')
+                                                ->label(fn (Budget $record) => 'Gerar PDF e Enviar via WhatsApp' . ($record->notified_via_whatsapp ? ' ✅' : ''))
                                                 ->icon('heroicon-o-chat-bubble-left-right')
                                                 ->color('success')
+                                                ->disabled(fn (Budget $record) => 
+                                                    !isset($record->content['tax']) || 
+                                                    !isset($record->content['discount']) || 
+                                                    !isset($record->content['shipping'])
+                                                )
                                                 ->requiresConfirmation()
                                                 ->action(function (Budget $record) {
                                                     $pdfModel = self::generatePdfModel($record);
 
                                                     if ($pdfModel) {
+                                                        $record->update([
+                                                            'notified_via_whatsapp' => true,
+                                                            'status' => $record->status === 'pending' ? 'notified' : $record->status
+                                                        ]);
                                                         $url = $pdfModel->getDownloadUrl();
                                                         $content = $record->content;
                                                         $content['share_link'] = $url;
