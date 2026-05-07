@@ -14,44 +14,25 @@ use Flowframe\Trend\TrendValue;
 
 class StatsWidget extends BaseWidget
 {
-    protected static ?int $sort = 0;
+    protected static ?int $sort = 1;
 
     protected static ?string $pollingInterval = '30s';
 
     protected static bool $isLazy = false;
 
-    // Define the number of columns as an array with specific configurations for each screen size
     protected int|string|array $columns = [
-        'default' => 1, // On very small screens, display 1 card per row
-        'sm'      => 1, // On small screens, display 1 card per row
-        'md'      => 2, // On medium screens, display 2 cards per row (4 per row in total)
-        'lg'      => 2, // On large screens, display 2 cards per row
-        'xl'      => 2, // On extra large screens, display 2 cards per row
-        '2xl'     => 2, // On 2xl screens, display 2 cards per row
+        'default' => 1,
+        'sm'      => 2,
+        'lg'      => 4,
     ];
 
     protected function getStats(): array
     {
         return [
-
-            // Maintenance status
-
-            // Budget statistics
             $this->makeBudgetStat(),
-            // Total budgets
-            $this->makeTotalValueStat(),
-            // Email list
-            $this->makeNewsletterStat(),
-
-            // Customer statistics
-            $this->makeCustomerStat(),
-
-            // Pending budgets
             $this->makePendingBudgetsStat(),
-
-            // Ongoing budgets
-            $this->makeOngoingBudgetsStat(),
-
+            $this->makeDoneBudgetsStat(),
+            $this->makeTotalValueStat(),
         ];
     }
 
@@ -81,35 +62,14 @@ class StatsWidget extends BaseWidget
         $totalBudgets = Budget::withoutTrashed()->count();
         $monthlyTrend = $this->getMonthlyTrend(Budget::class);
 
-        return Stat::make(__('Budgets'), $totalBudgets)
+        return Stat::make('Total de Orçamentos', $totalBudgets)
             ->icon('heroicon-o-currency-dollar')
             ->chart($monthlyTrend['data']->toArray())
-            ->description($this->getComparisonText($monthlyTrend['difference'], __('budgets')))
+            ->description($this->getComparisonText($monthlyTrend['difference'], 'orçamentos'))
             ->descriptionIcon($this->getTrendIcon($monthlyTrend['difference']))
             ->color($this->getTrendColor($monthlyTrend['difference']));
     }
 
-    /**
-     * Creates the customer statistics widget
-     * @return Stat
-     */
-    protected function makeCustomerStat(): Stat
-    {
-        $totalCustomers = Customer::withoutTrashed()->count();
-        $monthlyTrend = $this->getMonthlyTrend(Customer::class);
-
-        return Stat::make(__('Customers'), $totalCustomers)
-            ->icon('heroicon-o-user')
-            ->chart($monthlyTrend['data']->toArray())
-            ->description($this->getComparisonText($monthlyTrend['difference'], __('customers')))
-            ->descriptionIcon($this->getTrendIcon($monthlyTrend['difference']))
-            ->color($this->getTrendColor($monthlyTrend['difference']));
-    }
-
-    /**
-     * Creates the pending budgets statistics widget
-     * @return Stat
-     */
     protected function makePendingBudgetsStat(): Stat
     {
         $pendingBudgets = Budget::withoutTrashed()
@@ -119,40 +79,31 @@ class StatsWidget extends BaseWidget
         $allBudgets = Budget::withoutTrashed()->count();
         $percentage = $allBudgets > 0 ? round(($pendingBudgets / $allBudgets) * 100) : 0;
 
-        return Stat::make(__('Pending Budgets'), $pendingBudgets)
+        return Stat::make('Orçamentos Pendentes', $pendingBudgets)
             ->icon('heroicon-o-clock')
-            ->description($percentage . '% ' . __('of all budgets'))
+            ->description($percentage . '% ' . 'do total geral')
             ->descriptionIcon('heroicon-m-information-circle')
             ->color('warning');
     }
 
-    /**
-     * Creates the ongoing budgets statistics widget
-     * @return Stat
-     */
-    protected function makeOngoingBudgetsStat(): Stat
+    protected function makeDoneBudgetsStat(): Stat
     {
-        $ongoingBudgets = Budget::withoutTrashed()
-            ->where('status', '=', 'on going')
+        $doneBudgets = Budget::withoutTrashed()
+            ->where('status', '=', 'done')
             ->where('is_active', '=', true)
             ->count();
         $allBudgets = Budget::withoutTrashed()->count();
-        $percentage = $allBudgets > 0 ? round(($ongoingBudgets / $allBudgets) * 100) : 0;
+        $percentage = $allBudgets > 0 ? round(($doneBudgets / $allBudgets) * 100) : 0;
 
-        return Stat::make(__('On Going Budgets'), $ongoingBudgets)
-            ->icon('heroicon-o-arrow-trending-up')
-            ->description($percentage . '% ' . __('of all budgets'))
-            ->descriptionIcon('heroicon-m-information-circle')
-            ->color('info');
+        return Stat::make('Orçamentos Concluídos', $doneBudgets)
+            ->icon('heroicon-o-check-circle')
+            ->description($percentage . '% ' . 'em taxa de sucesso')
+            ->descriptionIcon('heroicon-m-check-badge')
+            ->color('success');
     }
 
-    /**
-     * Creates the total budget value statistics widget
-     * @return Stat
-     */
     protected function makeTotalValueStat(): Stat
     {
-        // Get budgets that have the content.total field defined
         $budgets = Budget::where('status', '=', 'done')
             ->where('is_active', '=', true)
             ->withoutTrashed()
@@ -165,51 +116,15 @@ class StatsWidget extends BaseWidget
             }
         }
 
-        $currencySuffix = env('CURRENCY_SUFFIX', '$');
-
-        return Stat::make(__('Total Budget Value'), $currencySuffix . ' ' . number_format($totalValue, 2, '.', ','))
+        return Stat::make('Receita Gerada', 'R$ ' . number_format($totalValue, 2, '.', ','))
             ->icon('heroicon-o-banknotes')
-            ->description(__('Sum of all budgets completed'))
+            ->description('Soma de todos os orçamentos finalizados')
             ->descriptionIcon('heroicon-m-calculator')
             ->color('success');
     }
 
-    /**
-     * Creates the messages/emails statistics widget
-     * @return Stat
-     */
-    protected function makeMailStat(): Stat
-    {
-        // Count unread emails (received and not marked as spam)
-        $unreadMails = Mail::withoutTrashed()
-            ->where('is_read', false)
-            ->where('is_sent', false)
-            ->where('is_spam', false)
-            ->count();
-
-        // Total emails in the system
-        $totalMails = Mail::withoutTrashed()->count();
-
-        // Calculate the percentage of unread
-        $percentage = $totalMails > 0 ? round(($unreadMails / $totalMails) * 100) : 0;
-
-        return Stat::make(__('Unread Messages'), $unreadMails)
-            ->icon('heroicon-o-envelope')
-            ->description($percentage . '% ' . __('of all messages'))
-            ->descriptionIcon('heroicon-m-inbox-stack')
-            ->color($unreadMails > 0 ? 'warning' : 'success');
-    }
-
-
-
-    /**
-     * Gets the monthly trend for a model
-     * @param string $model
-     * @return array
-     */
     protected function getMonthlyTrend(string $model): array
     {
-        // Trend data for the last 6 months
         $data = Trend::model($model)
             ->between(
                 start: now()->subMonths(6)->startOfMonth(),
@@ -218,12 +133,10 @@ class StatsWidget extends BaseWidget
             ->perMonth()
             ->count();
 
-        // Calculate the percentage difference relative to the previous month
         $values = $data->map(fn(TrendValue $value) => $value->aggregate);
         $latestMonth = $values->last();
         $previousMonth = $values->count() > 1 ? $values[$values->count() - 2] : 0;
 
-        // Avoid division by zero
         if ($previousMonth == 0) {
             $difference = $latestMonth > 0 ? 100 : 0;
         } else {
@@ -236,21 +149,15 @@ class StatsWidget extends BaseWidget
         ];
     }
 
-    /**
-     * Returns the comparison text based on the percentage difference
-     * @param int $difference
-     * @param string $itemLabel
-     * @return string
-     */
     protected function getComparisonText(int $difference, string $itemLabel): string
     {
         if ($difference > 0) {
-            return "+{$difference}% " . __('more') . " {$itemLabel}";
+            return "+{$difference}% " . 'mais' . " {$itemLabel}";
         } elseif ($difference < 0) {
-            return "{$difference}% " . __('less') . " {$itemLabel}";
+            return "{$difference}% " . 'menos' . " {$itemLabel}";
         }
 
-        return __('No change in') . " {$itemLabel}";
+        return 'Sem alteração em' . " {$itemLabel}";
     }
 
     /**

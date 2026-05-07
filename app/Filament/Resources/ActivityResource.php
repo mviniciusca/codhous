@@ -12,4 +12,19 @@ class ActivityResource extends BaseActivityResource
     }
 
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Registro de Atividade';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Atividade';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Registro de Atividades';
+    }
 }

@@ -182,66 +182,43 @@ class CalculatorWidget extends Widget implements HasForms
     public function form(Form $form): Form
     {
         return $form->schema([
-            Section::make(__('Calculadora de Orçamento & Itens'))
-                ->description(__('Adicione produtos ao orçamento para gerar uma cotação rápida.'))
+            Section::make('Calculadora de Orçamento')
+                ->description('Adicione produtos para gerar uma cotação rápida e criar orçamentos instantâneos.')
                 ->icon('heroicon-o-calculator')
-                ->collapsed()
                 ->columnSpanFull()
                 ->schema([
-                    Grid::make(2)->schema([
+                    Grid::make(12)->schema([
                         // Calculator Group (Left)
-                        Section::make(__('Calculadora'))
-                            ->icon('heroicon-o-calculator')
-                            ->collapsible()
-                            ->columnSpan(1)
+                        Section::make('Dados do Produto')
+                            ->icon('heroicon-o-plus-circle')
+                            ->columnSpan(7)
                             ->schema([
-                                Grid::make(4)
+                                Grid::make(12)
                                     ->schema([
                                         Select::make('content.product')
                                             ->live()
-                                            ->label(__('Produto'))
-                                            ->helperText(__('Tipo de Concreto'))
+                                            ->label('Produto / Tipo de Concreto')
                                             ->options(Product::where('is_active', true)->pluck('name', 'id'))
                                             ->afterStateHydrated(function (Get $get, Set $set, $state) {
                                                 $this->updatePrice($get, $set, $state);
                                             })
                                             ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                                $set('content.product_option', null); // Reset option when changing product
+                                                $set('content.product_option', null);
                                                 $this->updatePrice($get, $set, $state);
                                             })
                                             ->required()
-                                            ->dehydrated()
-                                            ->columnSpan(2),
+                                            ->columnSpan(8),
 
                                         Select::make('content.product_option')
                                             ->live()
-                                            ->label(__('Variação'))
-                                            ->helperText(__('Escolha uma variação'))
+                                            ->label('Variação')
                                             ->options(function (Get $get) {
                                                 $productId = $get('content.product');
-                                                if (! $productId) {
-                                                    return [];
-                                                }
-
-                                                return ProductOption::where('product_id', $productId)
-                                                    ->pluck('name', 'id');
+                                                if (! $productId) return [];
+                                                return ProductOption::where('product_id', $productId)->pluck('name', 'id');
                                             })
-                                            ->hidden(function (Get $get) {
-                                                $productId = $get('content.product');
-                                                if (! $productId) {
-                                                    return true;
-                                                }
-
-                                                return ProductOption::where('product_id', $productId)->count() === 0;
-                                            })
-                                            ->required(function (Get $get) {
-                                                $productId = $get('content.product');
-                                                if (! $productId) {
-                                                    return false;
-                                                }
-
-                                                return ProductOption::where('product_id', $productId)->count() > 0;
-                                            })
+                                            ->hidden(fn (Get $get) => ! $get('content.product') || ProductOption::where('product_id', $get('content.product'))->count() === 0)
+                                            ->required(fn (Get $get) => $get('content.product') && ProductOption::where('product_id', $get('content.product'))->count() > 0)
                                             ->afterStateUpdated(function (Get $get, Set $set, $state) {
                                                 if ($state) {
                                                     $price = ProductOption::find($state)->price ?? 0;
@@ -249,131 +226,100 @@ class CalculatorWidget extends Widget implements HasForms
                                                     $this->calculateTotal($get, $set);
                                                 }
                                             })
-                                            ->dehydrated()
-                                            ->columnSpan(2),
+                                            ->columnSpan(4),
 
                                         TextInput::make('content.quantity')
                                             ->live(onBlur: true)
-                                            ->dehydrated()
+                                            ->label('Quantidade')
                                             ->required()
-                                            ->integer()
+                                            ->numeric()
                                             ->minValue(3)
                                             ->default(3)
                                             ->suffix('m³')
-                                            ->placeholder('3')
-                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                                $this->calculateTotal($get, $set);
-                                            })
-                                            ->numeric()
-                                            ->columnSpan(1),
+                                            ->afterStateUpdated(fn (Get $get, Set $set) => $this->calculateTotal($get, $set))
+                                            ->columnSpan(3),
 
                                         TextInput::make('content.price')
-                                            ->live()
+                                            ->label('Preço Unit.')
+                                            ->prefix('R$')
                                             ->disabled()
                                             ->dehydrated()
-                                            ->prefix(env('CURRENCY_SUFFIX'))
-                                            ->label(__('Preço'))
-                                            ->placeholder('0.00')
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->columnSpan(1),
+                                            ->columnSpan(3),
 
                                         TextInput::make('content.tax')
                                             ->live(onBlur: true)
-                                            ->dehydrated()
-                                            ->prefix('+'.env('CURRENCY_SUFFIX'))
-                                            ->label(__('Taxa'))
+                                            ->label('Taxas (+)')
+                                            ->prefix('R$')
                                             ->numeric()
-                                            ->required()
                                             ->default(0)
-                                            ->placeholder('0.00')
-                                            ->step(0.01)
-                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
                                                 $this->calculateTotal($get, $set);
                                                 $this->calculateCartTotal();
                                             })
-                                            ->columnSpan(1),
+                                            ->columnSpan(3),
 
                                         TextInput::make('content.discount')
                                             ->live(onBlur: true)
+                                            ->label('Desconto (-)')
+                                            ->prefix('R$')
                                             ->numeric()
-                                            ->required()
                                             ->default(0)
-                                            ->prefix('-'.env('CURRENCY_SUFFIX'))
-                                            ->label(__('Desconto'))
-                                            ->placeholder('0.00')
-                                            ->step(0.01)
-                                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
                                                 $this->calculateTotal($get, $set);
                                                 $this->calculateCartTotal();
                                             })
-                                            ->columnSpan(1),
+                                            ->columnSpan(3),
 
                                         TextInput::make('content.total')
-                                            ->live()
+                                            ->label('Subtotal do Item')
+                                            ->prefix('R$')
                                             ->readonly()
-                                            ->numeric()
-                                            ->required()
-                                            ->label(__('Preço Total'))
-                                            ->placeholder('0.00')
-                                            ->prefix(env('CURRENCY_SUFFIX'))
-                                            ->step(0.01)
-                                            ->columnSpan(2),
+                                            ->extraInputAttributes(['class' => 'text-xl font-bold text-primary-600'])
+                                            ->columnSpanFull(),
 
                                         \Filament\Forms\Components\Actions::make([
                                             Action::make('addToCart')
-                                                ->label(__('Adicionar ao Carrinho'))
-                                                ->icon('heroicon-m-shopping-cart')
+                                                ->label('Adicionar ao Orçamento')
+                                                ->icon('heroicon-m-plus')
                                                 ->color('primary')
                                                 ->disabled(fn (Get $get): bool => ! $get('content.product'))
                                                 ->action(fn () => $this->addToCart()),
-                                        ])
-                                            ->columnSpan(4),
+                                        ])->columnSpanFull()->alignRight(),
                                     ]),
                             ]),
 
-                        // Budget Group (Right) - Name changed from "Shopping Cart" to "Budget Items"
-                        Section::make(__('Itens do Orçamento'))
+                        // Budget Group (Right)
+                        Section::make('Resumo da Cotação')
                             ->icon('heroicon-o-document-text')
-                            ->collapsible()
-                            ->columnSpan(1)
+                            ->columnSpan(5)
                             ->schema([
                                 ViewField::make('cart_items')
+                                    ->label('Itens Adicionados')
                                     ->view('filament.widgets.cart-items'),
 
                                 TextInput::make('cart_total')
-                                    ->label(__('Total do Orçamento'))
-                                    ->prefix(env('CURRENCY_SUFFIX'))
+                                    ->label('Total Geral')
+                                    ->prefix('R$')
                                     ->disabled()
-                                    ->extraInputAttributes(['style' => 'width: 120px;'])
-                                    ->placeholder('0.00')
-                                    ->afterStateHydrated(function (Get $get, Set $set) {
-                                        $set('cart_total', number_format($this->cartTotal, 2, '.', ''));
-                                    })
+                                    ->extraInputAttributes(['class' => 'text-2xl font-black text-success-600'])
+                                    ->afterStateHydrated(fn (Set $set) => $set('cart_total', number_format($this->cartTotal, 2, '.', '')))
                                     ->dehydrated(false),
 
                                 \Filament\Forms\Components\Actions::make([
                                     Action::make('clearCart')
-                                        ->label(__('Limpar Itens'))
+                                        ->label('Limpar Tudo')
                                         ->icon('heroicon-m-trash')
                                         ->color('danger')
                                         ->disabled(fn (): bool => empty($this->cart))
                                         ->action(fn () => $this->clearCart()),
 
                                     Action::make('createBudget')
-                                        ->label(__('Gerar Orçamento'))
-                                        ->icon('heroicon-m-document-text')
+                                        ->label('Gerar Orçamento')
+                                        ->icon('heroicon-m-document-check')
                                         ->color('success')
                                         ->url(function () {
-                                            // Check if there are products in the cart
-                                            if (empty($this->cart)) {
-                                                return route('filament.admin.resources.budgets.create');
-                                            }
-
-                                            // Transform the cart into a format compatible with the budget
+                                            if (empty($this->cart)) return route('filament.admin.resources.budgets.create');
                                             $productsJson = json_encode($this->cart);
-
-                                            // Generate URL with cart products as parameters and indication to open the Shopping Bag tab
                                             return route('filament.admin.resources.budgets.create', [
                                                 'activeTab' => 'shopping_bag',
                                                 'products'  => base64_encode($productsJson),
