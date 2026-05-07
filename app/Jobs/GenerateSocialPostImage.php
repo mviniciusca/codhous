@@ -122,13 +122,18 @@ class GenerateSocialPostImage implements ShouldQueue
 
 
             // Render Quote (Main Text)
-            $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $finalTextColor, $align, $style) {
+            // Garantir que as quebras de linha manuais sejam respeitadas
+            $quoteLines = explode("\n", str_replace(["\r\n", "\r"], "\n", $quote));
+            $quote = implode("\n", $quoteLines);
+
+            $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $finalTextColor, $align) {
                 $font->filename($fontPath);
-                $font->size(55);
+                $font->size(80); // Ajustado para 80px para melhor proporção
                 $font->color($finalTextColor);
-                $font->align($align, 'center');
-                $font->lineHeight(1.2);
-                $font->wrap(1000); // Increased wrap width for straighter lines
+                $font->stroke('#000000', 1); // Contorno sutil para legibilidade (estilo sombra)
+                $font->align($align, 'center'); 
+                $font->lineHeight(1.0);
+                $font->wrap(800); // Margem lateral de segurança
             });
 
             // 5. Save

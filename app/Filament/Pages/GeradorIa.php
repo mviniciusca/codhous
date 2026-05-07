@@ -228,6 +228,8 @@ class GeradorIa extends Page implements HasActions, HasForms
         $this->overlayOpacity   = 40;
     }
 
+
+
     public function regeneratePost(int $id): void
     {
         $post = SocialPost::find($id);
