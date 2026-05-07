@@ -6,11 +6,14 @@ use App\Filament\Resources\BudgetResource\Pages;
 use App\Filament\Resources\BudgetResource\RelationManagers\BudgetHistoryRelationManager;
 use App\Filament\Resources\BudgetResource\RelationManagers\DocumentsRelationManager;
 use App\Models\Budget;
+use App\Models\Mail;
+use App\Mail\BudgetCustomMessageMail;
 use App\Services\FakeBudgetDataService;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -88,40 +91,77 @@ class BudgetResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Visão Geral do Orçamento')
-                    ->columns(4)
-                    ->description('Informações básicas e status atual do pedido.')
-                    ->icon('heroicon-o-document')
+                Section::make('Visão Geral')
+                    ->description('Acompanhe o identificador, o progresso comercial e as notificações deste pedido.')
+                    ->icon('heroicon-o-information-circle')
+                    ->columns(12)
                     ->schema([
                         Toggle::make('is_active')
-                            ->helperText('Define se este orçamento deve ser exibido nos relatórios ativos.')
                             ->label('Ativo')
                             ->default(true)
-                            ->inline(),
+                            ->inline(false)
+                            ->helperText('Visibilidade.')
+                            ->columnSpan([
+                                'default' => 12,
+                                'md' => 1,
+                            ]),
+
+                        TextInput::make('code')
+                            ->label('Identificador')
+                            ->default(fn () => \App\Models\Budget::generateUniqueCode())
+                            ->disabled()
+                            ->dehydrated()
+                            ->helperText('Código único.')
+                            ->columnSpan([
+                                'default' => 12,
+                                'md' => 2,
+                            ]),
+                        
                         Select::make('status')
-                            ->label('Status')
-                            ->helperText('Estado atual do atendimento.')
+                            ->label('Status do Negócio')
                             ->default('pending')
+                            ->native(false)
+                            ->helperText('Estágio comercial.')
                             ->options([
                                 'pending'  => 'Pendente',
-                                'notified' => 'Cliente Notificado',
                                 'on going' => 'Em Andamento',
                                 'done'     => 'Concluído',
                                 'ignored'  => 'Arquivado/Ignorado',
+                            ])
+                            ->columnSpan([
+                                'default' => 12,
+                                'md' => 3,
                             ]),
-                        TextInput::make('code')
-                            ->label('Código do Orçamento')
-                            ->default(fn () => \App\Models\Budget::generateUniqueCode())
-                            ->placeholder('Gerado automaticamente ao salvar')
-                            ->helperText('Ex: OR-2026-00001')
-                            ->disabled()
-                            ->dehydrated(),
+
+                        Placeholder::make('notification_status')
+                            ->label('Comunicação')
+                            ->content(function (Budget $record) {
+                                if (!$record->notified_via_email && !$record->notified_via_whatsapp) {
+                                    return new \Illuminate\Support\HtmlString('<span class="text-xs font-medium text-gray-500 italic">Aguardando Envio</span>');
+                                }
+                                
+                                $channels = [];
+                                if ($record->notified_via_email) $channels[] = 'E-mail ✅';
+                                if ($record->notified_via_whatsapp) $channels[] = 'WhatsApp ✅';
+                                
+                                return new \Illuminate\Support\HtmlString('<span class="text-xs font-bold text-success-600">Notificado (' . implode(', ', $channels) . ')</span>');
+                            })
+                            ->helperText('Envio ao cliente.')
+                            ->visible(fn ($record) => $record && $record->exists)
+                            ->columnSpan([
+                                'default' => 12,
+                                'md' => 3,
+                            ]),
+
                         DateTimePicker::make('created_at')
+                            ->label('Registro')
                             ->displayFormat('d/m/Y H:i')
-                            ->label('Data de Criação')
-                            ->default(now())
-                            ->required()
-                            ->helperText('Data e hora do registro do orçamento.'),
+                            ->disabled()
+                            ->helperText('Data/Hora.')
+                            ->columnSpan([
+                                'default' => 12,
+                                'md' => 3,
+                            ]),
                     ]),
 
                 Tabs::make('Conteúdo do Orçamento')
@@ -442,50 +482,14 @@ class BudgetResource extends Resource
                                         !isset($record->content['shipping'])
                                     ),
 
-                                Section::make('Comunicação com o Cliente')
-                                    ->description('Gere o documento oficial e notifique o cliente pelos canais disponíveis.')
+                                Section::make('Gerar e Enviar Orçamento')
+                                    ->description('Gere o PDF oficial e notifique o cliente agora mesmo.')
                                     ->schema([
                                         Actions::make([
-                                            Actions\Action::make('pdf_and_email')
-                                                ->label(fn (Budget $record) => 'Gerar PDF e Enviar por E-mail' . ($record->notified_via_email ? ' ✅' : ''))
-                                                ->icon('heroicon-o-envelope')
-                                                ->color('primary')
-                                                ->disabled(fn (Budget $record) => 
-                                                    !isset($record->content['tax']) || 
-                                                    !isset($record->content['discount']) || 
-                                                    !isset($record->content['shipping'])
-                                                )
-                                                ->requiresConfirmation()
-                                                ->action(function (Budget $record) {
-                                                    try {
-                                                        $mailService = new SendBudgetMailService(
-                                                            $record,
-                                                            $record->content['customer_email'] ?? ''
-                                                        );
-                                                        $mailService->dispatch();
-                                                        
-                                                        $record->update([
-                                                            'notified_via_email' => true,
-                                                            'status' => $record->status === 'pending' ? 'notified' : $record->status
-                                                        ]);
-
-                                                        Notification::make()
-                                                            ->title('E-mail enviado com sucesso!')
-                                                            ->success()
-                                                            ->send();
-                                                    } catch (\Exception $e) {
-                                                        Notification::make()
-                                                            ->title('Erro ao enviar e-mail')
-                                                            ->body($e->getMessage())
-                                                            ->danger()
-                                                            ->send();
-                                                    }
-                                                }),
-
                                             Actions\Action::make('generate_pdf_share')
                                                 ->label('Gerar PDF e Link de Compartilhamento')
                                                 ->icon('heroicon-o-share')
-                                                ->color('info')
+                                                ->color('primary')
                                                 ->disabled(fn (Budget $record) => 
                                                     !isset($record->content['tax']) || 
                                                     !isset($record->content['discount']) || 
@@ -499,10 +503,6 @@ class BudgetResource extends Resource
                                                     $pdfModel = self::generatePdfModel($record);
                                                     
                                                     if ($pdfModel) {
-                                                        $record->update([
-                                                            'notified_via_whatsapp' => true,
-                                                            'status' => $record->status === 'pending' ? 'notified' : $record->status
-                                                        ]);
                                                         $url = $pdfModel->getDownloadUrl();
                                                         
                                                         // Salva o link no content para referência futura
@@ -534,6 +534,41 @@ class BudgetResource extends Resource
                                                     }
                                                 }),
 
+                                            Actions\Action::make('pdf_and_email')
+                                                ->label(fn (Budget $record) => 'Gerar PDF e Enviar por E-mail' . ($record->notified_via_email ? ' ✅' : ''))
+                                                ->icon('heroicon-o-envelope')
+                                                ->color('info')
+                                                ->disabled(fn (Budget $record) => 
+                                                    !isset($record->content['tax']) || 
+                                                    !isset($record->content['discount']) || 
+                                                    !isset($record->content['shipping'])
+                                                )
+                                                ->requiresConfirmation()
+                                                ->action(function (Budget $record) {
+                                                    try {
+                                                        $mailService = new SendBudgetMailService(
+                                                            $record,
+                                                            $record->content['customer_email'] ?? ''
+                                                        );
+                                                        $mailService->dispatch();
+                                                        
+                                                        $record->update([
+                                                            'notified_via_email' => true,
+                                                        ]);
+
+                                                        Notification::make()
+                                                            ->title('E-mail enviado com sucesso!')
+                                                            ->success()
+                                                            ->send();
+                                                    } catch (\Exception $e) {
+                                                        Notification::make()
+                                                            ->title('Erro ao enviar e-mail')
+                                                            ->body($e->getMessage())
+                                                            ->danger()
+                                                            ->send();
+                                                    }
+                                                }),
+
                                             Actions\Action::make('pdf_and_whatsapp')
                                                 ->label(fn (Budget $record) => 'Gerar PDF e Enviar via WhatsApp' . ($record->notified_via_whatsapp ? ' ✅' : ''))
                                                 ->icon('heroicon-o-chat-bubble-left-right')
@@ -550,7 +585,6 @@ class BudgetResource extends Resource
                                                     if ($pdfModel) {
                                                         $record->update([
                                                             'notified_via_whatsapp' => true,
-                                                            'status' => $record->status === 'pending' ? 'notified' : $record->status
                                                         ]);
                                                         $url = $pdfModel->getDownloadUrl();
                                                         $content = $record->content;
@@ -573,6 +607,71 @@ class BudgetResource extends Resource
                                         ])
                                         ->alignment(Alignment::Center)
                                         ->fullWidth(),
+                                ]),
+
+                            Section::make('Enviar Mensagem Direta')
+                                ->description('Envie um e-mail personalizado para o cliente deste orçamento.')
+                                ->icon('heroicon-o-paper-airplane')
+                                ->schema([
+                                    Actions::make([
+                                        Actions\Action::make('send_custom_message')
+                                            ->label('Enviar E-mail Personalizado')
+                                            ->icon('heroicon-o-paper-airplane')
+                                            ->color('gray')
+                                            ->form([
+                                                TextInput::make('subject')
+                                                    ->label('Assunto')
+                                                    ->required()
+                                                    ->default(fn (Budget $record) => 'Sobre seu Orçamento: ' . $record->code),
+                                                RichEditor::make('message')
+                                                    ->label('Mensagem')
+                                                    ->required()
+                                                    ->placeholder('Escreva sua mensagem aqui...'),
+                                            ])
+                                            ->action(function (Budget $record, array $data) {
+                                                try {
+                                                    $customerEmail = $record->content['customer_email'] ?? null;
+                                                    $customerName = $record->content['customer_name'] ?? 'Cliente';
+
+                                                    if (!$customerEmail) {
+                                                        throw new \Exception('E-mail do cliente não encontrado.');
+                                                    }
+
+                                                    // Envia o e-mail
+                                                    \Illuminate\Support\Facades\Mail::to($customerEmail)->send(
+                                                        new BudgetCustomMessageMail(
+                                                            customSubject: $data['subject'],
+                                                            customMessage: $data['message'],
+                                                            customerName: $customerName
+                                                        )
+                                                    );
+
+                                                    // Salva no Resource de Mail
+                                                    Mail::create([
+                                                        'email' => $customerEmail,
+                                                        'name' => $customerName,
+                                                        'phone' => $record->content['customer_phone'] ?? null,
+                                                        'subject' => $data['subject'],
+                                                        'message' => $data['message'],
+                                                        'is_sent' => true,
+                                                    ]);
+
+                                                    Notification::make()
+                                                        ->title('Mensagem enviada e registrada!')
+                                                        ->success()
+                                                        ->send();
+
+                                                } catch (\Exception $e) {
+                                                    Notification::make()
+                                                        ->title('Erro ao enviar mensagem')
+                                                        ->body($e->getMessage())
+                                                        ->danger()
+                                                        ->send();
+                                                }
+                                            })
+                                    ])
+                                    ->alignment(Alignment::Center)
+                                    ->fullWidth(),
                                 ]),
 
                                 Section::make('Link de Compartilhamento Ativo')
