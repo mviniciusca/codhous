@@ -429,10 +429,26 @@
         {{-- Sidebar Direita: Galeria Vertical --}}
         <aside class="studio-sidebar-right">
              <div class="flex flex-col gap-4 pb-8">
-                {{ ($this->uploadBackgroundAction)() }}
+                {{-- Botão de Upload Customizado --}}
+                <button wire:click="mountAction('uploadBackground')" 
+                        type="button"
+                        class="gallery-item flex items-center justify-center bg-amber-500 border-none hover:bg-amber-600 transition-colors shadow-lg group">
+                    <x-heroicon-o-plus class="w-8 h-8 text-black group-hover:scale-110 transition-transform" />
+                </button>
 
                 @foreach ($this->backgrounds as $bg)
-                    <div wire:click="selectBackground({{ $bg->id }})" class="gallery-item {{ $backgroundImageId === $bg->id ? 'active' : '' }}"><img src="{{ $bg->getThumbnailUrl() }}" class="w-full h-full object-cover"></div>
+                    <div class="gallery-item relative group/item {{ $backgroundImageId === $bg->id ? 'active' : '' }}">
+                        <img src="{{ $bg->getThumbnailUrl() }}" 
+                             wire:click="selectBackground({{ $bg->id }})"
+                             class="w-full h-full object-cover cursor-pointer">
+                        
+                        {{-- Botão de Lixeira (Aparece no Hover) --}}
+                        <button wire:click="deleteBackground({{ $bg->id }})"
+                                wire:confirm="Tem certeza que deseja apagar esta imagem?"
+                                class="absolute top-1 right-1 w-6 h-6 bg-red-500/90 text-white rounded-md flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity hover:bg-red-600 shadow-sm z-20">
+                            <x-heroicon-o-trash class="w-3.5 h-3.5" />
+                        </button>
+                    </div>
                 @endforeach
             </div>
         </aside>

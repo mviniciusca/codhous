@@ -128,6 +128,24 @@ class GeradorIa extends Page implements HasActions, HasForms
         $this->backgroundImageId = ($this->backgroundImageId === $id) ? null : $id;
     }
 
+    public function deleteBackground(int $id): void
+    {
+        $bg = BackgroundImage::find($id);
+        
+        if ($bg) {
+            $bg->delete(); // Spatie Media Library handles file deletion automatically
+            
+            if ($this->backgroundImageId === $id) {
+                $this->backgroundImageId = null;
+            }
+
+            Notification::make()
+                ->title('Imagem removida!')
+                ->success()
+                ->send();
+        }
+    }
+
     public function selectPreset(string $value): void
     {
         $this->preset = $value;
@@ -225,7 +243,14 @@ class GeradorIa extends Page implements HasActions, HasForms
         }
     }
 
-    public function uploadBackgroundAction(): Action
+    protected function getActions(): array
+    {
+        return [
+            $this->getUploadBackgroundAction(),
+        ];
+    }
+
+    public function getUploadBackgroundAction(): Action
     {
         return Action::make('uploadBackground')
             ->label('Subir Imagem')
@@ -253,8 +278,9 @@ class GeradorIa extends Page implements HasActions, HasForms
                     'is_active' => true,
                 ]);
 
-                // Attach to media library
-                $bg->addMediaFromDisk($data['image'])->toMediaCollection('image');
+                // Attach to media library using absolute path
+                $bg->addMedia(storage_path('app/public/' . $data['image']))
+                   ->toMediaCollection('image');
 
                 Notification::make()
                     ->title('Imagem salva!')
