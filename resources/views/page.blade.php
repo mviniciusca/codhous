@@ -309,30 +309,10 @@
 
             {{-- ──── DIFERENCIAIS (MISSÃO, VISÃO, VALORES) ────────────────── --}}
             @case('differentials')
-                <section class="bg-background py-16 lg:py-24">
-                    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                        @if(!empty($block['data']['title']))
-                            <div class="mb-12 text-center">
-                                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                                    {{ $block['data']['title'] }}
-                                </h2>
-                            </div>
-                        @endif
-                        <div class="grid gap-8 md:grid-cols-3">
-                            @foreach($block['data']['items'] ?? [] as $item)
-                                <div class="group rounded-2xl border border-border bg-card p-8 transition-all hover:shadow-lg hover:-translate-y-1">
-                                    <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                                        <i data-lucide="{{ $item['icon'] ?? 'check-circle' }}" class="h-7 w-7"></i>
-                                    </div>
-                                    <h3 class="mb-3 font-mono text-xl font-bold text-foreground">{{ $item['title'] }}</h3>
-                                    <p class="text-muted-foreground leading-relaxed">
-                                        {{ $item['description'] }}
-                                    </p>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </section>
+                <x-section-differentials
+                    :title="$block['data']['title'] ?? null"
+                    :items="$block['data']['items'] ?? []"
+                />
                 @break
 
             {{-- ──── CTA ───────────────────────────────────────────────────── --}}

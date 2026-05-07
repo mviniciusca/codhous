@@ -315,11 +315,13 @@ class PageResource extends Resource
     protected static function getDifferentialsBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('differentials')
-            ->label(__('Diferenciais (Missão, Visão, Valores)'))
+            ->label(__('Diferenciais (Pilar / Missão / Visão)'))
             ->icon('heroicon-o-shield-check')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título da Seção')->default('Nossos Pilares'),
+                Forms\Components\TextInput::make('subtitle')->label('Subtítulo'),
+                Forms\Components\TextInput::make('title')->label('Título Principal'),
                 Forms\Components\Repeater::make('items')
+                    ->label('Itens (Recomendado: 3)')
                     ->schema([
                         Forms\Components\TextInput::make('title')->label('Título')->required(),
                         Forms\Components\Textarea::make('description')->label('Descrição')->required(),

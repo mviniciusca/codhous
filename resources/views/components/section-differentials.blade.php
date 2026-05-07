@@ -1,62 +1,77 @@
+@props([
+    'title' => null,
+    'subtitle' => null,
+    'items' => null,
+])
+
 @php
-    $section = \App\Models\ContentSection::getBySlug('differentials');
-    $header = $section?->content['header'] ?? [];
-    $items = $section?->content['items'] ?? null;
-    if (empty($items)) {
-        $header = ['subtitle' => 'Por que nos escolher', 'title' => 'Excelência técnica em cada carregamento', 'description' => 'Estamos redefinindo o padrão de atendimento no mercado de concreto usinado através da tecnologia e transparência.'];
-        $items = [
-            ['icon' => 'clock', 'title' => 'Zero Atrasos', 'description' => 'Nosso sistema de logística GPS garante que seu concreto chegue exatamente no horário programado.'],
-            ['icon' => 'microscope', 'title' => 'Laboratório', 'description' => 'Testamos rigorosamente cada lote em nosso laboratório próprio seguindo as normas NBR.'],
-            ['icon' => 'smartphone', 'title' => 'App de Gestão', 'description' => 'Acompanhe seu pedido, receba notificações e gerencie seus orçamentos pelo smartphone.'],
-            ['icon' => 'award', 'title' => 'Selo Verde', 'description' => 'Comprometidos com a sustentabilidade através do reuso de água e gestão de resíduos.'],
+    $displayTitle = $title;
+    $displaySubtitle = $subtitle;
+    $displayItems = $items;
+
+    // Se estiver vazio, tenta buscar da seção global 'differentials' ou usa o padrão estático
+    if (empty($displayItems)) {
+        $section = \App\Models\ContentSection::getBySlug('differentials');
+        $displayTitle = $displayTitle ?? ($section?->content['header']['title'] ?? 'Nossos Pilares');
+        $displaySubtitle = $displaySubtitle ?? ($section?->content['header']['subtitle'] ?? 'Diferenciais');
+        $displayItems = $section?->content['items'] ?? null;
+    }
+
+    // Fallback final: Focado em CONCRETO USINADO
+    if (empty($displayItems)) {
+        $displayTitle = $displayTitle ?? 'Por que nos escolher';
+        $displaySubtitle = $displaySubtitle ?? 'Nossos Pilares';
+        $displayItems = [
+            [
+                'title' => 'Tecnologia do Concreto',
+                'icon' => 'flask-conical',
+                'description' => 'Produzimos concreto com rigoroso controle tecnológico e FCK garantido, assegurando a máxima resistência para sua estrutura.'
+            ],
+            [
+                'title' => 'Logística de Precisão',
+                'icon' => 'truck',
+                'description' => 'Frota moderna e monitoramento em tempo real para garantir que o concreto chegue no canteiro no horário exato da concretagem.'
+            ],
+            [
+                'title' => 'Suporte Especialista',
+                'icon' => 'users',
+                'description' => 'Nossa equipe técnica acompanha sua obra desde o cálculo do volume até o bombeamento, oferecendo a melhor solução técnica.'
+            ],
         ];
     }
+
+    // Garante que só mostramos 3 itens
+    $displayItems = array_slice((array) $displayItems, 0, 3);
 @endphp
-<section id="diferenciais" class="bg-foreground py-20 lg:py-28 overflow-hidden">
+
+<section class="bg-background py-16 lg:py-24">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <div class="flex flex-col gap-16 lg:flex-row lg:items-center">
-            <div class="flex-1">
-                @if(!empty($header['subtitle']))
-                    <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $header['subtitle'] }}</span>
+        @if(!empty($displayTitle) || !empty($displaySubtitle))
+            <div class="mb-12 text-center">
+                @if(!empty($displaySubtitle))
+                    <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $displaySubtitle }}</span>
                 @endif
-                <h2 class="font-mono text-3xl font-bold tracking-tight text-background md:text-4xl" style="text-wrap: balance;">{{ $header['title'] ?? 'Diferenciais' }}</h2>
-                @if(!empty($header['description']))
-                    <p class="mt-4 text-lg leading-relaxed text-background/60">{{ $header['description'] }}</p>
-                @endif
-
-                <div class="mt-12 grid gap-8 sm:grid-cols-2">
-                    @foreach($items as $item)
-                        <div class="flex flex-col gap-4">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-background/5">
-                                <i data-lucide="{{ $item['icon'] ?? 'check' }}" class="h-6 w-6 text-primary"></i>
-                            </div>
-                            <h4 class="font-mono text-lg font-bold text-background">{{ $item['title'] ?? '' }}</h4>
-                            <p class="text-sm text-background/40">{{ $item['description'] ?? '' }}</p>
-                        </div>
-                    @endforeach
-                </div>
+                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                    {{ $displayTitle }}
+                </h2>
             </div>
+        @endif
+        
+        <div class="grid gap-12 md:grid-cols-3">
+            @foreach($displayItems as $item)
+                <div class="group flex flex-col items-center text-center transition-all hover:-translate-y-1">
+                    {{-- Ícone Centralizado --}}
+                    <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
+                        <i data-lucide="{{ $item['icon'] ?? 'check-circle' }}" class="h-8 w-8"></i>
+                    </div>
 
-            <div class="relative flex-1">
-                <div class="relative rounded-2xl border border-background/10 bg-background/5 p-2 backdrop-blur-sm">
-                    <div class="aspect-square overflow-hidden rounded-xl bg-foreground/20 relative">
-                        <div class="absolute inset-0 flex items-center justify-center text-background/10">
-                            <i data-lucide="image" class="h-20 w-20"></i>
-                        </div>
-                    </div>
-                    <div class="absolute -bottom-6 -left-6 rounded-lg border border-primary/40 bg-card p-6 shadow-2xl lg:-left-12">
-                        <div class="flex items-center gap-4">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                                <i data-lucide="shield" class="h-6 w-6 text-primary"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Garantia</p>
-                                <p class="font-mono text-xl font-bold text-card-foreground">Selo ISO 9001</p>
-                            </div>
-                        </div>
-                    </div>
+                    {{-- Texto Centralizado --}}
+                    <h3 class="mb-3 font-mono text-xl font-bold text-foreground">{{ $item['title'] ?? '' }}</h3>
+                    <p class="max-w-xs text-muted-foreground leading-relaxed">
+                        {{ $item['description'] ?? '' }}
+                    </p>
                 </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
