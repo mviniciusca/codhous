@@ -34,7 +34,7 @@ class MailResource extends Resource
         return self::count();
     }
 
-    protected static ?string $navigationGroup = 'Comunicação';
+    protected static ?string $navigationGroup = 'Website';
     protected static ?int $navigationSort = 1;
 
     public static function count(): ?string
