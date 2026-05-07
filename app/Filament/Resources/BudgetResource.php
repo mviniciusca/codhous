@@ -537,7 +537,7 @@ class BudgetResource extends Resource
                                             Actions\Action::make('pdf_and_email')
                                                 ->label(fn (Budget $record) => 'Gerar PDF e Enviar por E-mail' . ($record->notified_via_email ? ' ✅' : ''))
                                                 ->icon('heroicon-o-envelope')
-                                                ->color('info')
+                                                ->color('primary')
                                                 ->disabled(fn (Budget $record) => 
                                                     !isset($record->content['tax']) || 
                                                     !isset($record->content['discount']) || 
@@ -572,7 +572,7 @@ class BudgetResource extends Resource
                                             Actions\Action::make('pdf_and_whatsapp')
                                                 ->label(fn (Budget $record) => 'Gerar PDF e Enviar via WhatsApp' . ($record->notified_via_whatsapp ? ' ✅' : ''))
                                                 ->icon('heroicon-o-chat-bubble-left-right')
-                                                ->color('success')
+                                                ->color('primary')
                                                 ->disabled(fn (Budget $record) => 
                                                     !isset($record->content['tax']) || 
                                                     !isset($record->content['discount']) || 
