@@ -45,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->profile()
+            ->font('Jost')
             ->colors([
                 'danger'  => Color::Red,
                 'gray'    => Color::Zinc,

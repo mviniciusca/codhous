@@ -4,9 +4,26 @@
     $websiteTitle = data_get($website, 'title', 'Concreto Usinado & Equipamentos');
     $websiteDescription = data_get($website, 'description', 'Concreto usinado de alta qualidade e locação de equipamentos.');
     $scripts = data_get($website, 'scripts', []);
-    $googleFontsUrl = data_get($scripts, 'google_fonts_url', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+    $fontFamily = data_get($scripts, 'google_font_family', 'Inter');
+    
+    // Constrói a URL do Google Fonts dinamicamente
+    $fonts = ['Inter:wght@400;500;600;700'];
+    if ($fontFamily && $fontFamily !== 'Inter') {
+        $fonts[] = urlencode($fontFamily) . ':wght@400;500;600;700';
+    }
+    $googleFontsUrl = "https://fonts.googleapis.com/css2?family=" . implode('&family=', $fonts) . "&display=swap";
+    
     $headScripts = data_get($scripts, 'head_scripts');
 @endphp
+
+<style>
+    :root {
+        --font-titles: '{{ $fontFamily }}', sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6, .font-title {
+        font-family: var(--font-titles);
+    }
+</style>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">

@@ -143,10 +143,10 @@ class EditWebsite extends EditRecord
                     ->icon('heroicon-o-code-bracket')
                     ->description('Insira códigos de rastreamento, fontes ou scripts externos.')
                     ->schema([
-                        TextInput::make('settings.website.scripts.google_fonts')
-                            ->label('URL Google Fonts')
-                            ->helperText('Link da família de fontes selecionada.')
-                            ->placeholder('https://fonts.googleapis.com/...'),
+                        TextInput::make('settings.website.scripts.google_font_family')
+                            ->label('Nome da Fonte (Google Fonts)')
+                            ->helperText('Digite apenas o nome da fonte. Ex: Montserrat, Poppins, Outfit.')
+                            ->placeholder('Ex: Outfit'),
                         Textarea::make('settings.website.scripts.head')
                             ->label('Scripts no <head>')
                             ->helperText('Ex: Google Analytics, Tag Manager, Facebook Pixel.')

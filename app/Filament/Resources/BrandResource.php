@@ -16,6 +16,10 @@ class BrandResource extends Resource
 
     protected static ?string $navigationGroup = 'Website';
     
+    protected static ?string $navigationIcon = 'heroicon-o-star';
+
+    protected static ?int $navigationSort = 2;
+    
     protected static ?string $navigationLabel = 'Marcas e Parceiros';
     
     protected static ?string $modelLabel = 'Marca/Parceiro';
