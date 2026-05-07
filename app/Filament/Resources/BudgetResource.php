@@ -521,10 +521,13 @@ class BudgetResource extends Resource
                                                         // Salva o link no content para referência futura
                                                         $content = $record->content;
                                                         $content['share_link'] = $url;
-                                                        $record->update([
-                                                            'content' => $content,
-                                                            'pdf_document' => $pdfModel->path
-                                                        ]);
+                                                        
+                                                        $record->withoutEvents(function () use ($record, $content, $pdfModel) {
+                                                            $record->update([
+                                                                'content' => $content,
+                                                                'pdf_document' => $pdfModel->path
+                                                            ]);
+                                                        });
 
                                                         Notification::make()
                                                             ->title('PDF Gerado com Sucesso!')
@@ -569,9 +572,11 @@ class BudgetResource extends Resource
                                                         );
                                                         $mailService->dispatch();
                                                         
-                                                        $record->update([
-                                                            'notified_via_email' => true,
-                                                        ]);
+                                                        $record->withoutEvents(function () use ($record) {
+                                                            $record->update([
+                                                                'notified_via_email' => true,
+                                                            ]);
+                                                        });
 
                                                         activity()
                                                             ->performedOn($record)
@@ -608,20 +613,21 @@ class BudgetResource extends Resource
                                                     $pdfModel = self::generatePdfModel($record->refresh());
 
                                                     if ($pdfModel) {
-                                                        $record->update([
-                                                            'notified_via_whatsapp' => true,
-                                                        ]);
+                                                        $url = $pdfModel->getDownloadUrl();
+                                                        $content = $record->content;
+                                                        $content['share_link'] = $url;
+
+                                                        $record->withoutEvents(function () use ($record, $content, $pdfModel) {
+                                                            $record->update([
+                                                                'notified_via_whatsapp' => true,
+                                                                'content' => $content,
+                                                                'pdf_document' => $pdfModel->path
+                                                            ]);
+                                                        });
 
                                                         activity()
                                                             ->performedOn($record)
                                                             ->log('Enviou orçamento via WhatsApp');
-                                                        $url = $pdfModel->getDownloadUrl();
-                                                        $content = $record->content;
-                                                        $content['share_link'] = $url;
-                                                        $record->update([
-                                                            'content' => $content,
-                                                            'pdf_document' => $pdfModel->path
-                                                        ]);
 
                                                         $whatsappService = new WhatsappService();
                                                         $message = "Olá! Segue o link do seu orçamento: " . $url;
