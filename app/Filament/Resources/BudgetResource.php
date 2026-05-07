@@ -514,6 +514,10 @@ class BudgetResource extends Resource
                                                     if ($pdfModel) {
                                                         $url = $pdfModel->getDownloadUrl();
                                                         
+                                                        activity()
+                                                            ->performedOn($record)
+                                                            ->log('Gerou link de compartilhamento do PDF');
+                                                        
                                                         // Salva o link no content para referência futura
                                                         $content = $record->content;
                                                         $content['share_link'] = $url;
@@ -569,6 +573,10 @@ class BudgetResource extends Resource
                                                             'notified_via_email' => true,
                                                         ]);
 
+                                                        activity()
+                                                            ->performedOn($record)
+                                                            ->log('Enviou orçamento por e-mail para ' . ($record->content['customer_email'] ?? 'cliente'));
+
                                                         Notification::make()
                                                             ->title('E-mail enviado com sucesso!')
                                                             ->success()
@@ -603,6 +611,10 @@ class BudgetResource extends Resource
                                                         $record->update([
                                                             'notified_via_whatsapp' => true,
                                                         ]);
+
+                                                        activity()
+                                                            ->performedOn($record)
+                                                            ->log('Enviou orçamento via WhatsApp');
                                                         $url = $pdfModel->getDownloadUrl();
                                                         $content = $record->content;
                                                         $content['share_link'] = $url;
@@ -679,6 +691,11 @@ class BudgetResource extends Resource
                                                         'message' => $data['message'],
                                                         'is_sent' => true,
                                                     ]);
+
+                                                    activity()
+                                                        ->performedOn($record)
+                                                        ->withProperties(['subject' => $data['subject']])
+                                                        ->log('Enviou mensagem personalizada por e-mail');
 
                                                     Notification::make()
                                                         ->title('Mensagem enviada e registrada!')
