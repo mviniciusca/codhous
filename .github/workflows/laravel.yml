@@ -23,10 +23,12 @@ jobs:
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-    - name: Generate key
-      run: php artisan key:generate
+    - name: Create Storage Folders
+      run: mkdir -p storage/framework/{sessions,views,cache}
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
+    - name: Generate key
+      run: php artisan key:generate
     - name: Create Database
       run: |
         mkdir -p database
