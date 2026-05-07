@@ -371,7 +371,7 @@
                     <span class="text-[10px] text-gray-400 font-mono">{{ strlen($quote ?? '') }}/600</span>
                     <button wire:click="dispatchGeneration"
                             wire:loading.attr="disabled"
-                            class="bg-amber-500 hover:bg-amber-400 text-white dark:text-black px-8 py-2.5 rounded-full text-xs font-black transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95">
+                            class="bg-amber-500 hover:bg-amber-400 text-black px-8 py-2.5 rounded-full text-xs font-black transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 border-none">
                         <span wire:loading.remove wire:target="dispatchGeneration">GERAR</span>
                         <x-heroicon-o-arrow-path wire:loading wire:target="dispatchGeneration" class="w-3 h-3 animate-spin" />
                         <x-heroicon-o-sparkles wire:loading.remove wire:target="dispatchGeneration" class="w-3 h-3" />
