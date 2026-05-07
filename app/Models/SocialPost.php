@@ -18,6 +18,8 @@ class SocialPost extends Model
         'overlay_opacity' => 'integer',
         'text_x'          => 'float',
         'text_y'          => 'float',
+        'is_bold'         => 'boolean',
+        'is_italic'       => 'boolean',
         'generated_at'    => 'datetime',
     ];
 

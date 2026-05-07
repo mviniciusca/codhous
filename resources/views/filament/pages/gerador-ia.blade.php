@@ -154,29 +154,30 @@
             padding: 16px;
             border: 2px dashed transparent;
             transition: border-color 0.2s, transform 0.1s;
-            max-width: 90%;
+            max-width: 100%;
+            width: fit-content;
             will-change: transform, left, top;
         }
 
         .draggable-text:hover { border-color: rgba(251, 191, 36, 0.3); }
         .draggable-text.is-dragging { border-color: #fbbf24; opacity: 0.9; scale: 1.05; z-index: 1000; }
 
-        .style-max .quote-text { text-transform: uppercase; font-weight: 900; font-size: 42px; line-height: 0.9; }
+        .style-max .quote-text { text-transform: uppercase; line-height: 0.9; }
         .style-max .title-text { font-size: 14px; text-transform: uppercase; letter-spacing: 0.3em; margin-bottom: 8px; opacity: 0.7; }
 
-        .style-flux .quote-text { font-weight: 400; font-style: italic; font-size: 34px; letter-spacing: -0.02em; }
+        .style-flux .quote-text { letter-spacing: -0.02em; }
         .style-flux .title-text { font-size: 12px; letter-spacing: 0.5em; margin-bottom: 24px; opacity: 0.6; }
 
         .style-canva_side .side-block { position: absolute; left: 0; top: 0; width: 45%; height: 100%; background: var(--highlight); z-index: 5; }
 
-        /* Prompt Bar */
+        /* Toolbar / Prompt Bar */
         .studio-prompt-bar {
             position: absolute;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 640px;
-            max-width: 90%;
+            width: 700px;
+            max-width: 95%;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(0,0,0,0.08);
@@ -219,20 +220,38 @@
         }
 
         .btn-generate:hover { background: #f59e0b; transform: scale(1.02); }
-        .btn-generate:active { transform: scale(0.98); }
+
+        /* Formatação Toolbar */
+        .format-group {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.03);
+            padding: 4px;
+            border-radius: 100px;
+            gap: 2px;
+        }
+        .dark .format-group { background: rgba(255,255,255,0.05); }
+
+        .format-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #64748b;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .dark .format-btn { color: #94a3b8; }
+        .format-btn:hover { background: rgba(0,0,0,0.05); color: #1e293b; }
+        .dark .format-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .format-btn.active { background: #fbbf24; color: #000; }
 
         /* Galeria */
         .gallery-item {
-            width: 68px;
-            height: 68px;
-            border-radius: 14px;
-            overflow: hidden;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #e2e8f0;
+            width: 68px; height: 68px; border-radius: 14px; overflow: hidden; cursor: pointer; border: 3px solid transparent; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: #e2e8f0;
         }
-        .gallery-item:hover { transform: scale(1.08); border-color: rgba(251, 191, 36, 0.4); }
         .gallery-item.active { border-color: #fbbf24; box-shadow: 0 8px 16px -4px rgba(251, 191, 36, 0.3); }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
     </style>
@@ -306,11 +325,11 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="studio-input-wrap">
-                        <label class="studio-label">Texto</label>
+                        <label class="studio-label">Cor do Texto</label>
                         <input type="color" wire:model.live="textColor" class="w-full h-10 p-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg cursor-pointer">
                     </div>
                     <div class="studio-input-wrap">
-                        <label class="studio-label">Highlight</label>
+                        <label class="studio-label">Highlight / Filtro</label>
                         <input type="color" wire:model.live="overlayColor" class="w-full h-10 p-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg cursor-pointer">
                     </div>
                 </div>
@@ -365,17 +384,41 @@
                 <div class="draggable-text"
                      :class="{ 'is-dragging': isDragging }"
                      :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%);`"
-                     style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif; color: {{ $textColor }}; text-align: inherit;">
+                     style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif; text-align: {{ $textAlign }};">
                     
-                    @if($postTitle) <span class="title-text block font-black">{{ $postTitle }}</span> @endif
-                    @if(trim($quote)) <p class="quote-text font-bold leading-tight">{{ $quote }}</p> @else <p class="text-[12px] uppercase font-black opacity-20 tracking-widest italic">Arraste para posicionar</p> @endif
+                    @if($postTitle) 
+                        <span class="title-text block" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '900' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }};">
+                            {{ $postTitle }}
+                        </span> 
+                    @endif
+
+                    @if(trim($quote)) 
+                        <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                            {{ $quote }}
+                        </p> 
+                    @else 
+                        <p class="text-[12px] uppercase font-black opacity-20 tracking-widest italic" style="color: {{ $textColor }};">Arraste para posicionar</p> 
+                    @endif
                 </div>
             </div>
 
-            {{-- Prompt Bar --}}
+            {{-- Prompt Bar & Toolbar --}}
             <div class="studio-prompt-bar">
-                <x-heroicon-o-sparkles class="w-5 h-5 text-amber-500" />
+                
+                {{-- Text Style Toolbar --}}
+                <div class="format-group">
+                    <div wire:click="$set('textAlign', 'left')" class="format-btn {{ $textAlign === 'left' ? 'active' : '' }}"><x-heroicon-m-bars-3-bottom-left class="w-4 h-4" /></div>
+                    <div wire:click="$set('textAlign', 'center')" class="format-btn {{ $textAlign === 'center' ? 'active' : '' }}"><x-heroicon-m-bars-3 class="w-4 h-4" /></div>
+                    <div wire:click="$set('textAlign', 'right')" class="format-btn {{ $textAlign === 'right' ? 'active' : '' }}"><x-heroicon-m-bars-3-bottom-right class="w-4 h-4" /></div>
+                    <div class="w-px h-4 bg-gray-200 dark:bg-white/10 mx-1"></div>
+                    <div wire:click="$toggle('isBold')" class="format-btn {{ $isBold ? 'active' : '' }}"><span class="font-black text-xs">B</span></div>
+                    <div wire:click="$toggle('isItalic')" class="format-btn {{ $isItalic ? 'active' : '' }}"><span class="italic font-serif text-xs">I</span></div>
+                </div>
+
+                <div class="w-px h-8 bg-gray-200 dark:bg-white/10 mx-1"></div>
+
                 <input type="text" wire:model.live.debounce.300ms="quote" placeholder="Sua frase de impacto..." class="studio-prompt-input">
+                
                 <button wire:click="dispatchGeneration" wire:loading.attr="disabled" class="btn-generate">
                     <span wire:loading.remove>GERAR ARTE</span>
                     <x-heroicon-o-arrow-path wire:loading class="w-4 h-4 animate-spin" />
@@ -383,15 +426,19 @@
             </div>
         </main>
 
-        {{-- Sidebar Direita --}}
+        {{-- Sidebar Direita: Galeria Vertical --}}
         <aside class="studio-sidebar-right">
              <div class="flex flex-col gap-4 pb-8">
+                {{ ($this->uploadBackgroundAction)() }}
+
                 @foreach ($this->backgrounds as $bg)
                     <div wire:click="selectBackground({{ $bg->id }})" class="gallery-item {{ $backgroundImageId === $bg->id ? 'active' : '' }}"><img src="{{ $bg->getThumbnailUrl() }}" class="w-full h-full object-cover"></div>
                 @endforeach
             </div>
         </aside>
     </div>
+
+    <x-filament-actions::modals />
 
     <script>
         document.addEventListener('livewire:updated', function () {

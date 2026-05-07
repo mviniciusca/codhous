@@ -78,33 +78,43 @@ class GenerateSocialPostImage implements ShouldQueue
             // 3. Render Text Layers
             $title = $this->post->title;
             $quote = $this->post->quote;
-            $align = $style['align'] ?? 'center';
-            $valign = $style['valign'] ?? 'center';
+            $align = $this->post->text_align ?? 'center';
+            $isBold = $this->post->is_bold ?? true;
             
+            // Choose Font Path based on Bold setting
+            $fontPath = $isBold 
+                ? '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf' 
+                : '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
+
             // X & Y position logic from Drag & Drop (converted from 0-100% to 0-1080px)
             $xPos = ($this->post->text_x / 100) * 1080;
             $yPos = ($this->post->text_y / 100) * 1080;
 
+            $finalTextColor = $this->post->text_color ?: '#ffffff';
+            if (! str_starts_with($finalTextColor, '#')) {
+                $finalTextColor = "#{$finalTextColor}";
+            }
+
             // Render Title (Label)
             if ($title) {
-                $image->text($title, $xPos, $yPos - 80, function ($font) use ($fontPath, $textColor, $align) {
+                $image->text($title, $xPos, $yPos - 80, function ($font) use ($fontPath, $finalTextColor, $align) {
                     $font->filename($fontPath);
                     $font->size(25);
-                    $font->color($textColor);
+                    $font->color($finalTextColor);
                     $font->align($align);
                     $font->valign('bottom');
                 });
             }
 
             // Render Quote (Main Text)
-            $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $textColor, $align, $style) {
+            $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $finalTextColor, $align, $style) {
                 $font->filename($fontPath);
                 $font->size(55);
-                $font->color($textColor);
+                $font->color($finalTextColor);
                 $font->align($align);
                 $font->valign('middle');
                 $font->lineHeight(1.2);
-                $font->wrap($style['has_block'] ? 400 : 800);
+                $font->wrap(1000); // Increased wrap width for straighter lines
             });
 
             // 5. Save

@@ -5,13 +5,21 @@ namespace App\Filament\Pages;
 use App\Jobs\GenerateSocialPostImage;
 use App\Models\BackgroundImage;
 use App\Models\SocialPost;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 
-class GeradorIa extends Page
+class GeradorIa extends Page implements HasActions, HasForms
 {
+    use InteractsWithActions, InteractsWithForms;
     protected static ?string $navigationIcon = 'heroicon-o-sparkles';
 
     protected static ?string $navigationLabel = 'Gerador.IA';
@@ -39,6 +47,9 @@ class GeradorIa extends Page
     public string $preset         = 'bottom_right';
     public float  $textX          = 50.0;
     public float  $textY          = 50.0;
+    public string $textAlign      = 'center';
+    public bool   $isBold         = true;
+    public bool   $isItalic       = false;
 
     /** @var int|null ID of the selected BackgroundImage */
     public ?int $backgroundImageId = null;
@@ -125,9 +136,10 @@ class GeradorIa extends Page
         $style = $presetEnum->getStyle();
         
         $this->fontFamily = $style['font'];
+        $this->textAlign = $style['align'] ?? 'center';
+        $this->isBold = true; // Padrão
+        $this->isItalic = false;
         
-        // Resetar posição se for um preset específico (opcional)
-        // Se for canva_side, por exemplo, o texto faz mais sentido à esquerda
         if ($value === 'canva_side') {
             $this->textX = 24.0;
             $this->textY = 50.0;
@@ -165,6 +177,9 @@ class GeradorIa extends Page
             'preset'              => $this->preset,
             'text_x'              => $this->textX,
             'text_y'              => $this->textY,
+            'text_align'          => $this->textAlign,
+            'is_bold'             => $this->isBold,
+            'is_italic'           => $this->isItalic,
             'status'              => 'queued',
         ]);
 
@@ -186,6 +201,9 @@ class GeradorIa extends Page
         $this->preset           = 'bottom_right';
         $this->textX            = 50.0;
         $this->textY            = 50.0;
+        $this->textAlign        = 'center';
+        $this->isBold           = true;
+        $this->isItalic         = false;
         $this->fontFamily       = 'Inter';
         $this->textColor        = '#ffffff';
         $this->overlayColor     = '#000000';
@@ -205,5 +223,43 @@ class GeradorIa extends Page
                 ->success()
                 ->send();
         }
+    }
+
+    public function uploadBackgroundAction(): Action
+    {
+        return Action::make('uploadBackground')
+            ->label('Subir Imagem')
+            ->icon('heroicon-o-plus')
+            ->color('amber')
+            ->modalHeading('Nova Imagem de Fundo')
+            ->modalDescription('Suba uma foto para usar como fundo nos seus posts.')
+            ->modalSubmitActionLabel('Salvar na Galeria')
+            ->form([
+                TextInput::make('name')
+                    ->label('Nome da Imagem')
+                    ->required()
+                    ->placeholder('Ex: Paisagem de Verão'),
+                FileUpload::make('image')
+                    ->label('Arquivo')
+                    ->image()
+                    ->directory('backgrounds')
+                    ->visibility('public')
+                    ->required()
+                    ->imageEditor(),
+            ])
+            ->action(function (array $data) {
+                $bg = BackgroundImage::create([
+                    'name'      => $data['name'],
+                    'is_active' => true,
+                ]);
+
+                // Attach to media library
+                $bg->addMediaFromDisk($data['image'])->toMediaCollection('image');
+
+                Notification::make()
+                    ->title('Imagem salva!')
+                    ->success()
+                    ->send();
+            });
     }
 }
