@@ -16,7 +16,10 @@ return new class extends Migration
             $table->string('city');
             $table->string('state')->default('RJ');
             $table->string('postcode_prefix', 5); // Ex: 25000 (primeiros 5 dígitos)
+            $table->string('postcode_start', 5)->nullable()->comment('Início da faixa (5 dígitos). Ex: 20000');
+            $table->string('postcode_end', 5)->nullable()->comment('Fim da faixa (5 dígitos). Ex: 23999');
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_base')->default(false);
             $table->decimal('shipping_fee', 10, 2)->default(0); // Dica bônus
             $table->timestamps();
         });

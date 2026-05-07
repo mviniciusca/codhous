@@ -12,6 +12,11 @@ return new class extends Migration {
     {
         Schema::create('mails', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete()
+                ->comment('User who sent/received the mail');
             $table->string('email');
             $table->string('name');
             $table->string('phone')->nullable();

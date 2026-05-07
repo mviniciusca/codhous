@@ -12,6 +12,11 @@ return new class extends Migration {
     {
         Schema::create('budgets', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete()
+                ->comment('User who created the budget');
             $table->string('code');
             $table->string('status')->default('pending');
             $table->boolean('is_active')->default(true);
