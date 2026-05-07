@@ -106,6 +106,12 @@ class ContentSectionResource extends Resource
                                     ->label('Imagem (opcional)')
                                     ->image()
                                     ->directory('hero-slideshow'),
+                                Forms\Components\FileUpload::make('video')
+                                    ->label('Vídeo MP4 (opcional)')
+                                    ->acceptedFileTypes(['video/mp4'])
+                                    ->maxSize(20480)
+                                    ->directory('hero-slideshow')
+                                    ->helperText('O vídeo será exibido em loop e mudo por trás do conteúdo.'),
                             ])
                             ->columns(1)
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? 'Slide')

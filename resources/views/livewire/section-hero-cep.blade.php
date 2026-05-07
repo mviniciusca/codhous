@@ -35,8 +35,12 @@
             <div class="swiper-wrapper">
                 @forelse($slides as $slide)
                     <div class="swiper-slide relative">
-                        {{-- Imagem de fundo --}}
-                        @if(!empty($slide['image']))
+                        {{-- Imagem ou Vídeo de fundo --}}
+                        @if(!empty($slide['video']))
+                            <video autoplay muted loop playsinline class="h-full w-full object-cover">
+                                <source src="{{ str_starts_with($slide['video'], 'http') ? $slide['video'] : Storage::url($slide['video']) }}" type="video/mp4">
+                            </video>
+                        @elseif(!empty($slide['image']))
                             <img src="{{ str_starts_with($slide['image'], 'http') ? $slide['image'] : Storage::url($slide['image']) }}" 
                                  class="h-full w-full object-cover" 
                                  alt="{{ $slide['title'] ?? '' }}">
