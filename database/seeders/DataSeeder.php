@@ -15,7 +15,7 @@ class DataSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Configurações da Empresa (Nota Fiscal, Endereço, etc)
+        // 1. Configurações da Empresa
         $this->seedSettings();
 
         // 2. Usuários Administrativos
@@ -23,7 +23,6 @@ class DataSeeder extends Seeder
 
         // 3. Outros dados estruturais
         $this->call([
-            RolesAndPermissionsSeeder::class,
             PageSeeder::class,
             ContentSectionSeeder::class,
             OperationAreaSeeder::class,
@@ -52,9 +51,23 @@ class DataSeeder extends Seeder
                         'budget_tool' => true,
                         'whatsapp_widget' => [
                             'enabled' => true,
-                            'number' => '5511999999999',
+                            'number' => '21900000000',
                             'message' => 'Olá! Gostaria de um orçamento.',
                         ],
+                    ],
+                    'social_networks' => [
+                        'instagram' => 'codhoussoftware',
+                        'facebook' => 'codhoussoftware',
+                        'linkedin' => 'codhoussoftware',
+                        'twitter' => 'codhoussoftware',
+                        'whatsapp' => 'https://wa.me/5521900000000',
+                    ],
+                    'scripts' => [
+                        'google_font_family' => 'Jost',
+                        'head' => '<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">',
+                        'footer' => '',
                     ],
                 ],
                 'company' => [
@@ -91,22 +104,12 @@ class DataSeeder extends Seeder
 
     private function seedAdmins(): void
     {
-        $admin = User::updateOrCreate(
+        User::updateOrCreate(
             ['email' => 'codhous@codhous.app'],
             [
                 'name' => 'Codhous Admin',
                 'password' => bcrypt('password'),
             ]
         );
-
-        // Garantir que a role super_admin existe
-        $role = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
-        
-        // Atribuir permissões se necessário
-        if ($role->permissions->isEmpty()) {
-            $role->syncPermissions(Permission::all());
-        }
-
-        $admin->assignRole($role);
     }
 }

@@ -31,65 +31,9 @@ class DatabaseSeeder extends Seeder
         // 1. Carregar Dados Estruturais e Configurações via DataSeeder
         $this->call(DataSeeder::class);
 
-        // 2. Criar dados de exemplo para desenvolvimento (opcional se for produção)
-        
-        // Criar produtos e opções de produtos específicos
-        Product::factory()->concreto()->create();
-        Product::factory()->polimento()->create();
-        Product::factory()->maquinario()->create();
-
-        // Criar localizações
-        Location::factory(5)->create();
-
-        // Criar orçamentos
-        $budgets = Budget::factory(20)->create();
-
-        // Criar o relacionamento entre orçamentos e produtos na tabela pivot
-        foreach ($budgets as $budget) {
-            // Pegar os dados dos produtos do array content
-            $products_data = $budget->content['products'] ?? [];
-
-            if (! empty($products_data)) {
-                foreach ($products_data as $product_data) {
-                    // Adicionar o produto ao orçamento na tabela pivot
-                    $budget->products()->attach($product_data['product'], [
-                        'product_option_id' => $product_data['product_option'] ?? null,
-                        'location_id'       => $product_data['location'] ?? null,
-                        'quantity'          => $product_data['quantity'] ?? 0,
-                        'price'             => $product_data['price'] ?? 0,
-                        'subtotal'          => $product_data['subtotal'] ?? 0,
-                        'created_at'        => now(),
-                        'updated_at'        => now(),
-                    ]);
-                }
-            }
-
-            // Criar histórico para cada orçamento
-            BudgetHistory::factory()
-                ->state(function (array $attributes) {
-                    return [
-                        'user_id'   => 1, // Codhous Admin criado no DataSeeder
-                    ];
-                })
-                ->create(['budget_id' => $budget->id]);
-        }
-
-        // Criar outros dados
-        Newsletter::factory(20)->create();
-        Mail::factory(20)->create();
-        Customer::factory(10)->create();
-
-        // Criar obras de exemplo para o portfólio
+        // 2. Criar obras de exemplo para o portfólio
         $this->seedShowcases();
         
-        $this->call([
-            AlertSeeder::class,
-            MachinerySeeder::class,
-            ConcreteSeeder::class,
-            LocationSeeder::class,
-            FloorPolishingSeeder::class,
-        ]);
-
         // 3. Criar Páginas Iniciais
         $this->createInitialPages();
     }
