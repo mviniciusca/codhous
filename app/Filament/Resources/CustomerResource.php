@@ -49,7 +49,7 @@ class CustomerResource extends Resource
         return 'Clientes';
     }
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     public static function form(Form $form): Form
     {

@@ -15,7 +15,7 @@ class ContactAgendaResource extends Resource
 {
     protected static ?string $model = ContactAgenda::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationGroup = 'Empresa';
 
