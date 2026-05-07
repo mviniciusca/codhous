@@ -323,6 +323,8 @@ class BudgetResource extends Resource
                                                     ->columnSpan(4)
                                                     ->step(1)
                                                     ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? '')
+                                                    ->formatStateUsing(fn ($state) => number_format(floatval($state), 0, '', ''))
+                                                    ->dehydrateStateUsing(fn ($state) => ceil(floatval($state)))
                                                     ->afterStateUpdated(fn (Set $set, $state) => $set('quantity', ceil(floatval($state ?? 1)))),
                                                 TextInput::make('price')
                                                     ->label('Preço Unit.')
@@ -336,9 +338,9 @@ class BudgetResource extends Resource
                                                     ->label('Total Item')
                                                     ->columnSpan(4)
                                                     ->content(function (Get $get) {
-                                                        $qty = floatval($get('quantity') ?? 0);
+                                                        $qty = ceil(floatval($get('quantity') ?? 0));
                                                         $price = floatval($get('price') ?? 0);
-                                                        return 'R$ ' . number_format($qty * $price, 2, '.', ',');
+                                                        return 'R$ ' . number_format($qty * $price, 2, ',', '.');
                                                     }),
                                             ]),
                                     ])
