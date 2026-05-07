@@ -1,5 +1,41 @@
 <x-layouts.app :title="$meta['title']">
-    @foreach($page->content ?? [] as $block)
+    @php
+        $content = $page->content ?? [];
+        $firstBlock = $content[0] ?? null;
+        $hasHeader = collect($content)->contains('type', 'page_header');
+        $isHome = $page->slug === '/' || $page->slug === '';
+
+        // Dados base para o cabeçalho automático
+        $autoHeader = [
+            'title' => $page->title,
+            'badge' => null,
+            'description' => data_get($page->meta, 'description'),
+        ];
+
+        // Se for página interna sem header manual, e o primeiro bloco for 'services',
+        // nós "promovemos" as informações do bloco para o cabeçalho principal.
+        if (!$isHome && !$hasHeader && $firstBlock && $firstBlock['type'] === 'services') {
+            $autoHeader['title'] = $firstBlock['data']['title'] ?? $page->title;
+            $autoHeader['badge'] = $firstBlock['data']['badge'] ?? null;
+            $autoHeader['description'] = $firstBlock['data']['description'] ?? $autoHeader['description'];
+        }
+    @endphp
+
+    {{-- 
+        Injeção Automática de Cabeçalho:
+        Se não for a homepage e não houver um bloco de 'page_header' definido,
+        renderizamos um cabeçalho padrão ou promovido.
+    --}}
+    @if(!$isHome && !$hasHeader)
+        <x-page-header
+            :badge="$autoHeader['badge']"
+            :title="$autoHeader['title']"
+            :description="$autoHeader['description']"
+            :breadcrumbs="[['label' => $autoHeader['title']]]"
+        />
+    @endif
+
+    @foreach($content as $block)
         @switch($block['type'])
 
             {{-- ─────────────────────────────────────────────────────────────
@@ -40,9 +76,9 @@
             {{-- ──── SERVIÇOS ──────────────────────────────────────────────── --}}
             @case('services')
                 <x-section-services
-                    :title="$block['data']['title'] ?? null"
-                    :badge="$block['data']['badge'] ?? null"
-                    :description="$block['data']['description'] ?? null"
+                    :title="(!$isHome && !$hasHeader) ? '' : ($block['data']['title'] ?? null)"
+                    :badge="(!$isHome && !$hasHeader) ? '' : ($block['data']['badge'] ?? null)"
+                    :description="(!$isHome && !$hasHeader) ? '' : ($block['data']['description'] ?? null)"
                     :items="$block['data']['items'] ?? []"
                 />
                 @break

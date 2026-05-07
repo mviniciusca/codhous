@@ -10,10 +10,10 @@
     $header = $section?->content['header'] ?? [];
     $displayItems = $items ?? $section?->content['items'] ?? null;
     
-    // Se vierem props, usamos elas em vez do banco
-    if ($title) $header['title'] = $title;
-    if ($description) $header['description'] = $description;
-    if ($badge) $header['subtitle'] = $badge;
+    // Se vierem props, usamos elas em vez do banco (aceita string vazia para ocultar)
+    if (isset($title)) $header['title'] = $title;
+    if (isset($description)) $header['description'] = $description;
+    if (isset($badge)) $header['subtitle'] = $badge;
 
     if (empty($displayItems)) {
         $header = [
