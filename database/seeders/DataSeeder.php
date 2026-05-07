@@ -21,11 +21,9 @@ class DataSeeder extends Seeder
         // 2. Usuários Administrativos
         $this->seedAdmins();
 
-        // 3. Outros dados estruturais
+        // 3. Conteúdo do Site (Páginas, Seções e Áreas)
         $this->call([
-            PageSeeder::class,
-            ContentSectionSeeder::class,
-            OperationAreaSeeder::class,
+            ContentSeeder::class,
         ]);
     }
 

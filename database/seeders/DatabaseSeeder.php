@@ -33,9 +33,6 @@ class DatabaseSeeder extends Seeder
 
         // 2. Criar obras de exemplo para o portfólio
         $this->seedShowcases();
-        
-        // 3. Criar Páginas Iniciais
-        $this->createInitialPages();
     }
 
     protected function seedShowcases()
