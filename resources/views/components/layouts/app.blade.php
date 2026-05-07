@@ -10,12 +10,12 @@
     @livewireStyles
     @stack('styles')
 </head>
-<body class="font-sans antialiased bg-background text-foreground">
+<body class="font-sans antialiased bg-background text-foreground flex flex-col min-h-screen">
     
     <x-site-header />   
     
 
-    <main>
+    <main class="flex-grow">
         {{ $slot }}
     </main>
 
