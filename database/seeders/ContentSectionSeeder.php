@@ -92,9 +92,10 @@ class ContentSectionSeeder extends Seeder
                     'items' => [
                         ['question' => 'Qual o prazo para receber o orçamento?', 'answer' => 'Em horário comercial, respondemos em até 2 horas.'],
                         ['question' => 'Vocês entregam no dia que eu precisar?', 'answer' => 'Sim. Trabalhamos com agendamento e nossa logística garante alta taxa de pontualidade.'],
-                        ['question' => 'Qual o volume mínimo de concreto?', 'answer' => 'O volume mínimo varia conforme a região. Entre em contato ou use a calculadora no site.'],
+                        ['question' => 'Qual o volume mínimo de concreto?', 'answer' => 'Geralmente, empresas de concretagem estabelecem um volume mínimo por viagem de 3 m³ para otimizar o transporte, conforme guias de boas práticas baseados nas normas.'],
                         ['question' => 'O concreto vem com nota fiscal e certificado?', 'answer' => 'Sim. Todos os carregamentos são acompanhados de nota fiscal e laudo de resistência.'],
                         ['question' => 'Posso solicitar bombeamento junto com o concreto?', 'answer' => 'Sim. Oferecemos serviço de bombeamento. O orçamento pode incluir concreto + bombeamento.'],
+                        ['question' => 'Quais as formas de pagamento aceitas?', 'answer' => 'Aceitamos Pix, débito, cartão de crédito e também podemos combinar a melhor condição para atender as necessidades do seu projeto.'],
                     ],
                 ],
                 'sort_order' => 4,
