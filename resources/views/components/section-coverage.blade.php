@@ -1,21 +1,37 @@
+@props([
+    'title' => null,
+    'subtitle' => null,
+    'description' => null,
+    'cities' => null,
+    'sidebar' => null,
+])
+
 @php
-    $section = \App\Models\ContentSection::getBySlug('coverage');
-    $header = $section?->content['header'] ?? [];
-    $cities = $section?->content['cities'] ?? null;
-    $sidebar = $section?->content['sidebar'] ?? null;
-    if (empty($cities)) {
-        $header = ['subtitle' => 'Cobertura', 'title' => 'Onde atendemos', 'description' => 'Atuamos na região com frota própria e logística integrada para garantir entrega no prazo.'];
-        $cities = [
-            ['label' => 'São Paulo (capital e região metropolitana)'],
-            ['label' => 'Guarulhos e ABC Paulista'],
-            ['label' => 'Osasco, Barueri e região Oeste'],
-            ['label' => 'Campinas e região'],
-            ['label' => 'Santos e Baixada Santista'],
-            ['label' => 'Outras regiões sob consulta'],
-        ];
+    // Se não for passado via prop, tenta buscar da seção global 'coverage'
+    if (empty($cities) || empty($title)) {
+        $section = \App\Models\ContentSection::getBySlug('coverage');
+        
+        $title = $title ?? ($section?->content['header']['title'] ?? 'Onde atendemos');
+        $subtitle = $subtitle ?? ($section?->content['header']['subtitle'] ?? 'Cobertura');
+        $description = $description ?? ($section?->content['header']['description'] ?? 'Atuamos na região com frota própria e logística integrada para garantir entrega no prazo.');
+        
+        // Se as cidades ainda estiverem vazias, busca as selecionadas na seção ou TODAS as ativas do banco
+        if (empty($cities)) {
+            $cities = $section?->content['cities'] ?? null;
+        }
     }
+
+    // Fallback final: se ainda estiver vazio, pega todas as cidades ativas do OperationArea
+    if (empty($cities)) {
+        $cities = \App\Models\OperationArea::query()
+            ->where('is_active', true)
+            ->pluck('city')
+            ->toArray();
+    }
+
     if (empty($sidebar)) {
-        $sidebar = [
+        $section = $section ?? \App\Models\ContentSection::getBySlug('coverage');
+        $sidebar = $section?->content['sidebar'] ?? [
             ['title' => 'Raio de entrega', 'description' => 'Consulte disponibilidade e prazo para sua cidade no orçamento.'],
             ['title' => 'Frota própria', 'description' => 'Rastreamento e pontualidade em todas as entregas.'],
         ];
@@ -24,12 +40,12 @@
 <section id="onde-atuamos" class="border-b border-border bg-muted/50 py-20 lg:py-28">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <div class="mb-16 text-center">
-            @if(!empty($header['subtitle']))
-                <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $header['subtitle'] }}</span>
+            @if(!empty($subtitle))
+                <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $subtitle }}</span>
             @endif
-            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">{{ $header['title'] ?? 'Onde atendemos' }}</h2>
-            @if(!empty($header['description']))
-                <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{{ $header['description'] }}</p>
+            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">{{ $title ?? 'Onde atendemos' }}</h2>
+            @if(!empty($description))
+                <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{{ $description }}</p>
             @endif
         </div>
 
@@ -41,7 +57,7 @@
                         @foreach($cities as $city)
                             <li class="flex items-center gap-2">
                                 <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-primary"></span>
-                                {{ $city['label'] ?? '' }}
+                                {{ is_array($city) ? ($city['label'] ?? '') : $city }}
                             </li>
                         @endforeach
                     </ul>
