@@ -260,7 +260,7 @@ class BudgetResource extends Resource
                                     ->label('Itens do Orçamento')
                                     ->itemLabel(fn (array $state): ?string => 
                                         ($state['product_id'] ? \App\Models\Product::find($state['product_id'])?->name : 'Novo Item') . 
-                                        ($state['quantity'] ? " - Qtd: {$state['quantity']}" : "")
+                                        ($state['quantity'] ? " - Qtd: " . number_format(floatval($state['quantity']), 0, '', '') : "")
                                     )
                                     ->collapsible()
                                     ->helperText('Adicione aqui os itens que farão parte do orçamento final.')
@@ -321,8 +321,9 @@ class BudgetResource extends Resource
                                                     ->default(1)
                                                     ->reactive()
                                                     ->columnSpan(4)
-                                                    ->step(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->isDecimal() ? 0.01 : 1)
-                                                    ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? ''),
+                                                    ->step(1)
+                                                    ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? '')
+                                                    ->afterStateUpdated(fn (Set $set, $state) => $set('quantity', ceil(floatval($state ?? 1)))),
                                                 TextInput::make('price')
                                                     ->label('Preço Unit.')
                                                     ->numeric()

@@ -15,7 +15,7 @@
                         <p class="font-bold text-foreground text-xs truncate">{{ $product->name }}</p>
                         <p class="text-[10px] text-muted-foreground truncate">{{ $option?->name ?? 'Opção não selecionada' }}</p>
                         <p class="text-[11px] font-mono font-bold text-primary mt-1">
-                            {{ $item['quantity'] ?? 0 }} {{ $option?->unit?->value }}
+                            {{ number_format(floatval($item['quantity'] ?? 0), 0, '', '') }} {{ $option?->unit?->value }}
                         </p>
                     </div>
                 </div>

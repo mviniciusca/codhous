@@ -198,11 +198,12 @@ class Budget extends Component implements HasForms
                                                     ->required()
                                                     ->default(1)
                                                     ->validationAttribute('Quantidade')
-                                                    ->step(fn (Get $get) => \App\Models\ProductOption::find($get('product_option'))?->unit?->isDecimal() ? 0.01 : 1)
+                                                    ->step(1)
                                                     ->suffix(fn (Get $get) => $this->getUnitSuffix($get))
                                                     ->live(debounce: 500)
                                                     ->placeholder('Ex: 5')
-                                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                                        $set('quantity', ceil(floatval($state ?? 1)));
                                                         $this->calculateItemSubtotal($get, $set);
                                                         $this->calculateTotal($get, $set);
                                                     }),
@@ -241,7 +242,7 @@ class Budget extends Component implements HasForms
         if (empty($state['product'])) return 'Novo Item';
         $productName = Product::find($state['product'])?->name;
         $optionName = $state['product_option'] ? ' · ' . ProductOption::find($state['product_option'])?->name : '';
-        $qty = $state['quantity'] ? ' (' . $state['quantity'] . ')' : '';
+        $qty = $state['quantity'] ? ' (' . number_format(floatval($state['quantity']), 0, '', '') . ')' : '';
         return $productName . $optionName . $qty;
     }
 

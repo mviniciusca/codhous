@@ -261,7 +261,7 @@
                     <td class="text-center">000</td>
                     <td class="text-center">5102</td>
                     <td class="text-center">{{ $item->productOption?->unit?->value ?? 'UN' }}</td>
-                    <td class="text-center">{{ $item->productOption?->unit?->isDecimal() ? number_format($item->quantity, 2, '.', ',') : number_format($item->quantity, 0, '.', ',') }}</td>
+                    <td class="text-center">{{ number_format(ceil($item->quantity), 0, ',', '.') }}</td>
                     <td class="text-right">{{ number_format($item->price, 2, '.', ',') }}</td>
                     <td class="text-right">{{ number_format($item->subtotal, 2, '.', ',') }}</td>
                 </tr>
