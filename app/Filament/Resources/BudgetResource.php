@@ -403,7 +403,8 @@ class BudgetResource extends Resource
                                         TextInput::make('content.subtotal')
                                             ->live(debounce: 1000)
                                             ->dehydrated()
-                                            ->disabled()
+                                            ->readonly()
+                                            ->extraInputAttributes(['style' => 'background-color: #f3f4f6; cursor: not-allowed;'])
                                             ->label('Subtotal de Itens')
                                             ->helperText('Soma dos itens acima.')
                                             ->prefix('R$')
@@ -451,7 +452,8 @@ class BudgetResource extends Resource
                                             ->label('Valor Total Final')
                                             ->live()
                                             ->dehydrated()
-                                            ->disabled()
+                                            ->readonly()
+                                            ->extraInputAttributes(['style' => 'background-color: #f3f4f6; cursor: not-allowed;'])
                                             ->numeric()
                                             ->required()
                                             ->prefix('R$')
@@ -643,7 +645,14 @@ class BudgetResource extends Resource
                                                     ->required()
                                                     ->placeholder('Escreva sua mensagem aqui...'),
                                             ])
-                                            ->action(function (Budget $record, array $data) {
+                                            ->action(function (Budget $record, array $data, $livewire) {
+                                                // Salva o formulário primeiro para garantir integridade
+                                                if (method_exists($livewire, 'save')) {
+                                                    $livewire->save();
+                                                }
+
+                                                $record->refresh();
+
                                                 try {
                                                     $customerEmail = $record->content['customer_email'] ?? null;
                                                     $customerName = $record->content['customer_name'] ?? 'Cliente';
@@ -775,8 +784,8 @@ class BudgetResource extends Resource
         $discount = floatval($get('content.discount') ?? 0);
         $total = $subtotal + $shipping + $tax - $discount;
 
-        $set('content.subtotal', number_format($subtotal, 2, '.', ''));
-        $set('content.total', number_format($total, 2, '.', ''));
+        $set('content.subtotal', round($subtotal, 2));
+        $set('content.total', round($total, 2));
     }
 
     public static function calculateTotal(Get $get, Set $set): void
