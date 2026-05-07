@@ -254,6 +254,26 @@
         }
         .gallery-item.active { border-color: #fbbf24; box-shadow: 0 8px 16px -4px rgba(251, 191, 36, 0.3); }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* FORÇA BRUTA LIXEIRA */
+        .trash-btn {
+            position: absolute !important;
+            top: -5px !important;
+            right: -5px !important;
+            width: 24px !important;
+            height: 24px !important;
+            background-color: #ef4444 !important; /* Vermelho Vivo */
+            color: white !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 999 !important;
+            border: 2px solid white !important;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
+            cursor: pointer !important;
+            opacity: 1 !important; /* Sempre visível para teste */
+        }
     </style>
 
     <div class="studio-container rounded-b-2xl" 
@@ -437,16 +457,22 @@
                 </button>
 
                 @foreach ($this->backgrounds as $bg)
-                    <div class="gallery-item relative group/item {{ $backgroundImageId === $bg->id ? 'active' : '' }}">
-                        <img src="{{ $bg->getThumbnailUrl() }}" 
-                             wire:click="selectBackground({{ $bg->id }})"
-                             class="w-full h-full object-cover cursor-pointer">
-                        
-                        {{-- Botão de Lixeira (Aparece no Hover) --}}
+                    <div class="gallery-item-wrapper relative" style="width: 68px; height: 68px; margin-bottom: 12px;">
+                        <div class="gallery-item {{ $backgroundImageId === $bg->id ? 'active' : '' }}" 
+                             style="width: 100%; height: 100%; border-radius: 14px; overflow: hidden; position: relative;">
+                            <img src="{{ $bg->getThumbnailUrl() }}" 
+                                 wire:click="selectBackground({{ $bg->id }})"
+                                 class="w-full h-full object-cover cursor-pointer">
+                        </div>
+
+                        {{-- Botão de Lixeira (SVG DIRETO E CSS IMPORTANTE) --}}
                         <button wire:click="deleteBackground({{ $bg->id }})"
                                 wire:confirm="Tem certeza que deseja apagar esta imagem?"
-                                class="absolute top-1 right-1 w-6 h-6 bg-red-500/90 text-white rounded-md flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity hover:bg-red-600 shadow-sm z-20">
-                            <x-heroicon-o-trash class="w-3.5 h-3.5" />
+                                type="button"
+                                class="trash-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width: 14px; height: 14px;">
+                                <path fill-rule="evenodd" d="M8.75 3A2.75 2.75 0 0 0 6 5.75v.562c-.34.059-.68.124-1.022.196a.75.75 0 1 0 .312 1.468h.011l.83 7.06c.066.566.547 1.001 1.116 1.001h5.49c.568 0 1.05-.435 1.115-1.001l.83-7.06h.013a.75.75 0 1 0 .312-1.468 48.707 48.707 0 0 0-1.022-.195V5.75A2.75 2.75 0 0 0 11.25 3h-2.5ZM10 7.5a.75.75 0 0 1 .75.75v5.25a.75.75 0 0 1-1.5 0V8.25A.75.75 0 0 1 10 7.5ZM7.25 8.25a.75.75 0 0 0-1.5 0v5.25a.75.75 0 0 0 1.5 0V8.25Zm6 0a.75.75 0 0 0-1.5 0v5.25a.75.75 0 0 0 1.5 0V8.25Z" clip-rule="evenodd" />
+                            </svg>
                         </button>
                     </div>
                 @endforeach
