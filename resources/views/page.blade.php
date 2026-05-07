@@ -234,6 +234,18 @@
                 </section>
                 @break
 
+            {{-- ──── BANNER DE ATENDIMENTO ─────────────────────────────────── --}}
+            @case('contact_banner')
+                <x-section-contact-banner
+                    :badge="$block['data']['badge'] ?? null"
+                    :title="$block['data']['title'] ?? null"
+                    :description="$block['data']['description'] ?? null"
+                    :whatsapp-enabled="$block['data']['whatsapp_enabled'] ?? true"
+                    :call-enabled="$block['data']['call_enabled'] ?? true"
+                    :email-enabled="$block['data']['email_enabled'] ?? true"
+                />
+                @break
+
             {{-- ──── MAPA ──────────────────────────────────────────────────── --}}
             @case('map')
                 @php

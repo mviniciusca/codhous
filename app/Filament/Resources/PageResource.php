@@ -60,6 +60,7 @@ class PageResource extends Resource
                                             self::getTestimonialsBlock(),
                                             self::getCoverageBlock(),
                                             self::getContactFormBlock(),
+                                            self::getContactBannerBlock(),
                                             self::getMapBlock(),
                                             self::getDifferentialsBlock(),
                                             self::getCtaBlock(),
@@ -290,10 +291,11 @@ class PageResource extends Resource
             ->icon('heroicon-o-map-pin')
             ->schema([
                 Forms\Components\TextInput::make('title')->label('Título'),
-                Forms\Components\Repeater::make('cities')
-                    ->schema([
-                        Forms\Components\TextInput::make('label')->required(),
-                    ]),
+                Forms\Components\Select::make('cities')
+                    ->label('Cidades Atendidas')
+                    ->multiple()
+                    ->options(\App\Models\OperationArea::query()->where('is_active', true)->pluck('city', 'city'))
+                    ->helperText('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.'),
             ]);
     }
 
@@ -394,6 +396,37 @@ class PageResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('title')->label('Título')->default('Solicitar Orçamento'),
                 Forms\Components\Textarea::make('description')->label('Descrição'),
+            ]);
+    }
+    protected static function getContactBannerBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('contact_banner')
+            ->label(__('Banner de Atendimento (Call Actions)'))
+            ->icon('heroicon-o-chat-bubble-left-right')
+            ->schema([
+                Forms\Components\TextInput::make('badge')
+                    ->label('Badge (Texto Superior)')
+                    ->default('ATENDIMENTO'),
+                Forms\Components\TextInput::make('title')
+                    ->label('Título')
+                    ->default('Fale conosco')
+                    ->required(),
+                Forms\Components\Textarea::make('description')
+                    ->label('Descrição')
+                    ->default('Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.')
+                    ->rows(2),
+                Forms\Components\Grid::make(3)
+                    ->schema([
+                        Forms\Components\Toggle::make('whatsapp_enabled')
+                            ->label('Botão WhatsApp')
+                            ->default(true),
+                        Forms\Components\Toggle::make('call_enabled')
+                            ->label('Botão Ligar')
+                            ->default(true),
+                        Forms\Components\Toggle::make('email_enabled')
+                            ->label('Botão E-mail')
+                            ->default(true),
+                    ]),
             ]);
     }
 }

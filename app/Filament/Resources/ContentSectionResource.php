@@ -196,12 +196,11 @@ class ContentSectionResource extends Resource
                 // Coverage
                 Forms\Components\Section::make('Onde atuamos')
                     ->schema([
-                        Forms\Components\Repeater::make('content.cities')
-                            ->label('Cidades / Regiões')
-                            ->schema([
-                                Forms\Components\TextInput::make('label')->label('Nome')->required(),
-                            ])
-                            ->itemLabel(fn (array $state): ?string => $state['label'] ?? null),
+                        Forms\Components\Select::make('content.cities')
+                            ->label('Cidades Atendidas')
+                            ->multiple()
+                            ->options(\App\Models\OperationArea::query()->where('is_active', true)->pluck('city', 'city'))
+                            ->helperText('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.'),
                         Forms\Components\Repeater::make('content.sidebar')
                             ->label('Cards laterais')
                             ->schema([
@@ -250,14 +249,42 @@ class ContentSectionResource extends Resource
                 // CTA Contact
                 Forms\Components\Section::make('CTA Contato')
                     ->schema([
-                        Forms\Components\TextInput::make('content.title')
-                            ->label('Título')
-                            ->maxLength(255),
                         Forms\Components\Textarea::make('content.subtitle')
                             ->label('Subtítulo')
                             ->rows(2),
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_CTA_CONTACT)
+                    ->collapsible(),
+
+                // Contact Banner (Atendimento)
+                Forms\Components\Section::make('Banner de Atendimento')
+                    ->schema([
+                        Forms\Components\TextInput::make('content.badge')
+                            ->label('Badge (Texto Superior)')
+                            ->placeholder('ATENDIMENTO')
+                            ->default('ATENDIMENTO'),
+                        Forms\Components\TextInput::make('content.title')
+                            ->label('Título')
+                            ->default('Fale conosco')
+                            ->required(),
+                        Forms\Components\Textarea::make('content.description')
+                            ->label('Descrição')
+                            ->default('Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.')
+                            ->rows(2),
+                        Forms\Components\Grid::make(3)
+                            ->schema([
+                                Forms\Components\Toggle::make('content.whatsapp_enabled')
+                                    ->label('Botão WhatsApp')
+                                    ->default(true),
+                                Forms\Components\Toggle::make('content.call_enabled')
+                                    ->label('Botão Ligar')
+                                    ->default(true),
+                                Forms\Components\Toggle::make('content.email_enabled')
+                                    ->label('Botão E-mail')
+                                    ->default(true),
+                            ]),
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_CONTACT_BANNER)
                     ->collapsible(),
             ]);
     }

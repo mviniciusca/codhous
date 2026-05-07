@@ -32,6 +32,7 @@ class ContentSection extends Model
     public const TYPE_DIFFERENTIALS = 'differentials';
     public const TYPE_TIMELINE = 'timeline';
     public const TYPE_CTA_CONTACT = 'cta_contact';
+    public const TYPE_CONTACT_BANNER = 'contact_banner';
 
     public const HERO_LAYOUT_DEFAULT = 'default';
     public const HERO_LAYOUT_WHATSAPP = 'whatsapp';
@@ -48,6 +49,7 @@ class ContentSection extends Model
             self::TYPE_DIFFERENTIALS => 'Diferenciais',
             self::TYPE_TIMELINE => 'Como Funciona (Timeline)',
             self::TYPE_CTA_CONTACT => 'CTA Contato',
+            self::TYPE_CONTACT_BANNER => 'Banner de Atendimento',
         ];
     }
 
@@ -63,6 +65,7 @@ class ContentSection extends Model
             self::TYPE_DIFFERENTIALS => 'differentials',
             self::TYPE_TIMELINE => 'timeline',
             self::TYPE_CTA_CONTACT => 'cta_contact',
+            self::TYPE_CONTACT_BANNER => 'contact-banner',
             default => $type,
         };
     }
