@@ -301,6 +301,12 @@
                                                 download>
                                                 Download
                                             </x-filament::link>
+
+                                            <button wire:click="regeneratePost({{ $p->id }})" 
+                                                    title="Regerar imagem"
+                                                    class="text-gray-400 hover:text-primary-500 transition-colors">
+                                                <x-heroicon-m-arrow-path class="w-4 h-4" />
+                                            </button>
                                         @else
                                             <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
                                                 {{ ucfirst($p->status) }}

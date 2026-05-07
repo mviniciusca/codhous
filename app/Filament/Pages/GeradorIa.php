@@ -147,4 +147,19 @@ class GeradorIa extends Page
         $this->overlayColor     = '#000000';
         $this->overlayOpacity   = 40;
     }
+
+    public function regeneratePost(int $id): void
+    {
+        $post = SocialPost::find($id);
+        
+        if ($post) {
+            $post->update(['status' => 'queued']);
+            GenerateSocialPostImage::dispatch($post);
+            
+            Notification::make()
+                ->title('Post reenviado para a fila!')
+                ->success()
+                ->send();
+        }
+    }
 }
