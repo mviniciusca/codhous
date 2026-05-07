@@ -16,13 +16,16 @@ class GeradorIa extends Page
 
     protected static ?string $navigationLabel = 'Gerador.IA';
 
-    protected static ?string $title = 'Gerador.IA — Criador de Posts';
-
     protected static ?string $slug = 'gerador-ia';
 
     protected static ?int $navigationSort = 3;
 
     protected static string $view = 'filament.pages.gerador-ia';
+
+    public function getHeading(): string
+    {
+        return '';
+    }
 
     // ─── Form State ───────────────────────────────────────────
 

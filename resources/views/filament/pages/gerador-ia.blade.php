@@ -5,27 +5,37 @@
           href="https://fonts.googleapis.com/css2?family={{ urlencode($this->fontFamily) }}:wght@400;700;900&display=swap">
 
     <style>
-        /* Estúdio Container */
+        /* Estúdio Container Adaptável */
         .studio-container {
             display: grid;
             grid-template-columns: 280px 1fr 100px;
             gap: 0;
-            height: calc(100vh - 160px);
-            margin: -24px;
-            background: #0f1115;
+            height: calc(100vh - 120px);
+            margin: -40px -24px -24px -24px;
+            background: #ffffff;
             overflow: hidden;
             position: relative;
+            transition: background 0.3s ease;
         }
 
-        /* Painel Lateral Esquerdo (Ajustes) */
+        .dark .studio-container {
+            background: #09090b; /* Zinc 950 */
+        }
+
+        /* Painéis Laterais */
         .studio-sidebar-left {
-            background: #181a20;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            background: #f8fafc;
+            border-right: 1px solid rgba(0,0,0,0.05);
             padding: 20px;
             display: flex;
-            flex-col: column;
+            flex-direction: column;
             gap: 20px;
             overflow-y: auto;
+        }
+
+        .dark .studio-sidebar-left {
+            background: #111114;
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
 
         /* Canvas Central */
@@ -36,20 +46,31 @@
             justify-content: center;
             padding: 40px;
             position: relative;
-            background-image: radial-gradient(circle, #23262d 1px, transparent 1px);
+            background-color: #f1f5f9;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
             background-size: 30px 30px;
+        }
+
+        .dark .studio-canvas {
+            background-color: #0f1115;
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
         }
 
         /* Galeria Lateral Direita */
         .studio-sidebar-right {
-            background: #181a20;
-            border-left: 1px solid rgba(255,255,255,0.05);
+            background: #f8fafc;
+            border-left: 1px solid rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 12px 8px;
             gap: 12px;
             overflow-y: auto;
+        }
+
+        .dark .studio-sidebar-right {
+            background: #111114;
+            border-left: 1px solid rgba(255,255,255,0.05);
         }
 
         /* Floating Prompt Bar */
@@ -60,26 +81,36 @@
             transform: translateX(-50%);
             width: 600px;
             max-width: 90%;
-            background: rgba(24, 26, 32, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
             border-radius: 100px;
             padding: 8px 12px 8px 24px;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             z-index: 50;
+        }
+
+        .dark .studio-prompt-bar {
+            background: rgba(24, 26, 32, 0.85);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
         .studio-prompt-input {
             flex: 1;
             background: transparent;
             border: none;
-            color: white;
+            color: #1f2937;
             font-size: 14px;
             outline: none !important;
             padding: 8px 0;
+        }
+
+        .dark .studio-prompt-input {
+            color: white;
         }
 
         /* Thumbnail Estilo Print */
@@ -91,42 +122,104 @@
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 2px solid transparent;
-            opacity: 0.6;
+            opacity: 0.8;
+            background: #e2e8f0;
         }
+        .dark .gallery-item { background: #1e293b; opacity: 0.6; }
+        
         .gallery-item:hover { opacity: 1; transform: scale(1.05); }
         .gallery-item.active {
-            border-color: #fbbf24; /* Primary color */
+            border-color: #fbbf24;
             opacity: 1;
             transform: scale(1.1);
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
         }
 
-        /* Canvas Preview Responsive */
+        /* Preview Wrapper */
         .preview-wrapper {
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
-            border-radius: 8px;
+            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.2);
+            border-radius: 12px;
             overflow: hidden;
             background: #000;
             transition: all 0.3s ease;
         }
+        .dark .preview-wrapper {
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
+        }
 
-        /* Custom scrollbar para o estúdio */
-        .studio-sidebar-left::-webkit-scrollbar,
-        .studio-sidebar-right::-webkit-scrollbar {
-            width: 4px;
+        /* Inputs Custom */
+        .studio-input {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1f2937;
+            padding: 8px 12px;
+            outline: none !important;
+            transition: all 0.2s;
+            appearance: none;
         }
-        .studio-sidebar-left::-webkit-scrollbar-thumb,
-        .studio-sidebar-right::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
+        
+        select.studio-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+            padding-right: 32px;
         }
+
+        .dark .studio-input {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.05);
+            color: white;
+        }
+
+        .dark select.studio-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+        }
+
+        .studio-input:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.1);
+        }
+
+        /* Color Input Styling */
+        .color-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 11px;
+            font-family: monospace;
+            color: #64748b;
+        }
+        .dark .color-pill {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #94a3b8;
+        }
+        .color-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+        .color-circle::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-circle::-webkit-color-swatch { border: none; border-radius: 5px; }
     </style>
 
-    <div class="studio-container rounded-2xl shadow-2xl ring-1 ring-white/10">
+    <div class="studio-container rounded-b-2xl">
         
         {{-- Sidebar Esquerda: Ajustes --}}
         <aside class="studio-sidebar-left">
-            <div class="flex items-center gap-2 mb-4 text-white/50 text-xs uppercase tracking-widest font-bold">
+            <div class="flex items-center gap-2 mb-2 text-gray-400 dark:text-white/40 text-[10px] uppercase tracking-widest font-black">
                 <x-heroicon-o-adjustments-horizontal class="w-4 h-4" />
                 <span>Propriedades</span>
             </div>
@@ -134,28 +227,26 @@
             <div class="space-y-6">
                 {{-- Título --}}
                 <div class="space-y-2">
-                    <label class="text-xs text-gray-400 font-medium">Título do Projeto</label>
+                    <label class="text-[10px] text-gray-500 uppercase font-bold">Título do Post</label>
                     <input type="text" wire:model.live.debounce.300ms="postTitle"
-                           placeholder="Dê um nome..."
-                           class="w-full bg-[#23262d] border-none rounded-lg text-sm text-white placeholder-gray-600 focus:ring-1 focus:ring-amber-500">
+                           placeholder="Ex: Quote do Dia"
+                           class="studio-input focus:ring-2 focus:ring-amber-500">
                 </div>
 
                 {{-- Plataforma --}}
                 <div class="space-y-2">
-                    <label class="text-xs text-gray-400 font-medium">Formato / Plataforma</label>
-                    <select wire:model.live="platform"
-                            class="w-full bg-[#23262d] border-none rounded-lg text-sm text-white focus:ring-1 focus:ring-amber-500">
+                    <label class="text-[10px] text-gray-500 uppercase font-bold">Formato</label>
+                    <select wire:model.live="platform" class="studio-input focus:ring-2 focus:ring-amber-500">
                         @foreach ($this->platformOptions as $value => $opt)
-                            <option value="{{ $value }}">{{ $opt['label'] }} ({{ $opt['size'] }})</option>
+                            <option value="{{ $value }}">{{ $opt['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
 
                 {{-- Tipografia --}}
                 <div class="space-y-2">
-                    <label class="text-xs text-gray-400 font-medium">Fonte</label>
-                    <select wire:model.live="fontFamily"
-                            class="w-full bg-[#23262d] border-none rounded-lg text-sm text-white focus:ring-1 focus:ring-amber-500">
+                    <label class="text-[10px] text-gray-500 uppercase font-bold">Fonte</label>
+                    <select wire:model.live="fontFamily" class="studio-input focus:ring-2 focus:ring-amber-500">
                         @foreach ($this->fontOptions as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
@@ -165,50 +256,61 @@
                 {{-- Cores --}}
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs text-gray-400 font-medium">Cor Texto</label>
-                        <input type="color" wire:model.live="textColor" class="w-full h-10 bg-transparent border-none p-0 cursor-pointer rounded overflow-hidden">
+                        <label class="text-[10px] text-gray-500 uppercase font-bold">Texto</label>
+                        <div class="color-pill shadow-sm">
+                            <input type="color" wire:model.live="textColor" class="color-circle">
+                            <span class="uppercase tracking-tighter">{{ $textColor }}</span>
+                        </div>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs text-gray-400 font-medium">Filtro Cor</label>
-                        <input type="color" wire:model.live="overlayColor" class="w-full h-10 bg-transparent border-none p-0 cursor-pointer rounded overflow-hidden">
+                        <label class="text-[10px] text-gray-500 uppercase font-bold">Filtro</label>
+                        <div class="color-pill shadow-sm">
+                            <input type="color" wire:model.live="overlayColor" class="color-circle">
+                            <span class="uppercase tracking-tighter">{{ $overlayColor }}</span>
+                        </div>
                     </div>
                 </div>
 
                 {{-- Opacidade --}}
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
-                        <label class="text-xs text-gray-400 font-medium">Intensidade Filtro</label>
+                        <label class="text-[10px] text-gray-500 uppercase font-bold">Opacidade Filtro</label>
                         <span class="text-[10px] text-amber-500 font-bold">{{ $overlayOpacity }}%</span>
                     </div>
                     <input type="range" wire:model.live="overlayOpacity" min="0" max="100"
-                           class="w-full accent-amber-500 bg-gray-700 h-1 rounded-lg appearance-none cursor-pointer">
+                           class="w-full accent-amber-500 bg-gray-200 dark:bg-gray-700 h-1.5 rounded-lg appearance-none cursor-pointer">
                 </div>
 
-                <hr class="border-white/5 my-4">
+                <hr class="border-gray-200 dark:border-white/5 my-4">
 
                 {{-- Recent Status --}}
                 <div class="space-y-3" wire:poll.5s>
-                    <label class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Histórico Recente</label>
-                    <div class="space-y-2 max-h-40 overflow-y-auto pr-2">
+                    <label class="text-[10px] text-gray-400 uppercase tracking-widest font-black">Fila de Geração</label>
+                    <div class="space-y-2 max-h-48 overflow-y-auto pr-2">
                         @foreach($this->recentPosts as $p)
-                            <div class="flex items-center gap-2 p-2 rounded bg-white/5 border border-white/5 group relative">
-                                <div class="w-8 h-8 rounded bg-gray-800 shrink-0 overflow-hidden">
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 group relative">
+                                <div class="w-10 h-10 rounded-md bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden shadow-inner">
                                     @if($p->isGenerated())
                                         <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center">
-                                            <x-heroicon-o-arrow-path class="w-3 h-3 text-white/20 animate-spin" />
+                                            <x-heroicon-o-arrow-path class="w-4 h-4 text-gray-400 animate-spin" />
                                         </div>
                                     @endif
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-[10px] text-white truncate font-medium">{{ $p->title }}</p>
-                                    <p class="text-[8px] text-gray-500 uppercase">{{ $p->status }}</p>
+                                    <p class="text-[11px] text-gray-900 dark:text-white truncate font-bold">{{ $p->title }}</p>
+                                    <p class="text-[9px] text-gray-500 uppercase">{{ $p->status }} • {{ $p->created_at->diffForHumans() }}</p>
                                 </div>
                                 @if($p->isGenerated())
-                                    <a href="{{ $p->output_url }}" download class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <x-heroicon-m-arrow-down-tray class="w-3 h-3 text-amber-500" />
-                                    </a>
+                                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <a href="{{ $p->output_url }}" download title="Download" class="p-1 hover:bg-amber-500/10 rounded">
+                                            <x-heroicon-m-arrow-down-tray class="w-4 h-4 text-amber-500" />
+                                        </a>
+                                        <button wire:click="regeneratePost({{ $p->id }})" title="Regerar" class="p-1 hover:bg-blue-500/10 rounded">
+                                            <x-heroicon-m-arrow-path class="w-3 h-3 text-blue-500" />
+                                        </button>
+                                    </div>
                                 @endif
                             </div>
                         @endforeach
@@ -220,19 +322,19 @@
         {{-- Canvas Central --}}
         <main class="studio-canvas">
             
-            <div class="preview-wrapper"
-                 style="width: 500px; aspect-ratio: {{ $platform === 'story' ? '9/16' : ($platform === 'facebook' || $platform === 'linkedin' ? '1.91/1' : '1/1') }}; max-height: 80%;">
+            <div class="preview-wrapper shadow-2xl"
+                 style="width: 500px; aspect-ratio: {{ $platform === 'story' ? '9/16' : ($platform === 'facebook' || $platform === 'linkedin' ? '1.91/1' : '1/1') }}; max-height: 85%;">
                 
                 <div class="relative w-full h-full">
                     {{-- BG --}}
                     @if($this->selectedBackground?->getPreviewUrl())
-                        <div class="absolute inset-0 bg-cover bg-center transition-all duration-500"
+                        <div class="absolute inset-0 bg-cover bg-center transition-all duration-700"
                              style="background-image: url('{{ $this->selectedBackground->getPreviewUrl() }}');">
                         </div>
                     @else
-                        <div class="absolute inset-0 bg-[#181a20] flex flex-col items-center justify-center">
-                            <x-heroicon-o-sparkles class="w-12 h-12 text-white/5 mb-2" />
-                            <span class="text-xs text-white/20">Selecione um fundo à direita</span>
+                        <div class="absolute inset-0 bg-[#e2e8f0] dark:bg-[#181a20] flex flex-col items-center justify-center">
+                            <x-heroicon-o-photo class="w-16 h-16 text-gray-300 dark:text-white/5 mb-2" />
+                            <span class="text-xs text-gray-400 dark:text-white/20">Selecione um fundo à direita</span>
                         </div>
                     @endif
 
@@ -241,15 +343,15 @@
                          style="background: {{ $this->overlayCss }};"></div>
 
                     {{-- Text --}}
-                    <div class="absolute inset-0 flex items-center justify-center p-10 text-center">
+                    <div class="absolute inset-0 flex items-center justify-center p-12 text-center">
                         <div style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif; color: {{ $textColor }};">
                             @if(trim($quote))
-                                <span class="block text-4xl font-black leading-none opacity-40 mb-4">&ldquo;</span>
-                                <p class="font-bold leading-tight" style="font-size: 24px; text-shadow: 0 4px 30px rgba(0,0,0,0.6);">
+                                <span class="block text-5xl font-black leading-none opacity-40 mb-4">&ldquo;</span>
+                                <p class="font-bold leading-tight tracking-tight" style="font-size: 26px; text-shadow: 0 4px 30px rgba(0,0,0,0.6);">
                                     {{ $quote }}
                                 </p>
                             @else
-                                <p class="text-xs uppercase tracking-widest text-white/30 italic">Escreva algo na barra inferior...</p>
+                                <p class="text-[10px] uppercase tracking-[0.2em] text-gray-400 dark:text-white/30 font-bold italic">Digite o seu quote abaixo</p>
                             @endif
                         </div>
                     </div>
@@ -261,16 +363,16 @@
                 <x-heroicon-o-chat-bubble-bottom-center-text class="w-5 h-5 text-amber-500 shrink-0" />
                 <input type="text" 
                        wire:model.live.debounce.300ms="quote"
-                       placeholder="O que você quer dizer neste post?"
+                       placeholder="Sua frase de impacto aqui..."
                        class="studio-prompt-input"
                        maxlength="600">
                 
-                <div class="flex items-center gap-2">
-                    <span class="text-[10px] text-gray-500 mr-2">{{ strlen($quote ?? '') }}/600</span>
+                <div class="flex items-center gap-3">
+                    <span class="text-[10px] text-gray-400 font-mono">{{ strlen($quote ?? '') }}/600</span>
                     <button wire:click="dispatchGeneration"
                             wire:loading.attr="disabled"
-                            class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20">
-                        <span wire:loading.remove wire:target="dispatchGeneration">Gerar Post</span>
+                            class="bg-amber-500 hover:bg-amber-400 text-white dark:text-black px-8 py-2.5 rounded-full text-xs font-black transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95">
+                        <span wire:loading.remove wire:target="dispatchGeneration">GERAR</span>
                         <x-heroicon-o-arrow-path wire:loading wire:target="dispatchGeneration" class="w-3 h-3 animate-spin" />
                         <x-heroicon-o-sparkles wire:loading.remove wire:target="dispatchGeneration" class="w-3 h-3" />
                     </button>
@@ -282,23 +384,26 @@
         <aside class="studio-sidebar-right">
             {{-- Upload Shortcut --}}
             <a href="{{ route('filament.admin.resources.background-images.create') }}" 
-               title="Adicionar Fundo"
-               class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 hover:bg-amber-500 hover:text-black transition-all mb-4">
-                <x-heroicon-o-plus class="w-6 h-6" />
+               title="Adicionar Novo Fundo"
+               class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 hover:bg-amber-500 hover:text-white transition-all mb-4 group">
+                <x-heroicon-o-plus class="w-7 h-7 group-hover:rotate-90 transition-transform" />
             </a>
 
-            @foreach ($this->backgrounds as $bg)
-                <div wire:click="selectBackground({{ $bg->id }})"
-                     class="gallery-item {{ $backgroundImageId === $bg->id ? 'active' : '' }}">
-                    <img src="{{ $bg->getThumbnailUrl() ?: $bg->getFirstMediaUrl('image') }}" 
-                         alt="{{ $bg->name }}"
-                         class="w-full h-full object-cover">
-                </div>
-            @endforeach
+            <div class="flex flex-col gap-3 pb-8">
+                @foreach ($this->backgrounds as $bg)
+                    <div wire:click="selectBackground({{ $bg->id }})"
+                         title="{{ $bg->name }}"
+                         class="gallery-item {{ $backgroundImageId === $bg->id ? 'active' : '' }} shadow-sm">
+                        <img src="{{ $bg->getThumbnailUrl() ?: $bg->getFirstMediaUrl('image') }}" 
+                             alt="{{ $bg->name }}"
+                             class="w-full h-full object-cover">
+                    </div>
+                @endforeach
+            </div>
 
-            <div class="mt-auto pt-4 border-t border-white/5 opacity-20 hover:opacity-100 transition-opacity">
-                <a href="{{ route('filament.admin.resources.background-images.index') }}" title="Gerenciar Biblioteca">
-                    <x-heroicon-o-rectangle-group class="w-6 h-6 text-white" />
+            <div class="mt-auto pt-4 border-t border-gray-200 dark:border-white/5 opacity-30 hover:opacity-100 transition-opacity">
+                <a href="{{ route('filament.admin.resources.background-images.index') }}" title="Biblioteca Completa">
+                    <x-heroicon-o-rectangle-group class="w-6 h-6 text-gray-500 dark:text-white" />
                 </a>
             </div>
         </aside>
