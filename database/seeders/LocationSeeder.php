@@ -12,21 +12,29 @@ class LocationSeeder extends Seeder
      */
     public function run(): void
     {
+        // Limpa dados existentes
+        Location::query()->delete();
+
         $locations = [
-            'Laje',
-            'Viga / Pilar',
+            'Laje (Térreo)',
+            'Laje (Superior)',
+            'Vigas e Pilares',
             'Piso Industrial',
-            'Fundação / Sapata',
-            'Calçada',
+            'Piso de Garagem / Estacionamento',
+            'Fundação / Sapata / Bloco',
+            'Calçada / Acesso',
             'Escada',
-            'Capa de Laje',
-            'Enchimento',
+            'Capa de Laje (Treliçada)',
+            'Enchimento de Piso',
+            'Muro de Arrimo',
+            'Radier',
         ];
 
         foreach ($locations as $location) {
-            Location::updateOrCreate(
-                ['name' => $location]
-            );
+            Location::create([
+                'name' => $location,
+                'is_active' => true,
+            ]);
         }
     }
 }

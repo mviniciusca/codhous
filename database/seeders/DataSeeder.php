@@ -23,6 +23,8 @@ class DataSeeder extends Seeder
 
         // 3. Conteúdo do Site (Páginas, Seções e Áreas)
         $this->call([
+            ProductSeeder::class,
+            LocationSeeder::class,
             ContentSeeder::class,
         ]);
     }
