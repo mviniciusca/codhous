@@ -1,26 +1,21 @@
 @props([
     'title' => null,
     'subtitle' => null,
+    'description' => null,
     'items' => null,
 ])
 
 @php
     $displayTitle = $title;
     $displaySubtitle = $subtitle;
+    $displayDescription = $description;
     $displayItems = $items;
 
-    // Se estiver vazio, tenta buscar da seção global 'differentials' ou usa o padrão estático
+    // Fallback Primário: Focado em CONCRETO USINADO
     if (empty($displayItems)) {
-        $section = \App\Models\ContentSection::getBySlug('differentials');
-        $displayTitle = $displayTitle ?? ($section?->content['header']['title'] ?? 'Nossos Pilares');
-        $displaySubtitle = $displaySubtitle ?? ($section?->content['header']['subtitle'] ?? 'Diferenciais');
-        $displayItems = $section?->content['items'] ?? null;
-    }
-
-    // Fallback final: Focado em CONCRETO USINADO
-    if (empty($displayItems)) {
-        $displayTitle = $displayTitle ?? 'Por que nos escolher';
-        $displaySubtitle = $displaySubtitle ?? 'Nossos Pilares';
+        $displayTitle = $displayTitle ?? 'Nossos Pilares';
+        $displaySubtitle = $displaySubtitle ?? 'Por que nos escolher';
+        $displayDescription = $displayDescription ?? 'Conheça os pilares que sustentam nossa excelência no fornecimento de concreto e logística para obras de todos os portes.';
         $displayItems = [
             [
                 'title' => 'Tecnologia do Concreto',
@@ -40,20 +35,34 @@
         ];
     }
 
+    // Se mesmo assim estiver vazio (caso alguém tenha limpado o fallback), tenta buscar da seção global
+    if (empty($displayItems)) {
+        $section = \App\Models\ContentSection::getBySlug('differentials');
+        $displayTitle = $displayTitle ?? ($section?->content['header']['title'] ?? 'Nossos Pilares');
+        $displaySubtitle = $displaySubtitle ?? ($section?->content['header']['subtitle'] ?? 'Diferenciais');
+        $displayDescription = $displayDescription ?? ($section?->content['header']['description'] ?? null);
+        $displayItems = $section?->content['items'] ?? null;
+    }
+
     // Garante que só mostramos 3 itens
     $displayItems = array_slice((array) $displayItems, 0, 3);
 @endphp
 
 <section class="bg-background py-16 lg:py-24">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        @if(!empty($displayTitle) || !empty($displaySubtitle))
-            <div class="mb-12 text-center">
+        @if(!empty($displayTitle) || !empty($displaySubtitle) || !empty($displayDescription))
+            <div class="mb-16 text-center">
                 @if(!empty($displaySubtitle))
                     <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $displaySubtitle }}</span>
                 @endif
                 <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                     {{ $displayTitle }}
                 </h2>
+                @if(!empty($displayDescription))
+                    <p class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                        {{ $displayDescription }}
+                    </p>
+                @endif
             </div>
         @endif
         

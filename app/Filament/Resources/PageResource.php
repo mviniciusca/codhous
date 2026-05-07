@@ -320,6 +320,7 @@ class PageResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('subtitle')->label('Subtítulo'),
                 Forms\Components\TextInput::make('title')->label('Título Principal'),
+                Forms\Components\Textarea::make('description')->label('Descrição / Texto de Apoio'),
                 Forms\Components\Repeater::make('items')
                     ->label('Itens (Recomendado: 3)')
                     ->schema([
@@ -365,8 +366,7 @@ class PageResource extends Resource
                 Forms\Components\TextInput::make('title')->label('Título'),
                 Forms\Components\Textarea::make('iframe_code')
                     ->label('Código de Incorporação (iframe)')
-                    ->helperText('Cole aqui o <iframe> gerado pelo Google Maps')
-                    ->required(),
+                    ->helperText('Cole aqui o <iframe> gerado pelo Google Maps'),
             ]);
     }
 

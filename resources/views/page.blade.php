@@ -284,27 +284,10 @@
 
             {{-- ──── MAPA ──────────────────────────────────────────────────── --}}
             @case('map')
-                @php
-                    $company = \App\Models\Setting::get('company', []);
-                    $globalMapsCode = data_get($company, 'maps_code');
-                    $mapsCode = trim(!empty($globalMapsCode) ? $globalMapsCode : data_get($block, 'data.iframe_code', ''));
-                @endphp
-                @if(!empty($mapsCode))
-                    <section class="bg-muted py-16">
-                        <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                            @if(!empty($block['data']['title']))
-                                <div class="mb-8 max-w-2xl">
-                                    <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                                        {{ $block['data']['title'] }}
-                                    </h2>
-                                </div>
-                            @endif
-                            <div class="overflow-hidden rounded-2xl border border-border shadow-sm h-[400px] lg:h-[500px] w-full grayscale hover:grayscale-0 transition-all duration-700 [&>iframe]:w-full [&>iframe]:h-full">
-                                {!! $mapsCode !!}
-                            </div>
-                        </div>
-                    </section>
-                @endif
+                <x-section-map
+                    :title="$block['data']['title'] ?? null"
+                    :iframe="$block['data']['iframe_code'] ?? null"
+                />
                 @break
 
             {{-- ──── DIFERENCIAIS (MISSÃO, VISÃO, VALORES) ────────────────── --}}
