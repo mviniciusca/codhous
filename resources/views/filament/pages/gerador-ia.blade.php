@@ -157,6 +157,23 @@
         .color-pill { display: flex; align-items: center; gap: 8px; background: #ffffff; padding: 6px 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 11px; font-family: monospace; }
         .dark .color-pill { background: #1e293b; border: 1px solid rgba(255,255,255,0.05); color: #94a3b8; }
         .color-circle { width: 20px; height: 20px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
+
+        /* Galeria de Miniaturas */
+        .gallery-item {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            background: #f1f5f9;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .dark .gallery-item { background: #1e293b; }
+        .gallery-item:hover { transform: scale(1.05); border-color: rgba(251, 191, 36, 0.5); }
+        .gallery-item.active { border-color: #fbbf24; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 
     <div class="studio-container rounded-b-2xl" style="--highlight: {{ $overlayColor }};">
