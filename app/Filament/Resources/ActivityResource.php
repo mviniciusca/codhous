@@ -10,4 +10,6 @@ class ActivityResource extends BaseActivityResource
     {
         return 'Configurações';
     }
+
+    protected static ?int $navigationSort = 2;
 }
