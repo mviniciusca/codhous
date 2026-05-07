@@ -47,6 +47,9 @@ class CreateBudget extends CreateRecord
                     $total = $subtotal + $tax - $discount;
 
                     $this->form->fill([
+                        'is_active' => true,
+                        'status' => 'pending',
+                        'created_at' => now(),
                         'budgetItems' => $items,
                         'content' => [
                             'tax' => $tax,

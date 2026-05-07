@@ -31,10 +31,14 @@ class Budget extends Model
     {
         static::addGlobalScope(new UserBudgetScope);
 
-        // Automatically set user_id when creating
+        // Automatically set user_id and code when creating
         static::creating(function ($budget) {
             if (! $budget->user_id && \Illuminate\Support\Facades\Auth::check()) {
                 $budget->user_id = \Illuminate\Support\Facades\Auth::id();
+            }
+
+            if (! $budget->code) {
+                $budget->code = self::generateUniqueCode();
             }
         });
     }
@@ -95,24 +99,24 @@ class Budget extends Model
      */
     public static function generateUniqueCode(): string
     {
-        $prefix = 'BD';
+        $prefix = 'OR';
         $year = date('Y');
-        $month = date('m');
 
-        // Get the last budget created in this month
-        $lastBudget = self::whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
+        // Get the last budget created in this year with the same prefix
+        $lastBudget = self::withoutGlobalScopes()
+            ->where('code', 'like', "{$prefix}-{$year}-%")
             ->orderBy('id', 'desc')
             ->first();
 
         if ($lastBudget) {
-            // Extract the sequence number from the last code
-            $lastSequence = (int) substr($lastBudget->code, -5);
+            // Extract the sequence number from the last code (OR-YYYY-XXXXX)
+            $parts = explode('-', $lastBudget->code);
+            $lastSequence = (int) end($parts);
             $sequence = str_pad($lastSequence + 1, 5, '0', STR_PAD_LEFT);
         } else {
             $sequence = '00001';
         }
 
-        return sprintf('%s%s%s%s', $prefix, $year, $month, $sequence);
+        return sprintf('%s-%s-%s', $prefix, $year, $sequence);
     }
 }

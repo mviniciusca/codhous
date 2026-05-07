@@ -91,10 +91,12 @@ class BudgetResource extends Resource
                         Toggle::make('is_active')
                             ->helperText('Define se este orçamento deve ser exibido nos relatórios ativos.')
                             ->label('Ativo')
+                            ->default(true)
                             ->inline(),
                         Select::make('status')
                             ->label('Status')
                             ->helperText('Estado atual do atendimento.')
+                            ->default('pending')
                             ->options([
                                 'pending'  => 'Pendente',
                                 'on going' => 'Em Andamento',
@@ -103,13 +105,15 @@ class BudgetResource extends Resource
                             ]),
                         TextInput::make('code')
                             ->label('Código do Orçamento')
-                            ->helperText('Identificador único gerado automaticamente.')
+                            ->placeholder('Gerado automaticamente ao salvar')
+                            ->helperText('Ex: OR-2026-00001')
                             ->disabled(),
                         DateTimePicker::make('created_at')
                             ->displayFormat('d/m/Y H:i')
                             ->label('Data de Criação')
-                            ->disabled()
-                            ->helperText('Data e hora em que o cliente enviou o pedido.'),
+                            ->default(now())
+                            ->required()
+                            ->helperText('Data e hora do registro do orçamento.'),
                     ]),
 
                 Tabs::make('Conteúdo do Orçamento')
@@ -174,21 +178,27 @@ class BudgetResource extends Resource
                                             ->helperText('Número para comunicação direta.'),
                                         TextInput::make('content.postcode')
                                             ->required()
-                                            ->label('CEP'),
+                                            ->label('CEP')
+                                            ->helperText('Formato: 00000-000'),
                                         TextInput::make('content.street')
                                             ->required()
-                                            ->label('Logradouro'),
+                                            ->label('Logradouro')
+                                            ->helperText('Rua, Avenida, Praça, etc.'),
                                         TextInput::make('content.number')
-                                            ->label('Número'),
+                                            ->label('Número')
+                                            ->helperText('Número da residência ou lote.'),
                                         TextInput::make('content.city')
                                             ->required()
-                                            ->label('Cidade'),
+                                            ->label('Cidade')
+                                            ->helperText('Cidade onde o serviço será executado.'),
                                         TextInput::make('content.neighborhood')
                                             ->required()
-                                            ->label('Bairro'),
+                                            ->label('Bairro')
+                                            ->helperText('Nome do bairro ou localidade.'),
                                         TextInput::make('content.state')
                                             ->required()
-                                            ->label('UF'),
+                                            ->label('UF')
+                                            ->helperText('Estado (Ex: SP, RJ, MG).'),
                                     ]),
                             ]),
                         Tabs\Tab::make('Itens do Pedido')
