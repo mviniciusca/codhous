@@ -3,13 +3,18 @@
     $features = data_get($website, 'features', []);
     $whatsapp = data_get($features, 'whatsapp_widget', []);
     $enabled = data_get($whatsapp, 'enabled', false);
-    $number = data_get($whatsapp, 'number');
+    $whatsappNumber = preg_replace('/\D/', '', data_get($whatsapp, 'number', ''));
+    if ($whatsappNumber && strlen($whatsappNumber) <= 11) {
+        $whatsappNumber = '55' . $whatsappNumber;
+    }
+    if (empty($whatsappNumber)) {
+        $whatsappNumber = '5511999999999';
+    }
     $message = data_get($whatsapp, 'message', 'Olá, gostaria de solicitar um orçamento.');
-    $numberClean = $number ? preg_replace('/[^0-9]/', '', $number) : '';
-    $waUrl = $numberClean ? 'https://wa.me/' . $numberClean . '?text=' . urlencode($message) : '#';
+    $waUrl = $whatsappNumber ? 'https://wa.me/' . $whatsappNumber . '?text=' . urlencode($message) : '#';
 @endphp
 
-@if($enabled && $numberClean)
+@if($enabled && $whatsappNumber)
 <div id="whatsapp-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-0" aria-label="Abrir conversa no WhatsApp">
     {{-- Tooltip / label que aparece no hover --}}
     <a href="{{ $waUrl }}"

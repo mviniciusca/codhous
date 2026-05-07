@@ -1,7 +1,13 @@
 @php
     $website = \App\Models\Setting::get('website', []);
     $whatsapp = data_get($website, 'features.whatsapp_widget', []);
-    $whatsappNumber = preg_replace('/\D/', '', data_get($whatsapp, 'number', '5511999999999'));
+    $whatsappNumber = preg_replace('/\D/', '', data_get($whatsapp, 'number', ''));
+    if ($whatsappNumber && strlen($whatsappNumber) <= 11) {
+        $whatsappNumber = '55' . $whatsappNumber;
+    }
+    if (empty($whatsappNumber)) {
+        $whatsappNumber = '5511999999999';
+    }
 @endphp
 <div class="rounded-xl border border-background/10 bg-background/5 p-8 backdrop-blur-sm">
     <div class="mb-6 flex items-center gap-3">

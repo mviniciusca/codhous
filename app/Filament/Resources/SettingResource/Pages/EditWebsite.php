@@ -30,6 +30,19 @@ class EditWebsite extends EditRecord
     {
         return $form
             ->schema([
+                Section::make('Identidade Visual')
+                    ->icon('heroicon-o-photo')
+                    ->description('Gerencie o logotipo da sua empresa.')
+                    ->schema([
+                        FileUpload::make('settings.website.logo')
+                            ->label('Logotipo')
+                            ->helperText('Recomendado: SVG ou PNG transparente. Tamanho máx: 2MB.')
+                            ->image()
+                            ->imageEditor()
+                            ->directory('website')
+                            ->visibility('public'),
+                    ]),
+
                 Section::make('Identidade e SEO')
                     ->icon('heroicon-o-information-circle')
                     ->description('Configure as informações básicas e metatags para motores de busca.')
@@ -55,6 +68,11 @@ class EditWebsite extends EditRecord
                         Repeater::make('settings.website.navigation')
                             ->label('Links do Menu')
                             ->helperText('Adicione ou remova itens do menu superior.')
+                            ->collapsible()
+                            ->collapsed()
+                            ->cloneable()
+                            ->collapseAllAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action->label('Recolher Tudo'))
+                            ->expandAllAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action->label('Expandir Tudo'))
                             ->schema([
                                 TextInput::make('label')
                                     ->label('Rótulo')
@@ -99,8 +117,10 @@ class EditWebsite extends EditRecord
                             ->schema([
                                 TextInput::make('settings.website.features.whatsapp_widget.number')
                                     ->label('Número do WhatsApp')
-                                    ->helperText('Formato: 55 + DDD + Número (apenas números).')
-                                    ->placeholder('5511999999999')
+                                    ->prefix('+55')
+                                    ->mask('(99) 99999-9999')
+                                    ->placeholder('(21) 96613-4360')
+                                    ->helperText('O código +55 já está incluído. Informe apenas DDD e número.')
                                     ->tel(),
                                 TextInput::make('settings.website.features.whatsapp_widget.message')
                                     ->label('Mensagem Inicial')

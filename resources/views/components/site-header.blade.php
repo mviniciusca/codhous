@@ -2,6 +2,7 @@
     $website  = \App\Models\Setting::get('website', []);
     $company  = \App\Models\Setting::get('company', []);
     $websiteName = data_get($website, 'name', 'ConcretoPro');
+    $websiteLogo = data_get($website, 'logo');
 
     $navigation = data_get($website, 'navigation', []);
     if (empty($navigation)) {
@@ -61,10 +62,11 @@
         <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 lg:px-8">
             {{-- Logo --}}
             <a href="/" class="flex items-center gap-2.5">
-                <div class="flex h-8 w-8 items-center justify-center rounded bg-primary">
-                    <i data-lucide="truck" class="h-4.5 w-4.5 text-primary-foreground"></i>
-                </div>
-                <span class="font-mono text-xl font-bold tracking-tighter text-zinc-950">{{ $websiteName }}</span>
+                @if($websiteLogo)
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($websiteLogo) }}" alt="{{ $websiteName }}" class="h-10 w-auto object-contain">
+                @else
+                    <span class="font-mono text-xl font-bold tracking-tighter text-zinc-950">{{ $websiteName }}</span>
+                @endif
             </a>
 
             {{-- Desktop nav --}}

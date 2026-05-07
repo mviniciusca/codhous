@@ -16,15 +16,6 @@
     $headScripts = data_get($scripts, 'head_scripts');
 @endphp
 
-<style>
-    :root {
-        --font-titles: '{{ $fontFamily }}', sans-serif;
-    }
-    h1, h2, h3, h4, h5, h6, .font-title {
-        font-family: var(--font-titles);
-    }
-</style>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="theme-color" content="#e5b800">
@@ -45,6 +36,15 @@
 <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+<style>
+    :root {
+        --font-titles: '{{ $fontFamily }}', sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6, .font-title, header, header *, nav, button, .btn, .font-mono {
+        font-family: var(--font-titles) !important;
+    }
+</style>
 
 <!-- Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
