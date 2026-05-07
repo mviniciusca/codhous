@@ -149,7 +149,8 @@ class BudgetResource extends Resource
                                             }),
                                         Action::make('clear_all_fields')
                                             ->label('Limpar Tudo')
-                                            ->icon('heroicon-o-trash')
+                                            ->hiddenLabel()
+                                            ->icon('heroicon-o-arrow-uturn-left')
                                             ->color('danger')
                                             ->visible(fn ($livewire, Get $get) => 
                                                 $livewire instanceof Pages\CreateBudget && 
