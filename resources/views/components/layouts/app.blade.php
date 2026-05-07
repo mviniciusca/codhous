@@ -7,6 +7,17 @@
 <head>
     <x-site-head :title="$title" />
     {{ $meta }}
+
+    @php
+        $websiteSettings = \App\Models\Setting::get('website', []);
+        $primaryColor = data_get($websiteSettings, 'primary_color', '239 68 68');
+    @endphp
+    <style>
+        :root {
+            --primary-color: {{ $primaryColor }};
+        }
+    </style>
+
     @livewireStyles
     @stack('styles')
 </head>

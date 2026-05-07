@@ -41,6 +41,30 @@ class EditWebsite extends EditRecord
                             ->imageEditor()
                             ->directory('website')
                             ->visibility('public'),
+                        \Filament\Forms\Components\Select::make('settings.website.primary_color')
+                            ->label('Cor de Destaque (Branding)')
+                            ->options([
+                                '239 68 68' => 'Vermelho',
+                                '249 115 22' => 'Laranja',
+                                '245 158 11' => 'Âmbar',
+                                '234 179 8' => 'Amarelo',
+                                '132 204 22' => 'Lima',
+                                '34 197 94' => 'Verde',
+                                '16 185 129' => 'Esmeralda',
+                                '20 184 166' => 'Teal',
+                                '6 182 212' => 'Ciano',
+                                '14 165 233' => 'Sky',
+                                '59 130 246' => 'Azul',
+                                '99 102 241' => 'Índigo',
+                                '139 92 246' => 'Violeta',
+                                '168 85 247' => 'Roxo',
+                                '192 38 211' => 'Fúcsia',
+                                '236 72 153' => 'Pink',
+                                '244 63 94' => 'Rose',
+                                '113 113 122' => 'Zinco (Cinza)',
+                            ])
+                            ->default('239 68 68')
+                            ->helperText('Escolha a cor principal da identidade visual da sua loja.'),
                     ]),
 
                 Section::make('Identidade e SEO')

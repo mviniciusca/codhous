@@ -67,6 +67,7 @@ class DataSeeder extends Seeder
 <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">',
                         'footer' => '',
                     ],
+                    'primary_color' => '59 130 246',
                 ],
                 'company' => [
                     'document' => '00.000.000/0001-00',
@@ -87,11 +88,6 @@ class DataSeeder extends Seeder
                     'maps_code' => '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29422.638814103528!2d-43.23815695!3d-22.80876775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x99799368903d71%3A0xead21443a9686abf!2sGale%C3%A3o%2C%20Rio%20de%20Janeiro%20-%20RJ!5e0!3m2!1spt-BR!2sbr!4v1778116472539!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
                     'opening_hours' => 'Segunda a Sexta, 08:00 às 18:00',
                     'budget_information' => "• Validade da proposta: 15 dias.\n• Pagamento: 50% na aprovação e 50% na entrega.\n• Documento gerado eletronicamente.",
-                ],
-                'layout' => [
-                    'logo' => 'logos/logo.png',
-                    'primary_color' => '#000000',
-                    'secondary_color' => '#ffffff',
                 ],
                 'security' => [
                     'maintenance_mode' => false,

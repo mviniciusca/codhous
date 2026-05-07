@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 const colors = require('tailwindcss/colors')
 
-// Altere a cor aqui para qualquer uma do Tailwind (ex: colors.zinc, colors.red, colors.orange)
-const themeColor = colors.red
-
 export default {
     content: [
         './app/Filament/**/*.php',
@@ -37,7 +34,7 @@ export default {
                     foreground: 'oklch(0.18 0.01 250 / <alpha-value>)',
                 },
                 primary: {
-                    DEFAULT: themeColor[500],
+                    DEFAULT: 'rgb(var(--primary-color) / <alpha-value>)',
                     foreground: colors.white,
                 },
                 secondary: {
@@ -62,7 +59,7 @@ export default {
                 },
                 border: 'oklch(0.88 0.005 250 / <alpha-value>)',
                 input: 'oklch(0.88 0.005 250 / <alpha-value>)',
-                ring: themeColor[500],
+                ring: 'rgb(var(--primary-color) / <alpha-value>)',
             },
             boxShadow: {
                 'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -95,4 +92,3 @@ export default {
         require('flowbite/plugin')
     ],
 }
-
