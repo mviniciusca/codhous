@@ -35,5 +35,9 @@ jobs:
       run: chmod -R 777 storage bootstrap/cache
     - name: Generate key
       run: php artisan key:generate
+    - name: Install Node Dependencies
+      run: npm install
+    - name: Build Assets
+      run: npm run build
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       run: php artisan test
