@@ -261,9 +261,9 @@
                 @php
                     $company = \App\Models\Setting::get('company', []);
                     $globalMapsCode = data_get($company, 'maps_code');
-                    $mapsCode = !empty($globalMapsCode) ? $globalMapsCode : data_get($block, 'data.iframe_code');
+                    $mapsCode = trim(!empty($globalMapsCode) ? $globalMapsCode : data_get($block, 'data.iframe_code', ''));
                 @endphp
-                @if($mapsCode)
+                @if(!empty($mapsCode))
                     <section class="bg-muted py-16">
                         <div class="mx-auto max-w-7xl px-4 lg:px-8">
                             @if(!empty($block['data']['title']))
