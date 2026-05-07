@@ -14,6 +14,7 @@ class SocialPost extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'preset'          => \App\Enums\CardPreset::class,
         'overlay_opacity' => 'integer',
         'generated_at'    => 'datetime',
     ];

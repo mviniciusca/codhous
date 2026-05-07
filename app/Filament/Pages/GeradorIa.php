@@ -36,6 +36,7 @@ class GeradorIa extends Page
     public string $textColor    = '#ffffff';
     public string $overlayColor = '#000000';
     public int    $overlayOpacity = 40;
+    public string $preset         = 'bottom_right';
 
     /** @var int|null ID of the selected BackgroundImage */
     public ?int $backgroundImageId = null;
@@ -54,6 +55,14 @@ class GeradorIa extends Page
         return $this->backgroundImageId
             ? BackgroundImage::find($this->backgroundImageId)
             : null;
+    }
+
+    #[Computed]
+    public function presetOptions(): array
+    {
+        return collect(\App\Enums\CardPreset::cases())
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
+            ->toArray();
     }
 
     #[Computed]
@@ -106,6 +115,11 @@ class GeradorIa extends Page
         $this->backgroundImageId = ($this->backgroundImageId === $id) ? null : $id;
     }
 
+    public function selectPreset(string $value): void
+    {
+        $this->preset = $value;
+    }
+
     public function dispatchGeneration(): void
     {
         $this->validate([
@@ -127,6 +141,7 @@ class GeradorIa extends Page
             'overlay_color'       => $this->overlayColor,
             'overlay_opacity'     => $this->overlayOpacity,
             'background_image_id' => $this->backgroundImageId,
+            'preset'              => $this->preset,
             'status'              => 'queued',
         ]);
 
@@ -145,6 +160,7 @@ class GeradorIa extends Page
         $this->quote            = '';
         $this->backgroundImageId = null;
         $this->platform         = 'instagram';
+        $this->preset           = 'bottom_right';
         $this->fontFamily       = 'Inter';
         $this->textColor        = '#ffffff';
         $this->overlayColor     = '#000000';
