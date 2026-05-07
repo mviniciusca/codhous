@@ -17,9 +17,10 @@ return new class extends Migration {
                 ->constrained()
                 ->cascadeOnDelete();
             $table->string('name');
-            $table->string('slug');
+            $table->string('slug')->nullable();
             $table->string('unit')->nullable();
             $table->decimal('price', 10, 2);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             // Unique constraint
