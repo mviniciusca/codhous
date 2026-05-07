@@ -78,6 +78,12 @@ class Form extends Component implements HasForms
     public function create(): void
     {
         $data = $this->form->getState();
+
+        // Sanitização de campos
+        $data = array_map(function($value) {
+            return is_string($value) ? strip_tags($value) : $value;
+        }, $data);
+
         $user = User::first();
 
         Mail::to($user->email)
