@@ -42,6 +42,31 @@ class EditSecurity extends EditRecord
                             ->visible(fn($get) => $get('settings.security.maintenance_mode'))
                             ->rows(3),
                     ]),
+
+                Section::make('Cloudflare Turnstile (Anti-Spam)')
+                    ->icon('heroicon-o-shield-check')
+                    ->description('Proteja seus formulários contra bots de forma invisível.')
+                    ->schema([
+                        Toggle::make('settings.security.turnstile.enabled')
+                            ->label('Habilitar Turnstile')
+                            ->helperText('Ativa a proteção anti-spam nos formulários de contato e orçamento.')
+                            ->reactive()
+                            ->inline(false),
+                        \Filament\Forms\Components\Grid::make(2)
+                            ->visible(fn($get) => $get('settings.security.turnstile.enabled'))
+                            ->schema([
+                                \Filament\Forms\Components\TextInput::make('settings.security.turnstile.site_key')
+                                    ->label('Site Key')
+                                    ->placeholder('1x00000000000000000000AA')
+                                    ->required(fn($get) => $get('settings.security.turnstile.enabled')),
+                                \Filament\Forms\Components\TextInput::make('settings.security.turnstile.secret_key')
+                                    ->label('Secret Key')
+                                    ->placeholder('1x0000000000000000000000000000000AA')
+                                    ->required(fn($get) => $get('settings.security.turnstile.enabled'))
+                                    ->password()
+                                    ->revealable(),
+                            ]),
+                    ]),
             ]);
     }
 

@@ -7,6 +7,7 @@ use App\Mail\Contact;
 use App\Models\Mail as MailModel;
 use App\Models\User;
 use App\Notifications\NewMessage;
+use App\Services\TurnstileService;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -23,6 +24,7 @@ class Form extends Component implements HasForms
     use InteractsWithForms;
     public ?array $data = [];
     public bool $sent = false;
+    public ?string $turnstileToken = null;
     public function mount(): void
     {
         $this->form->fill();
@@ -75,9 +77,15 @@ class Form extends Component implements HasForms
      * TODO: Doc this Summary of create
      * @return void
      */
-    public function create(): void
+    public function create(TurnstileService $turnstile): void
     {
         $data = $this->form->getState();
+
+        // Validação Cloudflare Turnstile
+        if (!$turnstile->verify($this->turnstileToken, request()->ip())) {
+            $this->addError('turnstileToken', 'A verificação anti-spam falhou. Por favor, tente novamente.');
+            return;
+        }
 
         // Sanitização de campos
         $data = array_map(function($value) {
@@ -101,8 +109,11 @@ class Form extends Component implements HasForms
         $this->form->fill();
         $this->sent = true;
     }
-    public function render()
+    public function render(TurnstileService $turnstile)
     {
-        return view('livewire.mail.form');
+        return view('livewire.mail.form', [
+            'turnstileEnabled' => $turnstile->isEnabled(),
+            'turnstileSiteKey' => $turnstile->getSiteKey(),
+        ]);
     }
 }

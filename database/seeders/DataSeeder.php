@@ -97,6 +97,11 @@ class DataSeeder extends Seeder
                 ],
                 'security' => [
                     'maintenance_mode' => false,
+                    'turnstile' => [
+                        'enabled' => true,
+                        'site_key' => '1x00000000000000000000AA',
+                        'secret_key' => '1x0000000000000000000000000000000AA',
+                    ],
                 ],
             ],
         ]);

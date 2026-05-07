@@ -14,11 +14,37 @@
         <form wire:submit="create" class="space-y-5">
             {{ $this->form }}
 
+            {{-- Cloudflare Turnstile --}}
+            @if($turnstileEnabled)
+                <div class="space-y-2">
+                    <div 
+                        wire:ignore
+                        class="cf-turnstile" 
+                        data-sitekey="{{ $turnstileSiteKey }}"
+                        data-callback="onTurnstileSuccess"
+                    ></div>
+                    @error('turnstileToken')
+                        <p class="text-sm text-danger-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            @endif
+
             <button type="submit" class="w-full rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed" wire:loading.attr="disabled">
                 <span wire:loading.remove>Enviar Mensagem</span>
                 <span wire:loading>Enviando...</span>
             </button>
         </form>
+
+        @if($turnstileEnabled)
+            @push('scripts')
+                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                <script>
+                    function onTurnstileSuccess(token) {
+                        @this.set('turnstileToken', token);
+                    }
+                </script>
+            @endpush
+        @endif
     @endif
 
     <x-filament-actions::modals />
