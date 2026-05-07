@@ -37,6 +37,8 @@ class GeradorIa extends Page
     public string $overlayColor = '#000000';
     public int    $overlayOpacity = 40;
     public string $preset         = 'bottom_right';
+    public float  $textX          = 50.0;
+    public float  $textY          = 50.0;
 
     /** @var int|null ID of the selected BackgroundImage */
     public ?int $backgroundImageId = null;
@@ -119,12 +121,26 @@ class GeradorIa extends Page
     {
         $this->preset = $value;
         
-        // Carregar configurações padrão do estilo para o usuário ver
         $presetEnum = \App\Enums\CardPreset::from($value);
         $style = $presetEnum->getStyle();
         
         $this->fontFamily = $style['font'];
-        // Se quiser podemos resetar cores aqui tb, mas vou manter as atuais para não ser invasivo
+        
+        // Resetar posição se for um preset específico (opcional)
+        // Se for canva_side, por exemplo, o texto faz mais sentido à esquerda
+        if ($value === 'canva_side') {
+            $this->textX = 24.0;
+            $this->textY = 50.0;
+        } else {
+            $this->textX = 50.0;
+            $this->textY = 50.0;
+        }
+    }
+
+    public function updateCoordinates(float $x, float $y): void
+    {
+        $this->textX = $x;
+        $this->textY = $y;
     }
 
     public function dispatchGeneration(): void
@@ -147,6 +163,8 @@ class GeradorIa extends Page
             'overlay_opacity'     => $this->overlayOpacity,
             'background_image_id' => $this->backgroundImageId,
             'preset'              => $this->preset,
+            'text_x'              => $this->textX,
+            'text_y'              => $this->textY,
             'status'              => 'queued',
         ]);
 
@@ -166,6 +184,8 @@ class GeradorIa extends Page
         $this->backgroundImageId = null;
         $this->platform         = 'instagram';
         $this->preset           = 'bottom_right';
+        $this->textX            = 50.0;
+        $this->textY            = 50.0;
         $this->fontFamily       = 'Inter';
         $this->textColor        = '#ffffff';
         $this->overlayColor     = '#000000';

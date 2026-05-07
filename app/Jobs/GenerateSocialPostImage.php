@@ -81,19 +81,13 @@ class GenerateSocialPostImage implements ShouldQueue
             $align = $style['align'] ?? 'center';
             $valign = $style['valign'] ?? 'center';
             
-            // X position logic
-            $xPos = ($style['has_block'] && ($style['block_type'] ?? '') === 'side') ? 243 : 540;
-            if ($align === 'left' && ! $style['has_block']) $xPos = 100;
-            if ($align === 'right') $xPos = 980;
-
-            // Y position logic (Baseline for multiple layers)
-            $yBase = 540;
-            if ($valign === 'bottom') $yBase = 900;
-            if ($valign === 'top') $yBase = 200;
+            // X & Y position logic from Drag & Drop (converted from 0-100% to 0-1080px)
+            $xPos = ($this->post->text_x / 100) * 1080;
+            $yPos = ($this->post->text_y / 100) * 1080;
 
             // Render Title (Label)
             if ($title) {
-                $image->text($title, $xPos, $yBase - 80, function ($font) use ($fontPath, $textColor, $align) {
+                $image->text($title, $xPos, $yPos - 80, function ($font) use ($fontPath, $textColor, $align) {
                     $font->filename($fontPath);
                     $font->size(25);
                     $font->color($textColor);
@@ -103,7 +97,7 @@ class GenerateSocialPostImage implements ShouldQueue
             }
 
             // Render Quote (Main Text)
-            $image->text($quote, $xPos, $yBase, function ($font) use ($fontPath, $textColor, $align, $style) {
+            $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $textColor, $align, $style) {
                 $font->filename($fontPath);
                 $font->size(55);
                 $font->color($textColor);
