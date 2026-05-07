@@ -377,11 +377,11 @@
                 <div class="absolute inset-0" style="background: {{ $this->overlayCss }};"></div>
                 @if($preset === 'canva_side') <div class="side-block"></div> @endif
 
-                {{-- DRAGGABLE TEXT BLOCK (ESTÁVEL) --}}
+                {{-- DRAGGABLE TEXT BLOCK (FLUIDO) --}}
                 <div class="draggable-text"
                      x-data="{ 
-                        textX: @entangle('textX'), 
-                        textY: @entangle('textY'),
+                        textX: {{ $textX }}, 
+                        textY: {{ $textY }},
                         isDragging: false,
                         init() {
                             interact($el).draggable({
@@ -426,10 +426,6 @@
                 
                 {{-- Text Style Toolbar --}}
                 <div class="format-group">
-                    <div wire:click="$set('textAlign', 'left')" class="format-btn {{ $textAlign === 'left' ? 'active' : '' }}"><x-heroicon-m-bars-3-bottom-left class="w-4 h-4" /></div>
-                    <div wire:click="$set('textAlign', 'center')" class="format-btn {{ $textAlign === 'center' ? 'active' : '' }}"><x-heroicon-m-bars-3 class="w-4 h-4" /></div>
-                    <div wire:click="$set('textAlign', 'right')" class="format-btn {{ $textAlign === 'right' ? 'active' : '' }}"><x-heroicon-m-bars-3-bottom-right class="w-4 h-4" /></div>
-                    <div class="w-px h-4 bg-gray-200 dark:bg-white/10 mx-1"></div>
                     <div wire:click="$toggle('isBold')" class="format-btn {{ $isBold ? 'active' : '' }}"><span class="font-black text-xs">B</span></div>
                     <div wire:click="$toggle('isItalic')" class="format-btn {{ $isItalic ? 'active' : '' }}"><span class="italic font-serif text-xs">I</span></div>
                 </div>
@@ -438,9 +434,9 @@
 
                 <input type="text" wire:model.live.debounce.300ms="quote" placeholder="Sua frase de impacto..." class="studio-prompt-input">
                 
-                <button wire:click="dispatchGeneration" wire:loading.attr="disabled" class="btn-generate">
-                    <span wire:loading.remove>GERAR ARTE</span>
-                    <x-heroicon-o-arrow-path wire:loading class="w-4 h-4 animate-spin" />
+                <button wire:click="dispatchGeneration" wire:loading.attr="disabled" wire:target="dispatchGeneration" class="btn-generate">
+                    <span wire:loading.remove wire:target="dispatchGeneration">GERAR ARTE</span>
+                    <x-heroicon-o-arrow-path wire:loading wire:target="dispatchGeneration" class="w-4 h-4 animate-spin" />
                 </button>
             </div>
         </main>
