@@ -1,9 +1,9 @@
 <x-filament-panels::page>
-    {{-- Scripts para Drag & Drop e Google Fonts --}}
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    {{-- Pré-carregar fontes para o preview --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link id="gf-link" rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family={{ urlencode($this->fontFamily) }}:wght@400;700;900&display=swap">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
         /* Container Principal */
@@ -272,7 +272,12 @@
             border: 2px solid white !important;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
             cursor: pointer !important;
-            opacity: 1 !important; /* Sempre visível para teste */
+            opacity: 0 !important; /* Escondido por padrão */
+            transition: opacity 0.2s ease !important;
+        }
+
+        .gallery-item-wrapper:hover .trash-btn {
+            opacity: 1 !important; /* Aparece no hover */
         }
     </style>
 
@@ -403,21 +408,21 @@
                 {{-- DRAGGABLE TEXT BLOCK --}}
                 <div class="draggable-text"
                      :class="{ 'is-dragging': isDragging }"
-                     :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%);`"
-                     style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif; text-align: {{ $textAlign }};">
+                     :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%); font-family: '${(@this.fontFamily ?? 'Inter').replace('+', ' ')}', sans-serif;`"
+                     style="text-align: {{ $textAlign }};">
                     
                     @if($postTitle) 
-                        <span class="title-text block" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '900' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }};">
+                        <span class="title-text block" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '900' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-family: inherit;">
                             {{ $postTitle }}
                         </span> 
                     @endif
 
                     @if(trim($quote)) 
-                        <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                        <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: inherit;">
                             {{ $quote }}
                         </p> 
                     @else 
-                        <p class="text-[12px] uppercase font-black opacity-20 tracking-widest italic" style="color: {{ $textColor }};">Arraste para posicionar</p> 
+                        <p class="text-[12px] uppercase font-black opacity-20 tracking-widest italic" style="color: {{ $textColor }}; font-family: inherit;">Arraste para posicionar</p> 
                     @endif
                 </div>
             </div>

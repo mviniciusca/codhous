@@ -30,21 +30,21 @@ enum CardPreset: string
     {
         return match($this) {
             self::MAX => [
-                'font' => 'Poppins',
+                'font' => 'Montserrat',
                 'align' => 'left',
                 'valign' => 'center',
                 'uppercase' => true,
                 'has_block' => false,
             ],
             self::FLUX => [
-                'font' => 'Montserrat',
+                'font' => 'Playfair+Display',
                 'align' => 'center',
                 'valign' => 'center',
                 'uppercase' => false,
                 'has_block' => false,
             ],
             self::CANVA_SIDE => [
-                'font' => 'Inter',
+                'font' => 'Poppins',
                 'align' => 'left',
                 'valign' => 'center',
                 'uppercase' => false,
@@ -52,14 +52,14 @@ enum CardPreset: string
                 'block_type' => 'side', // Ocupa metade da tela
             ],
             self::BOLD_CENTER => [
-                'font' => 'Oswald',
+                'font' => 'Montserrat',
                 'align' => 'center',
                 'valign' => 'center',
                 'uppercase' => true,
                 'has_block' => false,
             ],
             self::MINIMAL => [
-                'font' => 'Raleway',
+                'font' => 'Poppins',
                 'align' => 'left',
                 'valign' => 'bottom',
                 'uppercase' => false,

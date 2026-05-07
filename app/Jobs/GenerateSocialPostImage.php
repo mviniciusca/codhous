@@ -79,12 +79,20 @@ class GenerateSocialPostImage implements ShouldQueue
             $title = $this->post->title;
             $quote = $this->post->quote;
             $align = $this->post->text_align ?? 'center';
+            $family = $this->post->font_family ?? 'Inter';
             $isBold = $this->post->is_bold ?? true;
             
-            // Choose Font Path based on Bold setting
-            $fontPath = $isBold 
-                ? '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf' 
-                : '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
+            $fontPath = match($family) {
+                'Poppins'          => storage_path('app/fonts/Poppins-Bold.ttf'),
+                'Montserrat'        => storage_path('app/fonts/Montserrat-ExtraBold.ttf'),
+                'Playfair+Display' => storage_path('app/fonts/PlayfairDisplay-BoldItalic.ttf'),
+                default            => '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+            };
+
+            // Fallback if file doesn't exist
+            if (! file_exists($fontPath)) {
+                $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
+            }
 
             // X & Y position logic from Drag & Drop (converted from 0-100% to 0-1080px)
             $xPos = ($this->post->text_x / 100) * 1080;
