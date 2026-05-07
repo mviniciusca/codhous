@@ -374,6 +374,8 @@ class BudgetResource extends Resource
                                                     ->numeric()
                                                     ->prefix('R$')
                                                     ->required()
+                                                    ->dehydrated()
+                                                    ->disabled()
                                                     ->reactive()
                                                     ->columnSpan(4)
                                                     ->step(0.01),
@@ -388,7 +390,7 @@ class BudgetResource extends Resource
                                             ]),
                                     ])
                                     ->columns(1)
-                                    ->live()
+                                    ->live(debounce: 1000)
                                     ->afterStateUpdated(function (Get $get, Set $set) {
                                         self::calculateTotalFromRepeater($get, $set);
                                     }),
@@ -399,9 +401,9 @@ class BudgetResource extends Resource
                                     ->columns(4)
                                     ->schema([
                                         TextInput::make('content.subtotal')
-                                            ->live()
+                                            ->live(debounce: 1000)
                                             ->dehydrated()
-                                            ->readonly()
+                                            ->disabled()
                                             ->label('Subtotal de Itens')
                                             ->helperText('Soma dos itens acima.')
                                             ->prefix('R$')
@@ -409,7 +411,7 @@ class BudgetResource extends Resource
                                             ->step(0.01),
                                         TextInput::make('content.shipping')
                                             ->label('Frete')
-                                            ->live()
+                                            ->live(debounce: 1000)
                                             ->dehydrated()
                                             ->prefix('+ R$')
                                             ->numeric()
@@ -422,7 +424,7 @@ class BudgetResource extends Resource
                                             }),
                                         TextInput::make('content.tax')
                                             ->label('Taxas / Outros')
-                                            ->live()
+                                            ->live(debounce: 1000)
                                             ->dehydrated()
                                             ->prefix('+ R$')
                                             ->numeric()
@@ -435,7 +437,7 @@ class BudgetResource extends Resource
                                             }),
                                         TextInput::make('content.discount')
                                             ->label('Desconto')
-                                            ->live()
+                                            ->live(debounce: 1000)
                                             ->dehydrated()
                                             ->numeric()
                                             ->required()
@@ -449,7 +451,7 @@ class BudgetResource extends Resource
                                             ->label('Valor Total Final')
                                             ->live()
                                             ->dehydrated()
-                                            ->readonly()
+                                            ->disabled()
                                             ->numeric()
                                             ->required()
                                             ->prefix('R$')
@@ -499,8 +501,13 @@ class BudgetResource extends Resource
                                                 ->modalHeading('Gerar Link de Compartilhamento')
                                                 ->modalDescription('O PDF será gerado e um link de download será criado.')
                                                 ->modalSubmitActionLabel('Gerar Agora')
-                                                ->action(function (Budget $record) {
-                                                    $pdfModel = self::generatePdfModel($record);
+                                                ->action(function (Budget $record, $livewire) {
+                                                    // Se estivermos na página de edição, salva o formulário primeiro
+                                                    if (method_exists($livewire, 'save')) {
+                                                        $livewire->save();
+                                                    }
+                                                    
+                                                    $pdfModel = self::generatePdfModel($record->refresh());
                                                     
                                                     if ($pdfModel) {
                                                         $url = $pdfModel->getDownloadUrl();
@@ -544,10 +551,14 @@ class BudgetResource extends Resource
                                                     !isset($record->content['shipping'])
                                                 )
                                                 ->requiresConfirmation()
-                                                ->action(function (Budget $record) {
+                                                ->action(function (Budget $record, $livewire) {
+                                                    if (method_exists($livewire, 'save')) {
+                                                        $livewire->save();
+                                                    }
+                                                    
                                                     try {
                                                         $mailService = new SendBudgetMailService(
-                                                            $record,
+                                                            $record->refresh(),
                                                             $record->content['customer_email'] ?? ''
                                                         );
                                                         $mailService->dispatch();
@@ -579,8 +590,12 @@ class BudgetResource extends Resource
                                                     !isset($record->content['shipping'])
                                                 )
                                                 ->requiresConfirmation()
-                                                ->action(function (Budget $record) {
-                                                    $pdfModel = self::generatePdfModel($record);
+                                                ->action(function (Budget $record, $livewire) {
+                                                    if (method_exists($livewire, 'save')) {
+                                                        $livewire->save();
+                                                    }
+                                                    
+                                                    $pdfModel = self::generatePdfModel($record->refresh());
 
                                                     if ($pdfModel) {
                                                         $record->update([

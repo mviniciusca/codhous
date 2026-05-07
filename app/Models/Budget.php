@@ -41,6 +41,35 @@ class Budget extends Model
                 $budget->code = self::generateUniqueCode();
             }
         });
+
+        static::updating(function ($budget) {
+            if ($budget->status === 'pending') {
+                $oldContent = $budget->getOriginal('content');
+                $newContent = $budget->content;
+
+                // Ensure we have arrays to compare
+                $oldContent = is_array($oldContent) ? $oldContent : json_decode($oldContent ?? '[]', true);
+                $newContent = is_array($newContent) ? $newContent : json_decode($newContent ?? '[]', true);
+
+                $pricingFields = ['shipping', 'tax', 'discount'];
+                $hasPricingChanges = false;
+
+                foreach ($pricingFields as $field) {
+                    $oldValue = $oldContent[$field] ?? null;
+                    $newValue = $newContent[$field] ?? null;
+
+                    // Compare values (ignoring type difference like "0" vs 0)
+                    if ($oldValue != $newValue) {
+                        $hasPricingChanges = true;
+                        break;
+                    }
+                }
+
+                if ($hasPricingChanges) {
+                    $budget->status = 'on going';
+                }
+            }
+        });
     }
 
     public function getActivitylogOptions(): LogOptions
