@@ -8,7 +8,7 @@
 {{--
     Template de Cabeçalho Padrão das Páginas Internas
 --}}
-<section class="bg-background pt-6 pb-6 lg:pt-8 lg:pb-8 border-b border-border/50">
+<section class="bg-background pt-6 pb-6 lg:pt-8 lg:pb-8">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         
         {{-- Breadcrumbs --}}
