@@ -8,14 +8,17 @@
     <style>
         /* Container Principal */
         .studio-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             display: grid;
-            grid-template-columns: 280px 1fr 100px;
+            grid-template-columns: 320px 1fr 100px;
             gap: 0;
-            height: calc(100vh - 64px); 
-            margin: -40px -24px -40px -24px; 
             background: #ffffff;
             overflow: hidden;
-            position: relative;
+            z-index: 9999; /* Fica acima de tudo no Filament */
         }
 
         .dark .studio-container { background: #09090b; }
@@ -38,14 +41,21 @@
         .studio-canvas {
             flex: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
+            flex-direction: column;
             position: relative;
             background-color: #f1f5f9;
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
             background-size: 30px 30px;
-            overflow: hidden;
+            overflow: hidden; /* O container do canvas não rola, quem rola é a área interna */
+        }
+
+        .studio-canvas-scroll {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
         }
 
         .dark .studio-canvas { background-color: #0f1115; background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); }
@@ -171,26 +181,20 @@
         .style-canva_side .side-block { position: absolute; left: 0; top: 0; width: 45%; height: 100%; background: var(--highlight); z-index: 5; }
 
         /* Toolbar / Prompt Bar */
+        /* Barra de Prompt Fixa no Fundo */
         .studio-prompt-bar {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 700px;
-            max-width: 95%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 100px;
-            padding: 8px 8px 8px 24px;
+            background: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 12px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
-            z-index: 200;
+            z-index: 30;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
+            width: 100%;
         }
 
-        .dark .studio-prompt-bar { background: rgba(24, 26, 32, 0.9); border-color: rgba(255,255,255,0.1); }
+        .dark .studio-prompt-bar { background: #111114; border-top: 1px solid rgba(255,255,255,0.05); }
 
         .studio-prompt-input {
             flex: 1;
@@ -281,13 +285,21 @@
         }
     </style>
 
-    <div class="studio-container rounded-b-2xl" 
+    <div class="studio-container" 
          x-data="{}"
          style="--highlight: {{ $overlayColor }};">
         
         {{-- Sidebar Esquerda --}}
         <aside class="studio-sidebar-left">
              <div class="space-y-6">
+                {{-- Botão Voltar --}}
+                <div class="mb-4">
+                    <a href="{{ filament()->getUrl() }}" class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-amber-500 transition-colors group">
+                        <x-heroicon-m-arrow-left class="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                        Voltar ao Painel
+                    </a>
+                </div>
+
                 <div>
                     <label class="studio-label">Design Style</label>
                     <div class="preset-grid">
@@ -360,68 +372,70 @@
             </div>
         </aside>
 
-        {{-- Canvas Central --}}
+        {{-- Coluna Central --}}
         <main class="studio-canvas">
-            <div class="preview-wrapper style-{{ $preset }}"
-                 style="width: 540px; aspect-ratio: {{ $platform === 'story' ? '9/16' : ($platform === 'facebook' || $platform === 'linkedin' ? '1.91/1' : '1/1') }}; max-height: 85%;">
-                
-                {{-- Background --}}
-                <div class="absolute inset-0 bg-[#000]">
-                     @if($this->selectedBackground?->getPreviewUrl())
-                        <div class="inner-image absolute inset-0 bg-cover bg-center"
-                             style="background-image: url('{{ $this->selectedBackground->getPreviewUrl() }}');">
-                        </div>
-                    @endif
-                </div>
-
-                <div class="absolute inset-0" style="background: {{ $this->overlayCss }};"></div>
-                @if($preset === 'canva_side') <div class="side-block"></div> @endif
-
-                {{-- DRAGGABLE TEXT BLOCK (FLUIDO) --}}
-                <div class="draggable-text"
-                     x-data="{ 
-                        textX: {{ $textX }}, 
-                        textY: {{ $textY }},
-                        isDragging: false,
-                        init() {
-                            interact($el).draggable({
-                                listeners: {
-                                    start: () => { this.isDragging = true },
-                                    move: (event) => {
-                                        const wrapper = document.querySelector('.preview-wrapper');
-                                        const rect = wrapper.getBoundingClientRect();
-                                        this.textX += (event.dx / rect.width) * 100;
-                                        this.textY += (event.dy / rect.height) * 100;
-                                    },
-                                    end: () => {
-                                        this.isDragging = false;
-                                        @this.updateCoordinates(this.textX, this.textY);
-                                    }
-                                }
-                            });
-                        }
-                     }"
-                     :class="{ 'is-dragging': isDragging }"
-                     :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%); font-family: '${@this.fontFamily.replace('+', ' ')}', sans-serif; text-align: {{ $textAlign }};`"
-                     style="position: absolute; cursor: move; z-index: 100; width: auto; max-width: 90%;">
+            <div class="studio-canvas-scroll">
+                <div class="preview-wrapper style-{{ $preset }}"
+                     style="width: 540px; aspect-ratio: {{ $platform === 'story' ? '9/16' : ($platform === 'facebook' || $platform === 'linkedin' ? '1.91/1' : '1/1') }}; max-height: 85%;">
                     
-                    @if($postTitle) 
-                        <span class="title-text block" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '900' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-family: inherit; text-align: inherit;">
-                            {{ $postTitle }}
-                        </span> 
-                    @endif
+                    {{-- Background --}}
+                    <div class="absolute inset-0 bg-[#000]">
+                         @if($this->selectedBackground?->getPreviewUrl())
+                            <div class="inner-image absolute inset-0 bg-cover bg-center"
+                                 style="background-image: url('{{ $this->selectedBackground->getPreviewUrl() }}');">
+                            </div>
+                        @endif
+                    </div>
 
-                    @if(trim($quote)) 
-                        <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: inherit; text-align: inherit;">
-                            {{ $quote }}
-                        </p> 
-                    @else 
-                        <p class="text-[12px] uppercase font-black opacity-20 tracking-widest italic" style="color: {{ $textColor }}; font-family: inherit; text-align: inherit;">Arraste para posicionar</p> 
-                    @endif
+                    <div class="absolute inset-0" style="background: {{ $this->overlayCss }};"></div>
+                    @if($preset === 'canva_side') <div class="side-block"></div> @endif
+
+                    {{-- DRAGGABLE TEXT BLOCK (ESTÁVEL) --}}
+                    <div class="draggable-text"
+                         x-data="{ 
+                            textX: {{ $textX }}, 
+                            textY: {{ $textY }},
+                            isDragging: false,
+                            init() {
+                                interact($el).draggable({
+                                    listeners: {
+                                        start: () => { this.isDragging = true },
+                                        move: (event) => {
+                                            const wrapper = document.querySelector('.preview-wrapper');
+                                            const rect = wrapper.getBoundingClientRect();
+                                            this.textX += (event.dx / rect.width) * 100;
+                                            this.textY += (event.dy / rect.height) * 100;
+                                        },
+                                        end: () => {
+                                            this.isDragging = false;
+                                            @this.updateCoordinates(this.textX, this.textY);
+                                        }
+                                    }
+                                });
+                            }
+                         }"
+                         :class="{ 'is-dragging': isDragging }"
+                         :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%); font-family: '${@this.fontFamily.replace('+', ' ')}', sans-serif; text-align: {{ $textAlign }};`"
+                         style="position: absolute; cursor: move; z-index: 100; width: auto; max-width: 90%;">
+                        
+                        @if($postTitle) 
+                            <span class="title-text block" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '900' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-family: inherit; text-align: inherit;">
+                                {{ $postTitle }}
+                            </span> 
+                        @endif
+
+                        @if(trim($quote)) 
+                            <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: inherit; text-align: inherit;">
+                                {{ $quote }}
+                            </p> 
+                        @else 
+                            <p class="text-[12px] uppercase font-black opacity-20 tracking-widest italic" style="color: {{ $textColor }}; font-family: inherit; text-align: inherit;">Arraste para posicionar</p> 
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            {{-- Prompt Bar & Toolbar --}}
+            {{-- Prompt Bar & Toolbar (Fixa no rodapé) --}}
             <div class="studio-prompt-bar">
                 
                 {{-- Text Style Toolbar --}}
