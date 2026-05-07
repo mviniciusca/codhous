@@ -11,22 +11,28 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // Usar SQL raw para verificar e remover constraint com segurança
-        $constraints = DB::select("
-            SELECT CONSTRAINT_NAME
-            FROM information_schema.TABLE_CONSTRAINTS
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'product_options'
-            AND CONSTRAINT_NAME = 'product_options_name_unique'
-        ");
+        $isMysql = DB::getDriverName() === 'mysql';
+        $constraints = [];
 
-        Schema::table('product_options', function (Blueprint $table) use ($constraints) {
+        if ($isMysql) {
+            // Usar SQL raw para verificar e remover constraint com segurança no MySQL
+            $constraints = DB::select("
+                SELECT CONSTRAINT_NAME
+                FROM information_schema.TABLE_CONSTRAINTS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'product_options'
+                AND CONSTRAINT_NAME = 'product_options_name_unique'
+            ");
+        }
+
+        Schema::table('product_options', function (Blueprint $table) use ($constraints, $isMysql) {
             // Remover a constraint antiga se ela existir
-            if (! empty($constraints)) {
+            if ($isMysql && ! empty($constraints)) {
                 $table->dropUnique('product_options_name_unique');
             }
 
-            // Adicionar nova constraint composta (product_id + name)
+            // No SQLite, se estivermos criando a tabela do zero nos testes, 
+            // a constraint composta é adicionada normalmente abaixo.
             $table->unique(['product_id', 'name'], 'product_options_product_name_unique');
         });
     }

@@ -40,10 +40,10 @@ class AppServiceProvider extends ServiceProvider
             $discoveryMode = false;
 
             try {
-                $settings = Setting::select(['maintenance_mode', 'discovery_mode'])->first();
+                $settings = Setting::first();
                 if ($settings) {
-                    $maintenanceMode = $settings->maintenance_mode ?? false;
-                    $discoveryMode = $settings->discovery_mode ?? false;
+                    $maintenanceMode = data_get($settings->settings, 'maintenance_mode', false);
+                    $discoveryMode = data_get($settings->settings, 'discovery_mode', false);
                 }
             } catch (\Exception $e) {
                 // Falha silenciosa - pode ocorrer durante migrações
