@@ -206,28 +206,25 @@
     <div class="section-title">Cálculo do Orçamento</div>
     <table>
         <tr>
-            <td style="width: 20%;">
-                <span class="label">Base de Cálculo</span>
-                <span class="value text-right">0,00</span>
+            <td style="width: 18%;">
+                <span class="label">Subtotal Itens</span>
+                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'subtotal', 0)), 2, ',', '.') }}</span>
             </td>
-            <td style="width: 20%;">
-                <span class="label">Valor do Imposto</span>
-                <span class="value text-right">0,00</span>
-            </td>
-            <td style="width: 20%;">
+            <td style="width: 18%;">
                 <span class="label">Valor do Frete</span>
-                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, '.', ',') }}</span>
+                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, ',', '.') }}</span>
             </td>
-            <td style="width: 20%;">
-                <span class="label">Desconto / Taxas</span>
-                @php
-                    $adj = floatval(data_get($state['content'], 'tax', 0)) - floatval(data_get($state['content'], 'discount', 0));
-                @endphp
-                <span class="value text-right">{{ number_format($adj, 2, '.', ',') }}</span>
+            <td style="width: 18%;">
+                <span class="label">Taxas / Outros</span>
+                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'tax', 0)), 2, ',', '.') }}</span>
             </td>
-            <td style="width: 20%;" class="total-box">
+            <td style="width: 18%;">
+                <span class="label">(-) Desconto</span>
+                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'discount', 0)), 2, ',', '.') }}</span>
+            </td>
+            <td style="width: 28%;" class="total-box">
                 <span class="label">Valor Total do Orçamento</span>
-                <span class="value text-right bold" style="font-size: 11px;">R$ {{ number_format(floatval(data_get($state['content'], 'total', 0)), 2, '.', ',') }}</span>
+                <span class="value text-right bold" style="font-size: 11px;">R$ {{ number_format(floatval(data_get($state['content'], 'total', 0)), 2, ',', '.') }}</span>
             </td>
         </tr>
     </table>

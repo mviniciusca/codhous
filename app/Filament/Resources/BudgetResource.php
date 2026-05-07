@@ -37,6 +37,7 @@ use App\Services\PdfGeneratorService;
 use App\Services\SendBudgetMailService;
 use App\Services\WhatsappService;
 use App\Models\BudgetPdf;
+use App\Models\OperationArea;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -195,7 +196,7 @@ class BudgetResource extends Resource
                                             ->mask('99999-999')
                                             ->label('CEP')
                                             ->helperText('Formato: 00000-000')
-                                            ->afterStateUpdated(function ($state, Set $set) {
+                                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                                 if (strlen(preg_replace('/[^0-9]/', '', $state ?? '')) === 8) {
                                                     try {
                                                         $finder = new \App\Services\AddressFinderService($state, $set, [
@@ -205,6 +206,20 @@ class BudgetResource extends Resource
                                                             'uf'         => 'content.state',
                                                         ], 'content.postcode');
                                                         $finder->find();
+
+                                                        // Busca automática de frete baseada na faixa de CEP
+                                                        $area = \App\Models\OperationArea::findOperationAreaByCep($state);
+                                                        if ($area) {
+                                                            $set('content.shipping', $area->shipping_fee);
+                                                            
+                                                            // Recalcula o total final com o novo frete
+                                                            self::calculateTotalFromRepeater($get, $set);
+                                                            
+                                                            \Filament\Notifications\Notification::make()
+                                                                ->title("Frete carregado: R$ " . number_format($area->shipping_fee, 2, ',', '.'))
+                                                                ->success()
+                                                                ->send();
+                                                        }
                                                     } catch (\Exception $e) {
                                                         // Fallback silencioso para não travar a UI
                                                     }
@@ -346,8 +361,8 @@ class BudgetResource extends Resource
                                             ->prefix('R$')
                                             ->numeric()
                                             ->step(0.01),
-                                        TextInput::make('content.tax')
-                                            ->label('Taxas/Frete')
+                                        TextInput::make('content.shipping')
+                                            ->label('Frete')
                                             ->live()
                                             ->dehydrated()
                                             ->prefix('+ R$')
@@ -355,7 +370,20 @@ class BudgetResource extends Resource
                                             ->required()
                                             ->default(0)
                                             ->step(0.01)
-                                            ->helperText('Custos adicionais.')
+                                            ->helperText('Custo de deslocamento.')
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                self::calculateTotalFromRepeater($get, $set);
+                                            }),
+                                        TextInput::make('content.tax')
+                                            ->label('Taxas / Outros')
+                                            ->live()
+                                            ->dehydrated()
+                                            ->prefix('+ R$')
+                                            ->numeric()
+                                            ->required()
+                                            ->default(0)
+                                            ->step(0.01)
+                                            ->helperText('Serviços extras ou taxas.')
                                             ->afterStateUpdated(function (Get $get, Set $set) {
                                                 self::calculateTotalFromRepeater($get, $set);
                                             }),
@@ -568,9 +596,10 @@ class BudgetResource extends Resource
             $subtotal += ($qty * $price);
         }
 
+        $shipping = floatval($get('content.shipping') ?? 0);
         $tax = floatval($get('content.tax') ?? 0);
         $discount = floatval($get('content.discount') ?? 0);
-        $total = $subtotal + $tax - $discount;
+        $total = $subtotal + $shipping + $tax - $discount;
 
         $set('content.subtotal', number_format($subtotal, 2, '.', ''));
         $set('content.total', number_format($total, 2, '.', ''));
