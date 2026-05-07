@@ -4,37 +4,75 @@ namespace App\Enums;
 
 enum CardPreset: string
 {
-    case TOP_LEFT = 'top_left';         // Home Quarantine Playlist
-    case TOP_CENTER = 'top_center';     // Quarantine and Chill
-    case TOP_RIGHT = 'top_right';       // Stay Home Enjoy Music
-    case BOTTOM_LEFT = 'bottom_left';   // Stay Home and Enjoy Your Music
-    case BOTTOM_CENTER = 'bottom_center'; // Stay Entertained
-    case BOTTOM_RIGHT = 'bottom_right'; // Stay Home (with yellow bg)
+    case MAX = 'max';             // Impacto, Poppins, Esquerda
+    case FLUX = 'flux';           // Elegante, Fina, Centralizado
+    case CANVA_SIDE = 'canva_side'; // Bloco lateral branco/preto
+    case BOLD_CENTER = 'bold_center'; // Clássico centralizado pesado
+    case MINIMAL = 'minimal';     // Texto pequeno, elegante, cantos
+    case STACKED = 'stacked';     // Título e Subtítulo empilhados com destaque
 
     public function label(): string
     {
         return match($this) {
-            self::TOP_LEFT => 'Playlist Style',
-            self::TOP_CENTER => 'Chill Split',
-            self::TOP_RIGHT => 'Modern Mix',
-            self::BOTTOM_LEFT => 'Geometric L',
-            self::BOTTOM_CENTER => 'Horizontal Split',
-            self::BOTTOM_RIGHT => 'Solid Impact',
+            self::MAX => 'Estilo MAX (Impacto)',
+            self::FLUX => 'Estilo FLUX (Elegante)',
+            self::CANVA_SIDE => 'Canva Side Block',
+            self::BOLD_CENTER => 'Bold Center',
+            self::MINIMAL => 'Minimalist Clean',
+            self::STACKED => 'Stacked Blocks',
         };
     }
 
     /**
-     * Retorna a descrição do layout para o preview ou logs.
+     * Retorna as configurações de estilo do preset.
      */
-    public function description(): string
+    public function getStyle(): array
     {
         return match($this) {
-            self::TOP_LEFT => 'Imagem central com borda espessa e blocos de cor nos cantos.',
-            self::TOP_CENTER => 'Divisão 50/50 com grafismos de listras e pontos.',
-            self::TOP_RIGHT => 'Foto à direita com mix de tipografia sólida e outline.',
-            self::BOTTOM_LEFT => 'Fundo predominante com moldura em L e texto à direita.',
-            self::BOTTOM_CENTER => 'Divisão horizontal, texto em duas camadas e numeração vertical.',
-            self::BOTTOM_RIGHT => 'Fundo sólido com círculos concêntricos e blocos de rodapé.',
+            self::MAX => [
+                'font' => 'Poppins',
+                'align' => 'left',
+                'valign' => 'center',
+                'uppercase' => true,
+                'has_block' => false,
+            ],
+            self::FLUX => [
+                'font' => 'Montserrat',
+                'align' => 'center',
+                'valign' => 'center',
+                'uppercase' => false,
+                'has_block' => false,
+            ],
+            self::CANVA_SIDE => [
+                'font' => 'Inter',
+                'align' => 'left',
+                'valign' => 'center',
+                'uppercase' => false,
+                'has_block' => true,
+                'block_type' => 'side', // Ocupa metade da tela
+            ],
+            self::BOLD_CENTER => [
+                'font' => 'Oswald',
+                'align' => 'center',
+                'valign' => 'center',
+                'uppercase' => true,
+                'has_block' => false,
+            ],
+            self::MINIMAL => [
+                'font' => 'Raleway',
+                'align' => 'left',
+                'valign' => 'bottom',
+                'uppercase' => false,
+                'has_block' => false,
+            ],
+            self::STACKED => [
+                'font' => 'Montserrat',
+                'align' => 'center',
+                'valign' => 'center',
+                'uppercase' => true,
+                'has_block' => true,
+                'block_type' => 'floating', // Bloco atrás do texto
+            ],
         };
     }
 }

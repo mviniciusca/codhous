@@ -93,34 +93,12 @@
         .dark .studio-prompt-input { color: white; }
 
         /* Presets Selectors */
-        .preset-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .preset-btn {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
+        .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .preset-btn { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 8px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
         .dark .preset-btn { background: #1e293b; border-color: rgba(255,255,255,0.05); }
-        .preset-btn.active { border-color: #fbbf24; background: #fffcf0; }
+        .preset-btn.active { border-color: #fbbf24; background: #fffcf0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(251, 191, 36, 0.1); }
         .dark .preset-btn.active { background: #2d2613; border-color: #fbbf24; }
-        .preset-icon-box {
-            height: 30px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.03);
-            border-radius: 4px;
-        }
-        .preset-btn span { font-size: 10px; font-weight: bold; color: #64748b; }
+        .preset-btn span { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
         .dark .preset-btn span { color: #94a3b8; }
         .preset-btn.active span { color: #b45309; }
         .dark .preset-btn.active span { color: #fbbf24; }
@@ -134,16 +112,22 @@
             position: relative;
         }
 
-        /* Preset 1: TOP_LEFT (Playlist) */
-        .preset-top_left .inner-image { margin: 40px; border: 15px solid white; height: calc(100% - 80px); }
-        .preset-top_left .deco-block { position: absolute; top: 20px; right: 20px; width: 60px; height: 60px; background: var(--highlight); border-radius: 50%; }
+        /* Preset Styles */
+        .style-max { text-align: left; justify-content: flex-start; padding: 80px; }
+        .style-max .quote-text { text-transform: uppercase; font-weight: 900; font-size: 42px; line-height: 0.95; }
+        .style-max .title-text { font-size: 14px; text-transform: uppercase; letter-spacing: 0.3em; margin-bottom: 15px; opacity: 0.8; }
 
-        /* Preset 2: TOP_CENTER (Chill Split) */
-        .preset-top_center .split-bg { position: absolute; top: 0; left: 0; width: 50%; height: 100%; background: var(--highlight); }
-        .preset-top_center .stripes { position: absolute; top: 10px; right: 10px; width: 80px; height: 40px; background: repeating-linear-gradient(45deg, #000, #000 5px, transparent 5px, transparent 10px); opacity: 0.3; }
+        .style-flux { text-align: center; justify-content: center; padding: 60px; }
+        .style-flux .quote-text { font-weight: 400; font-style: italic; font-size: 32px; }
+        .style-flux .title-text { font-size: 12px; letter-spacing: 0.5em; margin-bottom: 40px; }
 
-        /* Preset 5: BOTTOM_CENTER (Horizontal Split) */
-        .preset-bottom_center .split-bg-h { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: var(--highlight); }
+        .style-canva_side { display: flex; align-items: stretch; justify-content: flex-start; text-align: left; }
+        .style-canva_side .side-block { width: 45%; height: 100%; background: var(--highlight); padding: 40px; display: flex; flex-direction: column; justify-content: center; z-index: 20; position: relative; }
+        .style-canva_side .inner-image { width: 55%; left: auto; right: 0; }
+        .style-canva_side .text-container { position: relative; padding: 0; }
+
+        .style-minimal { align-items: flex-end; justify-content: flex-start; text-align: left; padding: 40px; }
+        .style-minimal .quote-text { font-size: 20px; font-weight: 300; }
 
         /* Color Pill Fixes */
         .studio-input { width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; color: #1f2937; padding: 8px 12px; appearance: none; }
@@ -182,34 +166,26 @@
         <aside class="studio-sidebar-left">
             <div class="flex items-center gap-2 mb-2 text-gray-400 dark:text-white/40 text-[10px] uppercase tracking-widest font-black">
                 <x-heroicon-o-adjustments-horizontal class="w-4 h-4" />
-                <span>Propriedades</span>
+                <span>Branding / Estilos</span>
             </div>
 
             <div class="space-y-5">
                 {{-- Presets --}}
                 <div class="space-y-2">
-                    <label class="text-[10px] text-gray-500 uppercase font-bold">Layout / Presets</label>
+                    <label class="text-[10px] text-gray-500 uppercase font-bold">Design Presets</label>
                     <div class="preset-grid">
                         @foreach($this->presetOptions as $val => $lbl)
                             <div wire:click="selectPreset('{{ $val }}')" 
                                  class="preset-btn {{ $preset === $val ? 'active' : '' }}">
-                                <div class="preset-icon-box">
-                                    @if($val === 'top_left') <x-heroicon-o-square-3-stack-3d class="w-4 h-4" /> @endif
-                                    @if($val === 'top_center') <x-heroicon-o-view-columns class="w-4 h-4" /> @endif
-                                    @if($val === 'top_right') <x-heroicon-o-swatch class="w-4 h-4" /> @endif
-                                    @if($val === 'bottom_left') <x-heroicon-o-stop class="w-4 h-4" /> @endif
-                                    @if($val === 'bottom_center') <x-heroicon-o-rectangle-stack class="w-4 h-4" /> @endif
-                                    @if($val === 'bottom_right') <x-heroicon-o-photo class="w-4 h-4" /> @endif
-                                </div>
-                                <span>{{ $lbl }}</span>
+                                <span>{{ str_replace('Estilo ', '', $lbl) }}</span>
                             </div>
                         @endforeach
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-[10px] text-gray-500 uppercase font-bold">Título do Post</label>
-                    <input type="text" wire:model.live.debounce.300ms="postTitle" class="studio-input">
+                    <label class="text-[10px] text-gray-500 uppercase font-bold">Título / Label</label>
+                    <input type="text" wire:model.live.debounce.300ms="postTitle" class="studio-input" placeholder="Ex: NOVIDADE">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -237,7 +213,7 @@
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[10px] text-gray-500 uppercase font-bold">Destaque</label>
+                        <label class="text-[10px] text-gray-500 uppercase font-bold">Highlight</label>
                         <div class="color-pill shadow-sm">
                             <input type="color" wire:model.live="overlayColor" class="color-circle">
                             <span>{{ $overlayColor }}</span>
@@ -257,7 +233,7 @@
 
                 {{-- Recent Status --}}
                 <div class="space-y-3" wire:poll.5s>
-                    <label class="text-[10px] text-gray-400 uppercase tracking-widest font-black">Histórico</label>
+                    <label class="text-[10px] text-gray-400 uppercase tracking-widest font-black">Fila de Geração</label>
                     <div class="space-y-2 max-h-40 overflow-y-auto pr-2">
                         @foreach($this->recentPosts as $p)
                             <div class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 group">
@@ -281,7 +257,7 @@
         {{-- Canvas Central --}}
         <main class="studio-canvas">
             
-            <div class="preview-wrapper preset-{{ $preset }}"
+            <div class="preview-wrapper style-{{ $preset }}"
                  style="width: 500px; aspect-ratio: {{ $platform === 'story' ? '9/16' : ($platform === 'facebook' || $platform === 'linkedin' ? '1.91/1' : '1/1') }}; max-height: 85%;">
                 
                 {{-- Background Base --}}
@@ -297,20 +273,28 @@
                     @endif
                 </div>
 
-                {{-- Preset Elements --}}
-                @if($preset === 'top_center') <div class="split-bg"></div> <div class="stripes"></div> @endif
-                @if($preset === 'top_left') <div class="deco-block"></div> @endif
-                @if($preset === 'bottom_center') <div class="split-bg-h"></div> @endif
-
                 {{-- Global Overlay --}}
                 <div class="absolute inset-0 transition-all duration-300" style="background: {{ $this->overlayCss }};"></div>
 
+                {{-- Style Specific Blocks --}}
+                @if($preset === 'canva_side') <div class="side-block"></div> @endif
+
                 {{-- Text Content --}}
-                <div class="absolute inset-0 flex items-center justify-center p-12 text-center">
-                    <div style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif; color: {{ $textColor }}; z-index: 10;">
+                <div class="absolute inset-0 flex flex-col text-container" 
+                     style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif; color: {{ $textColor }}; z-index: 30;">
+                    
+                    @php
+                        $presetEnum = \App\Enums\CardPreset::tryFrom($preset);
+                        $style = $presetEnum ? $presetEnum->getStyle() : [];
+                    @endphp
+
+                    <div class="w-full">
+                        @if($postTitle)
+                            <span class="title-text block font-black">{{ $postTitle }}</span>
+                        @endif
+                        
                         @if(trim($quote))
-                            <span class="block text-4xl font-black leading-none opacity-40 mb-4">&ldquo;</span>
-                            <p class="font-bold leading-tight" style="font-size: 26px; text-shadow: 0 4px 30px rgba(0,0,0,0.6);">{{ $quote }}</p>
+                            <p class="quote-text font-bold leading-tight" style="text-shadow: 0 4px 30px rgba(0,0,0,0.6);">{{ $quote }}</p>
                         @else
                             <p class="text-[10px] uppercase tracking-[0.2em] text-gray-400 dark:text-white/30 font-bold italic">Digite o seu quote abaixo</p>
                         @endif

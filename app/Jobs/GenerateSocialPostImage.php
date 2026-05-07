@@ -35,11 +35,14 @@ class GenerateSocialPostImage implements ShouldQueue
                 mkdir(dirname($fullPath), 0755, true);
             }
 
-            // ── Generate using Intervention Image v4 ──────────────────
+            // ── Configuration ────────────────────────────────────────
             $manager = new ImageManager(new Driver());
-            $preset = $this->post->preset ?? \App\Enums\CardPreset::BOTTOM_RIGHT;
+            $preset = $this->post->preset ?? \App\Enums\CardPreset::BOLD_CENTER;
+            $style = $preset->getStyle();
             $highlightColor = $this->post->overlay_color ?? '#FFC107';
-
+            $textColor = $this->post->text_color ?? '#ffffff';
+            $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'; // Bold base
+            
             // 1. Load background
             $bgPath = $this->post->backgroundImage?->getFirstMediaPath('image');
             if (! $bgPath || ! file_exists($bgPath)) {
@@ -55,71 +58,59 @@ class GenerateSocialPostImage implements ShouldQueue
             $bg = $manager->decodePath($bgPath);
             $bg->cover(1080, 1080);
 
-            // 2. Apply Preset Layout Logic
-            switch ($preset->value) {
-                case \App\Enums\CardPreset::TOP_CENTER->value:
-                    // Half color, half image
-                    $image->drawRectangle(function ($draw) use ($highlightColor) {
-                        $draw->at(0, 0);
-                        $draw->size(540, 1080);
-                        $draw->background($highlightColor);
-                    });
-                    $bg->cover(540, 1080);
-                    $image->insert($bg, 540, 0, 'top-left');
-                    break;
-
-                case \App\Enums\CardPreset::BOTTOM_CENTER->value:
-                    // Horizontal Split
-                    $bg->cover(1080, 540);
-                    $image->insert($bg, 0, 0, 'top-left');
-                    $image->drawRectangle(function ($draw) use ($highlightColor) {
-                        $draw->at(0, 540);
-                        $draw->size(1080, 540);
-                        $draw->background($highlightColor);
-                    });
-                    break;
-
-                case \App\Enums\CardPreset::TOP_LEFT->value:
-                    // Thick white border
-                    $image->insert($bg, 0, 0, 'top-left');
-                    $image->drawRectangle(function ($draw) {
-                        $draw->at(40, 40);
-                        $draw->size(1000, 1000);
-                        $draw->border('white', 20);
-                    });
-                    // Highlight circle
-                    $image->drawCircle(function ($draw) use ($highlightColor) {
-                        $draw->at(950, 130);
-                        $draw->radius(60);
-                        $draw->background($highlightColor);
-                    });
-                    break;
-
-                default:
-                    // Standard: Image + Overlay
-                    $image->insert($bg, 0, 0, 'top-left');
-                    $opacity = $this->post->overlay_opacity ?? 40;
-                    $image->brightness(-$opacity);
+            // 2. Render Layout Composition
+            if ($style['has_block'] && ($style['block_type'] ?? '') === 'side') {
+                // Style: CANVA SIDE
+                $image->drawRectangle(function ($draw) use ($highlightColor) {
+                    $draw->at(0, 0);
+                    $draw->size(486, 1080); // 45% of 1080
+                    $draw->background($highlightColor);
+                });
+                $bg->cover(594, 1080);
+                $image->insert($bg, 486, 0, 'top-left');
+            } else {
+                // Style: Full Image + Overlay
+                $image->insert($bg, 0, 0, 'top-left');
+                $opacity = $this->post->overlay_opacity ?? 40;
+                $image->brightness(-$opacity);
             }
 
-            // 4. Add Text (Quote)
-            $quote = $this->post->quote ?? '';
-            $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
-            $textColor = $this->post->text_color ?? '#ffffff';
+            // 3. Render Text Layers
+            $title = $this->post->title;
+            $quote = $this->post->quote;
+            $align = $style['align'] ?? 'center';
+            $valign = $style['valign'] ?? 'center';
             
-            // Adjust text position based on preset
-            $xPos = 540;
-            $yPos = 540;
-            if ($preset->value === \App\Enums\CardPreset::TOP_CENTER->value) $xPos = 270;
+            // X position logic
+            $xPos = ($style['has_block'] && ($style['block_type'] ?? '') === 'side') ? 243 : 540;
+            if ($align === 'left' && ! $style['has_block']) $xPos = 100;
+            if ($align === 'right') $xPos = 980;
 
-            $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $textColor) {
+            // Y position logic (Baseline for multiple layers)
+            $yBase = 540;
+            if ($valign === 'bottom') $yBase = 900;
+            if ($valign === 'top') $yBase = 200;
+
+            // Render Title (Label)
+            if ($title) {
+                $image->text($title, $xPos, $yBase - 80, function ($font) use ($fontPath, $textColor, $align) {
+                    $font->filename($fontPath);
+                    $font->size(25);
+                    $font->color($textColor);
+                    $font->align($align);
+                    $font->valign('bottom');
+                });
+            }
+
+            // Render Quote (Main Text)
+            $image->text($quote, $xPos, $yBase, function ($font) use ($fontPath, $textColor, $align, $style) {
                 $font->filename($fontPath);
-                $font->size(45);
+                $font->size(55);
                 $font->color($textColor);
-                $font->align('center');
+                $font->align($align);
                 $font->valign('middle');
-                $font->lineHeight(1.5);
-                $font->wrap(800); 
+                $font->lineHeight(1.2);
+                $font->wrap($style['has_block'] ? 400 : 800);
             });
 
             // 5. Save

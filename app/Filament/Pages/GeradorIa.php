@@ -118,22 +118,27 @@ class GeradorIa extends Page
     public function selectPreset(string $value): void
     {
         $this->preset = $value;
+        
+        // Carregar configurações padrão do estilo para o usuário ver
+        $presetEnum = \App\Enums\CardPreset::from($value);
+        $style = $presetEnum->getStyle();
+        
+        $this->fontFamily = $style['font'];
+        // Se quiser podemos resetar cores aqui tb, mas vou manter as atuais para não ser invasivo
     }
 
     public function dispatchGeneration(): void
     {
         $this->validate([
-            'postTitle'          => 'required|max:255',
             'quote'              => 'required|max:600',
             'backgroundImageId'  => 'required|exists:background_images,id',
         ], [
-            'postTitle.required'         => 'Dê um título para o post.',
             'quote.required'             => 'Digite o texto/quote do post.',
             'backgroundImageId.required' => 'Selecione uma imagem de fundo.',
         ]);
 
         $post = SocialPost::create([
-            'title'               => $this->postTitle,
+            'title'               => $this->postTitle ?: 'Arte ' . now()->format('H:i'),
             'platform'            => $this->platform,
             'quote'               => $this->quote,
             'font_family'         => $this->fontFamily,
