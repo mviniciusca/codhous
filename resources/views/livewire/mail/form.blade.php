@@ -1,21 +1,25 @@
 <div>
-    <form wire:submit="create">
-        {{ $this->form }}
-
-        <x-ui.button :icon="'none'">
-            <div class="flex gap-2">
-                <span>{{ __('Send Message') }}</span>
-                <span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                    </svg>
-                </span>
+    @if($sent)
+        <div class="text-center py-10 space-y-4">
+            <div class="inline-flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
             </div>
-        </x-ui.button>
+            <h2 class="text-2xl font-bold text-foreground">Mensagem Enviada!</h2>
+            <p class="text-muted-foreground">Obrigado pelo seu contato. Nossa equipe analisará sua mensagem e retornará o mais breve possível.</p>
+            <button wire:click="$set('sent', false)" class="mt-6 text-sm font-semibold text-primary hover:underline">
+                Enviar outra mensagem
+            </button>
+        </div>
+    @else
+        <form wire:submit="create" class="space-y-5">
+            {{ $this->form }}
 
-    </form>
+            <button type="submit" class="w-full rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed" wire:loading.attr="disabled">
+                <span wire:loading.remove>Enviar Mensagem</span>
+                <span wire:loading>Enviando...</span>
+            </button>
+        </form>
+    @endif
 
     <x-filament-actions::modals />
 </div>

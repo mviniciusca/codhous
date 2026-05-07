@@ -7,6 +7,7 @@ use App\Mail\Contact;
 use App\Models\Mail as MailModel;
 use App\Models\User;
 use App\Notifications\NewMessage;
+use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -21,6 +22,7 @@ class Form extends Component implements HasForms
 {
     use InteractsWithForms;
     public ?array $data = [];
+    public bool $sent = false;
     public function mount(): void
     {
         $this->form->fill();
@@ -29,39 +31,42 @@ class Form extends Component implements HasForms
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->label(__('Full Name'))
-                    ->minLength(6)
-                    ->maxLength(140)
-                    ->required(),
-                TextInput::make('email')
-                    ->label(__('Email'))
-                    ->email()
-                    ->minLength(5)
-                    ->maxLength(200)
-                    ->required(),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Nome Completo')
+                            ->placeholder('Seu nome completo')
+                            ->minLength(7)
+                            ->maxLength(140)
+                            ->required(),
+                        TextInput::make('email')
+                            ->label('E-mail')
+                            ->placeholder('seu@email.com')
+                            ->email()
+                            ->required(),
+                    ]),
                 TextInput::make('phone')
+                    ->label('Telefone')
                     ->tel()
-                    ->minLength(8)
-                    ->maxLength(200)
-                    ->label(__('Phone'))
-                    ->mask('(99)99999-9999')
+                    ->placeholder('(21) 90000-0000')
+                    ->mask('(99) 99999-9999')
                     ->required(),
                 Select::make('subject')
-                    ->required()
+                    ->label('Assunto')
                     ->options([
-                        'compliment' => __('Compliment'),
-                        'business' => __('Business'),
-                        'complaint' => __('Complaint'),
+                        'Dúvida' => 'Dúvida',
+                        'Elogio' => 'Elogio',
+                        'Outro' => 'Outro',
                     ])
-                    ->default('business')
-                    ->label(__('Subject')),
+                    ->default('Dúvida')
+                    ->required(),
                 Textarea::make('message')
+                    ->label('Mensagem')
+                    ->placeholder('Como podemos ajudar?')
                     ->required()
                     ->minLength(20)
-                    ->maxLength(600)
-                    ->label(__('Message'))
-                    ->rows(3)
+                    ->maxLength(2000)
+                    ->rows(4)
             ])
             ->statePath('data');
     }
@@ -83,10 +88,12 @@ class Form extends Component implements HasForms
         $user->notify(new NewMessage($mail->toArray()));
 
         Notification::make()
-            ->title(__('Mail sent with success!'))
+            ->title('Mensagem enviada com sucesso!')
+            ->body('Em breve entraremos em contato com você.')
             ->success()
             ->send();
         $this->form->fill();
+        $this->sent = true;
     }
     public function render()
     {

@@ -37,11 +37,12 @@ class NewMessage extends Notification
         return (new MailMessage)
             ->replyTo($this->data['email'])
             ->from($this->data['email'], $this->data['name'])
-            ->subject(__('Notification: you have a new mail message'))
-            ->greeting(__('Hello'))
-            ->line(__('You have a new message form: ') . $this->data['name'])
-            ->salutation(__('Have a nice day!'))
-            ->action(__('View on App'), url(env('APP_URL') . '/admin/mails/' . $this->data['id'] . '/view'));
+            ->subject('Nova mensagem de contato: ' . $this->data['name'])
+            ->greeting('Olá!')
+            ->line('Você recebeu uma nova mensagem de: ' . $this->data['name'])
+            ->line('Assunto: ' . ($this->data['subject'] ?? 'Sem assunto'))
+            ->action('Visualizar Mensagem', url(config('app.url') . '/admin/mails/' . $this->data['id'] . '/view'))
+            ->salutation('Atenciosamente, Equipe ' . config('app.name'));
     }
 
     /**

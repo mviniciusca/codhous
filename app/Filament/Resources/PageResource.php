@@ -61,6 +61,7 @@ class PageResource extends Resource
                                             self::getCoverageBlock(),
                                             self::getContactFormBlock(),
                                             self::getMapBlock(),
+                                            self::getDifferentialsBlock(),
                                             self::getCtaBlock(),
                                             self::getRichTextBlock(),
                                         ])
@@ -306,6 +307,22 @@ class PageResource extends Resource
                 Forms\Components\Textarea::make('subtitle'),
                 Forms\Components\TextInput::make('button_label'),
                 Forms\Components\TextInput::make('button_url'),
+            ]);
+    }
+
+    protected static function getDifferentialsBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('differentials')
+            ->label(__('Diferenciais (Missão, Visão, Valores)'))
+            ->icon('heroicon-o-shield-check')
+            ->schema([
+                Forms\Components\TextInput::make('title')->label('Título da Seção')->default('Nossos Pilares'),
+                Forms\Components\Repeater::make('items')
+                    ->schema([
+                        Forms\Components\TextInput::make('title')->label('Título')->required(),
+                        Forms\Components\Textarea::make('description')->label('Descrição')->required(),
+                        Forms\Components\TextInput::make('icon')->label('Ícone (Lucide)')->default('check-circle'),
+                    ])->columns(2),
             ]);
     }
 

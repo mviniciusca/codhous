@@ -226,29 +226,7 @@
 
                             {{-- Formulário --}}
                             <div class="rounded-2xl border border-border bg-card p-8 shadow-sm">
-                                <form action="#" class="space-y-5">
-                                    <div class="grid md:grid-cols-2 gap-5">
-                                        <div>
-                                            <label class="mb-2 block text-sm font-medium text-foreground">Nome</label>
-                                            <input type="text" placeholder="Seu nome" class="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
-                                        </div>
-                                        <div>
-                                            <label class="mb-2 block text-sm font-medium text-foreground">E-mail</label>
-                                            <input type="email" placeholder="seu@email.com" class="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="mb-2 block text-sm font-medium text-foreground">Assunto</label>
-                                        <input type="text" placeholder="Assunto da mensagem" class="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
-                                    </div>
-                                    <div>
-                                        <label class="mb-2 block text-sm font-medium text-foreground">Mensagem</label>
-                                        <textarea rows="5" placeholder="Descreva como podemos ajudar..." class="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"></textarea>
-                                    </div>
-                                    <button type="submit" class="w-full rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-                                        Enviar Mensagem
-                                    </button>
-                                </form>
+                                <livewire:mail.form />
                             </div>
 
                         </div>
@@ -279,6 +257,34 @@
                         </div>
                     </section>
                 @endif
+                @break
+
+            {{-- ──── DIFERENCIAIS (MISSÃO, VISÃO, VALORES) ────────────────── --}}
+            @case('differentials')
+                <section class="bg-background py-16 lg:py-24">
+                    <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                        @if(!empty($block['data']['title']))
+                            <div class="mb-12 text-center">
+                                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                                    {{ $block['data']['title'] }}
+                                </h2>
+                            </div>
+                        @endif
+                        <div class="grid gap-8 md:grid-cols-3">
+                            @foreach($block['data']['items'] ?? [] as $item)
+                                <div class="group rounded-2xl border border-border bg-card p-8 transition-all hover:shadow-lg hover:-translate-y-1">
+                                    <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                                        <i data-lucide="{{ $item['icon'] ?? 'check-circle' }}" class="h-7 w-7"></i>
+                                    </div>
+                                    <h3 class="mb-3 font-mono text-xl font-bold text-foreground">{{ $item['title'] }}</h3>
+                                    <p class="text-muted-foreground leading-relaxed">
+                                        {{ $item['description'] }}
+                                    </p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </section>
                 @break
 
             {{-- ──── CTA ───────────────────────────────────────────────────── --}}

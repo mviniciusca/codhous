@@ -89,6 +89,9 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             FloorPolishingSeeder::class,
         ]);
+
+        // 3. Criar Páginas Iniciais
+        $this->createInitialPages();
     }
 
     protected function seedShowcases()
@@ -125,9 +128,8 @@ class DatabaseSeeder extends Seeder
     protected function createInitialPages()
     {
         // Página Inicial
-        Page::create([
+        Page::updateOrCreate(['slug' => '/'], [
             'title' => 'Página Inicial',
-            'slug' => '/',
             'is_active_in_menu' => true,
             'is_visible' => true,
             'sort_order' => 1,
@@ -161,9 +163,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Serviços
-        Page::create([
+        Page::updateOrCreate(['slug' => 'servicos'], [
             'title' => 'Serviços',
-            'slug' => 'servicos',
             'is_active_in_menu' => true,
             'is_visible' => true,
             'sort_order' => 2,
@@ -173,9 +174,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Nossas Obras
-        Page::create([
+        Page::updateOrCreate(['slug' => 'nossas-obras'], [
             'title' => 'Nossas Obras',
-            'slug' => 'nossas-obras',
             'is_active_in_menu' => true,
             'is_visible' => true,
             'sort_order' => 3,
@@ -191,28 +191,47 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Sobre Nós
-        Page::create([
+        Page::updateOrCreate(['slug' => 'sobre-nos'], [
             'title' => 'Sobre Nós',
-            'slug' => 'sobre-nos',
             'is_active_in_menu' => true,
             'is_visible' => true,
             'sort_order' => 4,
             'content' => [
                 ['type' => 'page_header', 'data' => [
                     'badge' => 'QUEM SOMOS',
-                    'title' => 'Sobre a Empresa',
-                    'description' => 'Compromisso com a qualidade e agilidade na entrega de concreto usinado.',
-                    'show_breadcrumbs' => true
+                    'title' => 'Compromisso com a Solidez da sua Obra',
+                    'description' => 'Desde a fundação até o acabamento, a Codhous é sua parceira em concreto usinado de alta performance.',
+                    'show_breadcrumbs' => true,
+                    'background_image' => 'about/betoneira-premium.png'
                 ]],
-                ['type' => 'rich_text', 'data' => ['content' => '<h2>Nossa História</h2><p>Há mais de 15 anos fornecendo concreto de alta qualidade para pequenas e grandes obras. Nossa missão é garantir que cada cliente receba o traço exato com a pontualidade que o cronograma exige.</p><h3>Nossa Visão</h3><p>Ser referência em inovação logística no setor de construção civil.</p>']],
+                ['type' => 'rich_text', 'data' => ['content' => '<h2>Nossa História</h2><p>Com mais de 15 anos de atuação no mercado de construção civil, a Codhous nasceu com o propósito de desmistificar o fornecimento de concreto usinado. Entendemos que cada obra é única e que o cronograma é sagrado. Por isso, investimos em tecnologia de traço e logística de precisão para garantir que o seu projeto nunca pare.</p><p>Hoje, somos referência no Rio de Janeiro, atendendo desde pequenas reformas residenciais até grandes complexos industriais, sempre com o mesmo padrão de rigor técnico e atendimento personalizado.</p>']],
+                ['type' => 'differentials', 'data' => [
+                    'title' => 'Nossos Pilares',
+                    'items' => [
+                        [
+                            'title' => 'Nossa Missão',
+                            'description' => 'Fornecer soluções em concreto com agilidade, precisão e sustentabilidade, contribuindo para a segurança e durabilidade das construções de nossos clientes.',
+                            'icon' => 'target'
+                        ],
+                        [
+                            'title' => 'Nossa Visão',
+                            'description' => 'Ser a concreteira mais confiável e inovadora do estado, reconhecida pela excelência técnica e pelo compromisso com o sucesso de cada obra.',
+                            'icon' => 'eye'
+                        ],
+                        [
+                            'title' => 'Nossos Valores',
+                            'description' => 'Ética nas negociações, rigor técnico no traço, pontualidade britânica e respeito absoluto ao meio ambiente e às normas de segurança.',
+                            'icon' => 'shield-check'
+                        ],
+                    ]
+                ]],
                 ['type' => 'timeline', 'data' => ['title' => 'Nossa Trajetória']],
             ]
         ]);
 
         // Contato
-        Page::create([
+        Page::updateOrCreate(['slug' => 'contato'], [
             'title' => 'Contato',
-            'slug' => 'contato',
             'is_active_in_menu' => true,
             'is_visible' => true,
             'sort_order' => 5,
