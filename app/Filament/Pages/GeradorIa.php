@@ -288,4 +288,17 @@ class GeradorIa extends Page implements HasActions, HasForms
                     ->send();
             });
     }
+
+    public function deletePost(int $id): void
+    {
+        $post = \App\Models\SocialPost::find($id);
+        
+        if ($post) {
+            if ($post->output_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($post->output_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($post->output_path);
+            }
+            $post->delete();
+            \Filament\Notifications\Notification::make()->title('Arte removida!')->success()->send();
+        }
+    }
 }

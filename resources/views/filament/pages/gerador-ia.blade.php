@@ -370,6 +370,13 @@
                                         <a href="{{ $p->output_url }}" download="arte-{{ $p->id }}.png" title="Baixar" class="p-1 hover:text-amber-500 transition-colors text-white">
                                             <x-heroicon-m-arrow-down-tray class="w-3.5 h-3.5" />
                                         </a>
+                                        <div class="w-px h-3 bg-white/20"></div>
+                                        <button wire:click="deletePost({{ $p->id }})" 
+                                                wire:confirm="Tem certeza que deseja apagar esta arte?"
+                                                title="Deletar" 
+                                                class="p-1 hover:text-red-500 transition-colors text-white">
+                                            <x-heroicon-m-trash class="w-3.5 h-3.5" />
+                                        </button>
                                     </div>
                                 @else 
                                     <div class="w-full h-full flex flex-col items-center justify-center gap-1">
