@@ -119,7 +119,7 @@ class EditWebsite extends EditRecord
                                     ->label('Número do WhatsApp')
                                     ->prefix('+55')
                                     ->mask('(99) 99999-9999')
-                                    ->placeholder('(21) 96613-4360')
+                                    ->placeholder('(21) 90000-0000')
                                     ->helperText('O código +55 já está incluído. Informe apenas DDD e número.')
                                     ->tel(),
                                 TextInput::make('settings.website.features.whatsapp_widget.message')
