@@ -8,6 +8,7 @@
     <x-site-head :title="$title" />
     {{ $meta }}
     @livewireStyles
+    @stack('styles')
 </head>
 <body class="font-sans antialiased bg-background text-foreground">
     
@@ -23,5 +24,6 @@
     <x-site-alerts />
 
     @livewireScripts
+    @stack('scripts')
 </body>
 </html>

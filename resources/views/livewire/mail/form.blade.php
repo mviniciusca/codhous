@@ -22,6 +22,8 @@
                         class="cf-turnstile" 
                         data-sitekey="{{ $turnstileSiteKey }}"
                         data-callback="onTurnstileSuccess"
+                        data-theme="light"
+                        data-size="flexible"
                     ></div>
                     @error('turnstileToken')
                         <p class="text-sm text-danger-600">{{ $message }}</p>
