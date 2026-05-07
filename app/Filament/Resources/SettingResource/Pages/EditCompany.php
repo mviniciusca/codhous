@@ -149,6 +149,11 @@ class EditCompany extends EditRecord
         return [];
     }
 
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie as informações institucionais, contatos e endereço da sua empresa.';
+    }
+
     protected function getRedirectUrl(): string
     {
         return static::getUrl(['record' => $this->getRecord()]);

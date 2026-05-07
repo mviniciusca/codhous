@@ -186,6 +186,11 @@ class EditWebsite extends EditRecord
         return [];
     }
 
+    public function getSubheading(): ?string
+    {
+        return 'Configure as informações globais do site, SEO, scripts e menus de navegação.';
+    }
+
     protected function getRedirectUrl(): string
     {
         return static::getUrl(['record' => $this->getRecord()]);

@@ -21,4 +21,9 @@ class ListUsers extends ListRecords
                 ->icon('heroicon-o-user-plus'),
         ];
     }
+
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie os usuários que têm acesso ao painel administrativo e suas permissões.';
+    }
 }

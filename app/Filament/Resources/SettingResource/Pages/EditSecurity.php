@@ -75,6 +75,11 @@ class EditSecurity extends EditRecord
         return [];
     }
 
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie as configurações de segurança, modo manutenção e proteções anti-spam.';
+    }
+
     protected function getRedirectUrl(): string
     {
         return static::getUrl(['record' => $this->getRecord()]);

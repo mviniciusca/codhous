@@ -18,4 +18,9 @@ class ListContactAgenda extends ListRecords
                 ->icon('heroicon-o-plus'),
         ];
     }
+
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie seus contatos, acompanhe o histórico de conversas e organize sua agenda comercial.';
+    }
 }

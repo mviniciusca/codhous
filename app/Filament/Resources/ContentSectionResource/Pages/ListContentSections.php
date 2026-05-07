@@ -18,4 +18,9 @@ class ListContentSections extends ListRecords
                 ->icon('heroicon-o-plus'),
         ];
     }
+
+    public function getSubheading(): ?string
+    {
+        return 'Organize e gerencie as seções de conteúdo globais que podem ser reutilizadas em seu site.';
+    }
 }

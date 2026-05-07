@@ -16,4 +16,9 @@ class ListPages extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    public function getSubheading(): ?string
+    {
+        return 'Gerencie as páginas do seu site, seus conteúdos e configurações de SEO.';
+    }
 }
