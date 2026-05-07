@@ -5,13 +5,13 @@
           href="https://fonts.googleapis.com/css2?family={{ urlencode($this->fontFamily) }}:wght@400;700;900&display=swap">
 
     <style>
-        /* Estúdio Container Adaptável */
+        /* Estúdio Container Totalmente Imersivo */
         .studio-container {
             display: grid;
             grid-template-columns: 280px 1fr 100px;
             gap: 0;
-            height: calc(100vh - 120px);
-            margin: -40px -24px -24px -24px;
+            height: calc(100vh - 64px); /* Desconta apenas o TopBar do Filament */
+            margin: -40px -24px -40px -24px; /* Estica para todas as bordas */
             background: #ffffff;
             overflow: hidden;
             position: relative;
