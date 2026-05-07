@@ -130,7 +130,7 @@ class BudgetResource extends Resource
                                     ->icon('heroicon-o-user-circle')
                                     ->headerActions([
                                         Action::make('ai_smart_fill')
-                                            ->label('Simular Preenchimento Inteligente (IA)')
+                                            ->label('Preenchimento IA')
                                             ->icon('heroicon-o-sparkles')
                                             ->color('success')
                                             ->visible(fn ($livewire) => $livewire instanceof Pages\CreateBudget)
@@ -180,13 +180,30 @@ class BudgetResource extends Resource
                                         TextInput::make('content.customer_phone')
                                             ->required()
                                             ->live()
+                                            ->mask('(99)99999-9999')
                                             ->label('Telefone/WhatsApp')
                                             ->helperText('Número para comunicação direta.'),
                                         TextInput::make('content.postcode')
                                             ->required()
-                                            ->live()
+                                            ->live(onBlur: true)
+                                            ->mask('99999-999')
                                             ->label('CEP')
-                                            ->helperText('Formato: 00000-000'),
+                                            ->helperText('Formato: 00000-000')
+                                            ->afterStateUpdated(function ($state, Set $set) {
+                                                if (strlen(preg_replace('/[^0-9]/', '', $state ?? '')) === 8) {
+                                                    try {
+                                                        $finder = new \App\Services\AddressFinderService($state, $set, [
+                                                            'logradouro' => 'content.street',
+                                                            'bairro'     => 'content.neighborhood',
+                                                            'localidade' => 'content.city',
+                                                            'uf'         => 'content.state',
+                                                        ], 'content.postcode');
+                                                        $finder->find();
+                                                    } catch (\Exception $e) {
+                                                        // Fallback silencioso para não travar a UI
+                                                    }
+                                                }
+                                            }),
                                         TextInput::make('content.street')
                                             ->required()
                                             ->live()
