@@ -1,7 +1,7 @@
 {
     "name": "laravel/laravel",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Comprehensive management and storefront ecosystem for small construction companies, built with Laravel and Filament.",
     "keywords": [
         "laravel",
         "framework"

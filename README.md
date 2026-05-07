@@ -3,7 +3,7 @@
 > **⚠️ WORK IN PROGRESS (WIP)**  
 > This project is currently under active development. Some features might be subject to change or further refinement.
 
-Codhous is a premium, high-performance web storefront and administrative ecosystem designed specifically for the concrete and construction industry. Built with the **TALL stack** (Tailwind, Alpine.js, Laravel, Livewire), it provides a seamless experience for both customers and administrators.
+Codhous is a comprehensive management and digital presence ecosystem for small construction companies and concrete services. It unifies inventory control, detailed budgeting (with m² pricing), and professional website creation through a powerful integrated administrative panel. Built with the **TALL stack** (Tailwind, Alpine.js, Laravel, Livewire) and **Filament**, it offers an end-to-end solution for operational efficiency and online visibility.
 
 ## 🚀 Key Features
 
