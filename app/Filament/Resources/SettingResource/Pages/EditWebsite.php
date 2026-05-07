@@ -121,11 +121,13 @@ class EditWebsite extends EditRecord
                                     ->mask('(99) 99999-9999')
                                     ->placeholder('(21) 90000-0000')
                                     ->helperText('O código +55 já está incluído. Informe apenas DDD e número.')
+                                    ->required(fn($get) => $get('settings.website.features.whatsapp_widget.enabled'))
                                     ->tel(),
                                 TextInput::make('settings.website.features.whatsapp_widget.message')
                                     ->label('Mensagem Inicial')
                                     ->helperText('Texto que será pré-preenchido para o cliente.')
-                                    ->placeholder('Olá, gostaria de saber mais...'),
+                                    ->placeholder('Olá! Gostaria de um orçamento.')
+                                    ->required(fn($get) => $get('settings.website.features.whatsapp_widget.enabled')),
                             ]),
                     ]),
 

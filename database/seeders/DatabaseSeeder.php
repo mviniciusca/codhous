@@ -226,11 +226,11 @@ class DatabaseSeeder extends Seeder
                 ['type' => 'contact_form', 'data' => [
                     'title' => 'Envie sua Mensagem',
                     'description' => 'Preencha o formulário abaixo e retornaremos o mais breve possível.',
-                    'email_to' => 'contato@concretopro.com.br'
+                    'email_to' => ''
                 ]],
                 ['type' => 'map', 'data' => [
                     'title' => 'Nossa Localização',
-                    'iframe_code' => '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117506.31174624106!2d-43.342145!3d-22.913885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9bde559108a051%3A0xa9089ad1136e676!2sRio%20de%20Janeiro%2C%20RJ!5e0!3m2!1spt-BR!2sbr!4v1714930000000!5m2!1spt-BR!2sbr" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
+                    'iframe_code' => ''
                 ]],
             ]
         ]);

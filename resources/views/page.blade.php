@@ -174,6 +174,8 @@
 
                                 @php
                                     $company = \App\Models\Setting::get('company', []);
+                                    $contactEmail = !empty($block['data']['email_to']) ? $block['data']['email_to'] : data_get($company, 'email');
+                                    
                                     $addr    = data_get($company, 'address', []);
                                     $addrStr = is_array($addr)
                                         ? implode(', ', array_filter([
@@ -185,14 +187,14 @@
                                 @endphp
 
                                 <div class="space-y-5">
-                                    @if(!empty($block['data']['email_to']))
+                                    @if($contactEmail)
                                         <div class="flex items-center gap-4">
                                             <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                                 <i data-lucide="mail" class="h-5 w-5"></i>
                                             </div>
                                             <div>
                                                 <p class="text-xs text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">E-mail</p>
-                                                <p class="font-medium text-foreground">{{ $block['data']['email_to'] }}</p>
+                                                <p class="font-medium text-foreground">{{ $contactEmail }}</p>
                                             </div>
                                         </div>
                                     @endif
@@ -256,20 +258,27 @@
 
             {{-- ──── MAPA ──────────────────────────────────────────────────── --}}
             @case('map')
-                <section class="bg-muted py-16">
-                    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                        @if(!empty($block['data']['title']))
-                            <div class="mb-8 max-w-2xl">
-                                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                                    {{ $block['data']['title'] }}
-                                </h2>
+                @php
+                    $company = \App\Models\Setting::get('company', []);
+                    $globalMapsCode = data_get($company, 'maps_code');
+                    $mapsCode = !empty($globalMapsCode) ? $globalMapsCode : data_get($block, 'data.iframe_code');
+                @endphp
+                @if($mapsCode)
+                    <section class="bg-muted py-16">
+                        <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                            @if(!empty($block['data']['title']))
+                                <div class="mb-8 max-w-2xl">
+                                    <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                                        {{ $block['data']['title'] }}
+                                    </h2>
+                                </div>
+                            @endif
+                            <div class="overflow-hidden rounded-2xl border border-border shadow-sm h-[400px] lg:h-[500px] w-full grayscale hover:grayscale-0 transition-all duration-700 [&>iframe]:w-full [&>iframe]:h-full">
+                                {!! $mapsCode !!}
                             </div>
-                        @endif
-                        <div class="overflow-hidden rounded-2xl border border-border shadow-sm aspect-video w-full grayscale hover:grayscale-0 transition-all duration-700">
-                            {!! $block['data']['iframe_code'] !!}
                         </div>
-                    </div>
-                </section>
+                    </section>
+                @endif
                 @break
 
             {{-- ──── CTA ───────────────────────────────────────────────────── --}}

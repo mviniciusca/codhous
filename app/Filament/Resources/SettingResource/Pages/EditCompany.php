@@ -106,10 +106,11 @@ class EditCompany extends EditRecord
                                     ->label('Estado/UF')
                                     ->helperText('Sigla do estado (Ex: SP).'),
                             ]),
-                        TextInput::make('settings.company.maps_link')
-                            ->label('Link do Google Maps')
-                            ->helperText('URL para o botão "Como Chegar" (Ex: Google My Business).')
-                            ->placeholder('https://goo.gl/maps/...'),
+                        \Filament\Forms\Components\Textarea::make('settings.company.maps_code')
+                            ->label('Código de Incorporação (Google Maps)')
+                            ->helperText('Cole aqui o <iframe> gerado pelo Google Maps no menu "Compartilhar > Incorporar um mapa".')
+                            ->rows(3)
+                            ->placeholder('<iframe src="..."></iframe>'),
                     ]),
 
                 Section::make('Horário de Atendimento')

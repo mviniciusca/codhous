@@ -73,7 +73,7 @@ class SettingFactory extends Factory
                         'state' => 'RJ',
                         'postcode' => '20000-000',
                     ],
-                    'maps_link' => 'https://goo.gl/maps/example',
+                    'maps_code' => '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29422.638814103528!2d-43.23815695!3d-22.80876775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x99799368903d71%3A0xead21443a9686abf!2sGale%C3%A3o%2C%20Rio%20de%20Janeiro%20-%20RJ!5e0!3m2!1spt-BR!2sbr!4v1778116472539!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
                     'opening_hours' => 'Segunda a Sexta, 08:00 às 18:00',
                     'budget_information' => 'Pagamento em até 10x sem juros no cartão de crédito. Entrega em 5 dias úteis.',
                 ],
