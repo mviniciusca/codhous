@@ -110,9 +110,11 @@ class BudgetResource extends Resource
                             ]),
                         TextInput::make('code')
                             ->label('Código do Orçamento')
+                            ->default(fn () => \App\Models\Budget::generateUniqueCode())
                             ->placeholder('Gerado automaticamente ao salvar')
                             ->helperText('Ex: OR-2026-00001')
-                            ->disabled(),
+                            ->disabled()
+                            ->dehydrated(),
                         DateTimePicker::make('created_at')
                             ->displayFormat('d/m/Y H:i')
                             ->label('Data de Criação')

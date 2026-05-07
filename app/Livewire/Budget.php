@@ -48,7 +48,7 @@ class Budget extends Component implements HasForms
     {
         return $form
             ->schema([
-                Hidden::make('code')->default(Str::random(8)),
+                Hidden::make('code')->default(fn () => BudgetModel::generateUniqueCode()),
                 Hidden::make('content.price'),
                 Hidden::make('content.subtotal'),
                 Hidden::make('content.total'),
