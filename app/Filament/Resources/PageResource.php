@@ -65,6 +65,7 @@ class PageResource extends Resource
                                             self::getDifferentialsBlock(),
                                             self::getCtaBlock(),
                                             self::getRichTextBlock(),
+                                            self::getModuleReferenceBlock(),
                                         ])
                                     ->collapsible()
                                     ->collapsed(),
@@ -429,6 +430,21 @@ class PageResource extends Resource
                             ->label('Botão E-mail')
                             ->default(true),
                     ]),
+            ]);
+    }
+
+    protected static function getModuleReferenceBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('module_reference')
+            ->label(__('Módulo Global (Seção Pronta)'))
+            ->icon('heroicon-o-squares-plus')
+            ->schema([
+                Forms\Components\Select::make('content_section_id')
+                    ->label(__('Seção de Conteúdo'))
+                    ->options(\App\Models\ContentSection::query()->pluck('name', 'id'))
+                    ->required()
+                    ->searchable()
+                    ->helperText(__('Selecione uma seção criada no módulo "Seções do site" para reutilizá-la aqui.')),
             ]);
     }
 }
