@@ -129,8 +129,8 @@ class BudgetResource extends Resource
                                     ->description('Informações detalhadas de contato do cliente e endereço de execução do serviço.')
                                     ->icon('heroicon-o-user-circle')
                                     ->headerActions([
-                                        Action::make('fill_all_fake_data')
-                                            ->label('Preencher com Dados de Teste')
+                                        Action::make('ai_smart_fill')
+                                            ->label('Simular Preenchimento Inteligente (IA)')
                                             ->icon('heroicon-o-sparkles')
                                             ->color('success')
                                             ->visible(fn ($livewire) => $livewire instanceof Pages\CreateBudget)
@@ -143,7 +143,7 @@ class BudgetResource extends Resource
                                                 }
 
                                                 Notification::make()
-                                                    ->title('Dados de teste gerados!')
+                                                    ->title('Preenchimento inteligente aplicado!')
                                                     ->success()
                                                     ->send();
                                             }),
@@ -151,7 +151,10 @@ class BudgetResource extends Resource
                                             ->label('Limpar Tudo')
                                             ->icon('heroicon-o-trash')
                                             ->color('danger')
-                                            ->visible(fn ($livewire) => $livewire instanceof Pages\CreateBudget)
+                                            ->visible(fn ($livewire, Get $get) => 
+                                                $livewire instanceof Pages\CreateBudget && 
+                                                \App\Enums\FakeDataEnum::matches($get('content') ?? [])
+                                            )
                                             ->requiresConfirmation()
                                             ->action(function (Set $set) {
                                                 $set('content', []);
@@ -165,38 +168,47 @@ class BudgetResource extends Resource
                                     ->schema([
                                         TextInput::make('content.customer_name')
                                             ->required()
+                                            ->live()
                                             ->label('Nome do Cliente')
                                             ->helperText('Nome completo fornecido pelo cliente.'),
                                         TextInput::make('content.customer_email')
                                             ->required()
                                             ->email()
+                                            ->live()
                                             ->label('E-mail')
                                             ->helperText('Endereço de e-mail para contato.'),
                                         TextInput::make('content.customer_phone')
                                             ->required()
+                                            ->live()
                                             ->label('Telefone/WhatsApp')
                                             ->helperText('Número para comunicação direta.'),
                                         TextInput::make('content.postcode')
                                             ->required()
+                                            ->live()
                                             ->label('CEP')
                                             ->helperText('Formato: 00000-000'),
                                         TextInput::make('content.street')
                                             ->required()
+                                            ->live()
                                             ->label('Logradouro')
                                             ->helperText('Rua, Avenida, Praça, etc.'),
                                         TextInput::make('content.number')
+                                            ->live()
                                             ->label('Número')
                                             ->helperText('Número da residência ou lote.'),
                                         TextInput::make('content.city')
                                             ->required()
+                                            ->live()
                                             ->label('Cidade')
                                             ->helperText('Cidade onde o serviço será executado.'),
                                         TextInput::make('content.neighborhood')
                                             ->required()
+                                            ->live()
                                             ->label('Bairro')
                                             ->helperText('Nome do bairro ou localidade.'),
                                         TextInput::make('content.state')
                                             ->required()
+                                            ->live()
                                             ->label('UF')
                                             ->helperText('Estado (Ex: SP, RJ, MG).'),
                                     ]),
