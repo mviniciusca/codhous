@@ -92,7 +92,7 @@
                             @foreach($stats as $index => $stat)
                                 @if($index > 0)<div class="h-10 w-px bg-white/10"></div>@endif
                                 <div class="text-center">
-                                    <p class="font-mono text-3xl font-bold {{ $index === 0 ? 'text-primary' : 'text-white' }}">{{ $stat['value'] ?? '' }}</p>
+                                    <p class="font-mono text-3xl font-bold text-primary">{{ $stat['value'] ?? '' }}</p>
                                     <p class="text-xs text-zinc-400">{{ $stat['label'] ?? '' }}</p>
                                 </div>
                             @endforeach
@@ -123,7 +123,7 @@
                             @foreach($stats as $index => $stat)
                                 @if($index > 0)<div class="h-10 w-px bg-white/10"></div>@endif
                                 <div>
-                                    <p class="font-mono text-3xl font-bold {{ $index === 0 ? 'text-primary' : 'text-white' }}">{{ $stat['value'] ?? '' }}</p>
+                                    <p class="font-mono text-3xl font-bold text-primary">{{ $stat['value'] ?? '' }}</p>
                                     <p class="text-xs text-zinc-400">{{ $stat['label'] ?? '' }}</p>
                                 </div>
                             @endforeach
