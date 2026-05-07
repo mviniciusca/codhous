@@ -79,17 +79,34 @@ class GenerateSocialPostImage implements ShouldQueue
             $title = $this->post->title;
             $quote = $this->post->quote;
             $align = $this->post->text_align ?? 'center';
-            $family = $this->post->font_family ?? 'Inter';
-            $isBold = $this->post->is_bold ?? true;
+            $family = $this->post->font_family;
             
-            $fontPath = match($family) {
-                'Poppins'          => storage_path('app/fonts/Poppins-Bold.ttf'),
-                'Montserrat'        => storage_path('app/fonts/Montserrat-ExtraBold.ttf'),
-                'Playfair+Display' => storage_path('app/fonts/PlayfairDisplay-BoldItalic.ttf'),
-                default            => '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
-            };
+            // If custom font is chosen, use the text typed in custom_font
+            if ($family === 'custom' && !empty($this->post->custom_font)) {
+                $family = $this->post->custom_font;
+            }
 
-            // Fallback if file doesn't exist
+            // Normalize family name for file
+            $familyFile = str_replace([' ', '+'], '', $family);
+            $fontPath = storage_path("app/fonts/{$familyFile}.ttf");
+
+            // AUTO-DOWNLOAD FROM GOOGLE FONTS IF MISSING
+            if (! file_exists($fontPath)) {
+                try {
+                    $fontUrlFamily = str_replace(' ', '+', $family);
+                    // Use a simple trick to find the TTF URL (getting the CSS and parsing it)
+                    $css = file_get_contents("https://fonts.googleapis.com/css2?family={$fontUrlFamily}:wght@700");
+                    if (preg_match('/url\((https:\/\/fonts\.gstatic\.com\/s\/[^\)]+\.ttf)\)/', $css, $matches)) {
+                        $ttfUrl = $matches[1];
+                        file_put_contents($fontPath, file_get_contents($ttfUrl));
+                    }
+                } catch (\Exception $e) {
+                    // Fallback to default if download fails
+                    $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
+                }
+            }
+
+            // Final check
             if (! file_exists($fontPath)) {
                 $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
             }

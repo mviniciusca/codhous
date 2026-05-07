@@ -281,36 +281,22 @@
         }
     </style>
 
+    <script>
+        window.loadGoogleFont = function(fontName) {
+            if (!fontName || fontName === 'custom') return;
+            const fontId = 'font-' + fontName.replace(/ /g, '-').toLowerCase();
+            if (document.getElementById(fontId)) return;
+            
+            const link = document.createElement('link');
+            link.id = fontId;
+            link.rel = 'stylesheet';
+            link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;700;900&display=swap`;
+            document.head.appendChild(link);
+        };
+    </script>
+
     <div class="studio-container rounded-b-2xl" 
-         x-data="{ 
-            textX: @entangle('textX'), 
-            textY: @entangle('textY'),
-            isDragging: false,
-            init() {
-                interact('.draggable-text').draggable({
-                    inertia: true,
-                    modifiers: [
-                        interact.modifiers.restrictRect({
-                            restriction: '.preview-wrapper',
-                            endOnly: true
-                        })
-                    ],
-                    listeners: {
-                        start: () => { this.isDragging = true },
-                        move: (event) => {
-                            const wrapper = document.querySelector('.preview-wrapper');
-                            const rect = wrapper.getBoundingClientRect();
-                            this.textX += (event.dx / rect.width) * 100;
-                            this.textY += (event.dy / rect.height) * 100;
-                        },
-                        end: () => {
-                            this.isDragging = false;
-                            @this.updateCoordinates(this.textX, this.textY);
-                        }
-                    }
-                })
-            }
-         }"
+         x-data="{}"
          style="--highlight: {{ $overlayColor }};">
         
         {{-- Sidebar Esquerda --}}
@@ -345,6 +331,13 @@
                         <select wire:model.live="fontFamily" class="studio-input">
                             @foreach ($this->fontOptions as $v => $l) <option value="{{ $v }}">{{ $l }}</option> @endforeach
                         </select>
+
+                        @if($fontFamily === 'custom')
+                            <input type="text" 
+                                   wire:model.live.debounce.500ms="customFont" 
+                                   placeholder="Nome: Ex: Bebas Neue" 
+                                   class="mt-2 w-full p-2 text-[11px] rounded-lg bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:border-amber-500 outline-none">
+                        @endif
                     </div>
                 </div>
 
@@ -405,24 +398,46 @@
                 <div class="absolute inset-0" style="background: {{ $this->overlayCss }};"></div>
                 @if($preset === 'canva_side') <div class="side-block"></div> @endif
 
-                {{-- DRAGGABLE TEXT BLOCK --}}
+                {{-- DRAGGABLE TEXT BLOCK (RESTAURADO) --}}
                 <div class="draggable-text"
+                     x-data="{ 
+                        textX: @entangle('textX'), 
+                        textY: @entangle('textY'),
+                        isDragging: false,
+                        init() {
+                            interact($el).draggable({
+                                listeners: {
+                                    start: () => { this.isDragging = true },
+                                    move: (event) => {
+                                        const wrapper = document.querySelector('.preview-wrapper');
+                                        const rect = wrapper.getBoundingClientRect();
+                                        this.textX += (event.dx / rect.width) * 100;
+                                        this.textY += (event.dy / rect.height) * 100;
+                                    },
+                                    end: () => {
+                                        this.isDragging = false;
+                                        @this.updateCoordinates(this.textX, this.textY);
+                                    }
+                                }
+                            });
+                        }
+                     }"
                      :class="{ 'is-dragging': isDragging }"
-                     :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%); font-family: '${(@this.fontFamily ?? 'Inter').replace('+', ' ')}', sans-serif;`"
-                     style="text-align: {{ $textAlign }};">
+                     :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%); font-family: '${(@this.fontFamily === 'custom' ? @this.customFont : @this.fontFamily ?? 'Inter').replace('+', ' ')}', sans-serif; text-align: {{ $textAlign }};`"
+                     style="position: absolute; cursor: move; z-index: 100; width: auto; max-width: 90%;">
                     
                     @if($postTitle) 
-                        <span class="title-text block" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '900' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-family: inherit;">
+                        <span class="title-text block" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '900' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-family: inherit; text-align: inherit;">
                             {{ $postTitle }}
                         </span> 
                     @endif
 
                     @if(trim($quote)) 
-                        <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: inherit;">
+                        <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: inherit; text-align: inherit;">
                             {{ $quote }}
                         </p> 
                     @else 
-                        <p class="text-[12px] uppercase font-black opacity-20 tracking-widest italic" style="color: {{ $textColor }}; font-family: inherit;">Arraste para posicionar</p> 
+                        <p class="text-[12px] uppercase font-black opacity-20 tracking-widest italic" style="color: {{ $textColor }}; font-family: inherit; text-align: inherit;">Arraste para posicionar</p> 
                     @endif
                 </div>
             </div>

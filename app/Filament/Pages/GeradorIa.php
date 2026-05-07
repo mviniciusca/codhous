@@ -50,6 +50,7 @@ class GeradorIa extends Page implements HasActions, HasForms
     public string $textAlign      = 'center';
     public bool   $isBold         = true;
     public bool   $isItalic       = false;
+    public string $customFont     = '';
 
     /** @var int|null ID of the selected BackgroundImage */
     public ?int $backgroundImageId = null;
@@ -101,6 +102,7 @@ class GeradorIa extends Page implements HasActions, HasForms
             'Poppins'     => 'Poppins',
             'Raleway'     => 'Raleway',
             'Ubuntu'      => 'Ubuntu',
+            'custom'      => 'Outra Fonte (Google Fonts)...',
         ];
     }
 
@@ -188,6 +190,7 @@ class GeradorIa extends Page implements HasActions, HasForms
             'platform'            => $this->platform,
             'quote'               => $this->quote,
             'font_family'         => $this->fontFamily,
+            'custom_font'         => $this->customFont,
             'text_color'          => $this->textColor,
             'overlay_color'       => $this->overlayColor,
             'overlay_opacity'     => $this->overlayOpacity,
