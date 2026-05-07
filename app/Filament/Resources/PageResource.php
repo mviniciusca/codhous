@@ -85,9 +85,7 @@ class PageResource extends Resource
                                     ->label(__('Slug'))
                                     ->required()
                                     ->unique(ignoreRecord: true),
-                                Forms\Components\Toggle::make('is_active_in_menu')
-                                    ->label(__('Link Ativo no Menu'))
-                                    ->default(true),
+
                                 Forms\Components\Toggle::make('is_visible')
                                     ->label(__('Página Visível'))
                                     ->default(true),
@@ -99,8 +97,6 @@ class PageResource extends Resource
                         
                         Forms\Components\Section::make(__('SEO'))
                             ->schema([
-                                Forms\Components\TextInput::make('meta.title')
-                                    ->label(__('Meta Título')),
                                 Forms\Components\Textarea::make('meta.description')
                                     ->label(__('Meta Descrição')),
                             ])->collapsed(),
@@ -122,10 +118,7 @@ class PageResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color('gray'),
-                Tables\Columns\IconColumn::make('is_active_in_menu')
-                    ->label(__('No Menu'))
-                    ->boolean()
-                    ->sortable(),
+
                 Tables\Columns\IconColumn::make('is_visible')
                     ->label(__('Visível'))
                     ->boolean()

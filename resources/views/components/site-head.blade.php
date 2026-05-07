@@ -1,8 +1,17 @@
+@props([
+    'title' => null,
+    'description' => null,
+])
+
 @php
     $website = \App\Models\Setting::get('website', []);
     $websiteName = data_get($website, 'name', 'ConcretoPro');
     $websiteTitle = data_get($website, 'title', 'Concreto Usinado & Equipamentos');
-    $websiteDescription = data_get($website, 'description', 'Concreto usinado de alta qualidade e locação de equipamentos.');
+    $defaultDescription = data_get($website, 'description', 'Concreto usinado de alta qualidade e locação de equipamentos.');
+    
+    // Usa a descrição passada pela prop ou a do banco
+    $finalDescription = $description ?: $defaultDescription;
+    
     $scripts = data_get($website, 'scripts', []);
     $fontFamily = data_get($scripts, 'google_font_family', 'Inter');
     
@@ -19,7 +28,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="theme-color" content="#e5b800">
-<meta name="description" content="{{ $websiteDescription }}">
+<meta name="description" content="{{ $finalDescription }}">
 <title>{{ $websiteName }} | {{ $websiteTitle }}</title>
 
 <!-- Fonts -->

@@ -10,6 +10,11 @@ class EditPage extends EditRecord
 {
     protected static string $resource = PageResource::class;
 
+    public function getTitle(): string
+    {
+        return "Editar Página: " . $this->getRecord()->title;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

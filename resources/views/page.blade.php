@@ -1,4 +1,4 @@
-<x-layouts.app :title="$meta['title']">
+<x-layouts.app :title="$meta['title']" :description="$meta['description']">
     @php
         $content = $page->content ?? [];
         $firstBlock = $content[0] ?? null;

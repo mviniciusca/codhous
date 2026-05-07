@@ -10,6 +10,11 @@ class EditContentSection extends EditRecord
 {
     protected static string $resource = ContentSectionResource::class;
 
+    public function getTitle(): string
+    {
+        return "Editar Seção: " . $this->getRecord()->name;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

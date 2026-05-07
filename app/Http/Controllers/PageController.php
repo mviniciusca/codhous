@@ -19,7 +19,7 @@ class PageController extends Controller
         return view('page', [
             'page' => $page,
             'meta' => [
-                'title' => data_get($page->meta, 'title') ?: $page->title,
+                'title' => $page->title,
                 'description' => data_get($page->meta, 'description'),
             ]
         ]);
