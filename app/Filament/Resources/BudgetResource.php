@@ -121,6 +121,7 @@ class BudgetResource extends Resource
                     ]),
 
                 Tabs::make('Conteúdo do Orçamento')
+                    ->persistTabInQueryString()
                     ->afterStateHydrated(function (Get $get, Set $set) {
                         self::calculateTotalFromRepeater($get, $set);
                     })
@@ -283,14 +284,14 @@ class BudgetResource extends Resource
                                                     ->searchable()
                                                     ->required()
                                                     ->reactive()
-                                                    ->columnSpan(3)
+                                                    ->columnSpan(6)
                                                     ->afterStateUpdated(fn (Set $set) => $set('product_option_id', null)),
                                                 Select::make('product_option_id')
                                                     ->label('Opção/Resistência')
                                                     ->options(fn (Get $get) => \App\Models\ProductOption::where('product_id', $get('product_id'))->get()->pluck('name', 'id'))
                                                     ->required()
                                                     ->reactive()
-                                                    ->columnSpan(4)
+                                                    ->columnSpan(6)
                                                     ->afterStateUpdated(function (Set $set, $state) {
                                                         if ($state) {
                                                             $option = \App\Models\ProductOption::find($state);
@@ -304,7 +305,7 @@ class BudgetResource extends Resource
                                                     ->required()
                                                     ->default(1)
                                                     ->reactive()
-                                                    ->columnSpan(2)
+                                                    ->columnSpan(4)
                                                     ->step(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->isDecimal() ? 0.01 : 1)
                                                     ->suffix(fn (Get $get) => \App\Models\ProductOption::find($get('product_option_id'))?->unit?->value ?? ''),
                                                 TextInput::make('price')
@@ -313,11 +314,11 @@ class BudgetResource extends Resource
                                                     ->prefix('R$')
                                                     ->required()
                                                     ->reactive()
-                                                    ->columnSpan(2)
+                                                    ->columnSpan(4)
                                                     ->step(0.01),
                                                 Placeholder::make('total_item')
                                                     ->label('Total Item')
-                                                    ->columnSpan(1)
+                                                    ->columnSpan(4)
                                                     ->content(function (Get $get) {
                                                         $qty = floatval($get('quantity') ?? 0);
                                                         $price = floatval($get('price') ?? 0);
