@@ -28,7 +28,7 @@ class CalculatorWidget extends Widget implements HasForms
 
     protected int|string|array $columnSpan = 'full';
 
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 6;
 
     public ?array $data = [];
 

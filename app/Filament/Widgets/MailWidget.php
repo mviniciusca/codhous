@@ -19,7 +19,7 @@ use Illuminate\Support\Str;
 
 class MailWidget extends BaseWidget
 {
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 4;
 
     public Mail $mail;
 
@@ -39,7 +39,7 @@ class MailWidget extends BaseWidget
             ->recordUrl(
                 fn (Mail $record): string => route('filament.admin.resources.mails.view', ['record' => $record]),
             )
-            ->description(__('Most recent unread messages in your inbox'))
+            ->description('Mensagens recentes não lidas na sua caixa de entrada')
             ->query(
                 Mail::query()
                     ->where('is_spam', false)
@@ -48,13 +48,13 @@ class MailWidget extends BaseWidget
                     ->orderBy('created_at', 'desc')
                     ->limit(5)
             )
-            ->emptyStateHeading(__('No unread messages'))
-            ->emptyStateDescription(__('All messages have been read or marked as read.'))
+            ->emptyStateHeading('Nenhuma mensagem não lida')
+            ->emptyStateDescription('Todas as mensagens foram lidas ou marcadas como lidas.')
             ->emptyStateIcon('heroicon-o-envelope-open')
             ->columns([
                 IconColumn::make('priority')
                     ->boolean()
-                    ->label(__('Priority'))
+                    ->label('Prioridade')
                     ->getStateUsing(fn (Mail $record): bool => Str::contains(strtolower($record->subject), ['urgent', 'important', 'priority']) ||
                         $record->created_at > now()->subHours(24)
                     )
@@ -64,34 +64,34 @@ class MailWidget extends BaseWidget
                     ->falseColor('gray'),
 
                 TextColumn::make('name')
-                    ->label(__('From'))
+                    ->label('Remetente')
                     ->searchable()
                     ->limit(20)
                     ->tooltip(fn (Mail $record): string => "{$record->name} <{$record->email}>"),
 
                 TextColumn::make('subject')
-                    ->label(__('Subject'))
+                    ->label('Assunto')
                     ->searchable()
                     ->limit(40)
                     ->tooltip(fn (Mail $record): ?string => strlen($record->subject) > 40 ? $record->subject : null
                     ),
 
                 TextColumn::make('message')
-                    ->label(__('Preview'))
+                    ->label('Prévia')
                     ->limit(60)
                     ->tooltip(fn (Mail $record): ?string => strlen($record->message) > 60 ? Str::limit($record->message, 200) : null
                     ),
 
                 TextColumn::make('created_at')
-                    ->label(__('Received'))
+                    ->label('Recebido')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->formatStateUsing(function ($state) {
                         $date = \Carbon\Carbon::parse($state);
                         if ($date->isToday()) {
-                            return __('Today').' '.$date->format('H:i');
+                            return 'Hoje ' . $date->format('H:i');
                         } elseif ($date->isYesterday()) {
-                            return __('Yesterday').' '.$date->format('H:i');
+                            return 'Ontem ' . $date->format('H:i');
                         } else {
                             return $date->format('d/m/Y H:i');
                         }
@@ -100,62 +100,59 @@ class MailWidget extends BaseWidget
             ->actions([
                 ActionGroup::make([
                     Action::make('mark_as_read')
-                        ->label(__('Mark as Read'))
+                        ->label('Marcar como Lida')
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->action(function (Mail $record): void {
                             $record->update(['is_read' => true]);
                         })
-                        ->successNotificationTitle(__('Message marked as read')),
+                        ->successNotificationTitle('Mensagem marcada como lida'),
 
                     ViewAction::make()
-                        ->modalHeading(__('Quick View: Mail'))
-                        ->label(__('Quick View'))
+                        ->modalHeading('Visualização Rápida')
+                        ->label('Ver Mensagem')
                         ->form([
                             Group::make()
                                 ->columns(2)
                                 ->schema([
                                     TextInput::make('name')
-                                        ->helperText(__('Sender\'s Name'))
-                                        ->label(__('Name')),
+                                        ->label('Nome'),
                                     TextInput::make('email')
-                                        ->helperText(__('Sender\'s Email address'))
-                                        ->label(__('Email')),
+                                        ->label('E-mail'),
                                     TextInput::make('subject')
-                                        ->helperText(__('Message Subject'))
-                                        ->label(__('Subject')),
+                                        ->label('Assunto'),
                                     DatePicker::make('created_at')
-                                        ->label(__('Received'))
+                                        ->label('Recebido em')
                                         ->format('d/m/Y H:i'),
                                     Textarea::make('message')
-                                        ->helperText(__('Sender\'s Message'))
                                         ->rows(5)
                                         ->columnSpanFull()
-                                        ->label(__('Message')),
+                                        ->label('Mensagem'),
                                 ]),
                         ]),
 
                     Action::make('reply')
-                        ->label(__('Reply'))
+                        ->label('Responder')
                         ->icon('heroicon-o-paper-airplane')
                         ->url(fn (Mail $record): string => route('filament.admin.resources.mails.create', ['reply_to' => $record->id])
                         ),
 
                     DeleteAction::make()
+                        ->label('Excluir')
                         ->requiresConfirmation(),
                 ])
                     ->model(Mail::class),
             ])
             ->headerActions([
                 Action::make('view_all')
-                    ->label(__('View Inbox'))
+                    ->label('Ver Caixa de Entrada')
                     ->icon('heroicon-o-envelope')
                     ->color('primary')
                     ->url(route('filament.admin.resources.mails.index')),
             ])
             ->heading($unreadCount === 0
-                ? __('Inbox')
-                : __('Inbox (:count)', ['count' => $unreadCount]))
+                ? 'Mensagens'
+                : "Mensagens ({$unreadCount})")
             ->striped()
             ->paginated(false);
     }

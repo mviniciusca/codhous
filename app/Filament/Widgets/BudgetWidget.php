@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
 
 class BudgetWidget extends BaseWidget
 {
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -30,21 +30,21 @@ class BudgetWidget extends BaseWidget
             ->recordUrl(
                 fn (Budget $record): string => route('filament.admin.resources.budgets.edit', ['record' => $record]),
             )
-            ->description(__('Recent budget requests waiting for approval'))
+            ->description('Solicitações de orçamento recentes aguardando aprovação')
             ->headerActions([
                 Action::make('new_budget')
-                    ->label(__('New Budget'))
+                    ->label('Novo Orçamento')
                     ->color('primary')
                     ->icon('heroicon-o-plus-circle')
                     ->url(route('filament.admin.resources.budgets.create')),
                 Action::make('view_all')
-                    ->label(__('View All Budgets'))
+                    ->label('Ver Todos')
                     ->icon('heroicon-o-arrow-up-right')
                     ->url(route('filament.admin.resources.budgets.index')),
             ])
             ->heading($pendingCount === 0
-                ? __('Pending Budgets')
-                : __('Pending Budgets (:count)', ['count' => $pendingCount]))
+                ? 'Orçamentos Pendentes'
+                : "Orçamentos Pendentes ({$pendingCount})")
             ->query(
                 Budget::query()
                     ->select(['id', 'code', 'content', 'created_at', 'updated_at', 'status', 'is_active'])
@@ -52,20 +52,20 @@ class BudgetWidget extends BaseWidget
                     ->where('is_active', '=', true)
                     ->take(5)
             )
-            ->emptyStateHeading(__('No pending budgets'))
-            ->emptyStateDescription(__('All budgets have been processed or are in progress'))
+            ->emptyStateHeading('Nenhum orçamento pendente')
+            ->emptyStateDescription('Todos os orçamentos foram processados ou estão em andamento')
             ->emptyStateIcon('heroicon-o-document-check')
             ->paginated(false)
             ->striped()
             ->columns([
                 BadgeColumn::make('code')
-                    ->label(__('Budget Code'))
+                    ->label('Código')
                     ->searchable()
                     ->color('primary')
                     ->icon('heroicon-o-document-text'),
 
                 TextColumn::make('content.customer_name')
-                    ->label(__('Customer'))
+                    ->label('Cliente')
                     ->searchable()
                     ->sortable()
                     ->limit(30)
@@ -75,16 +75,16 @@ class BudgetWidget extends BaseWidget
                     ),
 
                 TextColumn::make('content.total')
-                    ->label(__('Total Value'))
-                    ->money(fn () => env('CURRENCY_CODE', 'USD'))
+                    ->label('Valor Total')
+                    ->money('BRL')
                     ->alignEnd()
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => $state ? number_format((float) $state, 2, '.', ',') : '-'
+                    ->formatStateUsing(fn ($state) => $state ? 'R$ ' . number_format((float) $state, 2, ',', '.') : '-'
                     )
                     ->color('success'),
 
                 IconColumn::make('priority')
-                    ->label(__('Priority'))
+                    ->label('Prioridade')
                     ->boolean()
                     ->getStateUsing(function (Budget $record): bool {
                         $createdAt = Carbon::parse($record->created_at);
@@ -98,32 +98,29 @@ class BudgetWidget extends BaseWidget
                     ->falseColor('gray'),
 
                 TextColumn::make('created_at')
-                    ->label(__('Waiting Since'))
+                    ->label('Aguardando desde')
                     ->sortable()
                     ->formatStateUsing(function ($state) {
                         $date = Carbon::parse($state);
 
                         if ($date->isToday()) {
-                            return __('Today').' '.$date->format('H:i');
+                            return 'Hoje ' . $date->format('H:i');
                         } elseif ($date->isYesterday()) {
-                            return __('Yesterday').' '.$date->format('H:i');
+                            return 'Ontem ' . $date->format('H:i');
                         } else {
-                            // Calculate exact days and round to whole number
                             $exactDays = Carbon::now()->floatDiffInDays($date);
                             $roundedDays = (int) round($exactDays);
 
-                            // Format the day text
                             $dayText = '';
                             if ($roundedDays > 0) {
-                                // Use singular form for 1 day
                                 if ($roundedDays == 1) {
-                                    $dayText = ' ('.__('1 day').')';
+                                    $dayText = ' (1 dia)';
                                 } else {
-                                    $dayText = ' ('.__(':days days', ['days' => $roundedDays]).')';
+                                    $dayText = " ({$roundedDays} dias)";
                                 }
                             }
 
-                            return $date->format('d/m/Y').$dayText;
+                            return $date->format('d/m/Y') . $dayText;
                         }
                     })
                     ->color(function ($state) {
@@ -144,17 +141,17 @@ class BudgetWidget extends BaseWidget
             ->actions([
                 ActionGroup::make([
                     Action::make('approve')
-                        ->label(__('Approve'))
+                        ->label('Aprovar')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
                         ->action(function (Budget $record): void {
                             $record->update(['status' => 'on going']);
                         })
-                        ->successNotificationTitle(__('Budget approved successfully')),
+                        ->successNotificationTitle('Orçamento aprovado com sucesso'),
 
                     Action::make('view_edit')
-                        ->label(__('View/Edit'))
+                        ->label('Ver/Editar')
                         ->icon('heroicon-o-pencil-square')
                         ->url(fn (Budget $record): string => route('filament.admin.resources.budgets.edit', ['record' => $record])
                         ),

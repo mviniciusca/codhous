@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ActivityWidget extends BaseWidget
 {
-    protected static ?int $sort = 11;
+    protected static ?int $sort = 5;
 
     protected int | string | array $columnSpan = 'full';
 
@@ -22,12 +22,12 @@ class ActivityWidget extends BaseWidget
     {
         return $table
             ->paginated(false)
-            ->heading(__('Recent Site Activity'))
-            ->description(__('Recent logins and user actions on the system'))
+            ->heading('Atividade Recente')
+            ->description('Logins recentes e ações de usuários no sistema')
             ->headerActions([
                 Action::make('view_all')
                     ->color('primary')
-                    ->label(__('View All'))
+                    ->label('Ver Tudo')
                     ->icon('heroicon-o-arrow-up-right')
                     ->url(route('filament.admin.resources.activity-logs.index')),
             ])
@@ -46,35 +46,39 @@ class ActivityWidget extends BaseWidget
                         'Notification' => 'info',
                         default        => 'gray',
                     })
-                    ->label(__('Type')),
+                    ->label('Tipo'),
 
                 TextColumn::make('causer_id')
-                    ->label(__('User'))
+                    ->label('Usuário')
                     ->formatStateUsing(function ($state) {
                         if (! $state) {
-                            return __('System');
+                            return 'Sistema';
                         }
                         $user = User::find($state);
 
-                        return $user ? $user->name : __('Unknown User');
+                        return $user ? $user->name : 'Usuário Desconhecido';
                     })
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('event')
-                    ->label(__('Action'))
+                    ->label('Ação')
                     ->formatStateUsing(function ($state, $record) {
                         // Format the event name to be more readable
-                        $formatted = ucfirst($state);
+                        $events = [
+                            'login' => 'Login',
+                            'logout' => 'Logout',
+                            'created' => 'Criou',
+                            'updated' => 'Editou',
+                            'deleted' => 'Excluiu',
+                        ];
+                        
+                        $formatted = $events[$state] ?? ucfirst($state);
 
-                        // For login events, add more context
                         if ($state === 'login' && $record->causer_id) {
                             $user = User::find($record->causer_id);
                             if ($user) {
-                                return __(':action by :user', [
-                                    'action' => $formatted,
-                                    'user'   => $user->name,
-                                ]);
+                                return "Login realizado por {$user->name}";
                             }
                         }
 
@@ -91,14 +95,14 @@ class ActivityWidget extends BaseWidget
                     ->searchable(),
 
                 TextColumn::make('description')
-                    ->label(__('Details'))
+                    ->label('Detalhes')
                     ->limit(50)
                     ->tooltip(function ($state) {
                         return strlen($state) > 50 ? $state : null;
                     }),
 
                 TextColumn::make('created_at')
-                    ->label(__('When'))
+                    ->label('Quando')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->searchable(),
