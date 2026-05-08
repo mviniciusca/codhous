@@ -100,8 +100,17 @@ class SocialPostResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->label('Ver'),
-                Tables\Actions\DeleteAction::make()->label('Excluir'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()->label('Ver'),
+                    Tables\Actions\Action::make('download')
+                        ->label('Baixar')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('info')
+                        ->url(fn (SocialPost $record) => $record->output_url)
+                        ->openUrlInNewTab()
+                        ->visible(fn (SocialPost $record) => $record->isGenerated()),
+                    Tables\Actions\DeleteAction::make()->label('Excluir'),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
