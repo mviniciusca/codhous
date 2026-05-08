@@ -167,12 +167,29 @@
         }
         .dark .canvas-box { background-color: #18181b; }
 
+        .canvas-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .canvas-pattern {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            mask-repeat: repeat;
+            -webkit-mask-repeat: repeat;
+        }
+
         .canvas-text {
             position: relative;
-            z-index: 2;
+            z-index: 3;
             width: 100%;
             word-wrap: break-word;
             transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         /* Command Bar */
@@ -313,7 +330,14 @@
             cursor: pointer;
         }
         .btn-toggle.active { border-color: var(--accent-color); background: rgba(251, 191, 36, 0.1); }
-        .dark .btn-toggle img { invert: 1; }
+        .btn-toggle img { filter: brightness(0); opacity: 0.4; }
+        .dark .btn-toggle img { filter: invert(1); opacity: 0.6; }
+
+        .recent-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
     </style>
 
     <div class="studio-layout">
@@ -393,7 +417,7 @@
 
                 <div class="space-y-4" wire:poll.10s>
                     <label class="section-title">Artes Recentes</label>
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="recent-grid">
                         @foreach($this->recentPosts->where('status', '!=', 'failed') as $p)
                             <div class="art-card relative aspect-square rounded-xl overflow-hidden border border-zinc-100 dark:border-zinc-800 group shadow-sm">
                                 @if($p->isGenerated())
