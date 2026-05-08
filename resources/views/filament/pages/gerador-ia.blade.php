@@ -491,16 +491,38 @@
                     <label class="section-title">Branding & Moldura</label>
                     <div class="control-card">
                         <div class="space-y-3">
-                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Logo URL</label>
-                            <input type="text" wire:model.live="logoUrl" 
-                                   placeholder="https://..."
-                                   class="w-full bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 text-xs">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Sua Logo (PNG)</label>
+                            <div class="flex items-center gap-2">
+                                <label class="flex-1 flex items-center justify-center h-10 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg cursor-pointer hover:border-amber-500 transition group bg-zinc-50 dark:bg-zinc-900/50">
+                                    <div class="flex items-center gap-2">
+                                        <x-heroicon-o-arrow-up-tray class="w-3 h-3 text-zinc-400 group-hover:text-amber-500" />
+                                        <span class="text-[10px] font-bold text-zinc-400 group-hover:text-amber-500">{{ $logoUpload ? 'Trocar' : 'Upload Logo' }}</span>
+                                    </div>
+                                    <input type="file" wire:model="logoUpload" class="hidden" accept="image/*">
+                                </label>
+                                @if($logoUrl)
+                                    <button wire:click="$set('logoUrl', null)" class="w-10 h-10 flex items-center justify-center rounded-lg border border-red-100 text-red-500 hover:bg-red-50 transition">
+                                        <x-heroicon-m-x-mark class="w-4 h-4"/>
+                                    </button>
+                                @endif
+                            </div>
                         </div>
                         <div class="space-y-3">
-                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Moldura URL</label>
-                            <input type="text" wire:model.live="frameUrl" 
-                                   placeholder="https://..."
-                                   class="w-full bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 text-xs">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Moldura Custom</label>
+                            <div class="flex items-center gap-2">
+                                <label class="flex-1 flex items-center justify-center h-10 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg cursor-pointer hover:border-amber-500 transition group bg-zinc-50 dark:bg-zinc-900/50">
+                                    <div class="flex items-center gap-2">
+                                        <x-heroicon-o-photo class="w-3 h-3 text-zinc-400 group-hover:text-amber-500" />
+                                        <span class="text-[10px] font-bold text-zinc-400 group-hover:text-amber-500">{{ $frameUpload ? 'Trocar' : 'Upload Moldura' }}</span>
+                                    </div>
+                                    <input type="file" wire:model="frameUpload" class="hidden" accept="image/*">
+                                </label>
+                                @if($frameUrl)
+                                    <button wire:click="$set('frameUrl', null)" class="w-10 h-10 flex items-center justify-center rounded-lg border border-red-100 text-red-500 hover:bg-red-50 transition">
+                                        <x-heroicon-m-x-mark class="w-4 h-4"/>
+                                    </button>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

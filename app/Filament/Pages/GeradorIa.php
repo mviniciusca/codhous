@@ -17,9 +17,11 @@ use Filament\Pages\Page;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 
+use Livewire\WithFileUploads;
+
 class GeradorIa extends Page implements HasActions, HasForms
 {
-    use InteractsWithActions, InteractsWithForms;
+    use InteractsWithActions, InteractsWithForms, WithFileUploads;
     protected static ?string $navigationIcon = 'heroicon-o-sparkles';
 
     protected static ?string $navigationLabel = 'Gerador.IA';
@@ -57,6 +59,8 @@ class GeradorIa extends Page implements HasActions, HasForms
     public array  $layers         = [];
     public ?string $logoUrl       = null;
     public ?string $frameUrl      = null;
+    public $logoUpload;
+    public $frameUpload;
     public bool   $hasVignette    = false;
     public string $vignetteType   = 'black';
 
@@ -369,6 +373,14 @@ class GeradorIa extends Page implements HasActions, HasForms
     public function updated($property)
     {
         $this->dispatch('updated');
+
+        if ($property === 'logoUpload' && $this->logoUpload) {
+            $this->logoUrl = $this->logoUpload->temporaryUrl();
+        }
+
+        if ($property === 'frameUpload' && $this->frameUpload) {
+            $this->frameUrl = $this->frameUpload->temporaryUrl();
+        }
     }
 
 
