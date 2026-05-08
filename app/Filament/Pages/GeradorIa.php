@@ -291,7 +291,7 @@ class GeradorIa extends Page implements HasActions, HasForms
         return Action::make('uploadBackground')
             ->label('Subir Imagem')
             ->icon('heroicon-o-plus')
-            ->color('amber')
+            ->color('primary')
             ->modalHeading('Nova Imagem de Fundo')
             ->modalDescription('Suba uma foto para usar como fundo nos seus posts.')
             ->modalSubmitActionLabel('Salvar na Galeria')
@@ -318,8 +318,12 @@ class GeradorIa extends Page implements HasActions, HasForms
                 $bg->addMedia(storage_path('app/public/' . $data['image']))
                    ->toMediaCollection('image');
 
+                // Selecionar automaticamente no editor
+                $this->backgroundImageId = $bg->id;
+                $this->updated('backgroundImageId');
+
                 Notification::make()
-                    ->title('Imagem salva!')
+                    ->title('Imagem salva e selecionada!')
                     ->success()
                     ->send();
             });
