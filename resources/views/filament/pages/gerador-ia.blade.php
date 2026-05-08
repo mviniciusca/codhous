@@ -4,13 +4,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Montserrat:wght@400;700;900&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@400;700;900&family=Roboto:wght@400;700;900&family=Lato:wght@400;700;900&family=Raleway:wght@400;700;900&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
 
-    <style>
-        .studio-layout {
+    <style>        .studio-layout {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             display: grid;
-            grid-template-columns: 340px 1fr 110px;
+            grid-template-columns: 280px 1fr 85px;
             background: #f8fafc;
             z-index: 40;
             font-family: 'Inter', sans-serif;
@@ -19,11 +18,11 @@
 
         /* Sidebar Controles */
         .sidebar-controls {
-            padding: 25px;
+            padding: 15px;
             border-right: 1px solid rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             overflow-y: auto;
             background: #ffffff;
             scrollbar-width: thin;
@@ -31,17 +30,17 @@
         .dark .sidebar-controls { background: #111114; border-color: rgba(255,255,255,0.08); }
 
         .section-title {
-            text-[10px] font-black uppercase text-gray-400 tracking-widest mb-3 block;
+            text-[9px] font-black uppercase text-gray-400 tracking-widest mb-2 block;
         }
 
         .control-group {
             background: #fdfdfd;
             border: 1px solid #f1f5f9;
-            padding: 15px;
-            border-radius: 16px;
+            padding: 12px;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         .dark .control-group { background: #18181b; border-color: rgba(255,255,255,0.05); }
 
@@ -50,9 +49,9 @@
             width: 100%;
             background: #f1f5f9;
             border: 1px solid #e2e8f0 !important;
-            border-radius: 12px !important;
-            padding: 10px 35px 10px 15px !important;
-            font-size: 13px !important;
+            border-radius: 10px !important;
+            padding: 8px 30px 8px 12px !important;
+            font-size: 12px !important;
             font-weight: 700;
             color: #1e293b;
             appearance: none !important;
@@ -60,8 +59,8 @@
             -moz-appearance: none !important;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E") !important;
             background-repeat: no-repeat !important;
-            background-position: right 12px center !important;
-            background-size: 16px !important;
+            background-position: right 10px center !important;
+            background-size: 14px !important;
         }
         .dark .studio-select { background-color: #27272a; border-color: #3f3f46 !important; color: #fff; }
 
@@ -69,9 +68,9 @@
             width: 100%;
             background: #f1f5f9;
             border: none !important;
-            border-radius: 12px !important;
-            padding: 10px 15px !important;
-            font-size: 13px !important;
+            border-radius: 10px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
             font-weight: 600;
             color: #1e293b;
         }
@@ -81,11 +80,11 @@
         .pattern-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
         .pattern-btn {
             aspect-ratio: 1;
-            border-radius: 10px;
+            border-radius: 8px;
             border: 2px solid #f1f5f9;
             background: #fff;
             display: flex;
@@ -106,12 +105,12 @@
             background-image: 
                 radial-gradient(#cbd5e1 1.5px, transparent 1.5px),
                 radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-            background-size: 30px 30px;
-            background-position: 0 0, 15px 15px;
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 60px;
+            padding: 30px;
             overflow: auto;
         }
         .dark .preview-area { 
@@ -120,19 +119,19 @@
         }
 
         .card-preview {
-            width: 540px;
-            height: 540px;
+            width: 500px;
+            height: 500px;
             background-color: #1e293b;
             background-size: cover;
             background-position: center;
             position: relative;
             border-radius: 0;
-            box-shadow: 0 50px 100px -30px rgba(0,0,0,0.5);
+            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 50px;
+            padding: 40px;
             overflow: hidden;
             flex-shrink: 0;
         }
@@ -166,44 +165,44 @@
 
         /* Sidebar Galeria */
         .sidebar-gallery {
-            padding: 20px 15px;
+            padding: 15px 10px;
             border-left: 1px solid rgba(0,0,0,0.08);
             background: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             overflow-y: auto;
         }
         .dark .sidebar-gallery { background: #111114; border-color: rgba(255,255,255,0.08); }
 
         .thumb {
-            width: 80px;
-            height: 80px;
-            border-radius: 14px;
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
             overflow: hidden;
             cursor: pointer;
-            border: 3px solid transparent;
+            border: 2px solid transparent;
             transition: 0.3s;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px -1px rgba(0,0,0,0.1);
         }
-        .thumb.active { border-color: #fbbf24; transform: scale(1.08); box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.3); }
+        .thumb.active { border-color: #fbbf24; transform: scale(1.05); box-shadow: 0 8px 12px -3px rgba(251, 191, 36, 0.3); }
         .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
         .btn-add {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             background: #fbbf24;
-            border-radius: 14px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #000;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
+            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3);
             transition: 0.2s;
         }
-        .btn-add:hover { transform: translateY(-3px); background: #f59e0b; }
+        .btn-add:hover { transform: translateY(-2px); background: #f59e0b; }
 
         /* Barra Inferior Fixa no Centro */
         .bottom-bar {
