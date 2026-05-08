@@ -10,55 +10,131 @@
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             display: grid;
-            grid-template-columns: 320px 1fr 100px;
+            grid-template-columns: 340px 1fr 110px;
             background: #f8fafc;
             z-index: 40;
+            font-family: 'Inter', sans-serif;
         }
         .dark .studio-layout { background: #09090b; }
 
         /* Sidebar Controles */
         .sidebar-controls {
-            padding: 30px;
-            border-right: 1px solid rgba(0,0,0,0.05);
+            padding: 25px;
+            border-right: 1px solid rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
             overflow-y: auto;
-            background: #fff;
+            background: #ffffff;
+            scrollbar-width: thin;
         }
-        .dark .sidebar-controls { background: #111114; border-color: rgba(255,255,255,0.05); }
+        .dark .sidebar-controls { background: #111114; border-color: rgba(255,255,255,0.08); }
 
-        /* Área de Preview */
-        .preview-area {
-            background-color: #f9f9f9;
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 30px 30px;
+        .section-title {
+            text-[10px] font-black uppercase text-gray-400 tracking-widest mb-3 block;
+        }
+
+        .control-group {
+            background: #fdfdfd;
+            border: 1px solid #f1f5f9;
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .dark .control-group { background: #18181b; border-color: rgba(255,255,255,0.05); }
+
+        /* Inputs Modernos - FIX SELECT */
+        .studio-select {
+            width: 100%;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            padding: 10px 35px 10px 15px !important;
+            font-size: 13px !important;
+            font-weight: 700;
+            color: #1e293b;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            background-size: 16px !important;
+        }
+        .dark .studio-select { background-color: #27272a; border-color: #3f3f46 !important; color: #fff; }
+
+        .prompt-input {
+            width: 100%;
+            background: #f1f5f9;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 10px 15px !important;
+            font-size: 13px !important;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .dark .prompt-input { background: #27272a; color: #fff; }
+
+        /* Patterns Grid */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .pattern-btn {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            border: 2px solid #f1f5f9;
+            background: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            overflow: hidden;
+        }
+        .pattern-btn.active { border-color: #fbbf24; background: #fffbeb; }
+        .dark .pattern-btn { background: #27272a; border-color: #3f3f46; }
+        .dark .pattern-btn.active { border-color: #fbbf24; background: #451a03; }
+
+        /* Área de Preview */
+        .preview-area {
+            position: relative;
+            background-color: #f1f5f9;
+            background-image: 
+                radial-gradient(#cbd5e1 1.5px, transparent 1.5px),
+                radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
             overflow: auto;
         }
         .dark .preview-area { 
-            background-color: #0f1115;
-            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-color: #09090b;
+            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
         }
 
         .card-preview {
             width: 540px;
             height: 540px;
-            background-color: #000;
+            background-color: #1e293b;
             background-size: cover;
             background-position: center;
             position: relative;
             border-radius: 0;
-            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.3);
+            box-shadow: 0 50px 100px -30px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 50px;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .card-overlay {
@@ -69,168 +145,227 @@
             z-index: 1;
         }
 
+        .card-pattern {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            mask-repeat: repeat;
+            -webkit-mask-repeat: repeat;
+        }
+
         .card-text {
             position: relative;
             z-index: 2;
-            color: #fff;
-            font-size: 42px;
-            font-weight: 900;
             line-height: 1.1;
             text-transform: uppercase;
             word-wrap: break-word;
             max-width: 100%;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Sidebar Galeria */
         .sidebar-gallery {
-            padding: 15px 10px;
-            border-left: 1px solid rgba(0,0,0,0.05);
-            background: #fff;
+            padding: 20px 15px;
+            border-left: 1px solid rgba(0,0,0,0.08);
+            background: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
             overflow-y: auto;
         }
-        .dark .sidebar-gallery { background: #111114; border-color: rgba(255,255,255,0.05); }
+        .dark .sidebar-gallery { background: #111114; border-color: rgba(255,255,255,0.08); }
 
         .thumb {
-            width: 70px;
-            height: 70px;
-            border-radius: 12px;
+            width: 80px;
+            height: 80px;
+            border-radius: 14px;
             overflow: hidden;
             cursor: pointer;
             border: 3px solid transparent;
-            transition: 0.2s;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        .thumb.active { border-color: #fbbf24; scale: 1.05; }
+        .thumb.active { border-color: #fbbf24; transform: scale(1.08); box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.3); }
         .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
         .btn-add {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             background: #fbbf24;
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #000;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3);
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
+            transition: 0.2s;
         }
+        .btn-add:hover { transform: translateY(-3px); background: #f59e0b; }
 
-        /* Barra Inferior */
+        /* Barra Inferior Fixa no Centro */
         .bottom-bar {
             position: absolute;
-            bottom: 0;
-            left: 320px;
-            right: 100px;
-            background: #fff;
-            padding: 15px 30px;
-            border-top: 1px solid rgba(0,0,0,0.05);
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 12px 25px;
+            border-radius: 100px;
+            border: 1px solid rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
             gap: 20px;
             z-index: 100;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+            width: 80%;
+            max-width: 800px;
         }
-        .dark .bottom-bar { background: #111114; border-color: rgba(255,255,255,0.05); }
-
-        .prompt-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            font-size: 16px;
-            font-weight: 500;
-            color: #1e293b;
-        }
-        .dark .prompt-input { color: #fff; }
+        .dark .bottom-bar { background: rgba(24, 24, 27, 0.9); border-color: rgba(255,255,255,0.1); }
 
         .btn-main {
-            background: #fbbf24;
-            color: #000;
-            padding: 12px 30px;
+            background: #1e293b;
+            color: #fff;
+            padding: 14px 40px;
             border-radius: 100px;
-            font-weight: 900;
+            font-weight: 800;
+            font-size: 13px;
             border: none;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .btn-main:hover { background: #f59e0b; scale: 1.05; }
+        .btn-main:hover { background: #0f172a; transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.3); }
+        .btn-main:active { transform: translateY(0); }
+
+        .action-icon-bar {
+            position: absolute;
+            bottom: 0;
+            inset-x: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            opacity: 1;
+        }
     </style>
 
     <div class="studio-layout">
-        {{-- Controles --}}
+        {{-- Sidebar Esquerda: Controles --}}
         <aside class="sidebar-controls">
-            <a href="{{ filament()->getUrl() }}" class="flex items-center gap-2 text-[10px] font-black uppercase text-gray-400 hover:text-amber-500">
-                <x-heroicon-m-arrow-left class="w-4 h-4" /> Voltar
+            <a href="{{ filament()->getUrl() }}" class="flex items-center gap-2 text-[10px] font-black uppercase text-gray-400 hover:text-amber-500 transition">
+                <x-heroicon-m-arrow-left class="w-4 h-4" /> Voltar ao Painel
             </a>
 
-            <div>
-                <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Estilo da Fonte</label>
-                <select wire:model.live="fontFamily" class="w-full bg-gray-50 dark:bg-white/5 border-none rounded-xl p-3 text-sm focus:ring-amber-500">
-                    @foreach($this->fontOptions as $val => $lbl)
-                        <option value="{{ $val }}">{{ $lbl }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <div class="flex justify-between items-center mb-2">
-                    <label class="text-[10px] font-black uppercase text-gray-400">Tamanho da Fonte</label>
-                    <span class="text-[10px] font-black text-amber-500">{{ $fontSize }}px</span>
-                </div>
-                <input type="range" wire:model.live="fontSize" min="12" max="150" class="w-full accent-amber-500 h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer">
-            </div>
-
-            <div>
-                <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Filtro de Fundo</label>
-                <div class="flex items-center gap-4">
-                    <input type="color" wire:model.live="overlayColor" class="w-12 h-12 p-1 bg-white dark:bg-gray-800 rounded-lg cursor-pointer">
-                    <input type="range" wire:model.live="overlayOpacity" min="0" max="100" class="flex-1 accent-amber-500">
-                </div>
-            </div>
-
-            <hr class="border-gray-100 dark:border-white/5">
-
-            <div class="space-y-3" wire:poll.5s>
-                <label class="text-[10px] font-black uppercase text-gray-400 block">Artes Recentes</label>
-                <div class="grid grid-cols-2 gap-3">
-                    @foreach($this->recentPosts->where('status', '!=', 'failed') as $p)
-                        <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/10 group shadow-sm">
-                            @if($p->isGenerated())
-                                <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
-                                {{-- Barra de Ações Sempre Visível --}}
-                                <div class="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-md py-2 flex items-center justify-center gap-4">
-                                    <a href="{{ $p->output_url }}" target="_blank" title="Ver" class="text-white hover:text-amber-500 transition-all hover:scale-110">
-                                        <x-heroicon-m-eye class="w-4 h-4" />
-                                    </a>
-                                    <a href="{{ $p->output_url }}" download title="Baixar" class="text-white hover:text-amber-500 transition-all hover:scale-110">
-                                        <x-heroicon-m-arrow-down-tray class="w-4 h-4" />
-                                    </a>
-                                    <button wire:click="deletePost({{ $p->id }})" wire:confirm="Apagar?" title="Deletar" class="text-white hover:text-red-500 transition-all hover:scale-110">
-                                        <x-heroicon-m-trash class="w-4 h-4" />
-                                    </button>
-                                </div>
-                            @else
-                                <div class="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-black/20">
-                                    <x-heroicon-o-arrow-path class="w-6 h-6 text-amber-500 animate-spin" />
-                                </div>
-                            @endif
+            <div class="space-y-6">
+                {{-- Tipografia --}}
+                <div class="control-group">
+                    <label class="section-title">Tipografia</label>
+                    <select wire:model.live="fontFamily" class="studio-select">
+                        @foreach($this->fontOptions as $val => $lbl)
+                            <option value="{{ $val }}">{{ $lbl }}</option>
+                        @endforeach
+                    </select>
+                    
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold text-gray-500 mb-1">
+                            <span>Tamanho</span>
+                            <span>{{ $fontSize }}px</span>
                         </div>
-                    @endforeach
-                </div>
-            </div>
+                        <input type="range" wire:model.live="fontSize" min="12" max="150" class="w-full accent-amber-500 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
 
-            <div class="mt-auto">
-                <button onclick="takeSnapshot()" class="w-full btn-main flex items-center justify-center gap-2">
-                    <x-heroicon-m-sparkles class="w-4 h-4" />
-                    GERAR ARTE FINAL
-                </button>
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1">
+                            <label class="text-[9px] font-bold text-gray-400 uppercase mb-1 block">Cor do Texto</label>
+                            <input type="color" wire:model.live="textColor" class="w-full h-8 p-1 bg-white border border-gray-100 rounded-lg cursor-pointer">
+                        </div>
+                        <button wire:click="$toggle('isBold')" class="w-8 h-8 mt-4 rounded-lg border {{ $isBold ? 'bg-amber-500 border-amber-500 text-black' : 'border-gray-200 text-gray-400' }} font-bold">B</button>
+                    </div>
+                </div>
+
+                {{-- Camadas --}}
+                <div class="control-group">
+                    <label class="section-title">Filtro de Fundo</label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" wire:model.live="overlayColor" class="w-10 h-10 p-1 bg-white border border-gray-100 rounded-lg cursor-pointer">
+                        <div class="flex-1">
+                            <input type="range" wire:model.live="overlayOpacity" min="0" max="100" class="w-full accent-amber-500 h-1">
+                            <div class="flex justify-between text-[8px] font-bold text-gray-400 mt-1">
+                                <span>Opacidade</span>
+                                <span>{{ $overlayOpacity }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Texturas --}}
+                <div class="control-group">
+                    <label class="section-title">Textura (Pattern)</label>
+                    <div class="pattern-grid">
+                        <button wire:click="$set('pattern', null)" class="pattern-btn {{ is_null($pattern) ? 'active' : '' }}" title="Nenhum">
+                            <span class="text-[9px] font-black opacity-30 text-gray-400">OFF</span>
+                        </button>
+                        @foreach(['dots', 'lines', 'grid'] as $p)
+                            <button wire:click="$set('pattern', '{{ $p }}')" class="pattern-btn {{ $pattern === $p ? 'active' : '' }}" title="{{ ucfirst($p) }}">
+                                <img src="/assets/patterns/{{ $p }}.png" class="w-5 h-5 opacity-40 invert dark:invert-0">
+                            </button>
+                        @endforeach
+                    </div>
+                    
+                    @if($pattern)
+                        <div class="pt-2 flex items-center gap-3">
+                            <input type="color" wire:model.live="patternColor" class="w-8 h-8 p-1 bg-white border border-gray-100 rounded-lg cursor-pointer">
+                            <input type="range" wire:model.live="patternSize" min="5" max="100" class="flex-1 accent-amber-500 h-1">
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Galeria Recent --}}
+                <div class="space-y-3 pt-4" wire:poll.5s>
+                    <label class="section-title">Recentes</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach($this->recentPosts->where('status', '!=', 'failed') as $p)
+                            <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/10 group shadow-md transition hover:shadow-xl">
+                                @if($p->isGenerated())
+                                    <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
+                                    <div class="action-icon-bar">
+                                        <a href="{{ $p->output_url }}" target="_blank" title="Ver" class="text-white hover:text-amber-500 transition hover:scale-125">
+                                            <x-heroicon-m-eye class="w-4 h-4" />
+                                        </a>
+                                        <a href="{{ $p->output_url }}" download title="Baixar" class="text-white hover:text-amber-500 transition hover:scale-125">
+                                            <x-heroicon-m-arrow-down-tray class="w-4 h-4" />
+                                        </a>
+                                        <button wire:click="deletePost({{ $p->id }})" wire:confirm="Apagar?" title="Deletar" class="text-white hover:text-red-500 transition hover:scale-125">
+                                            <x-heroicon-m-trash class="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-gray-50/50">
+                                        <x-heroicon-o-arrow-path class="w-6 h-6 text-amber-500 animate-spin" />
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="py-6">
+                    <button onclick="takeSnapshot()" class="w-full btn-main">
+                        GERAR ARTE FINAL
+                    </button>
+                </div>
             </div>
         </aside>
 
-        {{-- Preview Central --}}
+        {{-- Área de Preview Central --}}
         <main class="preview-area">
             <div class="card-preview" id="card-container"
                  style="background-image: url('{{ $this->selectedBackgroundUrl }}'); 
@@ -238,38 +373,44 @@
                         --overlay-opacity: {{ $overlayOpacity / 100 }};
                         align-items: {{ $preset === 'top' ? 'start' : ($preset === 'bottom' ? 'end' : 'center') }};">
                 <div class="card-overlay"></div>
-                <div class="card-text" style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}' !important; color: {{ $textColor }}; font-size: {{ $fontSize }}px;">
+                
+                @if($pattern)
+                    <div class="card-pattern" style="
+                        mask-image: url('/assets/patterns/{{ $pattern }}.png');
+                        -webkit-mask-image: url('/assets/patterns/{{ $pattern }}.png');
+                        mask-size: {{ $patternSize }}px;
+                        -webkit-mask-size: {{ $patternSize }}px;
+                        background-color: {{ $patternColor }};
+                        opacity: 0.2;
+                    "></div>
+                @endif
+
+                <div class="card-text" style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}' !important; color: {{ $textColor }}; font-size: {{ $fontSize }}px; font-weight: {{ $isBold ? '900' : '400' }};">
                     {!! nl2br(e($quote ?: 'Escreva algo...')) !!}
                 </div>
             </div>
 
             <div class="bottom-bar">
-                <div class="flex bg-gray-100 dark:bg-white/5 p-1 rounded-full gap-1">
-                    <button wire:click="selectPreset('top')" title="Topo" class="w-8 h-8 rounded-full flex items-center justify-center {{ $preset === 'top' ? 'bg-amber-500 text-black' : 'text-gray-400' }}">
+                <div class="flex bg-gray-100 dark:bg-white/10 p-1.5 rounded-full gap-1 border border-gray-200 dark:border-white/5">
+                    <button wire:click="selectPreset('top')" title="Topo" class="w-9 h-9 rounded-full flex items-center justify-center transition {{ $preset === 'top' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-gray-400 hover:bg-gray-200' }}">
                         <x-heroicon-m-bars-2 class="w-4 h-4 rotate-180" />
                     </button>
-                    <button wire:click="selectPreset('max')" title="Centro" class="w-8 h-8 rounded-full flex items-center justify-center {{ $preset === 'max' ? 'bg-amber-500 text-black' : 'text-gray-400' }}">
+                    <button wire:click="selectPreset('max')" title="Centro" class="w-9 h-9 rounded-full flex items-center justify-center transition {{ $preset === 'max' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-gray-400 hover:bg-gray-200' }}">
                         <x-heroicon-m-pause class="w-4 h-4 rotate-90" />
                     </button>
-                    <button wire:click="selectPreset('bottom')" title="Base" class="w-8 h-8 rounded-full flex items-center justify-center {{ $preset === 'bottom' ? 'bg-amber-500 text-black' : 'text-gray-400' }}">
+                    <button wire:click="selectPreset('bottom')" title="Base" class="w-9 h-9 rounded-full flex items-center justify-center transition {{ $preset === 'bottom' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-gray-400 hover:bg-gray-200' }}">
                         <x-heroicon-m-bars-2 class="w-4 h-4" />
                     </button>
                 </div>
 
-                <div class="w-px h-8 bg-gray-200 dark:bg-white/10"></div>
-
-                <input type="text" wire:model.live.debounce.300ms="quote" class="prompt-input" placeholder="O que você quer dizer hoje?">
-                
-                <div class="flex gap-2">
-                    <button wire:click="$toggle('isBold')" class="w-8 h-8 rounded-full border {{ $isBold ? 'bg-amber-500 border-amber-500 text-black' : 'border-gray-200 text-gray-400' }}">B</button>
-                </div>
+                <input type="text" wire:model.live.debounce.300ms="quote" class="prompt-input" placeholder="O que você quer dizer hoje? Digite aqui...">
             </div>
         </main>
 
-        {{-- Galeria --}}
+        {{-- Sidebar Direita: Galeria de Fundos --}}
         <aside class="sidebar-gallery">
-            <button wire:click="mountAction('uploadBackground')" type="button" class="btn-add">
-                <x-heroicon-o-plus class="w-8 h-8" />
+            <button wire:click="mountAction('uploadBackground')" type="button" class="btn-add" title="Upload de Imagem">
+                <x-heroicon-o-plus class="w-10 h-10" />
             </button>
 
             @foreach($this->backgrounds as $bg)
@@ -294,7 +435,8 @@
                 scale: 2, 
                 useCORS: true,
                 allowTaint: true,
-                backgroundColor: null
+                backgroundColor: null,
+                logging: false
             }).then(canvas => {
                 const dataUrl = canvas.toDataURL('image/png');
                 @this.saveSnapshot(dataUrl).then(() => {
@@ -302,7 +444,7 @@
                     btn.disabled = false;
                 });
             }).catch(err => {
-                console.error('Erro:', err);
+                console.error('Erro na captura:', err);
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
             });

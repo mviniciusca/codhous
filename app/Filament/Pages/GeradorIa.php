@@ -214,6 +214,8 @@ class GeradorIa extends Page implements HasActions, HasForms
             'overlay_color'       => $this->overlayColor,
             'overlay_opacity'     => $this->overlayOpacity,
             'pattern'             => $this->pattern,
+            'pattern_size'        => $this->patternSize,
+            'pattern_color'       => $this->patternColor,
             'background_image_id' => $this->backgroundImageId,
             'preset'              => $this->preset,
             'status'              => 'processing',
