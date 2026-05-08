@@ -45,6 +45,9 @@ class GeradorIa extends Page implements HasActions, HasForms
     public int    $fontSize     = 42;
     public string $overlayColor = '#000000';
     public int    $overlayOpacity = 40;
+    public ?string $pattern       = null;
+    public int    $patternSize    = 10;
+    public string $patternColor   = '#ffffff';
     public string $preset         = 'max';
     public float  $textX          = 50.0;
     public float  $textY          = 50.0;
@@ -106,6 +109,12 @@ class GeradorIa extends Page implements HasActions, HasForms
     }
 
     #[Computed]
+    public function selectedBackgroundUrl(): ?string
+    {
+        return $this->selectedBackground?->getFirstMediaUrl('image');
+    }
+
+    #[Computed]
     public function platformOptions(): array
     {
         return [
@@ -113,6 +122,17 @@ class GeradorIa extends Page implements HasActions, HasForms
             'facebook'  => ['label' => 'Facebook',  'size' => '1200×630'],
             'linkedin'  => ['label' => 'LinkedIn',  'size' => '1200×627'],
             'story'     => ['label' => 'Story/Reels', 'size' => '1080×1920'],
+        ];
+    }
+
+    #[Computed]
+    public function patternOptions(): array
+    {
+        return [
+            'dots'  => 'Pontos',
+            'lines' => 'Linhas',
+            'grid'  => 'Grade',
+            'noise' => 'Ruído',
         ];
     }
 
@@ -193,6 +213,9 @@ class GeradorIa extends Page implements HasActions, HasForms
             'text_color'          => $this->textColor,
             'overlay_color'       => $this->overlayColor,
             'overlay_opacity'     => $this->overlayOpacity,
+            'pattern'             => $this->pattern,
+            'pattern_size'        => $this->patternSize,
+            'pattern_color'       => $this->patternColor,
             'background_image_id' => $this->backgroundImageId,
             'preset'              => $this->preset,
             'text_x'              => $this->textX,
@@ -229,6 +252,14 @@ class GeradorIa extends Page implements HasActions, HasForms
         $this->fontSize         = 42;
         $this->overlayColor     = '#000000';
         $this->overlayOpacity   = 40;
+        $this->pattern          = null;
+        $this->patternSize     = 10;
+        $this->patternColor    = '#ffffff';
+    }
+
+    public function updated($property)
+    {
+        $this->dispatch('updated');
     }
 
 

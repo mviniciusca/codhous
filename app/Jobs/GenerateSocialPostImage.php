@@ -73,6 +73,26 @@ class GenerateSocialPostImage implements ShouldQueue
                 $image->insert($bg, 0, 0, 'top-left');
                 $opacity = $this->post->overlay_opacity ?? 40;
                 $image->brightness(-$opacity);
+
+                // Apply Pattern Layer (Tiled)
+                if ($this->post->pattern) {
+                    $patternFile = public_path('assets/patterns/' . $this->post->pattern . '.png');
+                    if (file_exists($patternFile)) {
+                        $pSize = $this->post->pattern_size ?? 10;
+                        // Escala para 1080px (aproximadamente 2x o preview)
+                        $renderSize = max(4, $pSize * 2); 
+                        
+                        $patternTile = $manager->decodePath($patternFile);
+                        $patternTile->resize($renderSize, $renderSize);
+                        
+                        // Loop para azulejar no canvas de 1080x1080
+                        for ($x = 0; $x < 1080; $x += $renderSize) {
+                            for ($y = 0; $y < 1080; $y += $renderSize) {
+                                $image->insert($patternTile, $x, $y, 'top-left', 0.25); 
+                            }
+                        }
+                    }
+                }
             }
 
             // 3. Render Text Layers
