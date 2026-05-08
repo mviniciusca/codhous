@@ -22,26 +22,17 @@ class SavePostSnapshot implements ShouldQueue
     public function handle(): void
     {
         try {
-            // Extrair o base64
-            if (preg_match('/^data:image\/(\w+);base64,/', $this->dataUrl, $type)) {
-                $data = substr($this->dataUrl, strpos($this->dataUrl, ',') + 1);
-                $data = base64_decode($data);
+            // Use Spatie Media Library to handle the base64 image
+            $this->post->addMediaFromBase64($this->dataUrl)
+                ->usingFileName("post-{$this->post->id}-" . now()->timestamp . ".png")
+                ->toMediaCollection('output');
 
-                $filename = "social-posts/{$this->post->id}-snapshot-" . now()->format('YmdHis') . '.png';
-                $fullPath = storage_path("app/public/{$filename}");
+            $this->post->update([
+                'status'       => 'done',
+                'generated_at' => now(),
+                // 'output_path' is no longer used but kept for migration compatibility if needed
+            ]);
 
-                if (! is_dir(dirname($fullPath))) {
-                    mkdir(dirname($fullPath), 0755, true);
-                }
-
-                file_put_contents($fullPath, $data);
-
-                $this->post->update([
-                    'status'       => 'done',
-                    'output_path'  => $filename,
-                    'generated_at' => now(),
-                ]);
-            }
         } catch (\Throwable $e) {
             Log::error('[SavePostSnapshot] Failed', [
                 'post_id' => $this->post->id,

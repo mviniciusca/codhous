@@ -329,11 +329,11 @@ class GeradorIa extends Page implements HasActions, HasForms
         $post = \App\Models\SocialPost::find($id);
         
         if ($post) {
-            if ($post->output_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($post->output_path)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($post->output_path);
-            }
-            $post->delete();
-            \Filament\Notifications\Notification::make()->title('Arte removida!')->success()->send();
+            $post->delete(); // Spatie Media Library handles media deletion
+            \Filament\Notifications\Notification::make()
+                ->title('Arte removida!')
+                ->success()
+                ->send();
         }
     }
 }

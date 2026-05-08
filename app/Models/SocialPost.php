@@ -7,11 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SocialPost extends Model
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
+class SocialPost extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $guarded = [];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('output')
+            ->singleFile();
+    }
 
     protected $casts = [
         'preset'          => \App\Enums\CardPreset::class,
@@ -49,7 +59,7 @@ class SocialPost extends Model
      */
     public function isGenerated(): bool
     {
-        return $this->status === 'done' && ! empty($this->output_path);
+        return $this->status === 'done' && $this->hasMedia('output');
     }
 
     /**
@@ -57,11 +67,7 @@ class SocialPost extends Model
      */
     public function getOutputUrlAttribute(): ?string
     {
-        if (! $this->output_path) {
-            return null;
-        }
-
-        return asset('storage/' . $this->output_path);
+        return $this->getFirstMediaUrl('output');
     }
 
     // ─── Scopes ──────────────────────────────────────────────
