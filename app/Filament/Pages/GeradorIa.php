@@ -194,7 +194,7 @@ class GeradorIa extends Page implements HasActions, HasForms
         $this->textY = $y;
     }
 
-    public function dispatchGeneration(): void
+    public function saveSnapshot(string $dataUrl): void
     {
         $this->validate([
             'quote'              => 'required|max:600',
@@ -209,28 +209,21 @@ class GeradorIa extends Page implements HasActions, HasForms
             'platform'            => $this->platform,
             'quote'               => $this->quote,
             'font_family'         => $this->fontFamily,
-            'font_size'           => $this->fontSize * 2, // Escala para 1080px (aprox)
+            'font_size'           => $this->fontSize,
             'text_color'          => $this->textColor,
             'overlay_color'       => $this->overlayColor,
             'overlay_opacity'     => $this->overlayOpacity,
             'pattern'             => $this->pattern,
-            'pattern_size'        => $this->patternSize,
-            'pattern_color'       => $this->patternColor,
             'background_image_id' => $this->backgroundImageId,
             'preset'              => $this->preset,
-            'text_x'              => $this->textX,
-            'text_y'              => $this->textY,
-            'text_align'          => $this->textAlign,
-            'is_bold'             => $this->isBold,
-            'is_italic'           => $this->isItalic,
-            'status'              => 'queued',
+            'status'              => 'processing',
         ]);
 
-        GenerateSocialPostImage::dispatch($post);
+        // Novo Job que apenas salva o base64 como imagem final
+        dispatch(new \App\Jobs\SavePostSnapshot($post, $dataUrl));
 
         Notification::make()
-            ->title('Post enviado para a fila!')
-            ->body('A imagem será gerada em segundo plano. Você pode continuar trabalhando.')
+            ->title('Arte enviada para processamento!')
             ->success()
             ->send();
     }

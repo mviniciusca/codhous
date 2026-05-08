@@ -51,7 +51,7 @@
             background-size: cover;
             background-position: center;
             position: relative;
-            border-radius: 20px;
+            border-radius: 0;
             box-shadow: 0 40px 100px -20px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
@@ -196,22 +196,25 @@
             <div class="space-y-3" wire:poll.5s>
                 <label class="text-[10px] font-black uppercase text-gray-400 block">Artes Recentes</label>
                 <div class="grid grid-cols-2 gap-3">
-                    @foreach($this->recentPosts as $p)
-                        <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/10 group">
+                    @foreach($this->recentPosts->where('status', '!=', 'failed') as $p)
+                        <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/10 group shadow-sm">
                             @if($p->isGenerated())
                                 <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
-                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                    <a href="{{ $p->output_url }}" target="_blank" class="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white transition">
+                                {{-- Barra de Ações Sempre Visível --}}
+                                <div class="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-md py-2 flex items-center justify-center gap-4">
+                                    <a href="{{ $p->output_url }}" target="_blank" title="Ver" class="text-white hover:text-amber-500 transition-all hover:scale-110">
                                         <x-heroicon-m-eye class="w-4 h-4" />
                                     </a>
-                                    <a href="{{ $p->output_url }}" download class="p-2 bg-amber-500 hover:bg-amber-600 rounded-full text-black transition">
+                                    <a href="{{ $p->output_url }}" download title="Baixar" class="text-white hover:text-amber-500 transition-all hover:scale-110">
                                         <x-heroicon-m-arrow-down-tray class="w-4 h-4" />
                                     </a>
+                                    <button wire:click="deletePost({{ $p->id }})" wire:confirm="Apagar?" title="Deletar" class="text-white hover:text-red-500 transition-all hover:scale-110">
+                                        <x-heroicon-m-trash class="w-4 h-4" />
+                                    </button>
                                 </div>
                             @else
-                                <div class="w-full h-full flex flex-col items-center justify-center gap-1">
-                                    <x-heroicon-o-arrow-path class="w-5 h-5 text-amber-500 animate-spin" />
-                                    <span class="text-[8px] font-black uppercase text-gray-400">Gerando</span>
+                                <div class="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-black/20">
+                                    <x-heroicon-o-arrow-path class="w-6 h-6 text-amber-500 animate-spin" />
                                 </div>
                             @endif
                         </div>
@@ -220,7 +223,7 @@
             </div>
 
             <div class="mt-auto">
-                <button wire:click="dispatchGeneration" class="w-full btn-main flex items-center justify-center gap-2">
+                <button onclick="takeSnapshot()" class="w-full btn-main flex items-center justify-center gap-2">
                     <x-heroicon-m-sparkles class="w-4 h-4" />
                     GERAR ARTE FINAL
                 </button>
@@ -229,7 +232,7 @@
 
         {{-- Preview Central --}}
         <main class="preview-area">
-            <div class="card-preview" 
+            <div class="card-preview" id="card-container"
                  style="background-image: url('{{ $this->selectedBackgroundUrl }}'); 
                         --overlay-color: {{ $overlayColor }}; 
                         --overlay-opacity: {{ $overlayOpacity / 100 }};
@@ -276,6 +279,35 @@
             @endforeach
         </aside>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        function takeSnapshot() {
+            const el = document.getElementById('card-container');
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            
+            btn.innerHTML = 'CAPTURANDO...';
+            btn.disabled = true;
+
+            html2canvas(el, {
+                scale: 2, 
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null
+            }).then(canvas => {
+                const dataUrl = canvas.toDataURL('image/png');
+                @this.saveSnapshot(dataUrl).then(() => {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                });
+            }).catch(err => {
+                console.error('Erro:', err);
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            });
+        }
+    </script>
 
     <x-filament-actions::modals />
 </x-filament-panels::page>

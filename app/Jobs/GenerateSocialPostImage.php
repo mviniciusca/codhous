@@ -69,23 +69,26 @@ class GenerateSocialPostImage implements ShouldQueue
                 $bg->cover(594, 1080);
                 $image->insert($bg, 486, 0, 'top-left');
             } else {
-                // Style: Full Image + Overlay
+                // Style: Full Image + Overlay (FIXED: Real Color Overlay)
                 $image->insert($bg, 0, 0, 'top-left');
+                
+                $color = $this->post->overlay_color ?? '#000000';
                 $opacity = $this->post->overlay_opacity ?? 40;
-                $image->brightness(-$opacity);
 
+                // Criar uma camada de cor sólida e inserir por cima com opacidade (Jeito estável V3)
+                $overlay = $manager->createImage(1080, 1080)->fill($color);
+                $image->insert($overlay, 0, 0, 'top-left', $opacity);
+                
                 // Apply Pattern Layer (Tiled)
                 if ($this->post->pattern) {
                     $patternFile = public_path('assets/patterns/' . $this->post->pattern . '.png');
                     if (file_exists($patternFile)) {
                         $pSize = $this->post->pattern_size ?? 10;
-                        // Escala para 1080px (aproximadamente 2x o preview)
                         $renderSize = max(4, $pSize * 2); 
                         
                         $patternTile = $manager->decodePath($patternFile);
                         $patternTile->resize($renderSize, $renderSize);
                         
-                        // Loop para azulejar no canvas de 1080x1080
                         for ($x = 0; $x < 1080; $x += $renderSize) {
                             for ($y = 0; $y < 1080; $y += $renderSize) {
                                 $image->insert($patternTile, $x, $y, 'top-left', 0.25); 
@@ -114,14 +117,12 @@ class GenerateSocialPostImage implements ShouldQueue
             if (! file_exists($fontPath)) {
                 try {
                     $fontUrlFamily = str_replace(' ', '+', $family);
-                    // Use a simple trick to find the TTF URL (getting the CSS and parsing it)
                     $css = file_get_contents("https://fonts.googleapis.com/css2?family={$fontUrlFamily}:wght@700");
                     if (preg_match('/url\((https:\/\/fonts\.gstatic\.com\/s\/[^\)]+\.ttf)\)/', $css, $matches)) {
                         $ttfUrl = $matches[1];
                         file_put_contents($fontPath, file_get_contents($ttfUrl));
                     }
                 } catch (\Exception $e) {
-                    // Fallback to default if download fails
                     $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
                 }
             }
@@ -135,25 +136,34 @@ class GenerateSocialPostImage implements ShouldQueue
             $xPos = ($this->post->text_x / 100) * 1080;
             $yPos = ($this->post->text_y / 100) * 1080;
 
+            // Ajuste de Valign manual baseado no preset (Enum)
+            if ($this->post->preset === \App\Enums\CardPreset::TOP) {
+                $yPos = 150; // Topo com margem
+            } elseif ($this->post->preset === \App\Enums\CardPreset::BOTTOM) {
+                $yPos = 930; // Base com margem
+            } else {
+                $yPos = 540; // Centro
+            }
+
             $finalTextColor = $this->post->text_color ?: '#ffffff';
             if (! str_starts_with($finalTextColor, '#')) {
                 $finalTextColor = "#{$finalTextColor}";
             }
 
-
             // Render Quote (Main Text)
-            // Garantir que as quebras de linha manuais sejam respeitadas
             $quoteLines = explode("\n", str_replace(["\r\n", "\r"], "\n", $quote));
             $quote = implode("\n", $quoteLines);
 
-            $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $finalTextColor, $align) {
+            // CORREÇÃO DE ESCALA: O preview é 540px, a saída é 1080px. Logo, fonte x2.
+            $finalFontSize = ($this->post->font_size ?? 80) * 2.2;
+
+            $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $finalTextColor, $align, $finalFontSize) {
                 $font->filename($fontPath);
-                $font->size($this->post->font_size ?? 80); // Usa o tamanho escolhido ou 80 como padrão
+                $font->size($finalFontSize); 
                 $font->color($finalTextColor);
-                $font->stroke('#000000', 1); // Contorno sutil para legibilidade (estilo sombra)
-                $font->align($align, 'center'); 
+                $font->align($align, 'middle'); 
                 $font->lineHeight(1.0);
-                $font->wrap(750); // Margem lateral de segurança maior
+                $font->wrap(850); 
             });
 
             // 5. Save
