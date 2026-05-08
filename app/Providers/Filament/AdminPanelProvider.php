@@ -35,7 +35,6 @@ class AdminPanelProvider extends PanelProvider
                 __('Orçamentos'),
                 __('Website'),
                 __('Empresa'),
-                __('Comunicação'),
                 __('Configurações'),
             ])
             ->resources([
