@@ -669,23 +669,37 @@
             </div>
 
             <div class="command-bar-wrapper">
-                <div class="preset-strip">
-                    @foreach(\App\Enums\CardPreset::cases() as $case)
-                        <button wire:click="selectPreset('{{ $case->value }}')"
-                            class="btn-preset-mini {{ $preset === $case->value ? 'active' : '' }}">
-                            {{ $case->label() }}
+                <div class="flex flex-col gap-3 items-center">
+                    <div class="preset-strip">
+                        @foreach(\App\Enums\CardPreset::cases() as $case)
+                            <button wire:click="selectPreset('{{ $case->value }}')"
+                                class="btn-preset-mini {{ $preset === $case->value ? 'active' : '' }}">
+                                {{ $case->label() }}
+                            </button>
+                        @endforeach
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button wire:click="generateAiDesign" class="generate-btn h-10 px-6 text-xs" style="background: #8b5cf6; color: white;">
+                            <x-heroicon-m-bolt class="w-3.5 h-3.5" />
+                            <span>Mágica IA</span>
                         </button>
-                    @endforeach
+                        <button onclick="takeSnapshot()" id="generate-trigger" class="generate-btn h-10 px-6 text-xs">
+                            <x-heroicon-m-sparkles class="w-3.5 h-3.5" />
+                            <span>Gerar Arte</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="command-bar">
+
+                <div class="command-bar !w-[800px] !h-auto min-h-[64px] py-2">
                     <div
                         class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-900 p-1 rounded-full border border-zinc-200 dark:border-zinc-800">
                         <button wire:click="selectPreset('top')"
                             class="w-8 h-8 rounded-full flex items-center justify-center {{ $preset === 'top' ? 'bg-amber-500 text-black' : 'text-zinc-400' }}">
                             <x-heroicon-m-bars-2 class="w-4 h-4 rotate-180" />
                         </button>
-                        <button wire:click="selectPreset('max')"
-                            class="w-8 h-8 rounded-full flex items-center justify-center {{ $preset === 'max' ? 'bg-amber-500 text-black' : 'text-zinc-400' }}">
+                        <button wire:click="selectPreset('bold_center')"
+                            class="w-8 h-8 rounded-full flex items-center justify-center {{ $preset === 'bold_center' ? 'bg-amber-500 text-black' : 'text-zinc-400' }}">
                             <x-heroicon-m-pause class="w-4 h-4 rotate-90" />
                         </button>
                         <button wire:click="selectPreset('bottom')"
@@ -693,16 +707,10 @@
                             <x-heroicon-m-bars-2 class="w-4 h-4" />
                         </button>
                     </div>
-                    <input type="text" wire:model.live.debounce.300ms="quote" class="prompt-input"
-                        placeholder="O que você quer expressar hoje?">
-                    <button wire:click="generateAiDesign" class="generate-btn" style="background: #8b5cf6; color: white;">
-                        <x-heroicon-m-bolt class="w-4 h-4" />
-                        <span>Mágica IA</span>
-                    </button>
-                    <button onclick="takeSnapshot()" id="generate-trigger" class="generate-btn">
-                        <x-heroicon-m-sparkles class="w-4 h-4" />
-                        <span>Gerar Arte</span>
-                    </button>
+                    <textarea wire:model.live.debounce.300ms="quote" 
+                              class="prompt-input resize-none py-2 max-h-[150px] overflow-y-auto w-full"
+                              placeholder="O que você quer expressar hoje?"
+                              rows="1"></textarea>
                 </div>
             </div>
         </main>
@@ -724,6 +732,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
+        // Auto-expand textarea
+        const tx = document.getElementsByTagName("textarea");
+        for (let i = 0; i < tx.length; i++) {
+            tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+            tx[i].addEventListener("input", OnInput, false);
+        }
+
+        function OnInput() {
+            this.style.height = 0;
+            this.style.height = (this.scrollHeight) + "px";
+        }
+
         function takeSnapshot() {
             const el = document.getElementById('card-container');
             const btn = document.getElementById('generate-trigger');
