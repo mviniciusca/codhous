@@ -1,150 +1,207 @@
 <x-filament-panels::page>
-    {{-- Forçar carregamento das fontes do Google --}}
+    {{-- Google Fonts for UI and Design --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Montserrat:wght@400;700;900&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@400;700;900&family=Roboto:wght@400;700;900&family=Lato:wght@400;700;900&family=Raleway:wght@400;700;900&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;700;900&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@400;700;900&family=Roboto:wght@400;700;900&family=Lato:wght@400;700;900&family=Raleway:wght@400;700;900&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
 
-    <style>        .studio-layout {
+    <style>
+        :root {
+            --sidebar-width: 320px;
+            --gallery-width: 90px;
+            --accent-color: #fbbf24;
+            --bg-base: #09090b;
+            --bg-surface: #121217;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --text-muted: #a1a1aa;
+        }
+
+        .studio-layout {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             display: grid;
-            grid-template-columns: 280px 1fr 85px;
-            background: #f8fafc;
+            grid-template-columns: var(--sidebar-width) 1fr var(--gallery-width);
+            background: var(--bg-base);
+            color: #fff;
             z-index: 40;
             font-family: 'Inter', sans-serif;
+            overflow: hidden;
         }
-        .dark .studio-layout { background: #09090b; }
 
         /* Sidebar Controles */
         .sidebar-controls {
-            padding: 15px;
-            border-right: 1px solid rgba(0,0,0,0.08);
+            padding: 24px;
+            border-right: 1px solid var(--border-subtle);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 24px;
             overflow-y: auto;
-            background: #ffffff;
-            scrollbar-width: thin;
+            background: var(--bg-surface);
+            scrollbar-width: none;
         }
-        .dark .sidebar-controls { background: #111114; border-color: rgba(255,255,255,0.08); }
+        .sidebar-controls::-webkit-scrollbar { display: none; }
+
+        .sidebar-header {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+        .back-link:hover { color: var(--accent-color); }
 
         .section-title {
-            text-[9px] font-black uppercase text-gray-400 tracking-widest mb-2 block;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            display: block;
         }
 
-        .control-group {
-            background: #fdfdfd;
-            border: 1px solid #f1f5f9;
-            padding: 12px;
-            border-radius: 12px;
+        .control-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 16px;
+            transition: 0.2s;
         }
-        .dark .control-group { background: #18181b; border-color: rgba(255,255,255,0.05); }
+        .control-card:hover { border-color: rgba(251, 191, 36, 0.2); }
 
-        /* Inputs Modernos - FIX SELECT */
+        /* Custom Inputs */
         .studio-select {
             width: 100%;
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0 !important;
+            background-color: rgba(0, 0, 0, 0.2);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            border: 1px solid var(--border-subtle) !important;
             border-radius: 10px !important;
-            padding: 8px 30px 8px 12px !important;
-            font-size: 12px !important;
-            font-weight: 700;
-            color: #1e293b;
+            padding: 10px 36px 10px 12px !important;
+            font-size: 13px !important;
+            font-weight: 600;
+            color: #fff;
             appearance: none !important;
             -webkit-appearance: none !important;
             -moz-appearance: none !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 10px center !important;
-            background-size: 14px !important;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .dark .studio-select { background-color: #27272a; border-color: #3f3f46 !important; color: #fff; }
+        .studio-select:focus { border-color: var(--accent-color) !important; outline: none; }
 
-        .prompt-input {
+        .range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .range-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .range-label { font-size: 11px; font-weight: 600; color: #fff; }
+        .range-value { font-size: 11px; font-weight: 700; color: var(--accent-color); }
+
+        .custom-range {
+            -webkit-appearance: none;
             width: 100%;
-            background: #f1f5f9;
-            border: none !important;
-            border-radius: 10px !important;
-            padding: 8px 12px !important;
-            font-size: 12px !important;
-            font-weight: 600;
-            color: #1e293b;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
         }
-        .dark .prompt-input { background: #27272a; color: #fff; }
+        .custom-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+            transition: 0.2s;
+        }
+        .custom-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
-        /* Patterns Grid */
+        /* Patterns & Buttons */
         .pattern-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
+            gap: 8px;
         }
-        .pattern-btn {
+        .btn-toggle {
             aspect-ratio: 1;
-            border-radius: 8px;
-            border: 2px solid #f1f5f9;
-            background: #fff;
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+            background: rgba(255, 255, 255, 0.02);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
             overflow: hidden;
         }
-        .pattern-btn.active { border-color: #fbbf24; background: #fffbeb; }
-        .dark .pattern-btn { background: #27272a; border-color: #3f3f46; }
-        .dark .pattern-btn.active { border-color: #fbbf24; background: #451a03; }
+        .btn-toggle.active { border-color: var(--accent-color); background: rgba(251, 191, 36, 0.1); }
+        .btn-toggle:hover:not(.active) { background: rgba(255, 255, 255, 0.05); }
 
-        /* Área de Preview */
-        .preview-area {
+        /* Canvas Area */
+        .preview-main {
             position: relative;
-            background-color: #f1f5f9;
+            background-color: var(--bg-base);
             background-image: 
-                radial-gradient(#cbd5e1 1.5px, transparent 1.5px),
-                radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
+                radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px;
+            padding: 60px;
             overflow: auto;
-        }
-        .dark .preview-area { 
-            background-color: #09090b;
-            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            scrollbar-width: thin;
         }
 
-        .card-preview {
+        .canvas-container {
+            position: relative;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .canvas-box {
             width: 500px;
             height: 500px;
-            background-color: #1e293b;
+            background-color: #18181b;
             background-size: cover;
             background-position: center;
             position: relative;
-            border-radius: 0;
-            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.5);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px;
-            overflow: hidden;
-            flex-shrink: 0;
+            padding: 48px;
+            transition: all 0.4s ease;
         }
 
-        .card-overlay {
+        .canvas-overlay {
             position: absolute;
             inset: 0;
-            background: var(--overlay-color, #000);
-            opacity: var(--overlay-opacity, 0.4);
             z-index: 1;
         }
 
-        .card-pattern {
+        .canvas-pattern {
             position: absolute;
             inset: 0;
             z-index: 1;
@@ -153,302 +210,444 @@
             -webkit-mask-repeat: repeat;
         }
 
-        .card-text {
+        .canvas-text {
             position: relative;
             z-index: 2;
-            line-height: 1.1;
-            text-transform: uppercase;
+            width: 100%;
             word-wrap: break-word;
-            max-width: 100%;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Sidebar Galeria */
-        .sidebar-gallery {
-            padding: 15px 10px;
-            border-left: 1px solid rgba(0,0,0,0.08);
-            background: #ffffff;
+        /* Bottom Command Bar */
+        .command-bar-wrapper {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            overflow-y: auto;
+            gap: 16px;
+            z-index: 100;
         }
-        .dark .sidebar-gallery { background: #111114; border-color: rgba(255,255,255,0.08); }
 
-        .thumb {
+        .preset-strip {
+            display: flex;
+            gap: 8px;
+            background: rgba(18, 18, 23, 0.6);
+            backdrop-filter: blur(16px);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .command-bar-wrapper:hover .preset-strip { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .btn-preset-mini {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            background: transparent;
+            border: 1px solid transparent;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-preset-mini.active { background: var(--accent-color); color: #000; }
+        .btn-preset-mini:hover:not(.active) { color: #fff; background: rgba(255, 255, 255, 0.05); }
+
+        .command-bar {
+            width: 720px;
+            height: 64px;
+            background: rgba(18, 18, 23, 0.85);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px 0 24px;
+            gap: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .prompt-input {
+            flex: 1;
+            background: transparent !important;
+            border: none !important;
+            color: #fff !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            outline: none !important;
+            padding: 0 !important;
+        }
+        .prompt-input::placeholder { color: var(--text-muted); }
+
+        .generate-btn {
+            background: var(--accent-color);
+            color: #000;
+            height: 48px;
+            padding: 0 24px;
+            border-radius: 24px;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.2);
+        }
+        .generate-btn:hover { transform: translateY(-2px) scale(1.02); background: #fcd34d; box-shadow: 0 12px 24px rgba(251, 191, 36, 0.3); }
+        .generate-btn:active { transform: translateY(0) scale(0.98); }
+
+        /* Recent Arts Section */
+        .recent-arts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .art-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-subtle);
+            transition: 0.3s;
+        }
+        .art-card:hover { transform: translateY(-4px); border-color: rgba(255, 255, 255, 0.2); }
+        
+        .art-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .art-card:hover .art-overlay { opacity: 1; }
+
+        /* Right Gallery */
+        .sidebar-gallery {
+            padding: 24px 12px;
+            border-left: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .asset-thumb {
             width: 60px;
             height: 60px;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: 0.3s;
-            box-shadow: 0 2px 4px -1px rgba(0,0,0,0.1);
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(255, 255, 255, 0.03);
         }
-        .thumb.active { border-color: #fbbf24; transform: scale(1.05); box-shadow: 0 8px 12px -3px rgba(251, 191, 36, 0.3); }
-        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .asset-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.3s; }
+        .asset-thumb:hover img { opacity: 1; }
+        .asset-thumb.active { border-color: var(--accent-color); transform: scale(1.1); box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+        .asset-thumb.active img { opacity: 1; }
 
-        .btn-add {
+        .btn-upload {
             width: 60px;
             height: 60px;
-            background: #fbbf24;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed var(--border-subtle);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #000;
+            color: var(--text-muted);
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3);
             transition: 0.2s;
         }
-        .btn-add:hover { transform: translateY(-2px); background: #f59e0b; }
+        .btn-upload:hover { background: rgba(255, 255, 255, 0.08); color: #fff; border-color: var(--accent-color); }
 
-        /* Barra Inferior Fixa no Centro */
-        .bottom-bar {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            padding: 8px 15px;
-            border-radius: 100px;
-            border: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 100;
-            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.1);
-            width: auto;
-            min-width: 600px;
-        }
-        .dark .bottom-bar { background: rgba(24, 24, 27, 0.9); border-color: rgba(255,255,255,0.1); }
-
-        .btn-main {
-            background: #1e293b;
-            color: #fff;
-            padding: 14px 40px;
-            border-radius: 100px;
-            font-weight: 800;
-            font-size: 13px;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .btn-main:hover { background: #0f172a; transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.3); }
-        .btn-main:active { transform: translateY(0); }
-
-        .action-icon-bar {
-            position: absolute;
-            bottom: 0;
-            inset-x: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            padding: 8px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            opacity: 1;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease forwards; }
     </style>
 
     <div class="studio-layout">
-        {{-- Sidebar Esquerda: Controles --}}
+        {{-- Left Sidebar: Tools --}}
         <aside class="sidebar-controls">
-            <a href="{{ filament()->getUrl() }}" class="flex items-center gap-2 text-[10px] font-black uppercase text-gray-400 hover:text-amber-500 transition">
-                <x-heroicon-m-arrow-left class="w-4 h-4" /> Voltar ao Painel
-            </a>
-
-            <div class="space-y-6">
-                {{-- Tipografia --}}
-                <div class="control-group">
-                    <label class="section-title">Tipografia</label>
-                    <select wire:model.live="fontFamily" class="studio-select">
-                        @foreach($this->fontOptions as $val => $lbl)
-                            <option value="{{ $val }}">{{ $lbl }}</option>
-                        @endforeach
-                    </select>
-                    
-                    <div>
-                        <div class="flex justify-between text-[10px] font-bold text-gray-500 mb-1">
-                            <span>Tamanho</span>
-                            <span>{{ $fontSize }}px</span>
-                        </div>
-                        <input type="range" wire:model.live="fontSize" min="12" max="150" class="w-full accent-amber-500 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            <header class="sidebar-header">
+                <a href="{{ filament()->getUrl() }}" class="back-link">
+                    <x-heroicon-m-arrow-left class="w-4 h-4" /> Voltar ao Painel
+                </a>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
+                        <x-heroicon-o-sparkles class="w-5 h-5 text-black" />
                     </div>
+                    <h2 class="text-lg font-black tracking-tight">Studio Editor</h2>
+                </div>
+            </header>
 
-                    <div class="flex items-center gap-3">
-                        <div class="flex-1">
-                            <label class="text-[9px] font-bold text-gray-400 uppercase mb-1 block">Cor do Texto</label>
-                            <input type="color" wire:model.live="textColor" class="w-full h-8 p-1 bg-white border border-gray-100 rounded-lg cursor-pointer">
+            <div class="space-y-8">
+                {{-- Typography Card --}}
+                <div class="space-y-4">
+                    <label class="section-title">Tipografia & Estilo</label>
+                    <div class="control-card">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Fonte</label>
+                            <select wire:model.live="fontFamily" class="studio-select">
+                                @foreach($this->fontOptions as $val => $lbl)
+                                    <option value="{{ $val }}">{{ $lbl }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <button wire:click="$toggle('isBold')" class="w-8 h-8 mt-4 rounded-lg border {{ $isBold ? 'bg-amber-500 border-amber-500 text-black' : 'border-gray-200 text-gray-400' }} font-bold">B</button>
+
+                        <div class="range-container">
+                            <div class="range-header">
+                                <span class="range-label">Tamanho do Texto</span>
+                                <span class="range-value">{{ $fontSize }}px</span>
+                            </div>
+                            <input type="range" wire:model.live="fontSize" min="12" max="150" class="custom-range">
+                        </div>
+
+                        <div class="flex items-end gap-3">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Cor</label>
+                                <div class="relative group">
+                                    <input type="color" wire:model.live="textColor" class="w-full h-10 p-1 bg-zinc-900 border border-zinc-800 rounded-lg cursor-pointer">
+                                </div>
+                            </div>
+                            <button wire:click="$toggle('isBold')" 
+                                    class="w-10 h-10 rounded-lg border flex items-center justify-center transition-all duration-300 {{ $isBold ? 'bg-amber-500 border-amber-500 text-black shadow-lg shadow-amber-500/20' : 'border-zinc-800 text-zinc-500 hover:border-zinc-600' }}">
+                                <span class="text-sm font-black">B</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {{-- Camadas --}}
-                <div class="control-group">
-                    <label class="section-title">Filtro de Fundo</label>
-                    <div class="flex items-center gap-3">
-                        <input type="color" wire:model.live="overlayColor" class="w-10 h-10 p-1 bg-white border border-gray-100 rounded-lg cursor-pointer">
-                        <div class="flex-1">
-                            <input type="range" wire:model.live="overlayOpacity" min="0" max="100" class="w-full accent-amber-500 h-1">
-                            <div class="flex justify-between text-[8px] font-bold text-gray-400 mt-1">
-                                <span>Opacidade</span>
-                                <span>{{ $overlayOpacity }}%</span>
+                {{-- Layers & Filters Card --}}
+                <div class="space-y-4">
+                    <label class="section-title">Filtros & Camadas</label>
+                    <div class="control-card">
+                        <div class="range-container">
+                            <div class="range-header">
+                                <span class="range-label">Opacidade do Fundo</span>
+                                <span class="range-value">{{ $overlayOpacity }}%</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <input type="color" wire:model.live="overlayColor" class="w-10 h-10 p-1 bg-zinc-900 border border-zinc-800 rounded-lg cursor-pointer flex-shrink-0">
+                                <input type="range" wire:model.live="overlayOpacity" min="0" max="100" class="custom-range">
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {{-- Texturas --}}
-                <div class="control-group">
-                    <label class="section-title">Textura (Pattern)</label>
-                    <div class="flex flex-wrap gap-2">
-                        <button wire:click="$set('pattern', null)" class="w-10 h-10 flex-shrink-0 rounded-lg border-2 {{ is_null($pattern) ? 'border-amber-500 bg-amber-50' : 'border-gray-100 bg-white' }} flex items-center justify-center transition" title="Nenhum">
-                            <span class="text-[9px] font-black {{ is_null($pattern) ? 'text-amber-600' : 'text-gray-300' }}">OFF</span>
-                        </button>
-                        @foreach(['dots', 'lines', 'grid'] as $p)
-                            <button wire:click="$set('pattern', '{{ $p }}')" class="w-10 h-10 flex-shrink-0 rounded-lg border-2 {{ $pattern === $p ? 'border-amber-500 bg-amber-50' : 'border-gray-100 bg-white' }} flex items-center justify-center transition" title="{{ ucfirst($p) }}">
-                                <img src="/assets/patterns/{{ $p }}.png" class="w-5 h-5 opacity-40 invert dark:invert-0">
-                            </button>
-                        @endforeach
-                    </div>
-                    
-                    @if($pattern)
-                        <div class="pt-1 flex items-center gap-2">
-                            <input type="color" wire:model.live="patternColor" class="w-6 h-6 p-1 bg-white border border-gray-100 rounded-lg cursor-pointer">
-                            <input type="range" wire:model.live="patternSize" min="5" max="100" class="flex-1 accent-amber-500 h-1">
+                        <div class="space-y-3 pt-2">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Textura</label>
+                            <div class="pattern-grid">
+                                <button wire:click="$set('pattern', null)" class="btn-toggle {{ is_null($pattern) ? 'active' : '' }}" title="Nenhum">
+                                    <span class="text-[10px] font-black {{ is_null($pattern) ? 'text-amber-500' : 'text-zinc-600' }}">OFF</span>
+                                </button>
+                                @foreach(['dots', 'lines', 'grid'] as $p)
+                                    <button wire:click="$set('pattern', '{{ $p }}')" class="btn-toggle {{ $pattern === $p ? 'active' : '' }}" title="{{ ucfirst($p) }}">
+                                        <img src="/assets/patterns/{{ $p }}.png" class="w-5 h-5 opacity-50 invert">
+                                    </button>
+                                @endforeach
+                            </div>
                         </div>
-                    @endif
+
+                        @if($pattern)
+                            <div class="range-container animate-fade-in" style="--delay: 0.1s">
+                                <div class="range-header">
+                                    <span class="range-label">Escala da Textura</span>
+                                    <span class="range-value">{{ $patternSize }}px</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <input type="color" wire:model.live="patternColor" class="w-8 h-8 p-1 bg-zinc-900 border border-zinc-800 rounded-lg cursor-pointer">
+                                    <input type="range" wire:model.live="patternSize" min="5" max="100" class="custom-range">
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
-                {{-- Galeria Recent --}}
-                <div class="space-y-2 pt-1" wire:poll.5s>
-                    <label class="section-title">Artes Recentes</label>
-                    <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important;">
+                {{-- Recent Arts --}}
+                <div class="space-y-4 pt-2" wire:poll.10s>
+                    <div class="flex justify-between items-center">
+                        <label class="section-title mb-0">Artes Recentes</label>
+                        <span class="text-[9px] font-bold text-amber-500/50 uppercase">Live Update</span>
+                    </div>
+                    <div class="recent-arts-grid">
                         @foreach($this->recentPosts->where('status', '!=', 'failed') as $p)
-                            <div class="relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/10 group shadow-sm transition hover:shadow-md" style="width: 100% !important; aspect-ratio: 1/1 !important;">
+                            <div class="art-card">
                                 @if($p->isGenerated())
-                                    <img src="{{ $p->output_url }}" class="w-full h-full object-cover" style="display: block !important;">
-                                    <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition duration-200">
-                                        <a href="{{ $p->output_url }}" target="_blank" class="text-white hover:text-amber-500 transform hover:scale-125 transition">
+                                    <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
+                                    <div class="art-overlay">
+                                        <a href="{{ $p->output_url }}" target="_blank" class="p-2 bg-white/10 hover:bg-amber-500 hover:text-black rounded-full transition-all">
                                             <x-heroicon-m-eye class="w-4 h-4" />
                                         </a>
-                                        <a href="{{ $p->output_url }}" download class="text-white hover:text-amber-500 transform hover:scale-125 transition">
-                                            <x-heroicon-m-arrow-down-tray class="w-4 h-4" />
-                                        </a>
-                                        <button wire:click="deletePost({{ $p->id }})" class="text-white hover:text-red-500 transform hover:scale-125 transition">
+                                        <button wire:click="deletePost({{ $p->id }})" class="p-2 bg-white/10 hover:bg-red-500 text-white rounded-full transition-all">
                                             <x-heroicon-m-trash class="w-4 h-4" />
                                         </button>
                                     </div>
                                 @else
-                                    <div class="w-full h-full flex items-center justify-center">
-                                        <x-heroicon-o-arrow-path class="w-4 h-4 text-amber-500 animate-spin" />
+                                    <div class="w-full h-full flex flex-col items-center justify-center gap-2">
+                                        <x-heroicon-o-arrow-path class="w-5 h-5 text-amber-500 animate-spin" />
+                                        <span class="text-[8px] font-bold text-zinc-600 uppercase">Processando</span>
                                     </div>
                                 @endif
                             </div>
                         @endforeach
                     </div>
                 </div>
-
-                {{-- Botão Removido daqui --}}
             </div>
         </aside>
 
-        {{-- Área de Preview Central --}}
-        <main class="preview-area">
-            <div class="card-preview" id="card-container"
-                 style="background-image: url('{{ $this->selectedBackgroundUrl }}'); 
-                        --overlay-color: {{ $overlayColor }}; 
-                        --overlay-opacity: {{ $overlayOpacity / 100 }};
-                        align-items: {{ $preset === 'top' ? 'start' : ($preset === 'bottom' ? 'end' : 'center') }};">
-                <div class="card-overlay"></div>
-                
-                @if($pattern)
-                    <div class="card-pattern" style="
-                        mask-image: url('/assets/patterns/{{ $pattern }}.png');
-                        -webkit-mask-image: url('/assets/patterns/{{ $pattern }}.png');
-                        mask-size: {{ $patternSize }}px;
-                        -webkit-mask-size: {{ $patternSize }}px;
-                        background-color: {{ $patternColor }};
-                        opacity: 0.2;
-                    "></div>
-                @endif
+        {{-- Main Canvas Area --}}
+        <main class="preview-main">
+            {{-- Platform Badge removido a pedido --}}
 
-                <div class="card-text" style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}' !important; color: {{ $textColor }}; font-size: {{ $fontSize }}px; font-weight: {{ $isBold ? '900' : '400' }};">
-                    {!! nl2br(e($quote ?: 'Escreva algo...')) !!}
+            <div class="canvas-container" id="canvas-wrapper">
+                <div class="canvas-box" id="card-container"
+                     style="background-image: url('{{ $this->selectedBackgroundUrl }}'); 
+                            align-items: {{ $preset === 'top' ? 'start' : ($preset === 'bottom' ? 'end' : 'center') }};
+                            justify-content: center;
+                            text-align: center;">
+                    
+                    <div class="canvas-overlay" style="background-color: {{ $overlayColor }}; opacity: {{ $overlayOpacity / 100 }};"></div>
+                    
+                    @if($pattern)
+                        <div class="canvas-pattern" style="
+                            mask-image: url('/assets/patterns/{{ $pattern }}.png');
+                            -webkit-mask-image: url('/assets/patterns/{{ $pattern }}.png');
+                            mask-size: {{ $patternSize }}px;
+                            -webkit-mask-size: {{ $patternSize }}px;
+                            background-color: {{ $patternColor }};
+                            opacity: 0.2;
+                        "></div>
+                    @endif
+
+                    <div class="canvas-text" style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif !important; color: {{ $textColor }}; font-size: {{ $fontSize }}px; font-weight: {{ $isBold ? '900' : '400' }}; line-height: 1.1; text-transform: uppercase;">
+                        {!! nl2br(e($quote ?: '')) !!}
+                    </div>
                 </div>
             </div>
 
-            <div class="bottom-bar">
-                <div class="flex bg-gray-100 dark:bg-white/10 p-1.5 rounded-full gap-1 border border-gray-200 dark:border-white/5">
-                    <button wire:click="selectPreset('top')" title="Topo" class="w-9 h-9 rounded-full flex items-center justify-center transition {{ $preset === 'top' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-gray-400 hover:bg-gray-200' }}">
-                        <x-heroicon-m-bars-2 class="w-4 h-4 rotate-180" />
-                    </button>
-                    <button wire:click="selectPreset('max')" title="Centro" class="w-9 h-9 rounded-full flex items-center justify-center transition {{ $preset === 'max' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-gray-400 hover:bg-gray-200' }}">
-                        <x-heroicon-m-pause class="w-4 h-4 rotate-90" />
-                    </button>
-                    <button wire:click="selectPreset('bottom')" title="Base" class="w-9 h-9 rounded-full flex items-center justify-center transition {{ $preset === 'bottom' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-gray-400 hover:bg-gray-200' }}">
-                        <x-heroicon-m-bars-2 class="w-4 h-4" />
-                    </button>
+            {{-- Floating Command Bar Wrapper --}}
+            <div class="command-bar-wrapper">
+                {{-- Preset Strip --}}
+                <div class="preset-strip">
+                    @foreach(\App\Enums\CardPreset::cases() as $case)
+                        <button wire:click="selectPreset('{{ $case->value }}')" 
+                                class="btn-preset-mini {{ $preset === $case->value ? 'active' : '' }}">
+                            {{ $case->name }}
+                        </button>
+                    @endforeach
                 </div>
 
-                <input type="text" wire:model.live.debounce.300ms="quote" class="prompt-input !bg-transparent !py-1" placeholder="O que você quer dizer hoje? Digite aqui...">
-                
-                <button onclick="takeSnapshot()" class="btn-generate flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-500 text-black font-black text-[10px] uppercase tracking-tighter hover:bg-amber-400 transition shadow-lg shadow-amber-500/20 group whitespace-nowrap">
-                    <x-heroicon-m-sparkles class="w-3.5 h-3.5 group-hover:animate-pulse" />
-                    <span>Gerar Arte</span>
-                </button>
+                <div class="command-bar">
+                    {{-- Quick Preset Toggles --}}
+                    <div class="flex items-center gap-1.5 bg-zinc-950/50 p-1 rounded-full border border-white/5 mr-2">
+                        <button wire:click="selectPreset('top')" title="Superior" class="w-8 h-8 rounded-full flex items-center justify-center transition-all {{ $preset === 'top' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-zinc-500 hover:text-white' }}">
+                            <x-heroicon-m-bars-2 class="w-4 h-4 rotate-180" />
+                        </button>
+                        <button wire:click="selectPreset('max')" title="Centro" class="w-8 h-8 rounded-full flex items-center justify-center transition-all {{ $preset === 'max' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-zinc-500 hover:text-white' }}">
+                            <x-heroicon-m-pause class="w-4 h-4 rotate-90" />
+                        </button>
+                        <button wire:click="selectPreset('bottom')" title="Inferior" class="w-8 h-8 rounded-full flex items-center justify-center transition-all {{ $preset === 'bottom' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-zinc-500 hover:text-white' }}">
+                            <x-heroicon-m-bars-2 class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <input type="text" 
+                           wire:model.live.debounce.300ms="quote" 
+                           class="prompt-input" 
+                           placeholder="O que você quer expressar hoje?">
+                    
+                    <button onclick="takeSnapshot()" id="generate-trigger" class="generate-btn">
+                        <x-heroicon-m-sparkles class="w-4 h-4" />
+                        <span>Gerar Arte</span>
+                    </button>
+                </div>
             </div>
         </main>
 
-        {{-- Sidebar Direita: Galeria de Fundos --}}
+        {{-- Right Sidebar: Asset Gallery --}}
         <aside class="sidebar-gallery">
-            <button wire:click="mountAction('uploadBackground')" type="button" class="btn-add" title="Upload de Imagem">
-                <x-heroicon-o-plus class="w-10 h-10" />
+            <button wire:click="mountAction('uploadBackground')" type="button" class="btn-upload" title="Upload de Imagem">
+                <x-heroicon-o-plus class="w-6 h-6" />
             </button>
 
+            <div class="w-full h-px bg-white/5 my-2"></div>
+
             @foreach($this->backgrounds as $bg)
-                <div class="thumb {{ $backgroundImageId === $bg->id ? 'active' : '' }}" wire:click="selectBackground({{ $bg->id }})">
-                    <img src="{{ $bg->getThumbnailUrl() }}">
+                <div class="asset-thumb {{ $backgroundImageId === $bg->id ? 'active' : '' }}" 
+                     wire:click="selectBackground({{ $bg->id }})"
+                     title="{{ $bg->name }}">
+                    <img src="{{ $bg->getThumbnailUrl() }}" loading="lazy">
                 </div>
             @endforeach
         </aside>
     </div>
 
+    {{-- Capture Script --}}
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
         function takeSnapshot() {
             const el = document.getElementById('card-container');
-            const btn = event.currentTarget;
+            const btn = document.getElementById('generate-trigger');
+            if(!btn) return;
+
             const originalContent = btn.innerHTML;
             
-            btn.innerHTML = 'CAPTURANDO...';
-            btn.disabled = true;
+            // Visual feedback
+            btn.classList.add('opacity-50', 'pointer-events-none');
+            btn.querySelector('span').innerText = 'Capturando...';
+            btn.querySelector('svg').classList.add('animate-spin');
 
             html2canvas(el, {
                 scale: 2, 
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: null,
-                logging: false
+                logging: false,
+                onclone: (clonedDoc) => {
+                    const clonedEl = clonedDoc.getElementById('card-container');
+                    if(clonedEl) clonedEl.style.transform = 'none';
+                }
             }).then(canvas => {
-                const dataUrl = canvas.toDataURL('image/png');
+                const dataUrl = canvas.toDataURL('image/png', 1.0);
                 @this.saveSnapshot(dataUrl).then(() => {
                     btn.innerHTML = originalContent;
-                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'pointer-events-none');
                 });
             }).catch(err => {
-                console.error('Erro na captura:', err);
+                console.error('Snapshot Error:', err);
                 btn.innerHTML = originalContent;
-                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'pointer-events-none');
             });
         }
+
+        // Shortcut support
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                takeSnapshot();
+            }
+        });
     </script>
 
     <x-filament-actions::modals />
