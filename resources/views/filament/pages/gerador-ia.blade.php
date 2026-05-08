@@ -207,21 +207,21 @@
         /* Barra Inferior Fixa no Centro */
         .bottom-bar {
             position: absolute;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
-            padding: 12px 25px;
+            padding: 8px 15px;
             border-radius: 100px;
             border: 1px solid rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
             z-index: 100;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
-            width: 80%;
-            max-width: 800px;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.1);
+            width: auto;
+            min-width: 600px;
         }
         .dark .bottom-bar { background: rgba(24, 24, 27, 0.9); border-color: rgba(255,255,255,0.1); }
 
@@ -356,11 +356,7 @@
                     </div>
                 </div>
 
-                <div class="py-2">
-                    <button onclick="takeSnapshot()" class="w-full btn-main !py-3">
-                        GERAR ARTE FINAL
-                    </button>
-                </div>
+                {{-- Botão Removido daqui --}}
             </div>
         </aside>
 
@@ -402,7 +398,12 @@
                     </button>
                 </div>
 
-                <input type="text" wire:model.live.debounce.300ms="quote" class="prompt-input" placeholder="O que você quer dizer hoje? Digite aqui...">
+                <input type="text" wire:model.live.debounce.300ms="quote" class="prompt-input !bg-transparent !py-1" placeholder="O que você quer dizer hoje? Digite aqui...">
+                
+                <button onclick="takeSnapshot()" class="btn-generate flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-500 text-black font-black text-[10px] uppercase tracking-tighter hover:bg-amber-400 transition shadow-lg shadow-amber-500/20 group whitespace-nowrap">
+                    <x-heroicon-m-sparkles class="w-3.5 h-3.5 group-hover:animate-pulse" />
+                    <span>Gerar Arte</span>
+                </button>
             </div>
         </main>
 
