@@ -536,6 +536,28 @@
                                 @endforeach
                             </div>
                         </div>
+                        <div class="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                            <div class="flex justify-between items-center">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Vinheta</label>
+                                <button wire:click="$toggle('hasVignette')" 
+                                        type="button"
+                                        class="w-11 h-6 rounded-full transition-colors relative flex-shrink-0 {{ $hasVignette ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700' }}">
+                                    <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform {{ $hasVignette ? 'translate-x-5' : '' }}"></div>
+                                </button>
+                            </div>
+                            @if($hasVignette)
+                            <div class="flex gap-2">
+                                <button wire:click="$set('vignetteType', 'black')" 
+                                        class="flex-1 h-8 rounded-lg border text-[10px] font-bold uppercase transition {{ $vignetteType === 'black' ? 'bg-zinc-900 border-zinc-900 text-white' : 'border-zinc-200 dark:border-zinc-800 text-zinc-400' }}">
+                                    Preta
+                                </button>
+                                <button wire:click="$set('vignetteType', 'white')" 
+                                        class="flex-1 h-8 rounded-lg border text-[10px] font-bold uppercase transition {{ $vignetteType === 'white' ? 'bg-white border-zinc-200 text-zinc-900' : 'border-zinc-200 dark:border-zinc-800 text-zinc-400' }}">
+                                    Branca
+                                </button>
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
@@ -599,6 +621,13 @@
                             "></div>
                     @endif
 
+                    {{-- Layer 1.6: Vignette --}}
+                    @if($hasVignette)
+                        <div class="absolute inset-0 z-[7] pointer-events-none"
+                             style="background: radial-gradient(circle, transparent 30%, {{ $vignetteType === 'black' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)' }} 100%);">
+                        </div>
+                    @endif
+
                     {{-- Layer 2: Frame --}}
                     @if($frameUrl)
                         <div class="absolute inset-0 z-10 pointer-events-none bg-contain bg-center bg-no-repeat"
@@ -644,7 +673,7 @@
                     @foreach(\App\Enums\CardPreset::cases() as $case)
                         <button wire:click="selectPreset('{{ $case->value }}')"
                             class="btn-preset-mini {{ $preset === $case->value ? 'active' : '' }}">
-                            {{ $case->name }}
+                            {{ $case->label() }}
                         </button>
                     @endforeach
                 </div>

@@ -57,6 +57,8 @@ class GeradorIa extends Page implements HasActions, HasForms
     public array  $layers         = [];
     public ?string $logoUrl       = null;
     public ?string $frameUrl      = null;
+    public bool   $hasVignette    = false;
+    public string $vignetteType   = 'black';
 
     /** @var int|null ID of the selected BackgroundImage */
     public ?int $backgroundImageId = null;
@@ -241,6 +243,8 @@ class GeradorIa extends Page implements HasActions, HasForms
             'text_x'              => $this->textX,
             'text_y'              => $this->textY,
             'layers'              => $this->layers,
+            'has_vignette'        => $this->hasVignette,
+            'vignette_type'       => $this->vignetteType,
             'status'              => 'processing',
         ]);
 
@@ -308,6 +312,11 @@ class GeradorIa extends Page implements HasActions, HasForms
 
                 if ($layer['type'] === 'branding') {
                     $this->logoUrl = $layer['url'] ?? null;
+                }
+
+                if ($layer['type'] === 'vignette') {
+                    $this->hasVignette = true;
+                    $this->vignetteType = ($layer['style']['color'] ?? '') === '#FFFFFF' ? 'white' : 'black';
                 }
             }
 

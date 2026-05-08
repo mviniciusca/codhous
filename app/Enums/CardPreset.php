@@ -16,14 +16,14 @@ enum CardPreset: string
     public function label(): string
     {
         return match($this) {
-            self::MAX => 'Estilo MAX (Impacto)',
-            self::FLUX => 'Estilo FLUX (Elegante)',
-            self::CANVA_SIDE => 'Canva Side Block',
-            self::BOLD_CENTER => 'Bold Center',
-            self::MINIMAL => 'Minimalist Clean',
-            self::STACKED => 'Stacked Blocks',
-            self::TOP => 'Superior',
-            self::BOTTOM => 'Inferior',
+            self::MAX => 'Impacto',
+            self::FLUX => 'Elegante',
+            self::CANVA_SIDE => 'Lateral',
+            self::BOLD_CENTER => 'Foco',
+            self::MINIMAL => 'Minimal',
+            self::STACKED => 'Blocos',
+            self::TOP => 'Topo',
+            self::BOTTOM => 'Fundo',
         };
     }
 
