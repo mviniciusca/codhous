@@ -10,6 +10,8 @@ enum CardPreset: string
     case BOLD_CENTER = 'bold_center'; // Clássico centralizado pesado
     case MINIMAL = 'minimal';     // Texto pequeno, elegante, cantos
     case STACKED = 'stacked';     // Título e Subtítulo empilhados com destaque
+    case TOP = 'top';             // Alinhamento Superior
+    case BOTTOM = 'bottom';       // Alinhamento Inferior
 
     public function label(): string
     {
@@ -20,6 +22,8 @@ enum CardPreset: string
             self::BOLD_CENTER => 'Bold Center',
             self::MINIMAL => 'Minimalist Clean',
             self::STACKED => 'Stacked Blocks',
+            self::TOP => 'Superior',
+            self::BOTTOM => 'Inferior',
         };
     }
 
@@ -72,6 +76,20 @@ enum CardPreset: string
                 'uppercase' => true,
                 'has_block' => true,
                 'block_type' => 'floating', // Bloco atrás do texto
+            ],
+            self::TOP => [
+                'font' => 'Montserrat',
+                'align' => 'center',
+                'valign' => 'top',
+                'uppercase' => true,
+                'has_block' => false,
+            ],
+            self::BOTTOM => [
+                'font' => 'Montserrat',
+                'align' => 'center',
+                'valign' => 'bottom',
+                'uppercase' => true,
+                'has_block' => false,
             ],
         };
     }
