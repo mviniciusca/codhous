@@ -128,12 +128,12 @@ class GenerateSocialPostImage implements ShouldQueue
 
             $image->text($quote, $xPos, $yPos, function ($font) use ($fontPath, $finalTextColor, $align) {
                 $font->filename($fontPath);
-                $font->size(80); // Ajustado para 80px para melhor proporção
+                $font->size($this->post->font_size ?? 80); // Usa o tamanho escolhido ou 80 como padrão
                 $font->color($finalTextColor);
                 $font->stroke('#000000', 1); // Contorno sutil para legibilidade (estilo sombra)
                 $font->align($align, 'center'); 
                 $font->lineHeight(1.0);
-                $font->wrap(800); // Margem lateral de segurança
+                $font->wrap(750); // Margem lateral de segurança maior
             });
 
             // 5. Save

@@ -42,6 +42,7 @@ class GeradorIa extends Page implements HasActions, HasForms
     public string $quote        = '';
     public string $fontFamily   = 'Inter';
     public string $textColor    = '#ffffff';
+    public int    $fontSize     = 42;
     public string $overlayColor = '#000000';
     public int    $overlayOpacity = 40;
     public string $preset         = 'max';
@@ -188,6 +189,7 @@ class GeradorIa extends Page implements HasActions, HasForms
             'platform'            => $this->platform,
             'quote'               => $this->quote,
             'font_family'         => $this->fontFamily,
+            'font_size'           => $this->fontSize * 2, // Escala para 1080px (aprox)
             'text_color'          => $this->textColor,
             'overlay_color'       => $this->overlayColor,
             'overlay_opacity'     => $this->overlayOpacity,
@@ -224,6 +226,7 @@ class GeradorIa extends Page implements HasActions, HasForms
         $this->isItalic         = false;
         $this->fontFamily       = 'Inter';
         $this->textColor        = '#ffffff';
+        $this->fontSize         = 42;
         $this->overlayColor     = '#000000';
         $this->overlayOpacity   = 40;
     }

@@ -55,7 +55,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 60px;
+            padding: 20px;
         }
 
         .dark .studio-canvas { background-color: #0f1115; background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); }
@@ -345,6 +345,14 @@
 
                 <div class="studio-input-wrap">
                     <div class="flex justify-between items-center mb-1">
+                        <label class="studio-label !mb-0">Tamanho da Fonte</label>
+                        <span class="text-[11px] text-amber-500 font-black">{{ $fontSize }}px</span>
+                    </div>
+                    <input type="range" wire:model.live="fontSize" min="12" max="150" class="w-full accent-amber-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                </div>
+
+                <div class="studio-input-wrap">
+                    <div class="flex justify-between items-center mb-1">
                         <label class="studio-label !mb-0">Opacidade Filtro</label>
                         <span class="text-[11px] text-amber-500 font-black">{{ $overlayOpacity }}%</span>
                     </div>
@@ -434,12 +442,12 @@
                             }
                          }"
                          :class="{ 'is-dragging': isDragging }"
-                         :style="`left: ${textX}%; top: ${textY}%; transform: translate(-50%, -50%); font-family: '${@this.fontFamily.replace('+', ' ')}', sans-serif; text-align: {{ $textAlign }};`"
+                         :style="`left: ${textX}%; top: ${textY}%; transform: translate(${ @this.textAlign === 'left' ? '0' : (@this.textAlign === 'right' ? '-100' : '-50') }%, -50%); font-family: '${@this.fontFamily.replace('+', ' ')}', sans-serif; text-align: {{ $textAlign }};`"
                          style="position: absolute; cursor: move; z-index: 100; width: auto; max-width: 90%;">
                         
 
                         @if(trim($quote)) 
-                            <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: 38px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: inherit; text-align: inherit;">
+                            <p class="quote-text leading-tight" style="color: {{ $textColor }}; font-weight: {{ $isBold ? '700' : '400' }}; font-style: {{ $isItalic ? 'italic' : 'normal' }}; font-size: {{ $fontSize }}px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: inherit; text-align: inherit;">
                                 {{ $quote }}
                             </p> 
                         @else 
