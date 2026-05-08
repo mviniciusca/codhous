@@ -58,6 +58,13 @@ class SocialPostResource extends Resource
                         Forms\Components\DateTimePicker::make('generated_at')
                             ->label('Gerada em')
                             ->disabled(),
+
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('output')
+                            ->label('Arte Final')
+                            ->collection('output')
+                            ->image()
+                            ->disabled()
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
