@@ -308,47 +308,47 @@
                 {{-- Texturas --}}
                 <div class="control-group">
                     <label class="section-title">Textura (Pattern)</label>
-                    <div class="pattern-grid">
-                        <button wire:click="$set('pattern', null)" class="pattern-btn {{ is_null($pattern) ? 'active' : '' }}" title="Nenhum">
-                            <span class="text-[9px] font-black opacity-30 text-gray-400">OFF</span>
+                    <div class="flex flex-wrap gap-2">
+                        <button wire:click="$set('pattern', null)" class="w-10 h-10 flex-shrink-0 rounded-lg border-2 {{ is_null($pattern) ? 'border-amber-500 bg-amber-50' : 'border-gray-100 bg-white' }} flex items-center justify-center transition" title="Nenhum">
+                            <span class="text-[9px] font-black {{ is_null($pattern) ? 'text-amber-600' : 'text-gray-300' }}">OFF</span>
                         </button>
                         @foreach(['dots', 'lines', 'grid'] as $p)
-                            <button wire:click="$set('pattern', '{{ $p }}')" class="pattern-btn {{ $pattern === $p ? 'active' : '' }}" title="{{ ucfirst($p) }}">
+                            <button wire:click="$set('pattern', '{{ $p }}')" class="w-10 h-10 flex-shrink-0 rounded-lg border-2 {{ $pattern === $p ? 'border-amber-500 bg-amber-50' : 'border-gray-100 bg-white' }} flex items-center justify-center transition" title="{{ ucfirst($p) }}">
                                 <img src="/assets/patterns/{{ $p }}.png" class="w-5 h-5 opacity-40 invert dark:invert-0">
                             </button>
                         @endforeach
                     </div>
                     
                     @if($pattern)
-                        <div class="pt-2 flex items-center gap-3">
-                            <input type="color" wire:model.live="patternColor" class="w-8 h-8 p-1 bg-white border border-gray-100 rounded-lg cursor-pointer">
+                        <div class="pt-1 flex items-center gap-2">
+                            <input type="color" wire:model.live="patternColor" class="w-6 h-6 p-1 bg-white border border-gray-100 rounded-lg cursor-pointer">
                             <input type="range" wire:model.live="patternSize" min="5" max="100" class="flex-1 accent-amber-500 h-1">
                         </div>
                     @endif
                 </div>
 
                 {{-- Galeria Recent --}}
-                <div class="space-y-3 pt-4" wire:poll.5s>
-                    <label class="section-title">Recentes</label>
-                    <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-2 pt-1" wire:poll.5s>
+                    <label class="section-title">Artes Recentes</label>
+                    <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important;">
                         @foreach($this->recentPosts->where('status', '!=', 'failed') as $p)
-                            <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/10 group shadow-md transition hover:shadow-xl">
+                            <div class="relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/10 group shadow-sm transition hover:shadow-md" style="width: 100% !important; aspect-ratio: 1/1 !important;">
                                 @if($p->isGenerated())
-                                    <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
-                                    <div class="action-icon-bar">
-                                        <a href="{{ $p->output_url }}" target="_blank" title="Ver" class="text-white hover:text-amber-500 transition hover:scale-125">
+                                    <img src="{{ $p->output_url }}" class="w-full h-full object-cover" style="display: block !important;">
+                                    <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition duration-200">
+                                        <a href="{{ $p->output_url }}" target="_blank" class="text-white hover:text-amber-500 transform hover:scale-125 transition">
                                             <x-heroicon-m-eye class="w-4 h-4" />
                                         </a>
-                                        <a href="{{ $p->output_url }}" download title="Baixar" class="text-white hover:text-amber-500 transition hover:scale-125">
+                                        <a href="{{ $p->output_url }}" download class="text-white hover:text-amber-500 transform hover:scale-125 transition">
                                             <x-heroicon-m-arrow-down-tray class="w-4 h-4" />
                                         </a>
-                                        <button wire:click="deletePost({{ $p->id }})" wire:confirm="Apagar?" title="Deletar" class="text-white hover:text-red-500 transition hover:scale-125">
+                                        <button wire:click="deletePost({{ $p->id }})" class="text-white hover:text-red-500 transform hover:scale-125 transition">
                                             <x-heroicon-m-trash class="w-4 h-4" />
                                         </button>
                                     </div>
                                 @else
-                                    <div class="w-full h-full flex items-center justify-center bg-gray-50/50">
-                                        <x-heroicon-o-arrow-path class="w-6 h-6 text-amber-500 animate-spin" />
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <x-heroicon-o-arrow-path class="w-4 h-4 text-amber-500 animate-spin" />
                                     </div>
                                 @endif
                             </div>
@@ -356,8 +356,8 @@
                     </div>
                 </div>
 
-                <div class="py-6">
-                    <button onclick="takeSnapshot()" class="w-full btn-main">
+                <div class="py-2">
+                    <button onclick="takeSnapshot()" class="w-full btn-main !py-3">
                         GERAR ARTE FINAL
                     </button>
                 </div>
