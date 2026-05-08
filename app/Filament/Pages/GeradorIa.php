@@ -54,6 +54,9 @@ class GeradorIa extends Page implements HasActions, HasForms
     public string $textAlign      = 'center';
     public bool   $isBold         = true;
     public bool   $isItalic       = false;
+    public array  $layers         = [];
+    public ?string $logoUrl       = null;
+    public ?string $frameUrl      = null;
 
     /** @var int|null ID of the selected BackgroundImage */
     public ?int $backgroundImageId = null;
@@ -176,14 +179,31 @@ class GeradorIa extends Page implements HasActions, HasForms
         
         $this->fontFamily = $style['font'];
         $this->textAlign = $style['align'] ?? 'center';
-        $this->isBold = true; // Padrão
+        $this->isBold = true; 
         $this->isItalic = false;
         
-        if ($value === 'canva_side') {
-            $this->textX = 24.0;
-            $this->textY = 50.0;
+        // Horizontal Alignment
+        $align = $style['align'] ?? 'center';
+        if ($align === 'left') {
+            $this->textX = 25.0;
+        } elseif ($align === 'right') {
+            $this->textX = 75.0;
         } else {
             $this->textX = 50.0;
+        }
+
+        // Vertical Alignment
+        $valign = $style['valign'] ?? 'center';
+        if ($valign === 'top') {
+            $this->textY = 20.0;
+        } elseif ($valign === 'bottom') {
+            $this->textY = 80.0;
+        } else {
+            $this->textY = 50.0;
+        }
+
+        if ($value === 'canva_side') {
+            $this->textX = 24.0;
             $this->textY = 50.0;
         }
     }
@@ -218,6 +238,9 @@ class GeradorIa extends Page implements HasActions, HasForms
             'pattern_color'       => $this->patternColor,
             'background_image_id' => $this->backgroundImageId,
             'preset'              => $this->preset,
+            'text_x'              => $this->textX,
+            'text_y'              => $this->textY,
+            'layers'              => $this->layers,
             'status'              => 'processing',
         ]);
 
@@ -250,6 +273,88 @@ class GeradorIa extends Page implements HasActions, HasForms
         $this->pattern          = null;
         $this->patternSize     = 10;
         $this->patternColor    = '#ffffff';
+    }
+
+    public function processAIResponse(string $jsonFromAI): void
+    {
+        try {
+            $data = json_decode($jsonFromAI, true);
+            if (!$data) return;
+
+            if (isset($data['canvas']['bg_color'])) {
+                $this->overlayColor = $data['canvas']['bg_color'];
+            }
+
+            $this->layers = $data['layers'] ?? [];
+
+            foreach ($this->layers as $layer) {
+                if ($layer['type'] === 'text') {
+                    $this->quote = $layer['content'];
+                    if (isset($layer['style']['color'])) $this->textColor = $layer['style']['color'];
+                    if (isset($layer['style']['size'])) $this->fontSize = (int) str_replace('px', '', $layer['style']['size']);
+                    if (isset($layer['style']['font'])) $this->fontFamily = $layer['style']['font'];
+                    if (isset($layer['style']['weight'])) $this->isBold = $layer['style']['weight'] === 'bold' || $layer['style']['weight'] === '900';
+                    
+                    if (isset($layer['position']['top'])) $this->textY = (float) str_replace('%', '', $layer['position']['top']);
+                    if (isset($layer['position']['left'])) $this->textX = (float) str_replace('%', '', $layer['position']['left']);
+                    if (isset($layer['position']['align'])) $this->textAlign = $layer['position']['align'];
+                }
+
+                if ($layer['type'] === 'frame') {
+                    // Logic to select a frame preset or URL
+                    // For now just storing it in the state
+                    $this->frameUrl = $layer['url'] ?? null;
+                }
+
+                if ($layer['type'] === 'branding') {
+                    $this->logoUrl = $layer['url'] ?? null;
+                }
+            }
+
+            $this->dispatch('updated');
+            
+            Notification::make()
+                ->title('Design sugerido pela IA aplicado!')
+                ->success()
+                ->send();
+
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Erro ao processar sugestão da IA')
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function generateAiDesign(): void
+    {
+        if (empty($this->quote)) {
+            Notification::make()->title('Digite uma frase primeiro!')->warning()->send();
+            return;
+        }
+
+        // Simulação do JSON que a IA retornaria
+        // Em um cenário real, você faria uma chamada para a API da OpenAI/Anthropic/Gemini aqui
+        $mockJson = json_encode([
+            "canvas" => [ "width" => 1080, "height" => 1080, "bg_color" => "#1a1a1a" ],
+            "layers" => [
+                [
+                    "type" => "text",
+                    "content" => strtoupper($this->quote),
+                    "style" => [ "color" => "#fbbf24", "size" => "64px", "font" => "Oswald", "weight" => "bold" ],
+                    "position" => [ "top" => "50%", "left" => "50%", "align" => "center" ],
+                    "z_index" => 30
+                ],
+                [
+                    "type" => "frame",
+                    "url" => "https://www.transparentpng.com/download/border/gold-square-border-free-png-2775.png",
+                    "opacity" => 0.8,
+                    "z_index" => 10
+                ]
+            ]
+        ]);
+
+        $this->processAIResponse($mockJson);
     }
 
     public function updated($property)

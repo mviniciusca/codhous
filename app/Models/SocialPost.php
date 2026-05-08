@@ -31,6 +31,7 @@ class SocialPost extends Model implements HasMedia
         'is_bold'         => 'boolean',
         'is_italic'       => 'boolean',
         'generated_at'    => 'datetime',
+        'layers'          => 'array',
     ];
 
     // ─── Relationships ────────────────────────────────────────

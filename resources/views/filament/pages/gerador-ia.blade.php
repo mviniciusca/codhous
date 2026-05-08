@@ -205,7 +205,6 @@
         }
 
         .canvas-text {
-            position: relative;
             z-index: 3;
             width: 100%;
             word-wrap: break-word;
@@ -489,6 +488,24 @@
                 </div>
 
                 <div class="space-y-4">
+                    <label class="section-title">Branding & Moldura</label>
+                    <div class="control-card">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Logo URL</label>
+                            <input type="text" wire:model.live="logoUrl" 
+                                   placeholder="https://..."
+                                   class="w-full bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 text-xs">
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Moldura URL</label>
+                            <input type="text" wire:model.live="frameUrl" 
+                                   placeholder="https://..."
+                                   class="w-full bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 text-xs">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
                     <label class="section-title">Filtros & Camadas</label>
                     <div class="control-card">
                         <div class="flex flex-col gap-2">
@@ -559,28 +576,65 @@
         {{-- Main Area --}}
         <main class="preview-main">
             <div class="canvas-container" id="canvas-wrapper">
-                <div class="canvas-box" id="card-container" style="background-image: url('{{ $this->selectedBackgroundUrl }}'); 
-                            align-items: {{ $preset === 'top' ? 'start' : ($preset === 'bottom' ? 'end' : 'center') }};
-                            justify-content: center;
-                            text-align: center;">
+                <div class="canvas-box" id="card-container" style="position: relative; overflow: hidden; padding: 0;">
+                    
+                    {{-- Layer 1: Background --}}
+                    <div class="absolute inset-0 z-0 bg-cover bg-center" 
+                         style="background-image: url('{{ $this->selectedBackgroundUrl }}');">
+                    </div>
 
-                    <div class="canvas-overlay"
-                        style="background-color: {{ $overlayColor }}; opacity: {{ $overlayOpacity / 100 }};"></div>
+                    {{-- Layer 1.5: Overlay & Pattern --}}
+                    <div class="canvas-overlay absolute inset-0 z-[5]"
+                        style="background-color: {{ $overlayColor }}; opacity: {{ $overlayOpacity / 100 }}; pointer-events: none;"></div>
 
                     @if($pattern)
-                        <div class="canvas-pattern" style="
+                        <div class="canvas-pattern absolute inset-0 z-[6]" style="
                                 mask-image: url('/assets/patterns/{{ $pattern }}.png');
                                 -webkit-mask-image: url('/assets/patterns/{{ $pattern }}.png');
                                 mask-size: {{ $patternSize }}px;
                                 -webkit-mask-size: {{ $patternSize }}px;
                                 background-color: {{ $patternColor }};
                                 opacity: 0.2;
+                                pointer-events: none;
                             "></div>
                     @endif
 
-                    <div class="canvas-text"
-                        style="font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif !important; color: {{ $textColor }}; font-size: {{ $fontSize }}px; font-weight: {{ $isBold ? '900' : '400' }}; line-height: 1.1; text-transform: uppercase;">
-                        {!! nl2br(e($quote ?: '')) !!}
+                    {{-- Layer 2: Frame --}}
+                    @if($frameUrl)
+                        <div class="absolute inset-0 z-10 pointer-events-none bg-contain bg-center bg-no-repeat"
+                             style="background-image: url('{{ $frameUrl }}');">
+                        </div>
+                    @endif
+
+                    {{-- Layer 3: Branding/Logo --}}
+                    @if($logoUrl)
+                        <div class="absolute z-20" style="top: 5%; right: 5%; width: 120px; height: auto;">
+                            <img src="{{ $logoUrl }}" class="w-full h-auto object-contain">
+                        </div>
+                    @endif
+
+                    {{-- Layer 4: Content/Text --}}
+                    <div class="canvas-text absolute z-30 w-full"
+                        style="
+                            top: {{ $textY }}%;
+                            left: {{ $textX }}%;
+                            transform: translate(-{{ $textX }}%, -{{ $textY }}%);
+                            padding: 0 48px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            text-align: {{ $textAlign }};
+                            font-family: '{{ str_replace('+', ' ', $fontFamily) }}', sans-serif !important; 
+                            color: {{ $textColor }}; 
+                            font-size: {{ $fontSize }}px; 
+                            font-weight: {{ $isBold ? '900' : '400' }}; 
+                            line-height: 1.1; 
+                            text-transform: uppercase;
+                            pointer-events: none;
+                        ">
+                        <div class="w-full break-words">
+                            {!! nl2br(e($quote ?: '')) !!}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -612,6 +666,10 @@
                     </div>
                     <input type="text" wire:model.live.debounce.300ms="quote" class="prompt-input"
                         placeholder="O que você quer expressar hoje?">
+                    <button wire:click="generateAiDesign" class="generate-btn" style="background: #8b5cf6; color: white;">
+                        <x-heroicon-m-bolt class="w-4 h-4" />
+                        <span>Mágica IA</span>
+                    </button>
                     <button onclick="takeSnapshot()" id="generate-trigger" class="generate-btn">
                         <x-heroicon-m-sparkles class="w-4 h-4" />
                         <span>Gerar Arte</span>
