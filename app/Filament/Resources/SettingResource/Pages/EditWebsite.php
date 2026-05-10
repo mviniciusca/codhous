@@ -41,6 +41,12 @@ class EditWebsite extends EditRecord
                             ->imageEditor()
                             ->directory('website')
                             ->visibility('public'),
+                        FileUpload::make('settings.website.favicon')
+                            ->label('Favicon')
+                            ->helperText('Recomendado: PNG ou ICO (32x32px ou 48x48px).')
+                            ->image()
+                            ->directory('website')
+                            ->visibility('public'),
                         \Filament\Forms\Components\Select::make('settings.website.primary_color')
                             ->label('Cor de Destaque (Branding)')
                             ->options([

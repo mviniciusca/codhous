@@ -23,6 +23,7 @@
     $googleFontsUrl = "https://fonts.googleapis.com/css2?family=" . implode('&family=', $fonts) . "&display=swap";
     
     $headScripts = data_get($scripts, 'head_scripts');
+    $favicon = data_get($website, 'favicon');
 @endphp
 
 <meta charset="UTF-8">
@@ -30,6 +31,10 @@
 <meta name="theme-color" content="#e5b800">
 <meta name="description" content="{{ $finalDescription }}">
 <title>{{ $websiteName }} | {{ $websiteTitle }}</title>
+
+@if($favicon)
+    <link rel="icon" type="image/x-icon" href="{{ \Illuminate\Support\Facades\Storage::url($favicon) }}">
+@endif
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
