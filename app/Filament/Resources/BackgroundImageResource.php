@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\MediaCluster;
 use App\Filament\Resources\BackgroundImageResource\Pages;
 use App\Models\BackgroundImage;
 use Filament\Forms;
@@ -9,16 +10,22 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Pages\SubNavigationPosition;
 
 class BackgroundImageResource extends Resource
 {
+    public static function getSubNavigationPosition(): SubNavigationPosition
+    {
+        return SubNavigationPosition::Top;
+    }
+
     protected static ?string $model = BackgroundImage::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-photo';
+    protected static ?string $cluster = MediaCluster::class;
 
-    protected static ?string $navigationGroup = 'Comunicação';
+    protected static ?string $navigationIcon = 'heroicon-o-camera';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 2;
 
     public static function getNavigationLabel(): string
     {
