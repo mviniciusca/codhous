@@ -249,20 +249,30 @@ class GeradorIa extends Page implements HasActions, HasForms
             'layers'              => $this->layers,
             'has_vignette'        => $this->hasVignette,
             'vignette_type'       => $this->vignetteType,
-            'status'              => 'queued',
+            'status'              => 'processing',
         ]);
 
-        // Salvar snapshot temporariamente em disco para o cron job processar
-        $dir = storage_path('app/snapshots');
-        if (! is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        file_put_contents("{$dir}/{$post->id}.txt", $dataUrl);
+        try {
+            // Executa síncronamente de forma imediata
+            (new \App\Jobs\SavePostSnapshot($post, $dataUrl))->handle();
 
-        Notification::make()
-            ->title('Arte agendada para processamento via cron!')
-            ->success()
-            ->send();
+            Notification::make()
+                ->title('Arte gerada e salva com sucesso!')
+                ->success()
+                ->send();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[saveSnapshot] Failed', [
+                'post_id' => $post->id,
+                'error'   => $e->getMessage(),
+            ]);
+
+            $post->update(['status' => 'failed']);
+
+            Notification::make()
+                ->title('Erro ao gerar/salvar a arte.')
+                ->danger()
+                ->send();
+        }
     }
 
     public function resetForm(): void
@@ -394,12 +404,29 @@ class GeradorIa extends Page implements HasActions, HasForms
         $post = SocialPost::find($id);
         
         if ($post) {
-            $post->update(['status' => 'queued']);
+            $post->update(['status' => 'processing']);
             
-            Notification::make()
-                ->title('Post agendado para processamento via cron!')
-                ->success()
-                ->send();
+            try {
+                // Executa síncronamente de forma imediata
+                (new GenerateSocialPostImage($post))->handle();
+
+                Notification::make()
+                    ->title('Arte regenerada com sucesso!')
+                    ->success()
+                    ->send();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('[regeneratePost] Failed', [
+                    'post_id' => $post->id,
+                    'error'   => $e->getMessage(),
+                ]);
+
+                $post->update(['status' => 'failed']);
+
+                Notification::make()
+                    ->title('Erro ao regenerar a arte.')
+                    ->danger()
+                    ->send();
+            }
         }
     }
 
