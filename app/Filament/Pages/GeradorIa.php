@@ -249,14 +249,18 @@ class GeradorIa extends Page implements HasActions, HasForms
             'layers'              => $this->layers,
             'has_vignette'        => $this->hasVignette,
             'vignette_type'       => $this->vignetteType,
-            'status'              => 'processing',
+            'status'              => 'queued',
         ]);
 
-        // Novo Job que apenas salva o base64 como imagem final
-        dispatch(new \App\Jobs\SavePostSnapshot($post, $dataUrl));
+        // Salvar snapshot temporariamente em disco para o cron job processar
+        $dir = storage_path('app/snapshots');
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        file_put_contents("{$dir}/{$post->id}.txt", $dataUrl);
 
         Notification::make()
-            ->title('Arte enviada para processamento!')
+            ->title('Arte agendada para processamento via cron!')
             ->success()
             ->send();
     }
@@ -391,10 +395,9 @@ class GeradorIa extends Page implements HasActions, HasForms
         
         if ($post) {
             $post->update(['status' => 'queued']);
-            GenerateSocialPostImage::dispatch($post);
             
             Notification::make()
-                ->title('Post reenviado para a fila!')
+                ->title('Post agendado para processamento via cron!')
                 ->success()
                 ->send();
         }
