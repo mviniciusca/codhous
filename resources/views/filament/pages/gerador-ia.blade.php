@@ -92,7 +92,7 @@
 
         .sb-brand-text strong {
             display: block;
-            font-size: 14px;
+            font-size: 17px;
             font-weight: 800;
             letter-spacing: -0.02em;
             color: var(--text-main);
@@ -662,7 +662,6 @@
                     </div>
                     <div class="sb-brand-text">
                         <strong>StudioIA</strong>
-                        <span>Editor de Artes</span>
                     </div>
                     <a href="{{ filament()->getUrl() }}" class="sb-back" title="Voltar">
                         <x-heroicon-m-arrow-left class="w-3 h-3" />
