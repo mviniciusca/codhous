@@ -8,8 +8,8 @@
 
     <style>
         :root {
-            --sidebar-width: 320px;
-            --gallery-width: 90px;
+            --sidebar-width: 280px;
+            --gallery-width: 88px;
             --accent-color: #fbbf24;
 
             /* Light Theme Defaults */
@@ -52,20 +52,101 @@
             transition: background 0.3s ease;
         }
 
-        /* Sidebar Controles */
+        /* ── Sidebar ── */
         .sidebar-controls {
-            padding: 24px;
             border-right: 1px solid var(--border-subtle);
             display: flex;
             flex-direction: column;
-            gap: 24px;
-            overflow-y: auto;
+            overflow: hidden;
             background: var(--bg-surface);
-            scrollbar-width: none;
         }
 
-        .sidebar-controls::-webkit-scrollbar {
-            display: none;
+        /* Header */
+        .sb-header {
+            padding: 14px 16px 12px;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sb-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sb-brand-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--accent-color);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sb-brand-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sb-brand-text strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .sb-brand-text span {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .sb-back {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            transition: 0.15s;
+        }
+        .sb-back:hover { color: var(--accent-color); border-color: var(--accent-color); }
+
+        /* Scroll body */
+        .sb-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 16px 20px;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .sb-body::-webkit-scrollbar { display: none; }
+
+        /* Section title */
+        .section-title {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Section block */
+        .sb-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .back-link {
@@ -74,35 +155,12 @@
             gap: 8px;
             font-size: 11px;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
             color: var(--text-muted);
             transition: 0.2s;
         }
+        .back-link:hover { color: var(--accent-color); }
 
-        .back-link:hover {
-            color: var(--accent-color);
-        }
 
-        .section-title {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 0.1em;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .control-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
 
         /* Custom Inputs */
         .studio-select {
@@ -110,16 +168,17 @@
             background-color: var(--bg-base);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
+            background-position: right 8px center;
+            background-size: 12px;
             border: 1px solid var(--border-subtle) !important;
-            border-radius: 10px !important;
-            padding: 10px 36px 10px 12px !important;
-            font-size: 13px !important;
+            border-radius: 8px !important;
+            padding: 7px 28px 7px 10px !important;
+            font-size: 11px !important;
             font-weight: 600;
             color: var(--text-main);
             appearance: none !important;
             cursor: pointer;
+            transition: border-color 0.15s;
         }
 
         .studio-select:focus {
@@ -314,45 +373,47 @@
 
         /* Gallery */
         .sidebar-gallery {
-            padding: 24px 12px;
+            padding: 14px 10px;
             border-left: 1px solid var(--border-subtle);
             background: var(--bg-surface);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 10px;
             overflow-y: auto;
             scrollbar-width: none;
         }
 
         .asset-thumb {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
+            width: 58px;
+            height: 58px;
+            border-radius: 11px;
             overflow: hidden;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: 0.3s;
+            transition: 0.25s;
             background: var(--bg-base);
         }
 
         .asset-thumb.active {
             border-color: var(--accent-color);
-            transform: scale(1.1);
+            box-shadow: 0 0 0 2px rgba(251,191,36,0.3);
         }
 
         .btn-upload {
-            width: 60px;
-            height: 60px;
+            width: 58px;
+            height: 58px;
             background: var(--bg-base);
-            border: 1px dashed var(--border-subtle);
-            border-radius: 12px;
+            border: 1.5px dashed var(--border-subtle);
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
             cursor: pointer;
+            transition: 0.15s;
         }
+        .btn-upload:hover { border-color: var(--accent-color); color: var(--accent-color); }
 
         .pattern-grid {
             display: grid;
@@ -437,183 +498,302 @@
             background: #ef4444;
             color: #fff;
         }
+
+        /* Custom UI classes for Studio Editor Sidebar */
+        .sb-label {
+            font-size: 7.5px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.1em !important;
+            color: var(--text-muted) !important;
+            display: inline-block;
+        }
+        .sb-value {
+            font-size: 9px !important;
+            font-weight: 700 !important;
+            color: var(--accent-color) !important;
+        }
+        .bold-toggle-btn {
+            flex: 1;
+            height: 28px !important;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            font-size: 9px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.15s;
+            background: var(--bg-base);
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+        .bold-toggle-btn:hover {
+            background: rgba(251, 191, 36, 0.05);
+            color: var(--accent-color);
+        }
+        .bold-toggle-btn.active {
+            background: var(--accent-color) !important;
+            border-color: var(--accent-color) !important;
+            color: #000000 !important;
+            box-shadow: 0 1px 3px rgba(251, 191, 36, 0.2);
+        }
+        .studio-toggle {
+            position: relative;
+            display: inline-flex;
+            width: 32px !important;
+            height: 18px !important;
+            flex-shrink: 0;
+            cursor: pointer;
+            border-radius: 9px;
+            border: 1.5px solid var(--border-subtle);
+            background: var(--bg-base);
+            transition: all 0.2s ease;
+            align-items: center;
+            padding: 0 1px;
+        }
+        .studio-toggle.active {
+            background: var(--accent-color) !important;
+            border-color: var(--accent-color) !important;
+        }
+        .studio-toggle-knob {
+            pointer-events: none;
+            display: inline-block;
+            width: 12px !important;
+            height: 12px !important;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+            transform: translateX(0);
+        }
+        .studio-toggle.active .studio-toggle-knob {
+            transform: translateX(14px) !important;
+        }
+        .vignette-btn-group {
+            display: flex;
+            gap: 6px;
+            width: 100%;
+        }
+        .vignette-btn {
+            flex: 1;
+            height: 26px !important;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            font-size: 8px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+            background: var(--bg-base);
+            color: var(--text-muted);
+        }
+        .vignette-btn:hover {
+            background: rgba(251, 191, 36, 0.05);
+            color: var(--accent-color);
+        }
+        .vignette-btn.active-black {
+            background: #000000 !important;
+            border-color: #000000 !important;
+            color: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .dark .vignette-btn.active-black {
+            background: #ffffff !important;
+            border-color: #ffffff !important;
+            color: #000000 !important;
+        }
+        .vignette-btn.active-white {
+            background: #ffffff !important;
+            border-color: var(--border-subtle) !important;
+            color: #000000 !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .dark .vignette-btn.active-white {
+            background: #27272a !important;
+            border-color: #3f3f46 !important;
+            color: #ffffff !important;
+        }
+        .logo-upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 32px !important;
+            border: 1px dashed var(--border-subtle);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+            width: 100%;
+            background: var(--bg-base);
+        }
+        .logo-upload-btn:hover {
+            border-color: var(--accent-color);
+            background: rgba(251, 191, 36, 0.05);
+        }
+        .logo-upload-text {
+            font-size: 8px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            color: var(--text-muted);
+        }
+        .logo-upload-btn:hover .logo-upload-text {
+            color: var(--accent-color);
+        }
     </style>
 
     <div class="studio-layout">
         {{-- Left Sidebar --}}
         <aside class="sidebar-controls">
-            <header class="flex flex-col gap-4">
-                <a href="{{ filament()->getUrl() }}" class="back-link">
-                    <x-heroicon-m-arrow-left class="w-4 h-4" /> Voltar ao Painel
-                </a>
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-                        <x-heroicon-o-sparkles class="w-5 h-5 text-black" />
-                    </div>
-                    <h2 class="text-lg font-black tracking-tight">Studio Editor</h2>
-                </div>
-            </header>
 
-            <div class="space-y-8">
-                <div class="space-y-4">
-                    <label class="section-title">Tipografia & Estilo</label>
-                    <div class="control-card">
-                        <div class="space-y-3">
-                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Fonte</label>
-                            <select wire:model.live="fontFamily" class="studio-select">
-                                @foreach($this->fontOptions as $val => $lbl)
-                                    <option value="{{ $val }}">{{ $lbl }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[11px] font-bold">Tamanho</span>
-                                <span class="text-[11px] font-bold text-amber-500">{{ $fontSize }}px</span>
-                            </div>
-                            <input type="range" wire:model.live="fontSize" min="12" max="150" class="custom-range">
-                        </div>
-                        <div class="flex items-end gap-3">
-                            <div class="flex-1 space-y-2">
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Cor</label>
-                                <input type="color" wire:model.live="textColor"
-                                    class="w-full h-10 p-1 bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
-                            </div>
-                            <button wire:click="$toggle('isBold')"
-                                class="w-10 h-10 rounded-lg border flex items-center justify-center transition {{ $isBold ? 'bg-amber-500 border-amber-500 text-black' : 'border-zinc-200 dark:border-zinc-800 text-zinc-400' }}">
-                                <span class="text-sm font-black">B</span>
-                            </button>
-                        </div>
+            {{-- Header --}}
+            <div class="sb-header">
+                <div class="sb-brand">
+                    <div class="sb-brand-icon">
+                        <x-heroicon-o-sparkles class="w-3.5 h-3.5 text-black" />
                     </div>
+                    <div class="sb-brand-text">
+                        <strong>StudioIA</strong>
+                        <span>Editor de Artes</span>
+                    </div>
+                    <a href="{{ filament()->getUrl() }}" class="sb-back" title="Voltar">
+                        <x-heroicon-m-arrow-left class="w-3 h-3" />
+                    </a>
                 </div>
+            </div>
 
-                <div class="space-y-4">
-                    <label class="section-title">Branding & Moldura</label>
-                    <div class="control-card">
-                        <div class="space-y-3">
-                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Sua Logo (PNG)</label>
-                            <div class="flex items-center gap-2">
-                                <label class="flex-1 flex items-center justify-center h-10 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg cursor-pointer hover:border-amber-500 transition group bg-zinc-50 dark:bg-zinc-900/50">
-                                    <div class="flex items-center gap-2">
-                                        <x-heroicon-o-arrow-up-tray class="w-3 h-3 text-zinc-400 group-hover:text-amber-500" />
-                                        <span class="text-[10px] font-bold text-zinc-400 group-hover:text-amber-500">{{ $logoUpload ? 'Trocar' : 'Upload Logo' }}</span>
-                                    </div>
-                                    <input type="file" wire:model="logoUpload" class="hidden" accept="image/*">
-                                </label>
-                                @if($logoUrl)
-                                    <button wire:click="$set('logoUrl', null)" class="w-10 h-10 flex items-center justify-center rounded-lg border border-red-100 text-red-500 hover:bg-red-50 transition">
-                                        <x-heroicon-m-x-mark class="w-4 h-4"/>
-                                    </button>
-                                @endif
-                            </div>
+            {{-- Scroll Body: todas as seções visíveis --}}
+            <div class="sb-body">
+
+                {{-- Tipografia --}}
+                <div class="sb-section">
+                    <span class="section-title">Tipografia</span>
+                    <select wire:model.live="fontFamily" class="studio-select">
+                        @foreach($this->fontOptions as $val => $lbl)
+                            <option value="{{ $val }}">{{ $lbl }}</option>
+                        @endforeach
+                    </select>
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="sb-label">Tamanho</span>
+                            <span class="sb-value">{{ $fontSize }}px</span>
                         </div>
-                        <div class="space-y-3">
-                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Moldura Custom</label>
-                            <div class="flex items-center gap-2">
-                                <label class="flex-1 flex items-center justify-center h-10 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg cursor-pointer hover:border-amber-500 transition group bg-zinc-50 dark:bg-zinc-900/50">
-                                    <div class="flex items-center gap-2">
-                                        <x-heroicon-o-photo class="w-3 h-3 text-zinc-400 group-hover:text-amber-500" />
-                                        <span class="text-[10px] font-bold text-zinc-400 group-hover:text-amber-500">{{ $frameUpload ? 'Trocar' : 'Upload Moldura' }}</span>
-                                    </div>
-                                    <input type="file" wire:model="frameUpload" class="hidden" accept="image/*">
-                                </label>
-                                @if($frameUrl)
-                                    <button wire:click="$set('frameUrl', null)" class="w-10 h-10 flex items-center justify-center rounded-lg border border-red-100 text-red-500 hover:bg-red-50 transition">
-                                        <x-heroicon-m-x-mark class="w-4 h-4"/>
-                                    </button>
-                                @endif
-                            </div>
+                        <input type="range" wire:model.live="fontSize" min="12" max="150" class="custom-range">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex flex-col gap-1 flex-shrink-0">
+                            <span class="sb-label">Cor</span>
+                            <input type="color" wire:model.live="textColor"
+                                class="w-8 h-8 p-0.5 bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-md cursor-pointer" style="width: 32px; height: 32px;">
+                        </div>
+                        <div wire:click="$toggle('isBold')" class="bold-toggle-btn {{ $isBold ? 'active' : '' }}" role="button">
+                            <span class="text-xs">B</span>
+                            <span class="font-normal normal-case text-[9px]">{{ $isBold ? 'Negrito' : 'Normal' }}</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <label class="section-title">Filtros & Camadas</label>
-                    <div class="control-card">
-                        <div class="flex flex-col gap-2">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[11px] font-bold">Opacidade Fundo</span>
-                                <span class="text-[11px] font-bold text-amber-500">{{ $overlayOpacity }}%</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <input type="color" wire:model.live="overlayColor"
-                                    class="w-10 h-10 p-1 bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer flex-shrink-0">
-                                <input type="range" wire:model.live="overlayOpacity" min="0" max="100"
-                                    class="custom-range">
-                            </div>
+                {{-- Overlay & Filtros --}}
+                <div class="sb-section">
+                    <span class="section-title">Overlay &amp; Filtros</span>
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="sb-label">Opacidade Fundo</span>
+                            <span class="sb-value">{{ $overlayOpacity }}%</span>
                         </div>
-                        <div class="space-y-3 pt-2">
-                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Textura</label>
-                            <div class="pattern-grid">
-                                <button wire:click="$set('pattern', null)"
-                                    class="btn-toggle {{ is_null($pattern) ? 'active' : '' }}">
-                                    <span
-                                        class="text-[10px] font-black {{ is_null($pattern) ? 'text-amber-500' : 'text-zinc-400' }}">OFF</span>
-                                </button>
-                                @foreach(['dots', 'lines', 'grid'] as $p)
-                                    <button wire:click="$set('pattern', '{{ $p }}')"
-                                        class="btn-toggle {{ $pattern === $p ? 'active' : '' }}">
-                                        <img src="/assets/patterns/{{ $p }}.png" class="w-5 h-5 opacity-50">
-                                    </button>
-                                @endforeach
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <input type="color" wire:model.live="overlayColor"
+                                class="w-7 h-7 p-0.5 bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-md cursor-pointer flex-shrink-0">
+                            <input type="range" wire:model.live="overlayOpacity" min="0" max="100" class="custom-range">
                         </div>
-                        <div class="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                            <div class="flex justify-between items-center">
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Vinheta</label>
-                                <button wire:click="$toggle('hasVignette')" 
-                                        type="button"
-                                        class="w-11 h-6 rounded-full transition-colors relative flex-shrink-0 {{ $hasVignette ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700' }}">
-                                    <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform {{ $hasVignette ? 'translate-x-5' : '' }}"></div>
-                                </button>
+                    </div>
+                    <div>
+                        <span class="sb-label mb-2 block">Textura</span>
+                        <div class="pattern-grid">
+                            <div wire:click="$set('pattern', null)" class="btn-toggle cursor-pointer {{ is_null($pattern) ? 'active' : '' }}" role="button">
+                                <span class="text-[8px] font-black {{ is_null($pattern) ? 'text-amber-500' : 'text-zinc-400' }}">SEM</span>
                             </div>
-                            @if($hasVignette)
-                            <div class="flex gap-2">
-                                <button wire:click="$set('vignetteType', 'black')" 
-                                        class="flex-1 h-8 rounded-lg border text-[10px] font-bold uppercase transition {{ $vignetteType === 'black' ? 'bg-zinc-900 border-zinc-900 text-white' : 'border-zinc-200 dark:border-zinc-800 text-zinc-400' }}">
-                                    Preta
-                                </button>
-                                <button wire:click="$set('vignetteType', 'white')" 
-                                        class="flex-1 h-8 rounded-lg border text-[10px] font-bold uppercase transition {{ $vignetteType === 'white' ? 'bg-white border-zinc-200 text-zinc-900' : 'border-zinc-200 dark:border-zinc-800 text-zinc-400' }}">
-                                    Branca
-                                </button>
-                            </div>
-                            @endif
+                            @foreach(['dots', 'lines', 'grid'] as $p)
+                                <div wire:click="$set('pattern', '{{ $p }}')" class="btn-toggle cursor-pointer {{ $pattern === $p ? 'active' : '' }}" role="button">
+                                    <img src="/assets/patterns/{{ $p }}.png" class="w-4 h-4 opacity-50">
+                                </div>
+                            @endforeach
                         </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="sb-label">Vinheta</span>
+                        <div wire:click="$toggle('hasVignette')" class="studio-toggle {{ $hasVignette ? 'active' : '' }}" role="button">
+                            <span class="studio-toggle-knob"></span>
+                        </div>
+                    </div>
+                    @if($hasVignette)
+                    <div class="vignette-btn-group">
+                        <div wire:click="$set('vignetteType', 'black')"
+                             class="vignette-btn {{ $vignetteType === 'black' ? 'active-black' : '' }}" role="button">
+                            Preta
+                        </div>
+                        <div wire:click="$set('vignetteType', 'white')"
+                             class="vignette-btn {{ $vignetteType === 'white' ? 'active-white' : '' }}" role="button">
+                            Branca
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                {{-- Logo --}}
+                <div class="sb-section">
+                    <span class="section-title">Marca</span>
+                    <div class="flex items-center gap-2">
+                        <label class="logo-upload-btn">
+                            <x-heroicon-o-arrow-up-tray class="w-3.5 h-3.5 text-zinc-400" style="width: 14px; height: 14px;" />
+                            <span class="logo-upload-text">{{ $logoUpload ? 'Trocar Logo' : 'Enviar Logo' }}</span>
+                            <input type="file" wire:model="logoUpload" class="hidden" accept="image/*">
+                        </label>
+                        @if($logoUrl)
+                            <div wire:click="$set('logoUrl', null)" class="w-8 h-8 flex items-center justify-center rounded-lg border border-red-200 text-red-400 hover:bg-red-50 transition cursor-pointer" role="button" style="width: 32px; height: 32px; flex-shrink: 0;">
+                                <x-heroicon-m-x-mark class="w-3.5 h-3.5" style="width: 14px; height: 14px;"/>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
-                <div class="space-y-4" wire:poll.10s>
-                    <label class="section-title">Artes Recentes</label>
+                {{-- Artes Recentes --}}
+                <div class="sb-section" wire:poll.10s>
+                    <span class="section-title">Artes Recentes</span>
                     <div class="recent-grid">
                         @foreach($this->recentPosts->where('status', '!=', 'failed') as $p)
-                            <div
-                                class="art-card relative aspect-square rounded-xl overflow-hidden border border-zinc-100 dark:border-zinc-800 group shadow-sm">
+                            <div class="art-card relative aspect-square rounded-lg overflow-hidden border border-zinc-100 dark:border-zinc-800 group shadow-sm">
                                 @if($p->isGenerated())
                                     <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
                                     <div class="art-overlay">
                                         <a href="{{ $p->output_url }}" target="_blank" class="btn-action-mini" title="Ver">
-                                            <x-heroicon-m-eye class="w-4 h-4" />
+                                            <x-heroicon-m-eye class="w-3.5 h-3.5" />
                                         </a>
-                                        <a href="{{ $p->output_url }}" download="arte-{{ $p->id }}.png" class="btn-action-mini"
-                                            title="Baixar">
-                                            <x-heroicon-m-arrow-down-tray class="w-4 h-4" />
+                                        <a href="{{ $p->output_url }}" download="arte-{{ $p->id }}.png" class="btn-action-mini" title="Baixar">
+                                            <x-heroicon-m-arrow-down-tray class="w-3.5 h-3.5" />
                                         </a>
-                                        <button wire:click="deletePost({{ $p->id }})" class="btn-action-mini btn-delete"
-                                            title="Excluir">
-                                            <x-heroicon-m-trash class="w-4 h-4" />
+                                        <button wire:click="deletePost({{ $p->id }})" class="btn-action-mini btn-delete" title="Excluir">
+                                            <x-heroicon-m-trash class="w-3.5 h-3.5" />
                                         </button>
                                     </div>
                                 @else
-                                    <div
-                                        class="w-full h-full flex flex-col items-center justify-center gap-2 bg-zinc-50 dark:bg-zinc-900">
-                                        <x-heroicon-o-arrow-path class="w-5 h-5 text-amber-500 animate-spin" />
+                                    <div class="w-full h-full flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+                                        <x-heroicon-o-arrow-path class="w-4 h-4 text-amber-500 animate-spin" />
                                     </div>
                                 @endif
                             </div>
                         @endforeach
                     </div>
                 </div>
+
             </div>
         </aside>
 
@@ -650,12 +830,6 @@
                         </div>
                     @endif
 
-                    {{-- Layer 2: Frame --}}
-                    @if($frameUrl)
-                        <div class="absolute inset-0 z-10 pointer-events-none bg-contain bg-center bg-no-repeat"
-                             style="background-image: url('{{ $frameUrl }}');">
-                        </div>
-                    @endif
 
                     {{-- Layer 3: Branding/Logo --}}
                     @if($logoUrl)
@@ -754,6 +928,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
+
+
         // Auto-expand textarea
         const tx = document.getElementsByTagName("textarea");
         for (let i = 0; i < tx.length; i++) {
