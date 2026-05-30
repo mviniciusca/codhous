@@ -178,6 +178,7 @@ class GeradorIa extends Page implements HasActions, HasForms
 
     public function selectPreset(string $value): void
     {
+
         $this->preset = $value;
         
         $presetEnum = \App\Enums\CardPreset::from($value);
@@ -304,8 +305,16 @@ class GeradorIa extends Page implements HasActions, HasForms
             $data = json_decode($jsonFromAI, true);
             if (!$data) return;
 
+            // Reseta opções secundárias para aplicar o novo design randômico completamente
+            $this->frameUrl = null;
+            $this->hasVignette = false;
+            $this->pattern = null;
+
             if (isset($data['canvas']['bg_color'])) {
                 $this->overlayColor = $data['canvas']['bg_color'];
+            }
+            if (isset($data['canvas']['bg_opacity'])) {
+                $this->overlayOpacity = (int) $data['canvas']['bg_opacity'];
             }
 
             $this->layers = $data['layers'] ?? [];
@@ -324,8 +333,6 @@ class GeradorIa extends Page implements HasActions, HasForms
                 }
 
                 if ($layer['type'] === 'frame') {
-                    // Logic to select a frame preset or URL
-                    // For now just storing it in the state
                     $this->frameUrl = $layer['url'] ?? null;
                 }
 
@@ -336,6 +343,12 @@ class GeradorIa extends Page implements HasActions, HasForms
                 if ($layer['type'] === 'vignette') {
                     $this->hasVignette = true;
                     $this->vignetteType = ($layer['style']['color'] ?? '') === '#FFFFFF' ? 'white' : 'black';
+                }
+
+                if ($layer['type'] === 'pattern') {
+                    $this->pattern = $layer['name'] ?? null;
+                    if (isset($layer['style']['size'])) $this->patternSize = (int) $layer['style']['size'];
+                    if (isset($layer['style']['color'])) $this->patternColor = $layer['style']['color'];
                 }
             }
 
@@ -361,25 +374,119 @@ class GeradorIa extends Page implements HasActions, HasForms
             return;
         }
 
-        // Simulação do JSON que a IA retornaria
-        // Em um cenário real, você faria uma chamada para a API da OpenAI/Anthropic/Gemini aqui
-        $mockJson = json_encode([
-            "canvas" => [ "width" => 1080, "height" => 1080, "bg_color" => "#1a1a1a" ],
-            "layers" => [
-                [
-                    "type" => "text",
-                    "content" => strtoupper($this->quote),
-                    "style" => [ "color" => "#fbbf24", "size" => "64px", "font" => "Oswald", "weight" => "bold" ],
-                    "position" => [ "top" => "50%", "left" => "50%", "align" => "center" ],
-                    "z_index" => 30
+        // Paleta de cores premium (escuros, vibrantes e neutros)
+        $bgColors = [
+            '#121217', '#09090b', '#1a1a1a', '#1e1e24', '#2d3748', '#1a202c', '#0f172a', '#172554', '#3b0764',
+            '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6',
+            '#f8fafc', '#f1f5f9', '#fafafa', '#fdf2f8', '#ecfdf5', '#eff6ff',
+        ];
+        $bgColor = $bgColors[array_rand($bgColors)];
+
+        // Verifica a luminosidade da cor de fundo para garantir o contraste do texto
+        $hex = ltrim($bgColor, '#');
+        [$r, $g, $b] = sscanf($hex, '%02x%02x%02x');
+        $brightness = ($r * 299 + $g * 587 + $b * 114) / 1000;
+        $isBgLight = $brightness > 127;
+
+        if ($isBgLight) {
+            $textColors = ['#1e293b', '#0f172a', '#000000', '#312e81', '#581c87', '#7c2d12', '#064e3b'];
+        } else {
+            $textColors = ['#ffffff', '#fbbf24', '#38bdf8', '#34d399', '#f472b6', '#a78bfa', '#fda4af'];
+        }
+        $textColor = $textColors[array_rand($textColors)];
+
+        // Escolhe uma fonte aleatória
+        $fonts = array_keys($this->fontOptions);
+        $font = $fonts[array_rand($fonts)];
+
+        $size = rand(36, 76) . 'px';
+        $weight = (rand(0, 1) === 1) ? 'bold' : 'normal';
+
+        // Escolhe alinhamento e calcula posições correspondentes
+        $aligns = ['left', 'center', 'right'];
+        $align = $aligns[array_rand($aligns)];
+
+        $x = '50%';
+        if ($align === 'left') {
+            $x = rand(0, 1) ? '25%' : '20%';
+        } elseif ($align === 'right') {
+            $x = rand(0, 1) ? '75%' : '80%';
+        }
+
+        $yOptions = ['25%', '50%', '75%'];
+        $y = $yOptions[array_rand($yOptions)];
+
+        $opacity = rand(20, 80);
+
+        // Montagem das camadas dinâmicas da IA
+        $layers = [];
+
+        // Camada de Texto
+        $layers[] = [
+            "type" => "text",
+            "content" => strtoupper($this->quote),
+            "style" => [
+                "color" => $textColor,
+                "size" => $size,
+                "font" => $font,
+                "weight" => $weight,
+            ],
+            "position" => [
+                "top" => $y,
+                "left" => $x,
+                "align" => $align,
+            ],
+            "z_index" => 30
+        ];
+
+        // Camada de Vinheta (40% de chance)
+        if (rand(1, 100) <= 40) {
+            $vignetteColor = $isBgLight ? '#FFFFFF' : '#000000';
+            $layers[] = [
+                "type" => "vignette",
+                "style" => [
+                    "color" => $vignetteColor,
                 ],
-                [
-                    "type" => "frame",
-                    "url" => "https://www.transparentpng.com/download/border/gold-square-border-free-png-2775.png",
-                    "opacity" => 0.8,
-                    "z_index" => 10
-                ]
-            ]
+                "z_index" => 7
+            ];
+        }
+
+        // Camada de Textura/Pattern (35% de chance)
+        if (rand(1, 100) <= 35) {
+            $patterns = ['dots', 'lines', 'grid'];
+            $patternName = $patterns[array_rand($patterns)];
+            $patternColor = $isBgLight ? '#000000' : '#ffffff';
+            $patternSize = rand(8, 22);
+
+            $layers[] = [
+                "type" => "pattern",
+                "name" => $patternName,
+                "style" => [
+                    "color" => $patternColor,
+                    "size" => $patternSize,
+                ],
+                "z_index" => 6
+            ];
+        }
+
+        // Camada de Moldura (20% de chance)
+        if (rand(1, 100) <= 20) {
+            $layers[] = [
+                "type" => "frame",
+                "url" => "https://www.transparentpng.com/download/border/gold-square-border-free-png-2775.png",
+                "opacity" => 0.8,
+                "z_index" => 10
+            ];
+        }
+
+        $mockJson = json_encode([
+            "canvas" => [ 
+                "width" => 1080, 
+                "height" => 1080, 
+                "bg_color" => $bgColor,
+                "bg_opacity" => $opacity
+            ],
+            "layers" => $layers
         ]);
 
         $this->processAIResponse($mockJson);
