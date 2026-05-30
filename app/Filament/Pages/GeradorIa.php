@@ -183,7 +183,8 @@ class GeradorIa extends Page implements HasActions, HasForms
         $presetEnum = \App\Enums\CardPreset::from($value);
         $style = $presetEnum->getStyle();
         
-        $this->fontFamily = $style['font'];
+        // Mantém a fonte escolhida pelo usuário em vez de sobrescrever com a do preset
+        // $this->fontFamily = $style['font'];
         $this->textAlign = $style['align'] ?? 'center';
         $this->isBold = true; 
         $this->isItalic = false;
