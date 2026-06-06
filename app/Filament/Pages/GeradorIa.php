@@ -2,9 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use App\Jobs\GenerateSocialPostImage;
 use App\Models\BackgroundImage;
-use App\Models\SocialPost;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -145,11 +143,7 @@ class GeradorIa extends Page implements HasActions, HasForms
         ];
     }
 
-    #[Computed]
-    public function recentPosts(): \Illuminate\Database\Eloquent\Collection
-    {
-        return SocialPost::latest()->take(5)->get();
-    }
+
 
     // ─── Actions ──────────────────────────────────────────────
 
@@ -222,60 +216,6 @@ class GeradorIa extends Page implements HasActions, HasForms
         $this->textY = $y;
     }
 
-    public function saveSnapshot(string $dataUrl): void
-    {
-        $this->validate([
-            'quote'              => 'required|max:600',
-            'backgroundImageId'  => 'required|exists:background_images,id',
-        ], [
-            'quote.required'             => 'Digite o texto/quote do post.',
-            'backgroundImageId.required' => 'Selecione uma imagem de fundo.',
-        ]);
-
-        $post = SocialPost::create([
-            'title'               => $this->postTitle ?: 'Arte ' . now()->format('H:i'),
-            'platform'            => $this->platform,
-            'quote'               => $this->quote,
-            'font_family'         => $this->fontFamily,
-            'font_size'           => $this->fontSize,
-            'text_color'          => $this->textColor,
-            'overlay_color'       => $this->overlayColor,
-            'overlay_opacity'     => $this->overlayOpacity,
-            'pattern'             => $this->pattern,
-            'pattern_size'        => $this->patternSize,
-            'pattern_color'       => $this->patternColor,
-            'background_image_id' => $this->backgroundImageId,
-            'preset'              => $this->preset,
-            'text_x'              => $this->textX,
-            'text_y'              => $this->textY,
-            'layers'              => $this->layers,
-            'has_vignette'        => $this->hasVignette,
-            'vignette_type'       => $this->vignetteType,
-            'status'              => 'processing',
-        ]);
-
-        try {
-            // Executa síncronamente de forma imediata
-            (new \App\Jobs\SavePostSnapshot($post, $dataUrl))->handle();
-
-            Notification::make()
-                ->title('Arte gerada e salva com sucesso!')
-                ->success()
-                ->send();
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('[saveSnapshot] Failed', [
-                'post_id' => $post->id,
-                'error'   => $e->getMessage(),
-            ]);
-
-            $post->update(['status' => 'failed']);
-
-            Notification::make()
-                ->title('Erro ao gerar/salvar a arte.')
-                ->danger()
-                ->send();
-        }
-    }
 
     public function resetForm(): void
     {
@@ -506,38 +446,6 @@ class GeradorIa extends Page implements HasActions, HasForms
     }
 
 
-
-    public function regeneratePost(int $id): void
-    {
-        $post = SocialPost::find($id);
-        
-        if ($post) {
-            $post->update(['status' => 'processing']);
-            
-            try {
-                // Executa síncronamente de forma imediata
-                (new GenerateSocialPostImage($post))->handle();
-
-                Notification::make()
-                    ->title('Arte regenerada com sucesso!')
-                    ->success()
-                    ->send();
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::error('[regeneratePost] Failed', [
-                    'post_id' => $post->id,
-                    'error'   => $e->getMessage(),
-                ]);
-
-                $post->update(['status' => 'failed']);
-
-                Notification::make()
-                    ->title('Erro ao regenerar a arte.')
-                    ->danger()
-                    ->send();
-            }
-        }
-    }
-
     protected function getActions(): array
     {
         return [
@@ -586,18 +494,5 @@ class GeradorIa extends Page implements HasActions, HasForms
                     ->success()
                     ->send();
             });
-    }
-
-    public function deletePost(int $id): void
-    {
-        $post = \App\Models\SocialPost::find($id);
-        
-        if ($post) {
-            $post->delete(); // Spatie Media Library handles media deletion
-            \Filament\Notifications\Notification::make()
-                ->title('Arte removida!')
-                ->success()
-                ->send();
-        }
     }
 }

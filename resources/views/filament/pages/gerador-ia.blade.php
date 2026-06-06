@@ -764,34 +764,6 @@
                     </div>
                 </div>
 
-                {{-- Artes Recentes --}}
-                <div class="sb-section" wire:poll.10s>
-                    <span class="section-title">Artes Recentes</span>
-                    <div class="recent-grid">
-                        @foreach($this->recentPosts->where('status', '!=', 'failed') as $p)
-                            <div class="art-card relative aspect-square rounded-lg overflow-hidden border border-zinc-100 dark:border-zinc-800 group shadow-sm">
-                                @if($p->isGenerated())
-                                    <img src="{{ $p->output_url }}" class="w-full h-full object-cover">
-                                    <div class="art-overlay">
-                                        <a href="{{ $p->output_url }}" target="_blank" class="btn-action-mini" title="Ver">
-                                            <x-heroicon-m-eye class="w-3.5 h-3.5" />
-                                        </a>
-                                        <a href="{{ $p->output_url }}" download="arte-{{ $p->id }}.png" class="btn-action-mini" title="Baixar">
-                                            <x-heroicon-m-arrow-down-tray class="w-3.5 h-3.5" />
-                                        </a>
-                                        <button wire:click="deletePost({{ $p->id }})" class="btn-action-mini btn-delete" title="Excluir">
-                                            <x-heroicon-m-trash class="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
-                                        <x-heroicon-o-arrow-path class="w-4 h-4 text-amber-500 animate-spin" />
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
 
             </div>
         </aside>
@@ -879,10 +851,6 @@
                             <x-heroicon-m-bolt class="w-3.5 h-3.5" />
                             <span>Mágica IA</span>
                         </button>
-                        <button onclick="takeSnapshot()" id="generate-trigger" class="generate-btn h-10 px-6 text-xs">
-                            <x-heroicon-m-sparkles class="w-3.5 h-3.5" />
-                            <span>Gerar Arte</span>
-                        </button>
                     </div>
                 </div>
 
@@ -925,10 +893,7 @@
         </aside>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
-
-
         // Auto-expand textarea
         const tx = document.getElementsByTagName("textarea");
         for (let i = 0; i < tx.length; i++) {
@@ -939,36 +904,6 @@
         function OnInput() {
             this.style.height = 0;
             this.style.height = (this.scrollHeight) + "px";
-        }
-
-        function takeSnapshot() {
-            const el = document.getElementById('card-container');
-            const btn = document.getElementById('generate-trigger');
-            if (!btn) return;
-            const originalContent = btn.innerHTML;
-            btn.classList.add('opacity-50', 'pointer-events-none');
-            btn.querySelector('span').innerText = 'Capturando...';
-            html2canvas(el, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: null,
-                logging: false,
-                onclone: (clonedDoc) => {
-                    const clonedEl = clonedDoc.getElementById('card-container');
-                    if (clonedEl) clonedEl.style.transform = 'none';
-                }
-            }).then(canvas => {
-                const dataUrl = canvas.toDataURL('image/png', 1.0);
-                @this.saveSnapshot(dataUrl).then(() => {
-                    btn.innerHTML = originalContent;
-                    btn.classList.remove('opacity-50', 'pointer-events-none');
-                });
-            }).catch(err => {
-                console.error('Snapshot Error:', err);
-                btn.innerHTML = originalContent;
-                btn.classList.remove('opacity-50', 'pointer-events-none');
-            });
         }
     </script>
     <x-filament-actions::modals />
