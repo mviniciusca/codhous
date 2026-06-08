@@ -80,6 +80,13 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "block-insecure": false,
+            "ignore": {
+                "PKSA-mdq4-51ck-6kdq": "CRLF injection in default email rule, fixed in newer major versions.",
+                "PKSA-8qx3-n5y5-vvnd": "Security advisory affecting Laravel 11.x, fixed in newer major versions."
+            }
         }
     },
     "minimum-stability": "stable",
