@@ -534,242 +534,190 @@ class BudgetResource extends Resource
                                         !isset($record->content['shipping'])
                                     ),
 
-                                Section::make('Gerar e Enviar Orçamento')
-                                    ->description('Gere o PDF oficial e notifique o cliente agora mesmo.')
-                                    ->schema([
-                                        Actions::make([
-                                            Actions\Action::make('generate_pdf_share')
-                                                ->label('Gerar PDF e Link de Compartilhamento')
-                                                ->icon('heroicon-o-share')
-                                                ->color('primary')
-                                                ->disabled(fn (Budget $record) => 
-                                                    !isset($record->content['tax']) || 
-                                                    !isset($record->content['discount']) || 
-                                                    !isset($record->content['shipping'])
-                                                )
-                                                ->requiresConfirmation()
-                                                ->modalHeading('Gerar Link de Compartilhamento')
-                                                ->modalDescription('O PDF será gerado e um link de download será criado.')
-                                                ->modalSubmitActionLabel('Gerar Agora')
-                                                ->action(function (Budget $record, $livewire) {
-                                                    // Se estivermos na página de edição, salva o formulário primeiro
-                                                    if (method_exists($livewire, 'save')) {
-                                                        $livewire->save();
-                                                    }
-                                                    
-                                                    $pdfModel = self::generatePdfModel($record->refresh());
-                                                    
-                                                    if ($pdfModel) {
-                                                        $url = $pdfModel->getDownloadUrl();
+                                \Filament\Forms\Components\Grid::make(3)->schema([
+                                    Section::make('Compartilhar Link')
+                                        ->description('Gere o PDF e copie o link.')
+                                        ->icon('heroicon-o-link')
+                                        ->columnSpan(['default' => 3, 'md' => 1])
+                                        ->schema([
+                                            Actions::make([
+                                                Actions\Action::make('generate_pdf_share')
+                                                    ->label('Gerar Link')
+                                                    ->icon('heroicon-o-share')
+                                                    ->color('gray')
+                                                    ->button()
+                                                    ->disabled(fn (Budget $record) => 
+                                                        !isset($record->content['tax']) || 
+                                                        !isset($record->content['discount']) || 
+                                                        !isset($record->content['shipping'])
+                                                    )
+                                                    ->requiresConfirmation()
+                                                    ->modalHeading('Gerar Link de Compartilhamento')
+                                                    ->modalDescription('O PDF será gerado e um link de download será criado.')
+                                                    ->modalSubmitActionLabel('Gerar Agora')
+                                                    ->action(function (Budget $record, $livewire, \Filament\Forms\Set $set) {
+                                                        // Se estivermos na página de edição, salva o formulário primeiro
+                                                        if (method_exists($livewire, 'save')) {
+                                                            $livewire->save();
+                                                        }
                                                         
-                                                        activity()
-                                                            ->performedOn($record)
-                                                            ->log('Gerou link de compartilhamento do PDF');
+                                                        $pdfModel = self::generatePdfModel($record->refresh());
                                                         
-                                                        // Salva o link no content para referência futura
-                                                        $content = $record->content;
-                                                        $content['share_link'] = $url;
+                                                        if ($pdfModel) {
+                                                            $url = $pdfModel->getDownloadUrl();
+                                                            
+                                                            activity()
+                                                                ->performedOn($record)
+                                                                ->log('Gerou link de compartilhamento do PDF');
+                                                            
+                                                            // Salva o link no content para referência futura
+                                                            $content = $record->content;
+                                                            $content['share_link'] = $url;
+                                                            
+                                                            $record->withoutEvents(function () use ($record, $content, $pdfModel) {
+                                                                $record->update([
+                                                                    'content' => $content,
+                                                                    'pdf_document' => $pdfModel->path
+                                                                ]);
+                                                            });
+                                                            
+                                                            $set('content.share_link', $url);
+
+                                                            Notification::make()
+                                                                ->title('PDF Gerado com Sucesso!')
+                                                                ->success()
+                                                                ->body("O documento foi gerado e está pronto para compartilhamento.")
+                                                                ->persistent()
+                                                                ->actions([
+                                                                    \Filament\Notifications\Actions\Action::make('download')
+                                                                        ->label('Baixar PDF')
+                                                                        ->button()
+                                                                        ->url($url, shouldOpenInNewTab: true),
+                                                                ])
+                                                                ->send();
+                                                        }
+                                                    }),
+                                            ])->fullWidth(),
+                                        ]),
+
+                                    Section::make('WhatsApp')
+                                        ->description('Envie direto para o cliente.')
+                                        ->icon('heroicon-o-chat-bubble-left-right')
+                                        ->columnSpan(['default' => 3, 'md' => 1])
+                                        ->schema([
+                                            Actions::make([
+                                                Actions\Action::make('pdf_and_whatsapp')
+                                                    ->label(fn (Budget $record) => 'Enviar via WhatsApp' . ($record->notified_via_whatsapp ? ' ✅' : ''))
+                                                    ->icon('heroicon-o-chat-bubble-left-right')
+                                                    ->color('success')
+                                                    ->button()
+                                                    ->disabled(fn (Budget $record) => 
+                                                        !isset($record->content['tax']) || 
+                                                        !isset($record->content['discount']) || 
+                                                        !isset($record->content['shipping'])
+                                                    )
+                                                    ->requiresConfirmation()
+                                                    ->action(function (Budget $record, $livewire, \Filament\Forms\Set $set) {
+                                                        if (method_exists($livewire, 'save')) {
+                                                            $livewire->save();
+                                                        }
                                                         
-                                                        $record->withoutEvents(function () use ($record, $content, $pdfModel) {
-                                                            $record->update([
-                                                                'content' => $content,
-                                                                'pdf_document' => $pdfModel->path
-                                                            ]);
-                                                        });
+                                                        $pdfModel = self::generatePdfModel($record->refresh());
 
-                                                        Notification::make()
-                                                            ->title('PDF Gerado com Sucesso!')
-                                                            ->success()
-                                                            ->body("O documento foi gerado e está pronto para compartilhamento.")
-                                                            ->persistent()
-                                                            ->actions([
-                                                                \Filament\Notifications\Actions\Action::make('download')
-                                                                    ->label('Baixar PDF')
-                                                                    ->button()
-                                                                    ->url($url, shouldOpenInNewTab: true),
-                                                                \Filament\Notifications\Actions\Action::make('copy')
-                                                                    ->label('Copiar Link')
-                                                                    ->color('gray')
-                                                                    ->extraAttributes([
-                                                                        'onclick' => "navigator.clipboard.writeText('{$url}'); window.Filament.notifications.notify({ title: 'Copiado!', status: 'success' })"
-                                                                    ]),
-                                                            ])
-                                                            ->send();
-                                                    }
-                                                }),
+                                                        if ($pdfModel) {
+                                                            $url = $pdfModel->getDownloadUrl();
+                                                            $content = $record->content;
+                                                            $content['share_link'] = $url;
 
-                                            Actions\Action::make('pdf_and_email')
-                                                ->label(fn (Budget $record) => 'Gerar PDF e Enviar por E-mail' . ($record->notified_via_email ? ' ✅' : ''))
-                                                ->icon('heroicon-o-envelope')
-                                                ->color('primary')
-                                                ->disabled(fn (Budget $record) => 
-                                                    !isset($record->content['tax']) || 
-                                                    !isset($record->content['discount']) || 
-                                                    !isset($record->content['shipping'])
-                                                )
-                                                ->requiresConfirmation()
-                                                ->action(function (Budget $record, $livewire) {
-                                                    if (method_exists($livewire, 'save')) {
-                                                        $livewire->save();
-                                                    }
-                                                    
-                                                    try {
-                                                        $mailService = new SendBudgetMailService(
-                                                            $record->refresh(),
-                                                            $record->content['customer_email'] ?? ''
-                                                        );
-                                                        $mailService->dispatch();
+                                                            $record->withoutEvents(function () use ($record, $content, $pdfModel) {
+                                                                $record->update([
+                                                                    'notified_via_whatsapp' => true,
+                                                                    'content' => $content,
+                                                                    'pdf_document' => $pdfModel->path
+                                                                ]);
+                                                            });
+                                                            
+                                                            $set('content.share_link', $url);
+
+                                                            activity()
+                                                                ->performedOn($record)
+                                                                ->log('Enviou orçamento via WhatsApp');
+
+                                                            $whatsappService = new WhatsappService();
+                                                            $message = "Olá! Segue o link do seu orçamento: " . $url;
+                                                            $waUrl = $whatsappService->generateUrl(
+                                                                $record->content['customer_phone'] ?? '',
+                                                                $message
+                                                            );
+
+                                                            $livewire->js("window.open('{$waUrl}', '_blank')");
+                                                        }
+                                                    }),
+                                            ])->fullWidth(),
+                                        ]),
+
+                                    Section::make('E-mail Oficial')
+                                        ->description('Envie de forma automatizada.')
+                                        ->icon('heroicon-o-envelope')
+                                        ->columnSpan(['default' => 3, 'md' => 1])
+                                        ->schema([
+                                            Actions::make([
+                                                Actions\Action::make('pdf_and_email')
+                                                    ->label(fn (Budget $record) => 'Enviar por E-mail' . ($record->notified_via_email ? ' ✅' : ''))
+                                                    ->icon('heroicon-o-envelope')
+                                                    ->color('primary')
+                                                    ->button()
+                                                    ->disabled(fn (Budget $record) => 
+                                                        !isset($record->content['tax']) || 
+                                                        !isset($record->content['discount']) || 
+                                                        !isset($record->content['shipping'])
+                                                    )
+                                                    ->requiresConfirmation()
+                                                    ->action(function (Budget $record, $livewire, \Filament\Forms\Set $set) {
+                                                        if (method_exists($livewire, 'save')) {
+                                                            $livewire->save();
+                                                        }
                                                         
-                                                        $record->withoutEvents(function () use ($record) {
-                                                            $record->update([
-                                                                'notified_via_email' => true,
-                                                            ]);
-                                                        });
+                                                        try {
+                                                            $mailService = new SendBudgetMailService(
+                                                                $record->refresh(),
+                                                                $record->content['customer_email'] ?? ''
+                                                            );
+                                                            $mailService->dispatch();
+                                                            
+                                                            $record->withoutEvents(function () use ($record) {
+                                                                $record->update([
+                                                                    'notified_via_email' => true,
+                                                                ]);
+                                                            });
+                                                            
+                                                            $record->refresh();
+                                                            if (!empty($record->content['share_link'])) {
+                                                                $set('content.share_link', $record->content['share_link']);
+                                                            }
 
-                                                        activity()
-                                                            ->performedOn($record)
-                                                            ->log('Enviou orçamento por e-mail para ' . ($record->content['customer_email'] ?? 'cliente'));
+                                                            activity()
+                                                                ->performedOn($record)
+                                                                ->log('Enviou orçamento por e-mail para ' . ($record->content['customer_email'] ?? 'cliente'));
 
-                                                        // Notificação removida aqui pois o MailService ou o Save já notificam
-                                                    } catch (\Exception $e) {
-                                                        Notification::make()
-                                                            ->title('Erro ao enviar e-mail')
-                                                            ->body($e->getMessage())
-                                                            ->danger()
-                                                            ->send();
-                                                    }
-                                                }),
-
-                                            Actions\Action::make('pdf_and_whatsapp')
-                                                ->label(fn (Budget $record) => 'Gerar PDF e Enviar via WhatsApp' . ($record->notified_via_whatsapp ? ' ✅' : ''))
-                                                ->icon('heroicon-o-chat-bubble-left-right')
-                                                ->color('primary')
-                                                ->disabled(fn (Budget $record) => 
-                                                    !isset($record->content['tax']) || 
-                                                    !isset($record->content['discount']) || 
-                                                    !isset($record->content['shipping'])
-                                                )
-                                                ->requiresConfirmation()
-                                                ->action(function (Budget $record, $livewire) {
-                                                    if (method_exists($livewire, 'save')) {
-                                                        $livewire->save();
-                                                    }
-                                                    
-                                                    $pdfModel = self::generatePdfModel($record->refresh());
-
-                                                    if ($pdfModel) {
-                                                        $url = $pdfModel->getDownloadUrl();
-                                                        $content = $record->content;
-                                                        $content['share_link'] = $url;
-
-                                                        $record->withoutEvents(function () use ($record, $content, $pdfModel) {
-                                                            $record->update([
-                                                                'notified_via_whatsapp' => true,
-                                                                'content' => $content,
-                                                                'pdf_document' => $pdfModel->path
-                                                            ]);
-                                                        });
-
-                                                        activity()
-                                                            ->performedOn($record)
-                                                            ->log('Enviou orçamento via WhatsApp');
-
-                                                        $whatsappService = new WhatsappService();
-                                                        $message = "Olá! Segue o link do seu orçamento: " . $url;
-                                                        $waUrl = $whatsappService->generateUrl(
-                                                            $record->content['customer_phone'] ?? '',
-                                                            $message
-                                                        );
-
-                                                        $livewire->js("window.open('{$waUrl}', '_blank')");
-                                                    }
-                                                }),
-                                        ])
-                                        ->alignment(Alignment::Center)
-                                        ->fullWidth(),
+                                                        } catch (\Exception $e) {
+                                                            Notification::make()
+                                                                ->title('Erro ao enviar e-mail')
+                                                                ->body($e->getMessage())
+                                                                ->danger()
+                                                                ->send();
+                                                        }
+                                                    }),
+                                            ])->fullWidth(),
+                                        ]),
                                 ]),
 
-                            Section::make('Enviar Mensagem Direta')
-                                ->description('Envie um e-mail personalizado para o cliente deste orçamento.')
-                                ->icon('heroicon-o-paper-airplane')
-                                ->schema([
-                                    Actions::make([
-                                        Actions\Action::make('send_custom_message')
-                                            ->label('Enviar E-mail Personalizado')
-                                            ->icon('heroicon-o-paper-airplane')
-                                            ->color('gray')
-                                            ->form([
-                                                TextInput::make('subject')
-                                                    ->label('Assunto')
-                                                    ->required()
-                                                    ->default(fn (Budget $record) => 'Sobre seu Orçamento: ' . $record->code),
-                                                RichEditor::make('message')
-                                                    ->label('Mensagem')
-                                                    ->required()
-                                                    ->placeholder('Escreva sua mensagem aqui...'),
-                                            ])
-                                            ->action(function (Budget $record, array $data, $livewire) {
-                                                // Salva o formulário primeiro para garantir integridade
-                                                if (method_exists($livewire, 'save')) {
-                                                    $livewire->save();
-                                                }
 
-                                                $record->refresh();
-
-                                                try {
-                                                    $customerEmail = $record->content['customer_email'] ?? null;
-                                                    $customerName = $record->content['customer_name'] ?? 'Cliente';
-
-                                                    if (!$customerEmail) {
-                                                        throw new \Exception('E-mail do cliente não encontrado.');
-                                                    }
-
-                                                    // Envia o e-mail
-                                                    \Illuminate\Support\Facades\Mail::to($customerEmail)->send(
-                                                        new BudgetCustomMessageMail(
-                                                            customSubject: $data['subject'],
-                                                            customMessage: $data['message'],
-                                                            customerName: $customerName
-                                                        )
-                                                    );
-
-                                                    // Salva no Resource de Mail
-                                                    Mail::create([
-                                                        'email' => $customerEmail,
-                                                        'name' => $customerName,
-                                                        'phone' => $record->content['customer_phone'] ?? null,
-                                                        'subject' => $data['subject'],
-                                                        'message' => $data['message'],
-                                                        'is_sent' => true,
-                                                    ]);
-
-                                                    activity()
-                                                        ->performedOn($record)
-                                                        ->withProperties(['subject' => $data['subject']])
-                                                        ->log('Enviou mensagem personalizada por e-mail');
-
-                                                    Notification::make()
-                                                        ->title('Mensagem enviada e registrada!')
-                                                        ->success()
-                                                        ->send();
-
-                                                } catch (\Exception $e) {
-                                                    Notification::make()
-                                                        ->title('Erro ao enviar mensagem')
-                                                        ->body($e->getMessage())
-                                                        ->danger()
-                                                        ->send();
-                                                }
-                                            })
-                                    ])
-                                    ->alignment(Alignment::Center)
-                                    ->fullWidth(),
-                                ]),
 
                                 Section::make('Link de Compartilhamento Ativo')
                                     ->icon('heroicon-o-link')
                                     ->description('Este orçamento já possui um documento gerado e pronto para compartilhamento.')
-                                    ->visible(fn(Budget $record) => !empty($record->content['share_link'] ?? null))
+                                    ->visible(fn(\Filament\Forms\Get $get, Budget $record) => !empty($get('content.share_link')) || !empty($record->content['share_link'] ?? null))
                                     ->schema([
                                         TextInput::make('content.share_link')
                                             ->label('URL do Documento (PDF)')
@@ -823,6 +771,94 @@ class BudgetResource extends Resource
                                                 }),
                                         ]),
                                     ]),
+                            ]),
+                        Tabs\Tab::make('Mensagem')
+                            ->icon('heroicon-o-envelope')
+                            ->visible(fn ($livewire) => $livewire instanceof Pages\EditBudget)
+                            ->schema([
+                                Section::make('Enviar Mensagem Direta')
+                                    ->description('Envie um e-mail personalizado para o cliente deste orçamento.')
+                                    ->schema([
+                                        TextInput::make('custom_email_subject')
+                                            ->label('Assunto')
+                                            ->dehydrated(false)
+                                            ->default(fn (Budget $record) => 'Sobre seu Orçamento: ' . $record->code),
+                                        RichEditor::make('custom_email_message')
+                                            ->label('Mensagem')
+                                            ->dehydrated(false)
+                                            ->placeholder('Escreva sua mensagem aqui...'),
+                                        Actions::make([
+                                            Actions\Action::make('send_custom_message_inline')
+                                                ->label('Enviar E-mail Agora')
+                                                ->icon('heroicon-o-paper-airplane')
+                                                ->color('primary')
+                                                ->button()
+                                                ->action(function (Budget $record, \Filament\Forms\Get $get, \Filament\Forms\Set $set, $livewire) {
+                                                    $subject = $get('custom_email_subject');
+                                                    $message = $get('custom_email_message');
+
+                                                    if (!$subject || !$message) {
+                                                        Notification::make()->title('Preencha todos os campos')->warning()->send();
+                                                        return;
+                                                    }
+                                                    
+                                                    // Salva o formulário principal se necessário
+                                                    if (method_exists($livewire, 'save')) {
+                                                        $livewire->save();
+                                                    }
+
+                                                    $record->refresh();
+
+                                                    try {
+                                                        $customerEmail = $record->content['customer_email'] ?? null;
+                                                        $customerName = $record->content['customer_name'] ?? 'Cliente';
+
+                                                        if (!$customerEmail) {
+                                                            throw new \Exception('E-mail do cliente não encontrado.');
+                                                        }
+
+                                                        // Envia o e-mail
+                                                        \Illuminate\Support\Facades\Mail::to($customerEmail)->send(
+                                                            new \App\Mail\BudgetCustomMessageMail(
+                                                                customSubject: $subject,
+                                                                customMessage: $message,
+                                                                customerName: $customerName
+                                                            )
+                                                        );
+
+                                                        // Salva no Resource de Mail
+                                                        \App\Models\Mail::create([
+                                                            'email' => $customerEmail,
+                                                            'name' => $customerName,
+                                                            'phone' => $record->content['customer_phone'] ?? null,
+                                                            'subject' => $subject,
+                                                            'message' => $message,
+                                                            'is_sent' => true,
+                                                        ]);
+
+                                                        activity()
+                                                            ->performedOn($record)
+                                                            ->withProperties(['subject' => $subject])
+                                                            ->log('Enviou mensagem personalizada por e-mail');
+
+                                                        Notification::make()
+                                                            ->title('Mensagem enviada com sucesso!')
+                                                            ->success()
+                                                            ->send();
+
+                                                        $set('custom_email_message', null);
+                                                        $set('custom_email_subject', 'Sobre seu Orçamento: ' . $record->code);
+
+                                                    } catch (\Exception $e) {
+                                                        Notification::make()
+                                                            ->title('Erro ao enviar mensagem')
+                                                            ->body($e->getMessage())
+                                                            ->danger()
+                                                            ->send();
+                                                    }
+                                                })
+                                        ])->alignment(Alignment::Right)->fullWidth()
+                                    ])
                             ]),
                     ]),
             ]);
