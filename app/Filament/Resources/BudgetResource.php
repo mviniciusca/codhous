@@ -467,71 +467,44 @@ class BudgetResource extends Resource
                                 Placeholder::make('map_route')
                                     ->label('')
                                     ->content(function (\Filament\Forms\Get $get) {
-                                        $customerCep = preg_replace('/\D/', '', $get('content.postcode') ?? '');
-                                        $companyCep = preg_replace('/\D/', '', \App\Models\Setting::get('company.address.postcode', ''));
+                                        // Endereço da Empresa
+                                        $companyAddressParts = array_filter([
+                                            \App\Models\Setting::get('company.address.street'),
+                                            \App\Models\Setting::get('company.address.number'),
+                                            \App\Models\Setting::get('company.address.neighborhood'),
+                                            \App\Models\Setting::get('company.address.city'),
+                                            \App\Models\Setting::get('company.address.state'),
+                                            \App\Models\Setting::get('company.address.postcode')
+                                        ], fn($val) => !is_null($val) && $val !== '');
+                                        
+                                        $companyAddress = implode(', ', $companyAddressParts);
 
-                                        if (!$companyCep || !$customerCep) {
-                                            return new \Illuminate\Support\HtmlString('<div class="p-4 bg-gray-50 rounded-lg text-center text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">Insira um CEP válido do cliente para traçar a rota.</div>');
+                                        // Endereço do Cliente
+                                        $customerAddressParts = array_filter([
+                                            $get('content.street'),
+                                            $get('content.number'),
+                                            $get('content.neighborhood'),
+                                            $get('content.city'),
+                                            $get('content.state'),
+                                            $get('content.postcode')
+                                        ], fn($val) => !is_null($val) && $val !== '');
+
+                                        $customerAddress = implode(', ', $customerAddressParts);
+
+                                        if (empty($companyAddress) || empty($customerAddress)) {
+                                            return new \Illuminate\Support\HtmlString('<div class="p-4 bg-gray-50 rounded-lg text-center text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">Preencha o endereço do cliente para traçar a rota.</div>');
                                         }
 
-                                        return new \Illuminate\Support\HtmlString('
-                                            <div x-data="{
-                                                companyCep: \''.$companyCep.'\',
-                                                customerCep: \''.$customerCep.'\',
-                                                mapUrl: null,
-                                                error: null,
-                                                loading: true,
-                                                
-                                                async getCoords(cep) {
-                                                    try {
-                                                        let res = await fetch(`https://brasilapi.com.br/api/cep/v2/${cep}`);
-                                                        if (!res.ok) return null;
-                                                        let data = await res.json();
-                                                        
-                                                        let lat = data.location?.coordinates?.latitude;
-                                                        let lon = data.location?.coordinates?.longitude;
-                                                        
-                                                        if (lat && lon) return {lat, lon};
-                                                        
-                                                        if (data.street && data.city && data.state) {
-                                                            let nomRes = await fetch(`https://nominatim.openstreetmap.org/search?street=${encodeURIComponent(data.street)}&city=${encodeURIComponent(data.city)}&state=${encodeURIComponent(data.state)}&country=Brazil&format=json`);
-                                                            let nomData = await nomRes.json();
-                                                            if (nomData && nomData.length > 0) {
-                                                                return {lat: nomData[0].lat, lon: nomData[0].lon};
-                                                            }
-                                                        }
-                                                        return null;
-                                                    } catch (e) {
-                                                        return null;
-                                                    }
-                                                },
-                                                
-                                                async init() {
-                                                    this.loading = true;
-                                                    this.error = null;
-                                                    
-                                                    let companyCoords = await this.getCoords(this.companyCep);
-                                                    let customerCoords = await this.getCoords(this.customerCep);
+                                        $mapUrl = "https://www.google.com/maps/dir/".urlencode($companyAddress)."/".urlencode($customerAddress);
 
-                                                    if(companyCoords && customerCoords) {
-                                                        this.mapUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${companyCoords.lat}%2C${companyCoords.lon}%3B${customerCoords.lat}%2C${customerCoords.lon}`;
-                                                    } else {
-                                                        this.error = \'Não foi possível encontrar as coordenadas para um dos CEPs (Empresa: \' + this.companyCep + \', Cliente: \' + this.customerCep + \').\';
-                                                    }
-                                                    
-                                                    this.loading = false;
-                                                }
-                                            }">
-                                                <div x-show="loading" class="p-4 bg-gray-50 rounded-lg text-center text-sm dark:bg-gray-800 dark:text-gray-400">Buscando coordenadas (BrasilAPI/Nominatim)...</div>
-                                                <div x-show="error" class="p-4 bg-danger-50 text-danger-600 rounded-lg text-sm dark:bg-danger-500/10 dark:text-danger-400" x-text="error" style="display:none;"></div>
-                                                <div x-show="mapUrl" style="display:none;" class="flex flex-col items-center justify-center p-6 border rounded-xl shadow-sm dark:border-gray-700">
-                                                    <svg class="w-12 h-12 text-primary-500 mb-4" style="width: 3rem; height: 3rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                                                    <h3 class="text-lg font-bold text-gray-900 mb-2 dark:text-white">Rota Disponível</h3>
-                                                    <p class="text-sm text-gray-500 mb-4 text-center dark:text-gray-400">A rota entre a empresa e o cliente foi gerada.</p>
-                                                    <a :href="mapUrl" target="_blank" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg shadow-sm hover:bg-primary-700">
-                                                        Visualizar Rota no Mapa
-                                                    </a>
-                                                </div>
+                                        return new \Illuminate\Support\HtmlString('
+                                            <div class="flex flex-col items-center justify-center p-6 border rounded-xl shadow-sm dark:border-gray-700">
+                                                <svg class="w-12 h-12 text-primary-500 mb-4" style="width: 3rem; height: 3rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                <h3 class="text-lg font-bold text-gray-900 mb-2 dark:text-white">Rota via Google Maps</h3>
+                                                <p class="text-sm text-gray-500 mb-4 text-center dark:text-gray-400">Clique no botão abaixo para ver o trajeto exato até o cliente.</p>
+                                                <a href="'.$mapUrl.'" target="_blank" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                                                    Abrir no Google Maps
+                                                </a>
                                             </div>
                                         ');
                                     }),
