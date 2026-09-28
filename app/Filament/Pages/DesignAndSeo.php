@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\SettingResource\Pages;
+namespace App\Filament\Pages;
 
-use App\Filament\Resources\SettingResource;
+use App\Models\Setting;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
@@ -11,19 +11,35 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Pages\Page;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
 
-class EditWebsite extends EditRecord
+class DesignAndSeo extends Page implements HasForms
 {
-    protected static string $resource = SettingResource::class;
-
-    protected static ?string $navigationLabel = 'Website e SEO';
+    use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
-    public function getTitle(): string
+    protected static ?string $navigationGroup = 'Website';
+
+    protected static ?string $navigationLabel = 'Design e SEO';
+
+    protected static ?string $title = 'Design e SEO';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static string $view = 'filament.pages.design-and-seo';
+
+    public ?array $data = [];
+
+    public function mount(): void
     {
-        return 'Configurações do Website';
+        $setting = Setting::firstOrCreate(['id' => 1]);
+        $this->form->fill([
+            'settings' => $setting->settings,
+        ]);
     }
 
     public function form(Form $form): Form
@@ -208,12 +224,8 @@ class EditWebsite extends EditRecord
                             ->helperText('Scripts que devem ser carregados ao final da página.')
                             ->rows(4),
                     ]),
-            ]);
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [];
+            ])
+            ->statePath('data');
     }
 
     public function getSubheading(): ?string
@@ -221,16 +233,21 @@ class EditWebsite extends EditRecord
         return 'Configure as informações globais do site, SEO, scripts e menus de navegação.';
     }
 
-    protected function getRedirectUrl(): string
+    public function save(): void
     {
-        return static::getUrl(['record' => $this->getRecord()]);
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        $currentSettings = $this->getRecord()->settings ?? [];
-        $data['settings'] = array_replace_recursive($currentSettings, $data['settings']);
+        $data = $this->form->getState();
+        $setting = Setting::firstOrCreate(['id' => 1]);
         
-        return $data;
+        $currentSettings = $setting->settings ?? [];
+        $data['settings'] = array_replace_recursive($currentSettings, $data['settings'] ?? []);
+
+        $setting->update([
+            'settings' => $data['settings'],
+        ]);
+
+        Notification::make()
+            ->success()
+            ->title('Configurações salvas')
+            ->send();
     }
 }

@@ -28,7 +28,7 @@ class SettingResource extends Resource
 
     public static function getNavigationUrl(): string
     {
-        return Pages\EditWebsite::getUrl(['record' => 1]);
+        return Pages\EditCompany::getUrl(['record' => 1]);
     }
 
     public static function form(Form $form): Form
@@ -40,7 +40,6 @@ class SettingResource extends Resource
     public static function getRecordSubNavigation(Page $page): array
     {
         return $page->generateNavigationItems([
-            Pages\EditWebsite::class,
             Pages\EditCompany::class,
             Pages\EditSecurity::class,
         ]);
@@ -50,7 +49,6 @@ class SettingResource extends Resource
     {
         return [
             'index' => Pages\ListSettings::route('/'),
-            'website' => Pages\EditWebsite::route('/{record}/website'),
             'company' => Pages\EditCompany::route('/{record}/company'),
             'security' => Pages\EditSecurity::route('/{record}/security'),
         ];
