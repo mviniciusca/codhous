@@ -208,19 +208,19 @@
         <tr>
             <td style="width: 18%;">
                 <span class="label">Subtotal Itens</span>
-                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'subtotal', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">R$ {{ number_format(floatval(data_get($state['content'], 'subtotal', 0)), 2, ',', '.') }}</span>
             </td>
             <td style="width: 18%;">
                 <span class="label">Valor do Frete</span>
-                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">R$ {{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, ',', '.') }}</span>
             </td>
             <td style="width: 18%;">
                 <span class="label">Taxas / Outros</span>
-                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'tax', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">R$ {{ number_format(floatval(data_get($state['content'], 'tax', 0)), 2, ',', '.') }}</span>
             </td>
             <td style="width: 18%;">
                 <span class="label">(-) Desconto</span>
-                <span class="value text-right">{{ number_format(floatval(data_get($state['content'], 'discount', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">R$ {{ number_format(floatval(data_get($state['content'], 'discount', 0)), 2, ',', '.') }}</span>
             </td>
             <td style="width: 28%;" class="total-box">
                 <span class="label">Valor Total do Orçamento</span>
@@ -235,10 +235,7 @@
         <thead>
             <tr>
                 <th style="width: 10%;">Cód. Prod.</th>
-                <th style="width: 40%;">Descrição do Produto / Serviço</th>
-                <th style="width: 10%;">NCM/SH</th>
-                <th style="width: 5%;">CST</th>
-                <th style="width: 5%;">CFOP</th>
+                <th style="width: 60%;">Descrição do Produto / Serviço</th>
                 <th style="width: 5%;">UNID.</th>
                 <th style="width: 5%;">QTD.</th>
                 <th style="width: 10%;">V. UNIT.</th>
@@ -257,20 +254,14 @@
                         @if($item->productOption) ({{ $item->productOption->name }}) @endif
                         @if($item->location) - Local: {{ $item->location->name }} @endif
                     </td>
-                    <td class="text-center">0000.00.00</td>
-                    <td class="text-center">000</td>
-                    <td class="text-center">5102</td>
                     <td class="text-center">{{ $item->productOption?->unit?->value ?? 'UN' }}</td>
                     <td class="text-center">{{ number_format(ceil($item->quantity), 0, ',', '.') }}</td>
-                    <td class="text-right">{{ number_format($item->price, 2, '.', ',') }}</td>
-                    <td class="text-right">{{ number_format($item->subtotal, 2, '.', ',') }}</td>
+                    <td class="text-right">R$ {{ number_format((float)$item->price, 2, ',', '.') }}</td>
+                    <td class="text-right">R$ {{ number_format((float)$item->subtotal, 2, ',', '.') }}</td>
                 </tr>
             @endforeach
             @for($i = count($items); $i < 10; $i++)
                 <tr>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
@@ -286,16 +277,13 @@
     <div class="section-title">Dados Adicionais</div>
     <table>
         <tr>
-            <td style="width: 70%; height: 60px;">
+            <td style="width: 100%; height: 60px;">
                 <span class="label">Informações Complementares</span>
                 <span class="value" style="font-size: 7px;">
                     {{ $company->budget_information }}
                     <br><br>
                     <strong>OBSERVAÇÕES:</strong> {{ data_get($state['content'], 'observation', 'Nenhuma') }}
                 </span>
-            </td>
-            <td style="width: 30%;">
-                <span class="label">Reservado ao Fisco</span>
             </td>
         </tr>
     </table>
