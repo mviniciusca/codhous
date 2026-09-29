@@ -1,14 +1,15 @@
 <x-layouts.app 
     :title="$meta['title']" 
     :description="$meta['description']"
-    :headerTheme="data_get($page->meta, 'header_theme', 'default')"
-    :footerTheme="data_get($page->meta, 'footer_theme', 'default')"
 >
     @php
         $content = $page->content ?? [];
         $firstBlock = $content[0] ?? null;
         $hasHeader = collect($content)->contains('type', 'page_header');
         $isHome = $page->slug === '/' || $page->slug === '';
+        
+        $websiteSettings = \App\Models\Setting::get('website', []);
+        $pageTheme = data_get($websiteSettings, 'header_theme', 'default');
 
         // Dados base para o cabeçalho automático
         $autoHeader = [
@@ -41,6 +42,12 @@
     @endif
 
     @foreach($content as $block)
-        <x-render-block :type="$block['type']" :data="$block['data']" :page="$page" />
+        <x-render-block 
+            :type="$block['type']" 
+            :data="$block['data']" 
+            :page="$page" 
+            :theme="$pageTheme" 
+            :hide-header="(!$isHome && !$hasHeader && $loop->first)"
+        />
     @endforeach
 </x-layouts.app>

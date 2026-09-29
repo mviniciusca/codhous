@@ -46,6 +46,20 @@ class DesignAndSeo extends Page implements HasForms
     {
         return $form
             ->schema([
+                Section::make('Aparência / Temas Globais')
+                    ->icon('heroicon-o-swatch')
+                    ->description('Defina o layout e o tema base para todo o site (Cabeçalho, Rodapé e Hero).')
+                    ->schema([
+                        \Filament\Forms\Components\Select::make('settings.website.header_theme')
+                            ->label('Tema do Menu Superior (Header & Hero)')
+                            ->options(['default' => 'Padrão', 'corporate' => 'Corporativo', 'creative' => 'Criativo'])
+                            ->default('default'),
+                        \Filament\Forms\Components\Select::make('settings.website.footer_theme')
+                            ->label('Tema do Rodapé (Footer)')
+                            ->options(['default' => 'Padrão', 'corporate' => 'Corporativo (Escuro)', 'creative' => 'Criativo (Colorido)'])
+                            ->default('default'),
+                    ]),
+
                 Section::make('Identidade Visual')
                     ->icon('heroicon-o-photo')
                     ->description('Gerencie o logotipo da sua empresa.')

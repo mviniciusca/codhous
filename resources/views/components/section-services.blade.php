@@ -3,6 +3,7 @@
     'description' => null,
     'badge' => null,
     'items' => null,
+    'hideHeader' => false,
 ])
 
 @php
@@ -31,8 +32,8 @@
 
 <section id="servicos" class="bg-background py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        {{-- Só mostra o header se houver título ou badge --}}
-        @if(!empty($header['title']) || !empty($header['subtitle']))
+        {{-- Só mostra o header se houver título ou badge e se hideHeader for false --}}
+        @if(!$hideHeader && (!empty($header['title']) || !empty($header['subtitle'])))
             <div class="mb-12 max-w-2xl">
                 @if(!empty($header['subtitle']))
                     <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $header['subtitle'] }}</span>

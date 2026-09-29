@@ -7,6 +7,15 @@
     $websiteDescription = data_get($website, 'description', 'Excelência em concreto usinado e locação de equipamentos.');
     $scripts = data_get($website, 'scripts', []);
     $footerScripts = data_get($scripts, 'footer_scripts');
+
+    $navigation = data_get($website, 'navigation', []);
+    if (empty($navigation)) {
+        $dynamicPages = \App\Models\Page::visible()->inMenu()->orderBy('sort_order')->get();
+        $navigation   = $dynamicPages->map(fn ($p) => [
+            'label' => $p->title,
+            'url'   => $p->slug === '/' ? '/' : '/' . ltrim($p->slug, '/'),
+        ])->toArray();
+    }
     
     // Trade Name from resource
     $companyName = data_get($company, 'trade_name', 'ConcretoPro');
@@ -70,10 +79,10 @@
                     <span class="font-mono text-xl font-bold tracking-tighter">{{ $websiteName }}</span>
                 @endif
             </a>
-            <div class="flex gap-6 text-sm font-medium opacity-80">
-                <a href="#servicos" class="hover:opacity-100 transition-opacity">Serviços</a>
-                <a href="#orcamento" class="hover:opacity-100 transition-opacity">Orçamento</a>
-                <a href="/contato" class="hover:opacity-100 transition-opacity">Contato</a>
+            <div class="flex flex-wrap gap-6 text-sm font-medium opacity-80">
+                @foreach($navigation as $item)
+                    <a href="{{ data_get($item, 'url') }}" class="hover:opacity-100 transition-opacity">{{ data_get($item, 'label') }}</a>
+                @endforeach
             </div>
             <div class="flex gap-4">
                 @foreach($networks as $key => $iconName)
@@ -116,11 +125,11 @@
                 </div>
                 
                 <div>
-                    <h4 class="mb-6 font-mono text-sm font-bold text-white uppercase tracking-wider">Empresa</h4>
+                    <h4 class="mb-6 font-mono text-sm font-bold text-white uppercase tracking-wider">Navegação</h4>
                     <ul class="flex flex-col gap-3 text-sm">
-                        <li><a href="/sobre-nos" class="hover:text-primary transition-colors">Sobre Nós</a></li>
-                        <li><a href="#servicos" class="hover:text-primary transition-colors">Serviços B2B</a></li>
-                        <li><a href="/nossas-obras" class="hover:text-primary transition-colors">Portfólio</a></li>
+                        @foreach($navigation as $item)
+                            <li><a href="{{ data_get($item, 'url') }}" class="hover:text-primary transition-colors">{{ data_get($item, 'label') }}</a></li>
+                        @endforeach
                     </ul>
                 </div>
 
@@ -169,12 +178,11 @@
                 </div>
 
                 <div>
-                    <h4 class="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-foreground">Serviços</h4>
+                    <h4 class="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-foreground">Navegação</h4>
                     <ul class="flex flex-col gap-2 text-sm text-muted-foreground">
-                        <li><a href="#servicos" class="transition-colors hover:text-primary">Concreto Usinado</a></li>
-                        <li><a href="#servicos" class="transition-colors hover:text-primary">Bombeamento</a></li>
-                        <li><a href="#servicos" class="transition-colors hover:text-primary">Locação de Máquinas</a></li>
-                        <li><a href="#calculadora" class="transition-colors hover:text-primary">Calculadora de Volume</a></li>
+                        @foreach($navigation as $item)
+                            <li><a href="{{ data_get($item, 'url') }}" class="transition-colors hover:text-primary">{{ data_get($item, 'label') }}</a></li>
+                        @endforeach
                     </ul>
                 </div>
 

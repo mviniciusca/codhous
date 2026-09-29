@@ -13,10 +13,10 @@
 
 @if($theme === 'corporate')
     {{-- CORPORATE HERO: Split screen (Left: Content, Right: Slider) --}}
-    <section class="relative flex min-h-[80vh] flex-col lg:flex-row bg-white overflow-hidden">
+    <section class="relative min-h-[80vh] bg-white overflow-hidden flex flex-col lg:flex-row lg:items-center">
         {{-- Left Content --}}
-        <div class="relative z-20 flex flex-1 items-center justify-center px-4 py-16 lg:px-12 xl:px-24">
-            <div class="w-full max-w-xl">
+        <div class="mx-auto w-full max-w-7xl px-4 lg:px-8 relative z-20 flex-1 flex items-center pt-12 pb-8 lg:py-20">
+            <div class="w-full lg:w-1/2 lg:pr-12 xl:pr-16">
                 <div class="mb-8 inline-flex items-center gap-2 border-l-4 border-primary pl-4">
                     <span class="text-sm font-bold uppercase tracking-widest text-zinc-500">{{ $badge }}</span>
                 </div>
@@ -28,7 +28,11 @@
                 </p>
                 
                 <div class="mt-12 w-full">
-                    @include('livewire.partials.hero-cep-card')
+                    @if($isWhatsapp)
+                        @include('livewire.partials.hero-whatsapp-card')
+                    @else
+                        @include('livewire.partials.hero-cep-card')
+                    @endif
                 </div>
 
                 @if(!empty($stats))
@@ -45,7 +49,7 @@
         </div>
         
         {{-- Right Slider --}}
-        <div class="relative w-full flex-1 lg:w-1/2 min-h-[50vh] lg:min-h-full">
+        <div class="relative w-full h-[50vh] lg:h-auto lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 z-10">
             <div wire:ignore class="swiper hero-swiper h-full w-full absolute inset-0" x-data="{ initSwiper() { if (typeof Swiper !== 'undefined') { new Swiper($el, { loop: true, effect: 'fade', autoplay: { delay: 5000, disableOnInteraction: false }, speed: 1500 }); } } }" x-init="setTimeout(() => initSwiper(), 200)">
                 <div class="swiper-wrapper">
                     @forelse($slides as $slide)
@@ -106,7 +110,11 @@
             </p>
 
             <div class="mt-16 w-full max-w-lg rounded-3xl bg-white/10 p-6 backdrop-blur-xl border border-white/20 shadow-2xl">
-                @include('livewire.partials.hero-cep-card')
+                @if($isWhatsapp)
+                    @include('livewire.partials.hero-whatsapp-card')
+                @else
+                    @include('livewire.partials.hero-cep-card')
+                @endif
             </div>
         </div>
     </section>
@@ -205,9 +213,13 @@
                             </div>
                         @endif
                     </div>
-                    {{-- CEP card (sempre visível) --}}
+                    {{-- Card (WhatsApp ou CEP) --}}
                     <div class="w-full max-w-md">
-                        @include('livewire.partials.hero-cep-card')
+                        @if($isWhatsapp)
+                            @include('livewire.partials.hero-whatsapp-card')
+                        @else
+                            @include('livewire.partials.hero-cep-card')
+                        @endif
                     </div>
                 </div>
             @else
@@ -237,7 +249,11 @@
                         @endif
                     </div>
                     <div class="w-full max-w-md flex-shrink-0">
-                        @include('livewire.partials.hero-cep-card')
+                        @if($isWhatsapp)
+                            @include('livewire.partials.hero-whatsapp-card')
+                        @else
+                            @include('livewire.partials.hero-cep-card')
+                        @endif
                     </div>
                 </div>
             @endif

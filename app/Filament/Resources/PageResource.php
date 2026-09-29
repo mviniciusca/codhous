@@ -96,18 +96,6 @@ class PageResource extends Resource
                                     ->numeric()
                                     ->default(0),
                             ]),
-                        Forms\Components\Section::make(__('Aparência / Temas'))
-                            ->schema([
-                                Forms\Components\Select::make('meta.header_theme')
-                                    ->label('Tema do Menu Superior')
-                                    ->options(['default' => 'Padrão', 'corporate' => 'Corporativo', 'creative' => 'Criativo'])
-                                    ->default('default'),
-                                Forms\Components\Select::make('meta.footer_theme')
-                                    ->label('Tema do Rodapé')
-                                    ->options(['default' => 'Padrão', 'corporate' => 'Corporativo (Escuro)', 'creative' => 'Criativo (Colorido)'])
-                                    ->default('default'),
-                            ])->collapsed(),
-                        
                         Forms\Components\Section::make(__('SEO'))
                             ->schema([
                                 Forms\Components\Textarea::make('meta.description')
@@ -177,13 +165,6 @@ class PageResource extends Resource
                     ->options([
                         'default' => 'Padrão (Texto + CEP)',
                         'whatsapp' => 'WhatsApp (Texto Central)',
-                    ])->default('default'),
-                Forms\Components\Select::make('theme')
-                    ->label('Tema Visual')
-                    ->options([
-                        'default' => 'Padrão',
-                        'corporate' => 'Corporativo',
-                        'creative' => 'Criativo',
                     ])->default('default'),
                 Forms\Components\TextInput::make('badge')->label('Texto do Badge'),
                 Forms\Components\Repeater::make('slides')

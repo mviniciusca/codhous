@@ -1,4 +1,4 @@
-@props(['type', 'data', 'page' => null])
+@props(['type', 'data', 'page' => null, 'theme' => 'default', 'hideHeader' => false])
 
 @php
     $isHome = $page ? ($page->slug === '/' || $page->slug === '') : false;
@@ -10,7 +10,7 @@
             $section = \App\Models\ContentSection::find($data['content_section_id']);
         @endphp
         @if($section)
-            <x-render-block :type="$section->type" :data="$section->content" :page="$page" />
+            <x-render-block :type="$section->type" :data="$section->content" :page="$page" :theme="$theme" />
         @endif
         @break
 
@@ -29,7 +29,7 @@
             :main-slide="($data['slideshow'][0] ?? $data['slides'][0]) ?? []"
             :badge="$data['badge'] ?? ''"
             :layout="$data['layout'] ?? 'default'"
-            :theme="$data['theme'] ?? 'default'"
+            :theme="$theme"
             :stats="$data['stats'] ?? []"
         />
         @break
@@ -71,6 +71,7 @@
             :badge="$data['header']['subtitle'] ?? $data['badge'] ?? null"
             :description="$data['header']['description'] ?? $data['description'] ?? null"
             :items="$data['items'] ?? []"
+            :hide-header="$hideHeader"
         />
         @break
 

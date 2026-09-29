@@ -2,8 +2,6 @@
     'title' => null,
     'description' => null,
     'meta' => null,
-    'headerTheme' => 'default',
-    'footerTheme' => 'default',
 ])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
@@ -14,6 +12,8 @@
     @php
         $websiteSettings = \App\Models\Setting::get('website', []);
         $primaryColor = data_get($websiteSettings, 'primary_color', '239 68 68');
+        $headerTheme = data_get($websiteSettings, 'header_theme', 'default');
+        $footerTheme = data_get($websiteSettings, 'footer_theme', 'default');
     @endphp
     <style>
         :root {
