@@ -29,7 +29,31 @@
             :main-slide="($data['slideshow'][0] ?? $data['slides'][0]) ?? []"
             :badge="$data['badge'] ?? ''"
             :layout="$data['layout'] ?? 'default'"
+            :theme="$data['theme'] ?? 'default'"
             :stats="$data['stats'] ?? []"
+        />
+        @break
+
+    @case('hero_simple')
+        <x-hero-simple
+            :title="$data['title'] ?? ''"
+            :subtitle="$data['subtitle'] ?? ''"
+            :image="$data['image'] ?? null"
+            :primary-button-label="$data['primaryButtonLabel'] ?? null"
+            :primary-button-url="$data['primaryButtonUrl'] ?? null"
+            :secondary-button-label="$data['secondaryButtonLabel'] ?? null"
+            :secondary-button-url="$data['secondaryButtonUrl'] ?? null"
+        />
+        @break
+
+    @case('hero_split')
+        <x-hero-split
+            :title="$data['title'] ?? ''"
+            :subtitle="$data['subtitle'] ?? ''"
+            :image="$data['image'] ?? null"
+            :features="$data['features'] ?? []"
+            :button-label="$data['buttonLabel'] ?? null"
+            :button-url="$data['buttonUrl'] ?? null"
         />
         @break
 

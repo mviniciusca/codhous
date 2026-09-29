@@ -8,15 +8,21 @@
     if (empty($whatsappNumber)) {
         $whatsappNumber = '5511999999999';
     }
+
+    $isLight = isset($theme) && $theme === 'corporate';
+    $cardBg = $isLight ? 'bg-zinc-50 border-zinc-200 shadow-sm' : 'border-background/10 bg-background/5 backdrop-blur-sm';
+    $titleColor = $isLight ? 'text-zinc-900' : 'text-background';
+    $subtitleColor = $isLight ? 'text-zinc-500' : 'text-background/50';
+    $bottomTextColor = $isLight ? 'text-zinc-400' : 'text-background/40';
 @endphp
-<div class="rounded-xl border border-background/10 bg-background/5 p-8 backdrop-blur-sm">
+<div class="rounded-xl border p-8 {{ $cardBg }}">
     <div class="mb-6 flex items-center gap-3">
         <div wire:ignore class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
             <i data-lucide="map-pin" class="h-5 w-5 text-primary"></i>
         </div>
         <div>
-            <h3 class="font-mono text-lg font-bold text-background">Atendemos sua região?</h3>
-            <p class="text-xs text-background/50">Digite o CEP da obra para verificar</p>
+            <h3 class="font-mono text-lg font-bold {{ $titleColor }}">Atendemos sua região?</h3>
+            <p class="text-xs {{ $subtitleColor }}">Digite o CEP da obra para verificar</p>
         </div>
     </div>
 
@@ -31,7 +37,7 @@
                     inputmode="numeric"
                     maxlength="9"
                     placeholder="00000-000"
-                    class="flex-1 text-lg font-mono"
+                    class="flex-1 text-lg font-mono bg-white text-zinc-900"
                 />
                 <button
                     wire:click="lookupCep"
@@ -59,7 +65,7 @@
                     <span wire:ignore class="flex items-center justify-center"><i data-lucide="check-circle" class="h-5 w-5 text-primary"></i></span>
                     <span class="font-semibold text-primary text-sm">Atendemos sua região!</span>
                 </div>
-                <p class="text-sm text-background/70">{{ $addressText }}</p>
+                <p class="text-sm {{ $titleColor }} opacity-80">{{ $addressText }}</p>
             </div>
             <div class="mt-4 flex flex-col gap-3">
                 <a id="hero-whatsapp-link" href="https://wa.me/{{ $whatsappNumber }}?text=Ol%C3%A1!%20Verifiquei%20que%20voc%C3%AAs%20atendem%20minha%20regi%C3%A3o%20({{ $cep }}).%20Preciso%20de%20concreto%20usinado%20para%20minha%20obra." target="_blank" rel="noopener noreferrer"
@@ -72,18 +78,18 @@
                     <span wire:ignore class="flex items-center justify-center"><i data-lucide="arrow-right" class="h-4 w-4"></i></span>
                 </a>
             </div>
-            <button wire:click="resetCepForm" class="mt-3 w-full text-center text-xs text-background/40 transition-colors hover:text-background/60">
+            <button wire:click="resetCepForm" class="mt-3 w-full text-center text-xs {{ $bottomTextColor }} transition-colors hover:opacity-100">
                 Consultar outro CEP
             </button>
         </div>
     @endif
 
-    <div class="mt-6 flex items-center gap-4 border-t border-background/10 pt-5">
-        <div class="flex items-center gap-1.5 text-xs text-background/40">
+    <div class="mt-6 flex items-center gap-4 border-t border-zinc-200/20 pt-5">
+        <div class="flex items-center gap-1.5 text-xs {{ $bottomTextColor }}">
             <span wire:ignore class="flex items-center justify-center"><i data-lucide="shield-check" class="h-3.5 w-3.5 text-primary/60"></i></span>
             Consulta gratuita
         </div>
-        <div class="flex items-center gap-1.5 text-xs text-background/40">
+        <div class="flex items-center gap-1.5 text-xs {{ $bottomTextColor }}">
             <span wire:ignore class="flex items-center justify-center"><i data-lucide="clock" class="h-3.5 w-3.5 text-primary/60"></i></span>
             Resposta em minutos
         </div>

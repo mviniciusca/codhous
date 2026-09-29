@@ -1,4 +1,9 @@
-<x-layouts.app :title="$meta['title']" :description="$meta['description']">
+<x-layouts.app 
+    :title="$meta['title']" 
+    :description="$meta['description']"
+    :headerTheme="data_get($page->meta, 'header_theme', 'default')"
+    :footerTheme="data_get($page->meta, 'footer_theme', 'default')"
+>
     @php
         $content = $page->content ?? [];
         $firstBlock = $content[0] ?? null;

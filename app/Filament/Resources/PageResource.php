@@ -50,6 +50,8 @@ class PageResource extends Resource
                                         ->blocks([
                                             self::getPageHeaderBlock(),
                                             self::getHeroBlock(),
+                                            self::getHeroSimpleBlock(),
+                                            self::getHeroSplitBlock(),
                                             self::getCalculatorBlock(),
                                             self::getBudgetFormBlock(),
                                             self::getPartnersBlock(),
@@ -94,6 +96,17 @@ class PageResource extends Resource
                                     ->numeric()
                                     ->default(0),
                             ]),
+                        Forms\Components\Section::make(__('Aparência / Temas'))
+                            ->schema([
+                                Forms\Components\Select::make('meta.header_theme')
+                                    ->label('Tema do Menu Superior')
+                                    ->options(['default' => 'Padrão', 'corporate' => 'Corporativo', 'creative' => 'Criativo'])
+                                    ->default('default'),
+                                Forms\Components\Select::make('meta.footer_theme')
+                                    ->label('Tema do Rodapé')
+                                    ->options(['default' => 'Padrão', 'corporate' => 'Corporativo (Escuro)', 'creative' => 'Criativo (Colorido)'])
+                                    ->default('default'),
+                            ])->collapsed(),
                         
                         Forms\Components\Section::make(__('SEO'))
                             ->schema([
@@ -157,13 +170,20 @@ class PageResource extends Resource
     protected static function getHeroBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('hero')
-            ->label(__('Hero (Destaque Principal)'))
+            ->label(__('Hero (Destaque + CEP)'))
             ->icon('heroicon-o-presentation-chart-line')
             ->schema([
                 Forms\Components\Select::make('layout')
                     ->options([
                         'default' => 'Padrão (Texto + CEP)',
                         'whatsapp' => 'WhatsApp (Texto Central)',
+                    ])->default('default'),
+                Forms\Components\Select::make('theme')
+                    ->label('Tema Visual')
+                    ->options([
+                        'default' => 'Padrão',
+                        'corporate' => 'Corporativo',
+                        'creative' => 'Criativo',
                     ])->default('default'),
                 Forms\Components\TextInput::make('badge')->label('Texto do Badge'),
                 Forms\Components\Repeater::make('slides')
@@ -177,6 +197,41 @@ class PageResource extends Resource
                         Forms\Components\TextInput::make('value')->required(),
                         Forms\Components\TextInput::make('label')->required(),
                     ])->columns(2),
+            ]);
+    }
+
+    protected static function getHeroSimpleBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('hero_simple')
+            ->label(__('Hero (Simples/Clean)'))
+            ->icon('heroicon-o-photo')
+            ->schema([
+                Forms\Components\TextInput::make('title')->required()->label('Título'),
+                Forms\Components\Textarea::make('subtitle')->label('Subtítulo'),
+                Forms\Components\FileUpload::make('image')->image()->directory('hero')->label('Imagem de Fundo'),
+                Forms\Components\TextInput::make('primaryButtonLabel')->label('Botão Primário (Texto)'),
+                Forms\Components\TextInput::make('primaryButtonUrl')->label('Botão Primário (URL)'),
+                Forms\Components\TextInput::make('secondaryButtonLabel')->label('Botão Secundário (Texto)'),
+                Forms\Components\TextInput::make('secondaryButtonUrl')->label('Botão Secundário (URL)'),
+            ]);
+    }
+
+    protected static function getHeroSplitBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('hero_split')
+            ->label(__('Hero (Split 50/50)'))
+            ->icon('heroicon-o-view-columns')
+            ->schema([
+                Forms\Components\TextInput::make('title')->required()->label('Título'),
+                Forms\Components\Textarea::make('subtitle')->label('Subtítulo'),
+                Forms\Components\FileUpload::make('image')->image()->directory('hero')->label('Imagem Lateral'),
+                Forms\Components\Repeater::make('features')
+                    ->label('Tópicos (Lista)')
+                    ->schema([
+                        Forms\Components\TextInput::make('item')->required()->label('Texto do tópico'),
+                    ]),
+                Forms\Components\TextInput::make('buttonLabel')->label('Botão (Texto)'),
+                Forms\Components\TextInput::make('buttonUrl')->label('Botão (URL)'),
             ]);
     }
 

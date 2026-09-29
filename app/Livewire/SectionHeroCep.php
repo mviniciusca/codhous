@@ -23,6 +23,9 @@ class SectionHeroCep extends Component
     /** Layout: default (texto + CEP lado a lado) | whatsapp (destaque central + CEP abaixo) */
     public string $layout = 'default';
 
+    /** Tema: default, corporate, creative */
+    public string $theme = 'default';
+
     /** Estatísticas exibidas na hero (value + label) */
     public array $stats = [];
 
@@ -103,6 +106,7 @@ class SectionHeroCep extends Component
             'mainSlide' => $mainSlide,
             'badge' => $this->badge ?: 'Qualidade Certificada',
             'layout' => $this->layout ?: 'default',
+            'theme' => $this->theme ?: 'default',
             'stats' => $stats,
         ]);
     }
