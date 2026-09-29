@@ -47,6 +47,7 @@ class Budget extends Component implements HasForms
     public function form(Form $form): Form
     {
         return $form
+            ->model(BudgetModel::class)
             ->schema([
                 Hidden::make('code')->default(fn () => BudgetModel::generateUniqueCode()),
                 Hidden::make('content.price'),
@@ -214,6 +215,23 @@ class Budget extends Component implements HasForms
                                         ->cloneable()
                                         ->collapsible(),
                                 ])->collapsible(),
+
+                            Section::make('4. Fotos do Local (Opcional)')
+                                ->description('Envie fotos da obra ou do local para ajudar no orçamento.')
+                                ->icon('heroicon-o-camera')
+                                ->extraAttributes(['class' => 'shadow-none'])
+                                ->visible(fn (Get $get) => filled($get('content.street')))
+                                ->schema([
+                                    \Filament\Forms\Components\FileUpload::make('content.photos')
+                                        ->label('Fotos')
+                                        ->image()
+                                        ->multiple()
+                                        ->maxFiles(4)
+                                        ->maxSize(4096)
+                                        ->disk('public')
+                                        ->directory('budget-documents')
+                                        ->panelLayout('grid')
+                                ]),
                         ])->columnSpan(8),
 
                         // Coluna da Direita (Resumo / Checkout Sidebar)
@@ -281,6 +299,21 @@ class Budget extends Component implements HasForms
                 'price' => $req['price'] ?? 0,
                 'subtotal' => $req['subtotal'] ?? 0,
             ]);
+        }
+
+        if (!empty($state['content']['photos'])) {
+            foreach ($state['content']['photos'] as $index => $photoPath) {
+                $fullPath = storage_path('app/public/' . $photoPath);
+                $budget->documents()->create([
+                    'title' => 'Foto do Local (Anexo ' . ($index + 1) . ')',
+                    'description' => 'Foto recebida via formulário de orçamento.',
+                    'file_path' => $photoPath,
+                    'file_name' => basename($photoPath),
+                    'file_size' => file_exists($fullPath) ? filesize($fullPath) : 0,
+                    'file_type' => file_exists($fullPath) ? mime_content_type($fullPath) : 'image/jpeg',
+                    'uploaded_by' => null,
+                ]);
+            }
         }
 
         \Illuminate\Support\Facades\Mail::to(User::first()?->email ?? config('mail.from.address'))

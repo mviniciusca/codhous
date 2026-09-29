@@ -27,7 +27,8 @@ class DocumentsRelationManager extends RelationManager
                     ->required()
                     ->label('Título')
                     ->helperText('Título ou identificador do documento')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
                 Forms\Components\Textarea::make('description')
                     ->label('Descrição')
                     ->helperText('Descrição opcional sobre este documento')
@@ -71,20 +72,16 @@ class DocumentsRelationManager extends RelationManager
             ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Título')
+                    ->label('Documento')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
-                Tables\Columns\TextColumn::make('description')
-                    ->label('Descrição')
-                    ->limit(50)
-                    ->searchable()
-                    ->toggleable(),
+                    ->weight('bold')
+                    ->description(fn (\App\Models\BudgetDocument $record): ?string => $record->description ? \Illuminate\Support\Str::limit($record->description, 50) : null),
                 Tables\Columns\TextColumn::make('file_name')
                     ->label('Nome do Arquivo')
                     ->searchable()
                     ->icon('heroicon-o-document')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('file_type')
                     ->label('Tipo')
                     ->badge()
@@ -109,12 +106,12 @@ class DocumentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('uploader.name')
                     ->label('Enviado por')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Data de Upload')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -122,6 +119,9 @@ class DocumentsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->label('Enviar Documento')
+                    ->modalHeading('Enviar Documento')
+                    ->modalSubmitActionLabel('Enviar')
+                    ->modalCancelActionLabel('Cancelar')
                     ->icon('heroicon-o-arrow-up-tray')
                     ->mutateFormDataUsing(function (array $data): array {
                         // Ensure uploaded_by is set
@@ -163,10 +163,16 @@ class DocumentsRelationManager extends RelationManager
                         ->url(fn ($record) => $record->getDownloadUrl())
                         ->openUrlInNewTab()
                         ->visible(fn ($record) => $record->fileExists()),
-                    Tables\Actions\EditAction::make()
-                        ->label('Editar'),
+                    Tables\Actions\ViewAction::make()
+                        ->label('Detalhes')
+                        ->icon('heroicon-o-information-circle')
+                        ->modalHeading('Detalhes do Documento')
+                        ->modalCancelAction(fn ($action) => $action->label('Fechar')),
                     Tables\Actions\DeleteAction::make()
                         ->label('Excluir')
+                        ->modalHeading('Excluir Documento')
+                        ->modalSubmitActionLabel('Excluir')
+                        ->modalCancelActionLabel('Cancelar')
                         ->after(function () {
                             Notification::make()
                                 ->title('Documento excluído com sucesso')

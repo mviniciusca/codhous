@@ -100,6 +100,8 @@ class BudgetResource extends Resource
                             ->label('Ativo')
                             ->default(true)
                             ->inline(false)
+                            ->onIcon('heroicon-m-check')
+                            ->offIcon('heroicon-m-x-mark')
                             ->helperText('Visibilidade.')
                             ->columnSpan([
                                 'default' => 12,
@@ -353,7 +355,7 @@ class BudgetResource extends Resource
                                                     ->afterStateUpdated(function (Set $set, $state) {
                                                         if ($state) {
                                                             $option = \App\Models\ProductOption::find($state);
-                                                            $set('price', $option?->price ?? 0);
+                                                            $set('price', number_format($option?->price ?? 0, 2, ',', '.'));
                                                         }
                                                     })
                                                     ->searchable(),
@@ -371,20 +373,22 @@ class BudgetResource extends Resource
                                                     ->afterStateUpdated(fn (Set $set, $state) => $set('quantity', ceil(floatval($state ?? 1)))),
                                                 TextInput::make('price')
                                                     ->label('Preço Unit.')
-                                                    ->numeric()
                                                     ->prefix('R$')
+                                                    ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                                                    ->stripCharacters('.')
+                                                    ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state)))
                                                     ->required()
                                                     ->dehydrated()
                                                     ->disabled()
                                                     ->reactive()
-                                                    ->columnSpan(4)
-                                                    ->step(0.01),
+                                                    ->columnSpan(4),
                                                 Placeholder::make('total_item')
                                                     ->label('Total Item')
                                                     ->columnSpan(4)
                                                     ->content(function (Get $get) {
                                                         $qty = ceil(floatval($get('quantity') ?? 0));
-                                                        $price = floatval($get('price') ?? 0);
+                                                        $rawPrice = $get('price') ?? 0;
+                                                        $price = is_numeric($rawPrice) ? floatval($rawPrice) : floatval(str_replace(',', '.', str_replace('.', '', (string) $rawPrice)));
                                                         return 'R$ ' . number_format($qty * $price, 2, ',', '.');
                                                     }),
                                             ]),
@@ -404,21 +408,23 @@ class BudgetResource extends Resource
                                             ->live(debounce: 1000)
                                             ->dehydrated()
                                             ->readonly()
-                                            ->extraInputAttributes(['style' => 'background-color: #f3f4f6; cursor: not-allowed;'])
+                                            ->extraInputAttributes(['style' => 'cursor: not-allowed;'])
                                             ->label('Subtotal de Itens')
                                             ->helperText('Soma dos itens acima.')
                                             ->prefix('R$')
-                                            ->numeric()
-                                            ->step(0.01),
+                                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                                            ->stripCharacters('.')
+                                            ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state))),
                                         TextInput::make('content.shipping')
                                             ->label('Frete')
                                             ->live(debounce: 1000)
                                             ->dehydrated()
                                             ->prefix('+ R$')
-                                            ->numeric()
+                                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                                            ->stripCharacters('.')
+                                            ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state)))
                                             ->required()
                                             ->default(0)
-                                            ->step(0.01)
                                             ->helperText('Custo de deslocamento.')
                                             ->afterStateUpdated(function (Get $get, Set $set) {
                                                 self::calculateTotalFromRepeater($get, $set);
@@ -428,10 +434,11 @@ class BudgetResource extends Resource
                                             ->live(debounce: 1000)
                                             ->dehydrated()
                                             ->prefix('+ R$')
-                                            ->numeric()
+                                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                                            ->stripCharacters('.')
+                                            ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state)))
                                             ->required()
                                             ->default(0)
-                                            ->step(0.01)
                                             ->helperText('Serviços extras ou taxas.')
                                             ->afterStateUpdated(function (Get $get, Set $set) {
                                                 self::calculateTotalFromRepeater($get, $set);
@@ -440,10 +447,11 @@ class BudgetResource extends Resource
                                             ->label('Desconto')
                                             ->live(debounce: 1000)
                                             ->dehydrated()
-                                            ->numeric()
+                                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                                            ->stripCharacters('.')
+                                            ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state)))
                                             ->required()
                                             ->prefix('- R$')
-                                            ->step(0.01)
                                             ->helperText('Valor a subtrair.')
                                             ->afterStateUpdated(function (Get $get, Set $set) {
                                                 self::calculateTotalFromRepeater($get, $set);
@@ -453,11 +461,12 @@ class BudgetResource extends Resource
                                             ->live()
                                             ->dehydrated()
                                             ->readonly()
-                                            ->extraInputAttributes(['style' => 'background-color: #f3f4f6; cursor: not-allowed;'])
-                                            ->numeric()
+                                            ->extraInputAttributes(['style' => 'cursor: not-allowed;'])
+                                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                                            ->stripCharacters('.')
+                                            ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state)))
                                             ->required()
                                             ->prefix('R$')
-                                            ->step(0.01)
                                             ->helperText('Valor final do orçamento.'),
                                     ]),
                             ]),
@@ -879,17 +888,18 @@ class BudgetResource extends Resource
 
         foreach ($items as $item) {
             $qty = floatval($item['quantity'] ?? 0);
-            $price = floatval($item['price'] ?? 0);
+            $rawPrice = $item['price'] ?? 0;
+            $price = is_numeric($rawPrice) ? floatval($rawPrice) : floatval(str_replace(',', '.', str_replace('.', '', (string) $rawPrice)));
             $subtotal += ($qty * $price);
         }
 
-        $shipping = floatval($get('content.shipping') ?? 0);
-        $tax = floatval($get('content.tax') ?? 0);
-        $discount = floatval($get('content.discount') ?? 0);
+        $shipping = is_numeric($get('content.shipping')) ? floatval($get('content.shipping')) : floatval(str_replace(',', '.', str_replace('.', '', (string)($get('content.shipping') ?? 0))));
+        $tax = is_numeric($get('content.tax')) ? floatval($get('content.tax')) : floatval(str_replace(',', '.', str_replace('.', '', (string)($get('content.tax') ?? 0))));
+        $discount = is_numeric($get('content.discount')) ? floatval($get('content.discount')) : floatval(str_replace(',', '.', str_replace('.', '', (string)($get('content.discount') ?? 0))));
         $total = $subtotal + $shipping + $tax - $discount;
 
-        $set('content.subtotal', round($subtotal, 2));
-        $set('content.total', round($total, 2));
+        $set('content.subtotal', number_format($subtotal, 2, ',', '.'));
+        $set('content.total', number_format($total, 2, ',', '.'));
     }
 
     public static function calculateTotal(Get $get, Set $set): void
