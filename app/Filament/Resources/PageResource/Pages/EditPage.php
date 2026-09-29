@@ -18,6 +18,17 @@ class EditPage extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('view')
+                ->label('Ver página')
+                ->url(fn ($record) => url($record->slug === 'home' || $record->slug === 'index' ? '/' : '/' . $record->slug))
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-eye')
+                ->color('gray'),
+            Actions\Action::make('save')
+                ->label('Salvar')
+                ->action('save')
+                ->color('primary')
+                ->icon('heroicon-o-check'),
             Actions\DeleteAction::make(),
         ];
     }

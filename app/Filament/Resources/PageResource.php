@@ -41,68 +41,105 @@ class PageResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Group::make()
-                    ->schema([
-                        Forms\Components\Section::make(__('Conteúdo da Página'))
-                            ->schema([
-                                Forms\Components\Builder::make('content')
-                                    ->label(__('Blocos de Conteúdo'))
-                                        ->blocks([
-                                            self::getPageHeaderBlock(),
-                                            self::getHeroBlock(),
-                                            self::getHeroSimpleBlock(),
-                                            self::getHeroSplitBlock(),
-                                            self::getCalculatorBlock(),
-                                            self::getBudgetFormBlock(),
-                                            self::getPartnersBlock(),
-                                            self::getServicesBlock(),
-                                            self::getTimelineBlock(),
-                                            self::getShowcaseBlock(),
-                                            self::getFaqBlock(),
-                                            self::getTestimonialsBlock(),
-                                            self::getCoverageBlock(),
-                                            self::getContactFormBlock(),
-                                            self::getContactBannerBlock(),
-                                            self::getMapBlock(),
-                                            self::getDifferentialsBlock(),
-                                            self::getCtaBlock(),
-                                            self::getRichTextBlock(),
-                                            self::getModuleReferenceBlock(),
-                                        ])
-                                    ->collapsible()
-                                    ->collapsed(),
-                            ]),
-                    ])->columnSpan(['lg' => 2]),
+                Forms\Components\Wizard::make([
+                    Forms\Components\Wizard\Step::make('Conteúdo')
+                        ->description('Construa o conteúdo da sua página')
+                        ->icon('heroicon-o-document-text')
+                        ->schema([
+                            Forms\Components\Builder::make('content')
+                                ->label('')
+                                ->addActionLabel(__('Adicionar Novo Bloco'))
+                                ->blocks([
+                                    self::getPageHeaderBlock(),
+                                    self::getHeroBlock(),
+                                    self::getHeroSimpleBlock(),
+                                    self::getHeroSplitBlock(),
+                                    self::getCalculatorBlock(),
+                                    self::getBudgetFormBlock(),
+                                    self::getPartnersBlock(),
+                                    self::getServicesBlock(),
+                                    self::getTimelineBlock(),
+                                    self::getShowcaseBlock(),
+                                    self::getFaqBlock(),
+                                    self::getTestimonialsBlock(),
+                                    self::getCoverageBlock(),
+                                    self::getContactFormBlock(),
+                                    self::getContactBannerBlock(),
+                                    self::getMapBlock(),
+                                    self::getDifferentialsBlock(),
+                                    self::getCtaBlock(),
+                                    self::getRichTextBlock(),
+                                    self::getModuleReferenceBlock(),
+                                ])
+                                ->collapsible()
+                                ->collapsed()
+                                ->cloneable()
+                                ->blockPickerColumns(2)
+                                ->blockNumbers(false),
+                        ]),
 
-                Forms\Components\Group::make()
-                    ->schema([
-                        Forms\Components\Section::make(__('Configurações'))
-                            ->schema([
-                                Forms\Components\TextInput::make('title')
-                                    ->label(__('Título da Página'))
-                                    ->required()
-                                    ->lazy()
-                                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                                Forms\Components\TextInput::make('slug')
-                                    ->label(__('Slug'))
-                                    ->required()
-                                    ->unique(ignoreRecord: true),
+                    Forms\Components\Wizard\Step::make('Configurações e SEO')
+                        ->description('Configure a página para os motores de busca')
+                        ->icon('heroicon-o-cog-6-tooth')
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\Section::make(__('Configurações Básicas'))
+                                        ->description(__('Informações essenciais para a publicação e identificação da página.'))
+                                        ->icon('heroicon-o-adjustments-horizontal')
+                                        ->schema([
+                                            Forms\Components\TextInput::make('title')
+                                                ->label(__('Título da Página'))
+                                                ->helperText(__('O título principal que aparecerá na guia do navegador e nos resultados de busca.'))
+                                                ->required()
+                                                ->lazy()
+                                                ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
+                                            Forms\Components\TextInput::make('slug')
+                                                ->label(__('Slug (URL)'))
+                                                ->helperText(__('O caminho da URL para esta página (ex: /sobre-nos).'))
+                                                ->required()
+                                                ->unique(ignoreRecord: true),
+                                            Forms\Components\Grid::make(2)
+                                                ->schema([
+                                                    Forms\Components\Toggle::make('is_visible')
+                                                        ->label(__('Publicar Página'))
+                                                        ->helperText(__('Ative para tornar esta página pública.'))
+                                                        ->onIcon('heroicon-m-check')
+                                                        ->default(true),
+                                                    Forms\Components\TextInput::make('sort_order')
+                                                        ->label(__('Ordem'))
+                                                        ->helperText(__('Ordem de exibição em menus.'))
+                                                        ->numeric()
+                                                        ->default(0),
+                                                ]),
+                                        ])->columnSpan(1),
 
-                                Forms\Components\Toggle::make('is_visible')
-                                    ->label(__('Página Visível'))
-                                    ->default(true),
-                                Forms\Components\TextInput::make('sort_order')
-                                    ->label(__('Ordem'))
-                                    ->numeric()
-                                    ->default(0),
-                            ]),
-                        Forms\Components\Section::make(__('SEO'))
-                            ->schema([
-                                Forms\Components\Textarea::make('meta.description')
-                                    ->label(__('Meta Descrição')),
-                            ])->collapsed(),
-                    ])->columnSpan(['lg' => 1]),
-            ])->columns(3);
+                                    Forms\Components\Section::make(__('Otimização de Busca (SEO)'))
+                                        ->description(__('Ajustes finos para melhorar o ranqueamento no Google e redes sociais.'))
+                                        ->icon('heroicon-o-magnifying-glass-circle')
+                                        ->schema([
+                                            Forms\Components\TextInput::make('meta.title')
+                                                ->label(__('Título SEO (Opcional)'))
+                                                ->helperText(__('Se deixado em branco, será usado o Título da Página.')),
+                                            Forms\Components\Textarea::make('meta.description')
+                                                ->label(__('Meta Descrição'))
+                                                ->helperText(__('Resumo exibido nos resultados do Google. Recomendado até 160 caracteres.'))
+                                                ->rows(3),
+                                            Forms\Components\TextInput::make('meta.keywords')
+                                                ->label(__('Palavras-chave'))
+                                                ->helperText(__('Ex: serviços, produtos, empresa. Separadas por vírgula.')),
+                                            Forms\Components\FileUpload::make('meta.og_image')
+                                                ->label(__('Imagem de Compartilhamento (OG Image)'))
+                                                ->helperText(__('Imagem que aparecerá ao compartilhar a URL no WhatsApp, Facebook, etc.'))
+                                                ->image()
+                                                ->directory('seo'),
+                                        ])->columnSpan(1),
+                                ]),
+                        ]),
+                ])
+                ->skippable()
+                ->columnSpanFull()
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -162,21 +199,27 @@ class PageResource extends Resource
             ->icon('heroicon-o-presentation-chart-line')
             ->schema([
                 Forms\Components\Select::make('layout')
+                    ->label(__('Layout'))
+                    ->helperText(__('Escolha o estilo de exibição deste destaque.'))
                     ->options([
                         'default' => 'Padrão (Texto + CEP)',
                         'whatsapp' => 'WhatsApp (Texto Central)',
                     ])->default('default'),
-                Forms\Components\TextInput::make('badge')->label('Texto do Badge'),
+                Forms\Components\TextInput::make('badge')->label(__('Texto do Badge'))->helperText(__('Pequeno texto de destaque acima do título.')),
                 Forms\Components\Repeater::make('slides')
+                    ->label(__('Slides'))
+                    ->helperText(__('Adicione as imagens e textos para o carrossel.'))
                     ->schema([
-                        Forms\Components\TextInput::make('title')->required(),
-                        Forms\Components\Textarea::make('subtitle'),
-                        Forms\Components\FileUpload::make('image')->image()->directory('hero'),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal do slide.'))->required(),
+                        Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto de apoio do slide.')),
+                        Forms\Components\FileUpload::make('image')->label(__('Imagem'))->helperText(__('Imagem de fundo do slide.'))->image()->directory('hero'),
                     ])->minItems(1),
                 Forms\Components\Repeater::make('stats')
+                    ->label(__('Estatísticas'))
+                    ->helperText(__('Adicione números importantes (ex: +500 Projetos).'))
                     ->schema([
-                        Forms\Components\TextInput::make('value')->required(),
-                        Forms\Components\TextInput::make('label')->required(),
+                        Forms\Components\TextInput::make('value')->label(__('Valor'))->helperText(__('Ex: +500'))->required(),
+                        Forms\Components\TextInput::make('label')->label(__('Rótulo'))->helperText(__('Ex: Projetos entregues'))->required(),
                     ])->columns(2),
             ]);
     }
@@ -187,13 +230,13 @@ class PageResource extends Resource
             ->label(__('Hero (Simples/Clean)'))
             ->icon('heroicon-o-photo')
             ->schema([
-                Forms\Components\TextInput::make('title')->required()->label('Título'),
-                Forms\Components\Textarea::make('subtitle')->label('Subtítulo'),
-                Forms\Components\FileUpload::make('image')->image()->directory('hero')->label('Imagem de Fundo'),
-                Forms\Components\TextInput::make('primaryButtonLabel')->label('Botão Primário (Texto)'),
-                Forms\Components\TextInput::make('primaryButtonUrl')->label('Botão Primário (URL)'),
-                Forms\Components\TextInput::make('secondaryButtonLabel')->label('Botão Secundário (Texto)'),
-                Forms\Components\TextInput::make('secondaryButtonUrl')->label('Botão Secundário (URL)'),
+                Forms\Components\TextInput::make('title')->required()->label(__('Título'))->helperText(__('Título em destaque principal.')),
+                Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Breve descrição ou chamada de apoio.')),
+                Forms\Components\FileUpload::make('image')->image()->directory('hero')->label(__('Imagem de Fundo'))->helperText(__('Imagem que cobrirá a seção inteira.')),
+                Forms\Components\TextInput::make('primaryButtonLabel')->label(__('Botão Primário (Texto)'))->helperText(__('Texto do botão de ação principal.')),
+                Forms\Components\TextInput::make('primaryButtonUrl')->label(__('Botão Primário (URL)'))->helperText(__('Link para onde o botão principal deve levar.')),
+                Forms\Components\TextInput::make('secondaryButtonLabel')->label(__('Botão Secundário (Texto)'))->helperText(__('Texto do botão de ação secundário.')),
+                Forms\Components\TextInput::make('secondaryButtonUrl')->label(__('Botão Secundário (URL)'))->helperText(__('Link para onde o botão secundário deve levar.')),
             ]);
     }
 
@@ -203,16 +246,17 @@ class PageResource extends Resource
             ->label(__('Hero (Split 50/50)'))
             ->icon('heroicon-o-view-columns')
             ->schema([
-                Forms\Components\TextInput::make('title')->required()->label('Título'),
-                Forms\Components\Textarea::make('subtitle')->label('Subtítulo'),
-                Forms\Components\FileUpload::make('image')->image()->directory('hero')->label('Imagem Lateral'),
+                Forms\Components\TextInput::make('title')->required()->label(__('Título'))->helperText(__('Título principal da seção.')),
+                Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto explicativo ao lado da imagem.')),
+                Forms\Components\FileUpload::make('image')->image()->directory('hero')->label(__('Imagem Lateral'))->helperText(__('Imagem que será exibida na metade da tela.')),
                 Forms\Components\Repeater::make('features')
-                    ->label('Tópicos (Lista)')
+                    ->label(__('Tópicos (Lista)'))
+                    ->helperText(__('Adicione pontos de destaque em formato de lista.'))
                     ->schema([
-                        Forms\Components\TextInput::make('item')->required()->label('Texto do tópico'),
+                        Forms\Components\TextInput::make('item')->required()->label(__('Texto do Tópico'))->helperText(__('Descrição do benefício ou tópico.')),
                     ]),
-                Forms\Components\TextInput::make('buttonLabel')->label('Botão (Texto)'),
-                Forms\Components\TextInput::make('buttonUrl')->label('Botão (URL)'),
+                Forms\Components\TextInput::make('buttonLabel')->label(__('Botão (Texto)'))->helperText(__('Texto do botão de ação.')),
+                Forms\Components\TextInput::make('buttonUrl')->label(__('Botão (URL)'))->helperText(__('Link do botão de ação.')),
             ]);
     }
 
@@ -222,12 +266,14 @@ class PageResource extends Resource
             ->label(__('Parceiros'))
             ->icon('heroicon-o-building-office')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de parceiros.')),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto sobre a parceria.')),
                 Forms\Components\Repeater::make('items')
+                    ->label(__('Parceiros'))
+                    ->helperText(__('Cadastre as logomarcas ou nomes dos parceiros.'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')->required(),
-                        Forms\Components\TextInput::make('icon')->label('Ícone (Lucide)'),
+                        Forms\Components\TextInput::make('name')->label(__('Nome'))->helperText(__('Nome da empresa parceira.'))->required(),
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone (Lucide)'))->helperText(__('Nome do ícone Lucide, se houver.')),
                     ])->columns(2),
             ]);
     }
@@ -238,16 +284,18 @@ class PageResource extends Resource
             ->label(__('Serviços'))
             ->icon('heroicon-o-wrench-screwdriver')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da área de serviços.')),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Descrição geral sobre os serviços oferecidos.')),
                 Forms\Components\Repeater::make('items')
+                    ->label(__('Serviços'))
+                    ->helperText(__('Cadastre os serviços que deseja exibir.'))
                     ->schema([
-                        Forms\Components\TextInput::make('title')->required(),
-                        Forms\Components\Textarea::make('description'),
-                        Forms\Components\TextInput::make('icon'),
-                        Forms\Components\TagsInput::make('bullets'),
-                        Forms\Components\TextInput::make('cta_label'),
-                        Forms\Components\TextInput::make('cta_url'),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Nome do serviço.'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Detalhes sobre o serviço.')),
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone'))->helperText(__('Nome do ícone representativo.')),
+                        Forms\Components\TagsInput::make('bullets')->label(__('Tópicos'))->helperText(__('Pressione Enter para adicionar tópicos (tags).')),
+                        Forms\Components\TextInput::make('cta_label')->label(__('Rótulo do Botão (CTA)'))->helperText(__('Texto do botão de ação do serviço.')),
+                        Forms\Components\TextInput::make('cta_url')->label(__('URL do Botão (CTA)'))->helperText(__('Link para a página do serviço.')),
                     ]),
             ]);
     }
@@ -258,13 +306,15 @@ class PageResource extends Resource
             ->label(__('Linha do Tempo (Etapas)'))
             ->icon('heroicon-o-clock')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título para a linha do tempo.')),
                 Forms\Components\Repeater::make('steps')
+                    ->label(__('Etapas'))
+                    ->helperText(__('Cadastre cada passo da linha do tempo.'))
                     ->schema([
-                        Forms\Components\TextInput::make('step_label')->required(),
-                        Forms\Components\TextInput::make('title')->required(),
-                        Forms\Components\Textarea::make('description'),
-                        Forms\Components\TextInput::make('icon'),
+                        Forms\Components\TextInput::make('step_label')->label(__('Rótulo da Etapa'))->helperText(__('Ex: Passo 1, Ano 2023.'))->required(),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da etapa.'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Explicação da etapa.')),
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone'))->helperText(__('Ícone representativo da etapa.')),
                     ]),
             ]);
     }
@@ -275,10 +325,10 @@ class PageResource extends Resource
             ->label(__('Galeria de Obras (Showcase)'))
             ->icon('heroicon-o-camera')
             ->schema([
-                Forms\Components\TextInput::make('badge')->label('Texto do Badge (Laranja)')->placeholder('NOSSAS OBRAS'),
-                Forms\Components\TextInput::make('title')->label('Título')->required(),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
-                Forms\Components\TextInput::make('limit')->numeric()->default(4)->label('Limite de itens'),
+                Forms\Components\TextInput::make('badge')->label(__('Texto do Badge (Laranja)'))->helperText(__('Ex: NOSSAS OBRAS'))->placeholder('NOSSAS OBRAS'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da galeria.'))->required(),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo da galeria.')),
+                Forms\Components\TextInput::make('limit')->numeric()->default(4)->label(__('Limite de itens'))->helperText(__('Quantidade máxima de obras a serem exibidas.')),
             ]);
     }
 
@@ -288,11 +338,13 @@ class PageResource extends Resource
             ->label(__('FAQ (Perguntas Frequentes)'))
             ->icon('heroicon-o-question-mark-circle')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de perguntas frequentes.')),
                 Forms\Components\Repeater::make('items')
+                    ->label(__('Perguntas'))
+                    ->helperText(__('Cadastre as perguntas e respostas.'))
                     ->schema([
-                        Forms\Components\TextInput::make('question')->required(),
-                        Forms\Components\Textarea::make('answer')->required(),
+                        Forms\Components\TextInput::make('question')->label(__('Pergunta'))->helperText(__('A dúvida frequente.'))->required(),
+                        Forms\Components\Textarea::make('answer')->label(__('Resposta'))->helperText(__('A resposta para a dúvida.'))->required(),
                     ]),
             ]);
     }
@@ -303,13 +355,15 @@ class PageResource extends Resource
             ->label(__('Depoimentos'))
             ->icon('heroicon-o-chat-bubble-bottom-center-text')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de depoimentos.')),
                 Forms\Components\Repeater::make('items')
+                    ->label(__('Depoimentos'))
+                    ->helperText(__('Adicione os relatos de clientes.'))
                     ->schema([
-                        Forms\Components\Textarea::make('quote')->required(),
-                        Forms\Components\TextInput::make('author_name')->required(),
-                        Forms\Components\TextInput::make('author_role'),
-                        Forms\Components\TextInput::make('stars')->numeric()->default(5),
+                        Forms\Components\Textarea::make('quote')->label(__('Citação'))->helperText(__('O texto do depoimento.'))->required(),
+                        Forms\Components\TextInput::make('author_name')->label(__('Nome do Autor'))->helperText(__('Nome de quem fez o depoimento.'))->required(),
+                        Forms\Components\TextInput::make('author_role')->label(__('Cargo / Empresa'))->helperText(__('Cargo ou empresa do autor.')),
+                        Forms\Components\TextInput::make('stars')->label(__('Estrelas'))->helperText(__('Quantidade de estrelas (ex: 5).'))->numeric()->default(5),
                     ]),
             ]);
     }
@@ -320,12 +374,12 @@ class PageResource extends Resource
             ->label(__('Área de Atendimento'))
             ->icon('heroicon-o-map-pin')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de área de cobertura.')),
                 Forms\Components\Select::make('cities')
-                    ->label('Cidades Atendidas')
+                    ->label(__('Cidades Atendidas'))
                     ->multiple()
                     ->options(\App\Models\OperationArea::query()->where('is_active', true)->pluck('city', 'city'))
-                    ->helperText('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.'),
+                    ->helperText(__('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.')),
             ]);
     }
 
@@ -335,10 +389,10 @@ class PageResource extends Resource
             ->label(__('Chamada para Ação (CTA)'))
             ->icon('heroicon-o-megaphone')
             ->schema([
-                Forms\Components\TextInput::make('title'),
-                Forms\Components\Textarea::make('subtitle'),
-                Forms\Components\TextInput::make('button_label'),
-                Forms\Components\TextInput::make('button_url'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da chamada principal.')),
+                Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto de apoio da chamada.')),
+                Forms\Components\TextInput::make('button_label')->label(__('Rótulo do Botão'))->helperText(__('Texto do botão de ação.')),
+                Forms\Components\TextInput::make('button_url')->label(__('URL do Botão'))->helperText(__('Link para onde o botão deve levar.')),
             ]);
     }
 
@@ -348,15 +402,16 @@ class PageResource extends Resource
             ->label(__('Diferenciais (Pilar / Missão / Visão)'))
             ->icon('heroicon-o-shield-check')
             ->schema([
-                Forms\Components\TextInput::make('subtitle')->label('Subtítulo'),
-                Forms\Components\TextInput::make('title')->label('Título Principal'),
-                Forms\Components\Textarea::make('description')->label('Descrição / Texto de Apoio'),
+                Forms\Components\TextInput::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto pequeno acima do título.')),
+                Forms\Components\TextInput::make('title')->label(__('Título Principal'))->helperText(__('Título de destaque da seção.')),
+                Forms\Components\Textarea::make('description')->label(__('Descrição / Texto de Apoio'))->helperText(__('Explicação geral dos diferenciais.')),
                 Forms\Components\Repeater::make('items')
-                    ->label('Itens (Recomendado: 3)')
+                    ->label(__('Itens (Recomendado: 3)'))
+                    ->helperText(__('Adicione os pilares ou diferenciais.'))
                     ->schema([
-                        Forms\Components\TextInput::make('title')->label('Título')->required(),
-                        Forms\Components\Textarea::make('description')->label('Descrição')->required(),
-                        Forms\Components\TextInput::make('icon')->label('Ícone (Lucide)')->default('check-circle'),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Nome do diferencial.'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Explicação do diferencial.'))->required(),
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone (Lucide)'))->helperText(__('Ícone representativo.'))->default('check-circle'),
                     ])->columns(2),
             ]);
     }
@@ -367,11 +422,11 @@ class PageResource extends Resource
             ->label(__('Cabeçalho da Página'))
             ->icon('heroicon-o-document-text')
             ->schema([
-                Forms\Components\TextInput::make('badge')->label('Texto de Apoio (Laranja)')->placeholder('NOSSOS SERVIÇOS'),
-                Forms\Components\TextInput::make('title')->label('Título Principal')->required(),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
-                Forms\Components\Toggle::make('show_breadcrumbs')->label('Mostrar Breadcrumbs')->default(true),
-                Forms\Components\FileUpload::make('background_image')->image()->directory('headers')->label('Imagem de Fundo (Opcional)'),
+                Forms\Components\TextInput::make('badge')->label(__('Texto de Apoio (Laranja)'))->helperText(__('Texto acima do título principal.'))->placeholder('NOSSOS SERVIÇOS'),
+                Forms\Components\TextInput::make('title')->label(__('Título Principal'))->helperText(__('Título grande da página.'))->required(),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Subtítulo ou texto descritivo do cabeçalho.')),
+                Forms\Components\Toggle::make('show_breadcrumbs')->label(__('Mostrar Breadcrumbs'))->helperText(__('Exibe o caminho de navegação (ex: Home > Serviços).'))->onIcon('heroicon-m-check')->default(true),
+                Forms\Components\FileUpload::make('background_image')->image()->directory('headers')->label(__('Imagem de Fundo (Opcional)'))->helperText(__('Imagem de fundo para o cabeçalho.')),
             ]);
     }
 
@@ -381,9 +436,9 @@ class PageResource extends Resource
             ->label(__('Formulário de Contato'))
             ->icon('heroicon-o-envelope')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título')->default('Entre em Contato'),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
-                Forms\Components\TextInput::make('email_to')->label('Enviar para (e-mail)')->placeholder('contato@empresa.com'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título do bloco de contato.'))->default('Entre em Contato'),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Texto explicativo acima do formulário.')),
+                Forms\Components\TextInput::make('email_to')->label(__('Enviar para (e-mail)'))->helperText(__('E-mail que receberá as mensagens (se não preenchido, usará o padrão do sistema).'))->placeholder('contato@empresa.com'),
             ]);
     }
 
@@ -393,10 +448,10 @@ class PageResource extends Resource
             ->label(__('Mapa (Google Maps)'))
             ->icon('heroicon-o-map')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título do mapa.')),
                 Forms\Components\Textarea::make('iframe_code')
-                    ->label('Código de Incorporação (iframe)')
-                    ->helperText('Cole aqui o <iframe> gerado pelo Google Maps'),
+                    ->label(__('Código de Incorporação (iframe)'))
+                    ->helperText(__('Cole aqui o <iframe> gerado pelo Google Maps.')),
             ]);
     }
 
@@ -406,7 +461,7 @@ class PageResource extends Resource
             ->label(__('Texto Livre (Editor)'))
             ->icon('heroicon-o-document-text')
             ->schema([
-                Forms\Components\RichEditor::make('content')->required(),
+                Forms\Components\RichEditor::make('content')->label(__('Conteúdo'))->helperText(__('Digite o conteúdo livremente usando o editor.'))->required(),
             ]);
     }
 
@@ -416,7 +471,7 @@ class PageResource extends Resource
             ->label(__('Calculadora de Concreto'))
             ->icon('heroicon-o-calculator')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título')->default('Calculadora de Volume'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da calculadora.'))->default('Calculadora de Volume'),
             ]);
     }
 
@@ -426,8 +481,8 @@ class PageResource extends Resource
             ->label(__('Formulário de Orçamento (Wizard)'))
             ->icon('heroicon-o-document-text')
             ->schema([
-                Forms\Components\TextInput::make('title')->label('Título')->default('Solicitar Orçamento'),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título do formulário de orçamento.'))->default('Solicitar Orçamento'),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Instruções para o preenchimento.')),
             ]);
     }
     protected static function getContactBannerBlock(): Forms\Components\Builder\Block
@@ -437,26 +492,35 @@ class PageResource extends Resource
             ->icon('heroicon-o-chat-bubble-left-right')
             ->schema([
                 Forms\Components\TextInput::make('badge')
-                    ->label('Badge (Texto Superior)')
+                    ->label(__('Badge (Texto Superior)'))
+                    ->helperText(__('Pequeno texto de destaque.'))
                     ->default('ATENDIMENTO'),
                 Forms\Components\TextInput::make('title')
-                    ->label('Título')
+                    ->label(__('Título'))
+                    ->helperText(__('Título do banner de contato.'))
                     ->default('Fale conosco')
                     ->required(),
                 Forms\Components\Textarea::make('description')
-                    ->label('Descrição')
+                    ->label(__('Descrição'))
+                    ->helperText(__('Texto explicativo do banner.'))
                     ->default('Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.')
                     ->rows(2),
                 Forms\Components\Grid::make(3)
                     ->schema([
                         Forms\Components\Toggle::make('whatsapp_enabled')
-                            ->label('Botão WhatsApp')
+                            ->label(__('Botão WhatsApp'))
+                            ->helperText(__('Exibir botão do WhatsApp.'))
+                            ->onIcon('heroicon-m-check')
                             ->default(true),
                         Forms\Components\Toggle::make('call_enabled')
-                            ->label('Botão Ligar')
+                            ->label(__('Botão Ligar'))
+                            ->helperText(__('Exibir botão de ligação.'))
+                            ->onIcon('heroicon-m-check')
                             ->default(true),
                         Forms\Components\Toggle::make('email_enabled')
-                            ->label('Botão E-mail')
+                            ->label(__('Botão E-mail'))
+                            ->helperText(__('Exibir botão de envio de e-mail.'))
+                            ->onIcon('heroicon-m-check')
                             ->default(true),
                     ]),
             ]);
