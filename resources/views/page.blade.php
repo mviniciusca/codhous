@@ -1,6 +1,8 @@
 <x-layouts.app 
     :title="$meta['title']" 
     :description="$meta['description']"
+    :keywords="$meta['keywords'] ?? null"
+    :ogImage="$meta['og_image'] ?? null"
 >
     @php
         $content = $page->content ?? [];

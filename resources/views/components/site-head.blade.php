@@ -1,6 +1,8 @@
 @props([
     'title' => null,
     'description' => null,
+    'keywords' => null,
+    'ogImage' => null,
 ])
 
 @php
@@ -30,7 +32,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="theme-color" content="#e5b800">
 <meta name="description" content="{{ $finalDescription }}">
-<title>{{ $websiteName }} | {{ $websiteTitle }}</title>
+@if($keywords)
+    <meta name="keywords" content="{{ $keywords }}">
+@endif
+<title>{{ $title ? $title . ' | ' . $websiteName : $websiteName . ' | ' . $websiteTitle }}</title>
+
+<meta property="og:title" content="{{ $title ? $title . ' | ' . $websiteName : $websiteName . ' | ' . $websiteTitle }}">
+<meta property="og:description" content="{{ $finalDescription }}">
+@if($ogImage)
+    <meta property="og:image" content="{{ \Illuminate\Support\Facades\Storage::url($ogImage) }}">
+@endif
 
 @if($favicon)
     <link rel="icon" type="image/x-icon" href="{{ \Illuminate\Support\Facades\Storage::url($favicon) }}">

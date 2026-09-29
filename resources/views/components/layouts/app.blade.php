@@ -1,12 +1,14 @@
 @props([
     'title' => null,
     'description' => null,
+    'keywords' => null,
+    'ogImage' => null,
     'meta' => null,
 ])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
-    <x-site-head :title="$title" :description="$description" />
+    <x-site-head :title="$title" :description="$description" :keywords="$keywords" :ogImage="$ogImage" />
     {{ $meta }}
 
     @php
