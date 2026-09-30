@@ -6,6 +6,7 @@ use App\Enums\ProductUnit;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -26,7 +27,7 @@ class ProductOptionRelationManager extends RelationManager
                 Forms\Components\Section::make('Detalhes da Variação')
                     ->description('Defina as especificações técnicas, unidade e preço para esta variação.')
                     ->icon('heroicon-o-adjustments-horizontal')
-                    ->columns(2)
+                    ->columns(1)
                     ->schema([
                         TextInput::make('name')
                             ->label('Descrição da Variação')
@@ -44,10 +45,11 @@ class ProductOptionRelationManager extends RelationManager
                             ->prefixIcon('heroicon-o-link')
                             ->unique(ignoreRecord: true, modifyRuleUsing: fn($rule, RelationManager $livewire) => $rule->where('product_id', $livewire->ownerRecord->id))
                             ->helperText('Usado internamente para identificação única na URL.'),
-                        Select::make('unit')
+                        ToggleButtons::make('unit')
                             ->label('Unidade de Medida')
                             ->required()
                             ->options(ProductUnit::class)
+                            ->inline()
                             ->helperText('Como este item será quantificado (m³, kg, dia).'),
                         TextInput::make('price')
                             ->label('Preço Base')

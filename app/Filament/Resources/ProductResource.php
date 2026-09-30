@@ -26,7 +26,7 @@ class ProductResource extends Resource
 
     protected static ?string $navigationGroup = 'Orçamentos';
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?string $breadcrumb = 'Produtos e Serviços';
 
@@ -104,6 +104,11 @@ class ProductResource extends Resource
                 TextColumn::make('name')
                     ->label('Produto')
                     ->searchable(),
+                TextColumn::make('productOption.name')
+                    ->label('Variações')
+                    ->badge()
+                    ->color('gray')
+                    ->separator(','),
                 IconColumn::make('is_active')
                     ->boolean()
                     ->alignCenter()
