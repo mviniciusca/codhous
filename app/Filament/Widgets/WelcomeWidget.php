@@ -15,7 +15,7 @@ class WelcomeWidget extends Widget
  
     public function getGreeting(): string
     {
-        $hour = now()->hour;
+        $hour = now()->setTimezone('America/Sao_Paulo')->hour;
  
         if ($hour >= 5 && $hour < 12) {
             return 'Bom dia';
@@ -30,6 +30,6 @@ class WelcomeWidget extends Widget
  
     public function getUserName(): string
     {
-        return Auth::user()->name;
+        return explode(' ', Auth::user()->name)[0];
     }
 }

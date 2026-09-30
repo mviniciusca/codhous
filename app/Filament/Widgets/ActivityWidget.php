@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ActivityWidget extends BaseWidget
 {
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 99;
 
     protected int | string | array $columnSpan = 'full';
 
@@ -22,7 +22,7 @@ class ActivityWidget extends BaseWidget
     {
         return $table
             ->paginated(false)
-            ->heading('Atividade Recente')
+            ->heading(new \Illuminate\Support\HtmlString(svg('heroicon-o-clock', 'w-5 h-5 inline-block mr-1 text-gray-500', ['style' => 'vertical-align: middle; margin-top: -2px;'])->toHtml() . ' <span style="vertical-align: middle;">Atividade Recente</span>'))
             ->description('Logins recentes e ações de usuários no sistema')
             ->headerActions([
                 Action::make('view_all')

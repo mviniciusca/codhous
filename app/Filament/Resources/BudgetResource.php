@@ -791,7 +791,7 @@ class BudgetResource extends Resource
                                         TextInput::make('custom_email_subject')
                                             ->label('Assunto')
                                             ->dehydrated(false)
-                                            ->default(fn (Budget $record) => 'Sobre seu Orçamento: ' . $record->code),
+                                            ->default(fn (?Budget $record) => $record ? 'Sobre seu Orçamento: ' . $record->code : ''),
                                         RichEditor::make('custom_email_message')
                                             ->label('Mensagem')
                                             ->dehydrated(false)

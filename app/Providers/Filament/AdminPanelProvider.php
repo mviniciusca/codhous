@@ -45,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->login()
             ->passwordReset()
-            ->profile()
+            ->profile(\App\Filament\Pages\Auth\EditProfile::class)
             ->font('Jost')
             ->colors([
                 'danger'  => Color::Red,

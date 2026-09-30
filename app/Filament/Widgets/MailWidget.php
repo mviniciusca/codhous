@@ -150,9 +150,7 @@ class MailWidget extends BaseWidget
                     ->color('primary')
                     ->url(route('filament.admin.resources.mails.index')),
             ])
-            ->heading($unreadCount === 0
-                ? 'Mensagens'
-                : "Mensagens ({$unreadCount})")
+            ->heading(new \Illuminate\Support\HtmlString(svg('heroicon-o-envelope', 'w-5 h-5 inline-block mr-1 text-gray-500', ['style' => 'vertical-align: middle; margin-top: -2px;'])->toHtml() . ' <span style="vertical-align: middle;">' . ($unreadCount === 0 ? 'Mensagens' : "Mensagens ({$unreadCount})") . '</span>'))
             ->striped()
             ->paginated(false);
     }

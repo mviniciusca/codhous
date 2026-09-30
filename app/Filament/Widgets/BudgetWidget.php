@@ -42,9 +42,7 @@ class BudgetWidget extends BaseWidget
                     ->icon('heroicon-o-arrow-up-right')
                     ->url(route('filament.admin.resources.budgets.index')),
             ])
-            ->heading($pendingCount === 0
-                ? 'Orçamentos Pendentes'
-                : "Orçamentos Pendentes ({$pendingCount})")
+            ->heading(new \Illuminate\Support\HtmlString(svg('heroicon-o-document-text', 'w-5 h-5 inline-block mr-1 text-gray-500', ['style' => 'vertical-align: middle; margin-top: -2px;'])->toHtml() . ' <span style="vertical-align: middle;">' . ($pendingCount === 0 ? 'Orçamentos Pendentes' : "Orçamentos Pendentes ({$pendingCount})") . '</span>'))
             ->query(
                 Budget::query()
                     ->select(['id', 'code', 'content', 'created_at', 'updated_at', 'status', 'is_active'])

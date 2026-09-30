@@ -197,13 +197,20 @@ class CalculatorWidget extends Widget implements HasForms
                                     ->schema([
                                         Select::make('content.product')
                                             ->live()
+                                            ->searchable()
+                                            ->preload()
                                             ->label('Produto / Tipo de Concreto')
+                                            ->helperText('Escolha o item principal para o orçamento.')
                                             ->options(Product::where('is_active', true)->pluck('name', 'id'))
                                             ->afterStateHydrated(function (Get $get, Set $set, $state) {
                                                 $this->updatePrice($get, $set, $state);
                                             })
                                             ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                                $set('content.product_option', null);
+                                                if ($state && ProductOption::where('product_id', $state)->count() === 1) {
+                                                    $set('content.product_option', ProductOption::where('product_id', $state)->value('id'));
+                                                } else {
+                                                    $set('content.product_option', null);
+                                                }
                                                 $this->updatePrice($get, $set, $state);
                                             })
                                             ->required()
@@ -211,7 +218,10 @@ class CalculatorWidget extends Widget implements HasForms
 
                                         Select::make('content.product_option')
                                             ->live()
+                                            ->searchable()
+                                            ->preload()
                                             ->label('Variação')
+                                            ->helperText('Selecione a variação ou especificação técnica correta.')
                                             ->options(function (Get $get) {
                                                 $productId = $get('content.product');
                                                 if (! $productId) return [];
@@ -231,6 +241,7 @@ class CalculatorWidget extends Widget implements HasForms
                                         TextInput::make('content.quantity')
                                             ->live(onBlur: true)
                                             ->label('Quantidade')
+                                            ->helperText('Informe o volume/quantidade.')
                                             ->required()
                                             ->numeric()
                                             ->minValue(3)
@@ -241,6 +252,7 @@ class CalculatorWidget extends Widget implements HasForms
 
                                         TextInput::make('content.price')
                                             ->label('Preço Unit.')
+                                            ->helperText('Valor base (apenas leitura).')
                                             ->prefix('R$')
                                             ->disabled()
                                             ->dehydrated()
@@ -249,6 +261,7 @@ class CalculatorWidget extends Widget implements HasForms
                                         TextInput::make('content.tax')
                                             ->live(onBlur: true)
                                             ->label('Taxas (+)')
+                                            ->helperText('Custos extras, como bombeamento ou frete.')
                                             ->prefix('R$')
                                             ->numeric()
                                             ->default(0)
@@ -261,6 +274,7 @@ class CalculatorWidget extends Widget implements HasForms
                                         TextInput::make('content.discount')
                                             ->live(onBlur: true)
                                             ->label('Desconto (-)')
+                                            ->helperText('Descontos financeiros a aplicar.')
                                             ->prefix('R$')
                                             ->numeric()
                                             ->default(0)
@@ -272,6 +286,7 @@ class CalculatorWidget extends Widget implements HasForms
 
                                         TextInput::make('content.total')
                                             ->label('Subtotal do Item')
+                                            ->helperText('Soma do item já considerando taxas e descontos.')
                                             ->prefix('R$')
                                             ->readonly()
                                             ->extraInputAttributes(['class' => 'text-xl font-bold text-primary-600'])
