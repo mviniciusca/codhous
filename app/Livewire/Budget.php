@@ -22,6 +22,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Wizard;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -59,14 +60,10 @@ class Budget extends Component implements HasForms
                 Hidden::make('content.quantity'),
                 Hidden::make('content.shipping')->default(0),
 
-                Grid::make(12)
-                    ->schema([
-                        // Coluna da Esquerda (Formulário)
-                        Group::make([
-                            Section::make('1. Local de Entrega')
-                                ->description('Onde o material deve ser entregue?')
+                        Wizard::make([
+                            Wizard\Step::make('Local')
+                                ->description('Onde entregar?')
                                 ->icon('heroicon-o-map-pin')
-                                ->extraAttributes(['class' => '!shadow-none'])
                                 ->schema([
                                     TextInput::make('content.postcode')
                                         ->label('CEP')
@@ -123,14 +120,11 @@ class Budget extends Component implements HasForms
                                             TextInput::make('content.state')->label('UF')->columnSpan(2)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200 text-center']),
                                         ])
                                         ->visible(fn (Get $get) => filled($get('content.street'))),
-                                ])->collapsible(),
+                                ]),
 
-                            Section::make('2. Seus Dados')
-                                ->description('Como podemos entrar em contato?')
+                            Wizard\Step::make('Contato')
+                                ->description('Seus dados')
                                 ->icon('heroicon-o-user')
-                                ->extraAttributes(['class' => 'shadow-none'])
-                                ->visible(fn (Get $get) => filled($get('content.street')))
-                                ->disabled(fn (Get $get) => ! \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode')))
                                 ->schema([
                                     TextInput::make('content.customer_name')
                                         ->label('Nome Completo')
@@ -158,28 +152,26 @@ class Budget extends Component implements HasForms
                                             ->placeholder('E-mail para envio da proposta')
                                             ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
                                     ]),
-                                ])->collapsible(),
+                                ]),
 
-                            Section::make('3. Itens do Pedido')
-                                ->description('Quais produtos ou serviços você precisa?')
+                            Wizard\Step::make('Pedido')
+                                ->description('O que precisa?')
                                 ->icon('heroicon-o-shopping-bag')
-                                ->extraAttributes(['class' => 'shadow-none'])
-                                ->visible(fn (Get $get) => filled($get('content.street')))
-                                ->disabled(fn (Get $get) => ! \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode')))
                                 ->schema([
                                     Repeater::make('content.products')
                                         ->label('')
                                         ->live()
                                         ->itemLabel(fn (array $state): ?string => $this->getItemLabel($state))
                                         ->schema([
-                                            Grid::make(2)->schema([
+                                            Grid::make(12)->schema([
                                                 Select::make('product')
                                                     ->label('Produto')
                                                     ->options(Product::all()->pluck('name', 'id'))
                                                     ->required()
                                                     ->validationAttribute('Produto')
                                                     ->live()
-                                                    ->afterStateUpdated(fn (Set $set) => $set('product_option', null)),
+                                                    ->afterStateUpdated(fn (Set $set) => $set('product_option', null))
+                                                    ->columnSpan(5),
                                                 Select::make('product_option')
                                                     ->label('Opção / Traço')
                                                     ->options(fn (Get $get) => $this->getProductOptions($get))
@@ -187,15 +179,8 @@ class Budget extends Component implements HasForms
                                                     ->validationAttribute('Opção / Traço')
                                                     ->hidden(fn (Get $get) => $this->getProductOptions($get)->isEmpty())
                                                     ->live()
-                                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
-                                            ]),
-                                            Grid::make(2)->schema([
-                                                Select::make('location')
-                                                    ->label('Local da Obra')
-                                                    ->options(Location::all()->pluck('name', 'id'))
-                                                    ->required()
-                                                    ->validationAttribute('Local da Obra')
-                                                    ->live(),
+                                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state))
+                                                    ->columnSpan(5),
                                                 TextInput::make('quantity')
                                                     ->label('Quantidade')
                                                     ->numeric()
@@ -204,26 +189,42 @@ class Budget extends Component implements HasForms
                                                     ->validationAttribute('Quantidade')
                                                     ->step(1)
                                                     ->suffix(fn (Get $get) => $this->getUnitSuffix($get))
-                                                    ->live(debounce: 500)
+                                                    ->live(onBlur: true)
                                                     ->placeholder('Ex: 5')
                                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
                                                         $set('quantity', ceil(floatval($state ?? 1)));
                                                         $this->calculateItemSubtotal($get, $set);
                                                         $this->calculateTotal($get, $set);
-                                                    }),
+                                                    })
+                                                    ->columnSpan(2),
                                                 Hidden::make('price'),
                                             ]),
                                         ])
                                         ->addActionLabel('Adicionar Item')
                                         ->cloneable()
                                         ->collapsible(),
-                                ])->collapsible(),
 
-                            Section::make('4. Fotos do Local (Opcional)')
-                                ->description('Envie fotos da obra ou do local para ajudar no orçamento.')
+                                    \Filament\Forms\Components\ToggleButtons::make('content.location')
+                                        ->label('Local da Obra')
+                                        ->options(\App\Models\Location::all()->pluck('name', 'id'))
+                                        ->inline()
+                                        ->required()
+                                        ->validationAttribute('Local da Obra')
+                                        ->live()
+                                        ->visible(function (Get $get) {
+                                            $products = $get('content.products') ?? [];
+                                            foreach ($products as $item) {
+                                                if (!empty($item['product_option'])) {
+                                                    return true;
+                                                }
+                                            }
+                                            return false;
+                                        }),
+                                ]),
+
+                            Wizard\Step::make('Fotos')
+                                ->description('Imagens da obra')
                                 ->icon('heroicon-o-camera')
-                                ->extraAttributes(['class' => 'shadow-none'])
-                                ->visible(fn (Get $get) => filled($get('content.street')))
                                 ->schema([
                                     \Filament\Forms\Components\FileUpload::make('content.photos')
                                         ->label('Fotos')
@@ -235,14 +236,10 @@ class Budget extends Component implements HasForms
                                         ->directory('budget-documents')
                                         ->panelLayout('grid')
                                 ]),
-                        ])->columnSpan(8),
 
-                        // Coluna da Direita (Resumo / Checkout Sidebar)
-                        Group::make([
-                            Section::make('Resumo do Orçamento')
-                                ->description('Confira os itens selecionados para sua obra.')
-                                ->icon('heroicon-o-shopping-cart')
-                                ->extraAttributes(['class' => 'shadow-none'])
+                            Wizard\Step::make('Resumo')
+                                ->description('Revise e envie')
+                                ->icon('heroicon-o-check-circle')
                                 ->schema([
                                     Placeholder::make('summary')
                                         ->label('')
@@ -253,9 +250,14 @@ class Budget extends Component implements HasForms
                                             'turnstileSiteKey' => \App\Models\Setting::get('security.turnstile.site_key', '')
                                         ])),
                                 ])
-                                ->extraAttributes(['class' => 'sticky top-24'])
-                        ])->columnSpan(4),
-                    ]),
+                        ])
+                        ->nextAction(
+                            fn (\Filament\Forms\Components\Actions\Action $action) => $action->extraAttributes(['class' => '!bg-primary !text-white hover:!bg-primary/90 !border-0'])
+                        )
+                        ->previousAction(
+                            fn (\Filament\Forms\Components\Actions\Action $action) => $action->extraAttributes(['class' => '!bg-secondary !text-secondary-foreground !border !border-border hover:!bg-accent'])
+                        )
+                        ->submitAction(new \Illuminate\Support\HtmlString('<button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-primary text-white hover:bg-primary/90 h-10 px-8">Solicitar Orçamento Grátis</button>')),
             ])
             ->statePath('data');
     }

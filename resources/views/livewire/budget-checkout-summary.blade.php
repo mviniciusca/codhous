@@ -37,8 +37,6 @@
         </div>
     </div>
 
-    {{-- Botão de Finalizar --}}
-    <div class="pt-2">
         {{-- Cloudflare Turnstile --}}
         @if($turnstileEnabled ?? false)
             <div class="mb-4 flex justify-center" wire:ignore>
@@ -55,16 +53,7 @@
             @enderror
         @endif
 
-        <button type="submit" 
-                wire:loading.attr="disabled"
-                @if(!($canSubmit ?? false)) disabled @endif
-                class="w-full rounded-md bg-primary py-4 px-6 text-sm font-bold uppercase tracking-widest text-primary-foreground transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
-            <span wire:loading.remove wire:target="create">Solicitar Orçamento Grátis</span>
-            <span wire:loading wire:target="create">Enviando...</span>
-        </button>
-    </div>
-
-    <div class="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest">
+    <div class="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest mt-4">
         <i data-lucide="shield-check" class="h-3 w-3"></i>
         Ambiente 100% Seguro
     </div>

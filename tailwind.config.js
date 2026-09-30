@@ -4,6 +4,7 @@ const colors = require('tailwindcss/colors')
 export default {
     content: [
         './app/Filament/**/*.php',
+        './app/Livewire/**/*.php',
         './resources/views/filament/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
         './resources/**/*.blade.php',

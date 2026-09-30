@@ -90,7 +90,7 @@
     .fi-input,
     .fi-select,
     .fi-textarea {
-        @apply rounded-md border border-input bg-background shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
+        @apply rounded-md border border-input bg-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
     }
 
     .fi-btn {
@@ -106,7 +106,7 @@
     }
 
     .fi-btn-outline {
-        @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+        @apply border border-input bg-white hover:bg-accent hover:text-accent-foreground;
     }
 
     .fi-card {
@@ -125,7 +125,7 @@
     select,
     input[type="text"],
     input[type="password"] {
-        @apply bg-background dark:bg-secondary;
+        @apply bg-white dark:bg-secondary;
     }
 
     form button {
@@ -136,8 +136,19 @@
     .dark .fi-input,
     .dark .fi-select,
     .dark .fi-textarea {
-        @apply bg-background border-border;
+        @apply bg-secondary border-border;
     }
+
+    /* Fix Filament dynamic custom colors missing in frontend Tailwind */
+    .bg-custom-600 { @apply bg-primary !important; }
+    .bg-custom-500 { @apply bg-primary !important; }
+    .text-custom-600 { @apply text-primary !important; }
+    .ring-custom-600 { @apply ring-primary !important; }
+    .bg-custom-50 { @apply bg-primary/10 !important; }
+    .hover\:bg-custom-500:hover { @apply bg-primary/90 !important; }
+    .hover\:bg-custom-600:hover { @apply bg-primary/90 !important; }
+    .dark .dark\:bg-custom-500 { @apply bg-primary !important; }
+    .dark .dark\:hover\:bg-custom-400:hover { @apply bg-primary/90 !important; }
 
     /* Personalizações adicionais para tons de azul */
     .fi-sidebar {

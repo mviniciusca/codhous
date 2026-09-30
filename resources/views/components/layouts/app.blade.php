@@ -20,6 +20,12 @@
     <style>
         :root {
             --primary-color: {{ $primaryColor }};
+            --primary-400: {{ $primaryColor }};
+            --primary-500: {{ $primaryColor }};
+            --primary-600: {{ $primaryColor }};
+            --gray-400: 156, 163, 175;
+            --gray-500: 107, 114, 128;
+            --gray-600: 75, 85, 99;
         }
     </style>
 
