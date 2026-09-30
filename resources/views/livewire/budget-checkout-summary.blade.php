@@ -39,6 +39,22 @@
 
     {{-- Botão de Finalizar --}}
     <div class="pt-2">
+        {{-- Cloudflare Turnstile --}}
+        @if($turnstileEnabled ?? false)
+            <div class="mb-4 flex justify-center" wire:ignore>
+                <div 
+                    class="cf-turnstile" 
+                    data-sitekey="{{ $turnstileSiteKey ?? '' }}"
+                    data-callback="onTurnstileSuccess"
+                ></div>
+            </div>
+            @error('turnstileToken')
+                <div class="mb-4 text-center">
+                    <span class="text-sm text-red-600 font-medium">{{ $message }}</span>
+                </div>
+            @enderror
+        @endif
+
         <button type="submit" 
                 wire:loading.attr="disabled"
                 @if(!($canSubmit ?? false)) disabled @endif

@@ -20,6 +20,17 @@
         </form>
     @endif
 
+    @push('scripts')
+        @if($turnstileEnabled)
+            <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+            <script>
+                function onTurnstileSuccess(token) {
+                    @this.set('turnstileToken', token);
+                }
+            </script>
+        @endif
+    @endpush
+
     <script>
         document.addEventListener('livewire:initialized', () => {
             if (typeof lucide !== 'undefined') {

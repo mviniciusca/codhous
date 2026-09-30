@@ -11,6 +11,7 @@ use App\Notifications\NewBudget;
 use App\Services\BudgetCalculatorService;
 use App\Services\OperationAreaService;
 use App\Services\PostcodeFinderService;
+use App\Services\TurnstileService;
 use App\Rules\CepInOperationAreaRule;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Grid;
@@ -38,6 +39,8 @@ class Budget extends Component implements HasForms
     public ?array $data = [];
 
     public bool $isSubmitted = false;
+    
+    public ?string $turnstileToken = null;
 
     public function mount(): void
     {
@@ -245,7 +248,9 @@ class Budget extends Component implements HasForms
                                         ->label('')
                                         ->content(fn (Get $get) => view('livewire.budget-checkout-summary', [
                                             'data' => ['content' => $get('content')],
-                                            'canSubmit' => \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode'))
+                                            'canSubmit' => \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode')),
+                                            'turnstileEnabled' => \App\Models\Setting::get('security.turnstile.enabled', false),
+                                            'turnstileSiteKey' => \App\Models\Setting::get('security.turnstile.site_key', '')
                                         ])),
                                 ])
                                 ->extraAttributes(['class' => 'sticky top-24'])
@@ -269,9 +274,21 @@ class Budget extends Component implements HasForms
         return ['required', 'string', 'size:9', new CepInOperationAreaRule];
     }
 
-    public function create(): void
+    public function create(TurnstileService $turnstile): void
     {
         $this->form->validate();
+        
+        // Validação Cloudflare Turnstile
+        if (!$turnstile->verify($this->turnstileToken, request()->ip())) {
+            $this->addError('turnstileToken', 'A verificação anti-spam falhou. Por favor, tente novamente.');
+            \Filament\Notifications\Notification::make()
+                ->title('Erro de Validação')
+                ->body('A verificação anti-spam falhou. Atualize a página e tente novamente.')
+                ->danger()
+                ->send();
+            return;
+        }
+        
         $state = $this->form->getState();
 
         // Garantir que os totais estejam corretos antes de salvar e enviar e-mail
@@ -328,9 +345,12 @@ class Budget extends Component implements HasForms
         $this->isSubmitted = false;
     }
 
-    public function render()
+    public function render(TurnstileService $turnstile)
     {
-        return view('livewire.budget');
+        return view('livewire.budget', [
+            'turnstileEnabled' => $turnstile->isEnabled(),
+            'turnstileSiteKey' => $turnstile->getSiteKey(),
+        ]);
     }
 
     private function getProductOptions(Get $get): Collection
