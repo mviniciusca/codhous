@@ -39,8 +39,10 @@ class CreateBudget extends CreateRecord
                     // We need to preserve existing content structure if any, 
                     // but usually on create it's empty.
                     $subtotal = 0;
-                    foreach ($items as $item) {
+                    foreach ($items as &$item) {
                         $subtotal += ($item['quantity'] * $item['price']);
+                        // Format for the UI mask
+                        $item['price'] = number_format(floatval($item['price']), 2, ',', '.');
                     }
                     $tax = floatval($data['tax'] ?? 0);
                     $discount = floatval($data['discount'] ?? 0);
@@ -52,10 +54,10 @@ class CreateBudget extends CreateRecord
                         'created_at' => now(),
                         'budgetItems' => $items,
                         'content' => [
-                            'tax' => $tax,
-                            'discount' => $discount,
-                            'subtotal' => number_format($subtotal, 2, '.', ''),
-                            'total' => number_format($total, 2, '.', ''),
+                            'tax' => number_format($tax, 2, ',', '.'),
+                            'discount' => number_format($discount, 2, ',', '.'),
+                            'subtotal' => number_format($subtotal, 2, ',', '.'),
+                            'total' => number_format($total, 2, ',', '.'),
                         ]
                     ]);
                 }

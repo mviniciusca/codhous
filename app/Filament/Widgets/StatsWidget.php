@@ -112,11 +112,16 @@ class StatsWidget extends BaseWidget
 
         foreach ($budgets as $budget) {
             if (isset($budget->content['total'])) {
-                $totalValue += floatval($budget->content['total']);
+                $val = $budget->content['total'];
+                if (is_string($val) && str_contains($val, ',')) {
+                    $val = str_replace('.', '', $val);
+                    $val = str_replace(',', '.', $val);
+                }
+                $totalValue += floatval($val);
             }
         }
 
-        return Stat::make('Receita Gerada', 'R$ ' . number_format($totalValue, 2, '.', ','))
+        return Stat::make('Receita Gerada', 'R$ ' . number_format($totalValue, 2, ',', '.'))
             ->icon('heroicon-o-banknotes')
             ->description('Soma de todos os orçamentos finalizados')
             ->descriptionIcon('heroicon-m-calculator')
