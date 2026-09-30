@@ -103,6 +103,16 @@ class BudgetResource extends Resource
                             ->onIcon('heroicon-m-check')
                             ->offIcon('heroicon-m-x-mark')
                             ->helperText('Visibilidade.')
+                            ->live()
+                            ->afterStateUpdated(function ($state, ?Budget $record) {
+                                if ($record && $record->exists) {
+                                    $record->update(['is_active' => $state]);
+                                    \Filament\Notifications\Notification::make()
+                                        ->title($state ? 'Orçamento ativado!' : 'Orçamento desativado!')
+                                        ->success()
+                                        ->send();
+                                }
+                            })
                             ->columnSpan([
                                 'default' => 12,
                                 'md' => 1,
@@ -110,6 +120,7 @@ class BudgetResource extends Resource
 
                         TextInput::make('code')
                             ->label('Identificador')
+                            ->prefixIcon('heroicon-m-hashtag')
                             ->default(fn () => \App\Models\Budget::generateUniqueCode())
                             ->disabled()
                             ->dehydrated()
@@ -119,44 +130,47 @@ class BudgetResource extends Resource
                                 'md' => 2,
                             ]),
                         
-                        Select::make('status')
+                        \Filament\Forms\Components\ToggleButtons::make('status')
                             ->label('Status do Negócio')
                             ->default('pending')
-                            ->native(false)
                             ->helperText('Estágio comercial.')
                             ->options([
                                 'pending'  => 'Pendente',
-                                'on going' => 'Em Andamento',
+                                'on going' => 'Andamento',
                                 'done'     => 'Concluído',
-                                'ignored'  => 'Arquivado/Ignorado',
+                                'ignored'  => 'Arquivado',
                             ])
-                            ->columnSpan([
-                                'default' => 12,
-                                'md' => 3,
-                            ]),
-
-                        Placeholder::make('notification_status')
-                            ->label('Comunicação')
-                            ->content(function (Budget $record) {
-                                if (!$record->notified_via_email && !$record->notified_via_whatsapp) {
-                                    return new \Illuminate\Support\HtmlString('<span class="text-xs font-medium text-gray-500 italic">Aguardando Envio</span>');
+                            ->colors([
+                                'pending'  => 'warning',
+                                'on going' => 'info',
+                                'done'     => 'success',
+                                'ignored'  => 'danger',
+                            ])
+                            ->icons([
+                                'pending'  => 'heroicon-o-clock',
+                                'on going' => 'heroicon-o-arrow-path',
+                                'done'     => 'heroicon-o-check-circle',
+                                'ignored'  => 'heroicon-o-archive-box-x-mark',
+                            ])
+                            ->inline()
+                            ->live()
+                            ->afterStateUpdated(function ($state, ?Budget $record) {
+                                if ($record && $record->exists) {
+                                    $record->update(['status' => $state]);
+                                    \Filament\Notifications\Notification::make()
+                                        ->title('Status salvo!')
+                                        ->success()
+                                        ->send();
                                 }
-                                
-                                $channels = [];
-                                if ($record->notified_via_email) $channels[] = 'E-mail ✅';
-                                if ($record->notified_via_whatsapp) $channels[] = 'WhatsApp ✅';
-                                
-                                return new \Illuminate\Support\HtmlString('<span class="text-xs font-bold text-success-600">Notificado (' . implode(', ', $channels) . ')</span>');
                             })
-                            ->helperText('Envio ao cliente.')
-                            ->visible(fn ($record) => $record && $record->exists)
                             ->columnSpan([
                                 'default' => 12,
-                                'md' => 3,
+                                'md' => 6,
                             ]),
 
                         DateTimePicker::make('created_at')
                             ->label('Registro')
+                            ->prefixIcon('heroicon-m-calendar-days')
                             ->displayFormat('d/m/Y H:i')
                             ->disabled()
                             ->helperText('Data/Hora.')
@@ -255,7 +269,7 @@ class BudgetResource extends Resource
                                                         // Busca automática de frete baseada na faixa de CEP
                                                         $area = \App\Models\OperationArea::findOperationAreaByCep($state);
                                                         if ($area) {
-                                                            $set('content.shipping', $area->shipping_fee);
+                                                            $set('content.shipping', number_format((float) $area->shipping_fee, 2, ',', '.'));
                                                             
                                                             // Recalcula o total final com o novo frete
                                                             self::calculateTotalFromRepeater($get, $set);
@@ -818,6 +832,7 @@ class BudgetResource extends Resource
                             ->schema([
                                 Section::make('Enviar Mensagem Direta')
                                     ->description('Envie um e-mail personalizado para o cliente deste orçamento.')
+                                    ->icon('heroicon-o-paper-airplane')
                                     ->schema([
                                         TextInput::make('custom_email_subject')
                                             ->label('Assunto')

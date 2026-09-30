@@ -41,10 +41,24 @@ class EditBudget extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('save')
+                ->label('Salvar Orçamento')
+                ->action('save')
+                ->color('primary')
+                ->keyBindings(['mod+s']),
+            Actions\Action::make('cancel')
+                ->label('Voltar')
+                ->url($this->getResource()::getUrl('index'))
+                ->color('gray'),
             Actions\ForceDeleteAction::make()
                 ->label('Excluir Permanente'),
             Actions\RestoreAction::make()
                 ->label('Restaurar'),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return [];
     }
 }

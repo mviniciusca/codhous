@@ -54,9 +54,10 @@ class ProductOptionRelationManager extends RelationManager
                         TextInput::make('price')
                             ->label('Preço Base')
                             ->required()
-                            ->numeric()
                             ->prefix('R$')
-                            ->maxValue(42949672.95)
+                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                            ->stripCharacters('.')
+                            ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state)))
                             ->helperText('Valor de referência por unidade para fins de orçamento.'),
                     ])
             ]);

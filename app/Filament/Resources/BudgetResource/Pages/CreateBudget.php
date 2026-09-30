@@ -66,4 +66,24 @@ class CreateBudget extends CreateRecord
             }
         }
     }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\Action::make('create')
+                ->label('Criar Orçamento')
+                ->action('create')
+                ->color('primary')
+                ->keyBindings(['mod+s']),
+            Actions\Action::make('cancel')
+                ->label('Voltar')
+                ->url($this->getResource()::getUrl('index'))
+                ->color('gray'),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return [];
+    }
 }
