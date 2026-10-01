@@ -61,99 +61,6 @@ class Budget extends Component implements HasForms
                 Hidden::make('content.shipping')->default(0),
 
                         Wizard::make([
-                            Wizard\Step::make('Local')
-                                ->description('Onde entregar?')
-                                ->icon('heroicon-o-map-pin')
-                                ->schema([
-                                    TextInput::make('content.postcode')
-                                        ->label('CEP')
-                                        ->placeholder('00000-000')
-                                        ->mask('99999-999')
-                                        ->required()
-                                        ->validationAttribute('CEP')
-                                        ->live(debounce: 500)
-                                        ->extraInputAttributes(['class' => '!bg-white shadow-sm'])
-                                        ->rules($this->getPostcodeRules())
-                                        ->afterStateUpdated(function ($state, Set $set, $livewire) {
-                                            // Limpa campos para evitar dados residuais de CEPs anteriores
-                                            $set('content.street', null);
-                                            $set('content.neighborhood', null);
-                                            $set('content.city', null);
-                                            $set('content.state', null);
-                                            $set('content.shipping', 0);
-
-                                            if (strlen($state ?? '') === 9) {
-                                                try {
-                                                    $livewire->validateOnly('data.content.postcode');
-                                                    $postcode = new \App\Services\PostcodeFinderService($state, $set);
-                                                    $postcode->find();
-                                                    $livewire->applyShippingFromCep($state, $set);
-                                                } catch (\Illuminate\Validation\ValidationException $e) {
-                                                    // Se falhar a validação (ex: fora da área), os campos permanecem limpos
-                                                    throw $e;
-                                                }
-                                            }
-                                        }),
-                                    
-                                    Grid::make(3)
-                                        ->schema([
-                                            TextInput::make('content.street')
-                                                ->label('Rua/Av')
-                                                ->columnSpan(2)
-                                                ->disabled()
-                                                ->dehydrated()
-                                                ->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
-                                            TextInput::make('content.number')
-                                                ->label('Nº')
-                                                ->required()
-                                                ->validationAttribute('Número')
-                                                ->live(onBlur: true)
-                                                ->placeholder('Nº ou KM da obra')
-                                                ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
-                                        ])
-                                        ->visible(fn (Get $get) => filled($get('content.street'))),
-
-                                    Grid::make(12)
-                                        ->schema([
-                                            TextInput::make('content.neighborhood')->label('Bairro')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
-                                            TextInput::make('content.city')->label('Cidade')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
-                                            TextInput::make('content.state')->label('UF')->columnSpan(2)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200 text-center']),
-                                        ])
-                                        ->visible(fn (Get $get) => filled($get('content.street'))),
-                                ]),
-
-                            Wizard\Step::make('Contato')
-                                ->description('Seus dados')
-                                ->icon('heroicon-o-user')
-                                ->schema([
-                                    TextInput::make('content.customer_name')
-                                        ->label('Nome Completo')
-                                        ->required()
-                                        ->validationAttribute('Nome Completo')
-                                        ->live(onBlur: true)
-                                        ->placeholder('Nome do responsável pela obra')
-                                        ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
-                                    Grid::make(2)->schema([
-                                        TextInput::make('content.customer_phone')
-                                            ->label('WhatsApp')
-                                            ->tel()
-                                            ->mask('(99)99999-9999')
-                                            ->required()
-                                            ->validationAttribute('WhatsApp')
-                                            ->live(onBlur: true)
-                                            ->placeholder('(00) 00000-0000 - WhatsApp para retorno')
-                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
-                                        TextInput::make('content.customer_email')
-                                            ->label('E-mail')
-                                            ->email()
-                                            ->required()
-                                            ->validationAttribute('E-mail')
-                                            ->live(onBlur: true)
-                                            ->placeholder('E-mail para envio da proposta')
-                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
-                                    ]),
-                                ]),
-
                             Wizard\Step::make('Pedido')
                                 ->description('O que precisa?')
                                 ->icon('heroicon-o-shopping-bag')
@@ -202,7 +109,8 @@ class Budget extends Component implements HasForms
                                         ])
                                         ->addActionLabel('Adicionar Item')
                                         ->cloneable()
-                                        ->collapsible(),
+                                        ->collapsible()
+                                        ->defaultItems(1), // Auto-adds the first item to reduce friction!
 
                                     \Filament\Forms\Components\ToggleButtons::make('content.location')
                                         ->label('Local da Obra')
@@ -220,21 +128,96 @@ class Budget extends Component implements HasForms
                                             }
                                             return false;
                                         }),
-                                ]),
-
-                            Wizard\Step::make('Fotos')
-                                ->description('Imagens da obra')
-                                ->icon('heroicon-o-camera')
-                                ->schema([
+                                        
                                     \Filament\Forms\Components\FileUpload::make('content.photos')
-                                        ->label('Fotos')
+                                        ->label('Fotos da Obra (Opcional)')
                                         ->image()
                                         ->multiple()
                                         ->maxFiles(4)
                                         ->maxSize(4096)
                                         ->disk('public')
                                         ->directory('budget-documents')
-                                        ->panelLayout('grid')
+                                        ->panelLayout('grid'),
+                                ]),
+
+                            Wizard\Step::make('Contato & Local')
+                                ->description('Seus dados')
+                                ->icon('heroicon-o-user')
+                                ->schema([
+                                    Grid::make(3)->schema([
+                                        TextInput::make('content.customer_name')
+                                            ->label('Nome Completo')
+                                            ->required()
+                                            ->validationAttribute('Nome Completo')
+                                            ->live(onBlur: true)
+                                            ->placeholder('Seu nome')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
+                                        TextInput::make('content.customer_phone')
+                                            ->label('WhatsApp')
+                                            ->tel()
+                                            ->mask('(99)99999-9999')
+                                            ->required()
+                                            ->validationAttribute('WhatsApp')
+                                            ->live(onBlur: true)
+                                            ->placeholder('(00) 00000-0000')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
+                                        TextInput::make('content.customer_email')
+                                            ->label('E-mail')
+                                            ->email()
+                                            ->required()
+                                            ->validationAttribute('E-mail')
+                                            ->live(onBlur: true)
+                                            ->placeholder('Seu e-mail')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
+                                    ]),
+                                    Grid::make(4)->schema([
+                                        TextInput::make('content.postcode')
+                                            ->label('CEP da Obra')
+                                            ->placeholder('00000-000')
+                                            ->mask('99999-999')
+                                            ->required()
+                                            ->validationAttribute('CEP')
+                                            ->live(debounce: 500)
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm'])
+                                            ->rules($this->getPostcodeRules())
+                                            ->afterStateUpdated(function ($state, Set $set, $livewire) {
+                                                $set('content.street', null);
+                                                $set('content.neighborhood', null);
+                                                $set('content.city', null);
+                                                $set('content.state', null);
+                                                $set('content.shipping', 0);
+                                                if (strlen($state ?? '') === 9) {
+                                                    try {
+                                                        $livewire->validateOnly('data.content.postcode');
+                                                        $postcode = new \App\Services\PostcodeFinderService($state, $set);
+                                                        $postcode->find();
+                                                        $livewire->applyShippingFromCep($state, $set);
+                                                    } catch (\Illuminate\Validation\ValidationException $e) {
+                                                        throw $e;
+                                                    }
+                                                }
+                                            }),
+                                        TextInput::make('content.street')
+                                            ->label('Rua/Av')
+                                            ->columnSpan(2)
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                        TextInput::make('content.number')
+                                            ->label('Nº')
+                                            ->required()
+                                            ->validationAttribute('Número')
+                                            ->live(onBlur: true)
+                                            ->placeholder('Nº ou KM')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
+                                    ]),
+                                    Grid::make(12)
+                                        ->schema([
+                                            TextInput::make('content.neighborhood')->label('Bairro')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                            TextInput::make('content.city')->label('Cidade')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                            TextInput::make('content.state')->label('UF')->columnSpan(2)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200 text-center']),
+                                        ])
+                                        ->visible(fn (Get $get) => filled($get('content.street'))),
                                 ]),
 
                             Wizard\Step::make('Resumo')
