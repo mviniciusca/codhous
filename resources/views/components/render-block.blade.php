@@ -309,4 +309,16 @@
         />
         @break
 
+    @case('payment_offer')
+        <x-section-payment-offer
+            :badge="$data['badge'] ?? null"
+            :title="$data['title'] ?? null"
+            :subtitle="$data['subtitle'] ?? null"
+            :button-label="$data['button_label'] ?? null"
+            :button-url="$data['button_url'] ?? null"
+            :background-image="$data['background_image'] ?? null"
+            :payment-methods-image="$data['payment_methods_image'] ?? null"
+        />
+        @break
+
 @endswitch

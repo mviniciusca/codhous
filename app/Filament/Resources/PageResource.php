@@ -69,6 +69,7 @@ class PageResource extends Resource
                                     self::getDifferentialsBlock(),
                                     self::getCtaBlock(),
                                     self::getRichTextBlock(),
+                                    self::getPaymentOfferBlock(),
                                     self::getModuleReferenceBlock(),
                                 ])
                                 ->collapsible()
@@ -523,6 +524,22 @@ class PageResource extends Resource
                             ->onIcon('heroicon-m-check')
                             ->default(true),
                     ]),
+            ]);
+    }
+
+    protected static function getPaymentOfferBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('payment_offer')
+            ->label(__('Oferta de Pagamento'))
+            ->icon('heroicon-o-credit-card')
+            ->schema([
+                Forms\Components\TextInput::make('badge')->label(__('Badge'))->default('APROVEITE ESSA MEGA OPORTUNIDADE'),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->default('Parcelamento em até 12x sem juros')->required(),
+                Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->default('ou com desconto no pagamento à vista em dinheiro ou com o pix.'),
+                Forms\Components\TextInput::make('button_label')->label(__('Texto do Botão'))->default('Fazer orçamento grátis'),
+                Forms\Components\TextInput::make('button_url')->label(__('URL do Botão (Deixe vazio p/ usar o WhatsApp)'))->helperText('Se vazio, enviará para o WhatsApp padrão.'),
+                Forms\Components\FileUpload::make('background_image')->image()->directory('offers')->label(__('Imagem de Fundo (Opcional)')),
+                Forms\Components\FileUpload::make('payment_methods_image')->image()->directory('offers')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.'),
             ]);
     }
 
