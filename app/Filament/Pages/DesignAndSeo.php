@@ -156,38 +156,61 @@ class DesignAndSeo extends Page implements HasForms
                                 Toggle::make('settings.website.features.concrete_calculator')
                                     ->label('Calculadora de Concreto')
                                     ->helperText('Exibe a ferramenta de cálculo de volume na frente do site.')
+                                    ->onIcon('heroicon-m-check')
                                     ->inline(false),
                                 Toggle::make('settings.website.features.budget_tool')
                                     ->label('Ferramenta de Orçamento')
                                     ->helperText('Permite que os clientes solicitem orçamentos online.')
+                                    ->onIcon('heroicon-m-check')
                                     ->inline(false),
                             ]),
                     ]),
 
                 Section::make('Atendimento via WhatsApp')
                     ->icon('heroicon-o-chat-bubble-left-right')
-                    ->description('Configure o widget flutuante de atendimento direto.')
+                    ->description('Configurações do WhatsApp para o widget flutuante e botões de contato.')
                     ->schema([
-                        Toggle::make('settings.website.features.whatsapp_widget.enabled')
-                            ->label('Habilitar Widget')
-                            ->helperText('Ativa o botão flutuante do WhatsApp no canto da tela.')
-                            ->reactive(),
-                        Grid::make(2)
-                            ->visible(fn($get) => $get('settings.website.features.whatsapp_widget.enabled'))
+                        TextInput::make('settings.website.features.whatsapp_widget.number')
+                            ->label('Número do WhatsApp Oficial')
+                            ->prefix('+55')
+                            ->mask('(99) 99999-9999')
+                            ->placeholder('(21) 90000-0000')
+                            ->helperText('O código +55 já está incluído. Usado tanto para o widget quanto para os botões.')
+                            ->required()
+                            ->tel(),
+                            
+                        \Filament\Forms\Components\Fieldset::make('Widget Flutuante')
                             ->schema([
-                                TextInput::make('settings.website.features.whatsapp_widget.number')
-                                    ->label('Número do WhatsApp')
-                                    ->prefix('+55')
-                                    ->mask('(99) 99999-9999')
-                                    ->placeholder('(21) 90000-0000')
-                                    ->helperText('O código +55 já está incluído. Informe apenas DDD e número.')
-                                    ->required(fn($get) => $get('settings.website.features.whatsapp_widget.enabled'))
-                                    ->tel(),
+                                Toggle::make('settings.website.features.whatsapp_widget.enabled')
+                                    ->label('Habilitar Widget')
+                                    ->helperText('Ativa o botão flutuante no canto da tela em todas as páginas.')
+                                    ->onIcon('heroicon-m-check')
+                                    ->reactive()
+                                    ->columnSpanFull(),
                                 TextInput::make('settings.website.features.whatsapp_widget.message')
-                                    ->label('Mensagem Inicial')
-                                    ->helperText('Texto que será pré-preenchido para o cliente.')
+                                    ->label('Mensagem Inicial do Widget')
+                                    ->helperText('Texto pré-preenchido para o cliente no widget flutuante.')
                                     ->placeholder('Olá! Gostaria de um orçamento.')
-                                    ->required(fn($get) => $get('settings.website.features.whatsapp_widget.enabled')),
+                                    ->required(fn($get) => $get('settings.website.features.whatsapp_widget.enabled'))
+                                    ->visible(fn($get) => $get('settings.website.features.whatsapp_widget.enabled'))
+                                    ->columnSpanFull(),
+                            ]),
+
+                        \Filament\Forms\Components\Fieldset::make('Botão na Página de Contato')
+                            ->schema([
+                                Toggle::make('settings.website.features.whatsapp_button.enabled')
+                                    ->label('Habilitar Botão de Contato')
+                                    ->helperText('Adiciona um botão chamativo de WhatsApp acima do e-mail no formulário de contato.')
+                                    ->onIcon('heroicon-m-check')
+                                    ->reactive()
+                                    ->columnSpanFull(),
+                                TextInput::make('settings.website.features.whatsapp_button.text')
+                                    ->label('Texto do Botão')
+                                    ->default('Chamar no WhatsApp')
+                                    ->placeholder('Ex: Falar com Especialista')
+                                    ->required(fn($get) => $get('settings.website.features.whatsapp_button.enabled'))
+                                    ->visible(fn($get) => $get('settings.website.features.whatsapp_button.enabled'))
+                                    ->columnSpanFull(),
                             ]),
                     ]),
 

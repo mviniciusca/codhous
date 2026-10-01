@@ -77,7 +77,11 @@ class Budget extends Component implements HasForms
                                                     ->required()
                                                     ->validationAttribute('Produto')
                                                     ->live()
-                                                    ->afterStateUpdated(fn (Set $set) => $set('product_option', null))
+                                                    ->afterStateUpdated(function (Set $set, $state) {
+                                                        $set('product_option', null);
+                                                        $min = Product::find($state)?->min_quantity ?? 1;
+                                                        $set('quantity', floatval($min));
+                                                    })
                                                     ->columnSpan(5),
                                                 Select::make('product_option')
                                                     ->label('Opção / Traço')
@@ -93,13 +97,16 @@ class Budget extends Component implements HasForms
                                                     ->numeric()
                                                     ->required()
                                                     ->default(1)
+                                                    ->minValue(fn (Get $get) => Product::find($get('product'))?->min_quantity ?? 1)
                                                     ->validationAttribute('Quantidade')
                                                     ->step(1)
                                                     ->suffix(fn (Get $get) => $this->getUnitSuffix($get))
                                                     ->live(onBlur: true)
-                                                    ->placeholder('Ex: 5')
+                                                    ->placeholder(fn (Get $get) => 'Mín: ' . floatval(Product::find($get('product'))?->min_quantity ?? 1))
                                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                                        $set('quantity', ceil(floatval($state ?? 1)));
+                                                        $min = Product::find($get('product'))?->min_quantity ?? 1;
+                                                        $qty = max(floatval($state ?? $min), $min);
+                                                        $set('quantity', ceil($qty));
                                                         $this->calculateItemSubtotal($get, $set);
                                                         $this->calculateTotal($get, $set);
                                                     })

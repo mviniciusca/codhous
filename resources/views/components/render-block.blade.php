@@ -205,36 +205,75 @@
 
                         @php
                             $company = \App\Models\Setting::get('company', []);
+                            $website = \App\Models\Setting::get('website', []);
                             $contactEmail = !empty($data['email_to']) ? $data['email_to'] : data_get($company, 'email');
                             $phone = data_get($company, 'phone');
                             $addr = data_get($company, 'address', []);
                             $addrStr = is_array($addr) ? implode(', ', array_filter($addr)) : (string)$addr;
+
+                            $whatsappBtnEnabled = data_get($website, 'features.whatsapp_button.enabled', false);
+                            $whatsappBtnText = data_get($website, 'features.whatsapp_button.text', 'Chamar no WhatsApp');
+                            $whatsappNumber = data_get($website, 'features.whatsapp_widget.number');
+                            $whatsappUrl = $whatsappNumber 
+                                ? "https://wa.me/55" . preg_replace('/[^0-9]/', '', $whatsappNumber) . "?text=" . urlencode('Olá! Vim pela página de contato do site.')
+                                : '#';
                         @endphp
 
-                        <div class="space-y-5">
-                            @if($contactEmail)
-                                <div class="flex items-center gap-4">
-                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <i data-lucide="mail" class="h-5 w-5"></i>
+                        <div class="space-y-4">
+                            @if($whatsappBtnEnabled && $whatsappNumber)
+                                <a href="{{ $whatsappUrl }}" target="_blank" class="flex items-center gap-4 rounded-xl bg-[#25D366] p-4 text-white shadow transition-all hover:-translate-y-0.5 hover:bg-[#20ba5a] hover:shadow-md group">
+                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white transition-transform group-hover:scale-110">
+                                        <i data-lucide="message-circle" class="h-6 w-6 fill-current"></i>
                                     </div>
                                     <div>
-                                        <p class="text-xs text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">E-mail</p>
-                                        <p class="font-medium text-foreground">{{ $contactEmail }}</p>
+                                        <p class="font-bold text-white">{{ $whatsappBtnText }}</p>
+                                        <p class="text-xs font-medium text-white/80">{{ $whatsappNumber }}</p>
                                     </div>
-                                </div>
+                                </a>
                             @endif
-                            @if($phone)
-                                <div class="flex items-center gap-4">
-                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <i data-lucide="phone" class="h-5 w-5"></i>
+
+                            @if($contactEmail)
+                                <a href="mailto:{{ $contactEmail }}" class="flex items-center gap-4 rounded-xl border border-primary bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md group">
+                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                                        <i data-lucide="mail" class="h-6 w-6 fill-current"></i>
                                     </div>
                                     <div>
-                                        <p class="text-xs text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">Telefone</p>
-                                        <p class="font-medium text-foreground">{{ $phone }}</p>
+                                        <p class="font-bold text-primary">E-mail</p>
+                                        <p class="text-xs font-medium text-foreground">{{ $contactEmail }}</p>
                                     </div>
-                                </div>
+                                </a>
+                            @endif
+
+                            @if($phone)
+                                @php
+                                    $phoneClean = preg_replace('/[^0-9]/', '', $phone);
+                                    $phoneLink = strlen($phoneClean) >= 10 ? '55' . $phoneClean : $phoneClean;
+                                @endphp
+                                <a href="tel:{{ $phoneLink }}" class="flex items-center gap-4 rounded-xl border border-primary bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md group">
+                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                                        <i data-lucide="phone" class="h-6 w-6 fill-current"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-primary">Telefone</p>
+                                        <p class="text-xs font-medium text-foreground">{{ $phone }}</p>
+                                    </div>
+                                </a>
                             @endif
                         </div>
+
+                        @if($addrStr)
+                            <div class="mt-8 pt-8 border-t border-border">
+                                <div class="flex items-start gap-4">
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <i data-lucide="map-pin" class="h-5 w-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-foreground mb-1">Nosso Endereço</p>
+                                        <p class="text-sm text-muted-foreground leading-relaxed">{{ $addrStr }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                     <div class="rounded-2xl border border-border bg-card p-8 shadow-sm">
                         <livewire:mail.form />

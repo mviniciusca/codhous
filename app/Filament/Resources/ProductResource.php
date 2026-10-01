@@ -73,6 +73,12 @@ class ProductResource extends Resource
                                     ->label('Nome')
                                     ->placeholder('Ex: Concreto Usinado ou Polimento de Piso')
                                     ->helperText('O nome que aparecerá para o cliente no site.'),
+                                TextInput::make('min_quantity')
+                                    ->label('Quantidade Mínima')
+                                    ->numeric()
+                                    ->default(1)
+                                    ->required()
+                                    ->helperText('A quantidade mínima permitida para pedido deste produto.'),
                             ]),
                     ]),
                 Group::make()
