@@ -226,9 +226,24 @@
             $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
             $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
             $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/5';
+            
+            $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
+            $bgFit = $data['background_image_fit'] ?? 'cover';
+            $bgPos = $data['background_image_position'] ?? 'center';
+            $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
+            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
+            $bgPullUp = $bgPullUpAmount > 0;
+            
+            $overflowClass = $bgPullUp ? '' : 'overflow-hidden';
+            $bgDivClasses = 'absolute inset-x-0 bottom-0 z-0 pointer-events-none bg-no-repeat';
+            $topStyle = $bgPullUp ? "-{$bgPullUpAmount}%" : "0";
+            $bgPositionStyle = $bgPullUp ? ($bgPos === 'center' ? 'center bottom' : $bgPos . ' bottom') : $bgPos;
         @endphp
-        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }}">
+            @if($bgImg)
+                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
+            @endif
+            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 @if(!empty($calcTitle) || !empty($calcSubtitle))
                     <div class="mb-10">
                         @if(!empty($calcSubtitle))
@@ -250,6 +265,117 @@
                     </div>
                 @endif
                 <livewire:calculator :bg-color="$data['background_color'] ?? ''" />
+            </div>
+        </section>
+        @break
+
+    @case('payment_offer')
+        @php
+            $offerTitle = $data['header']['title'] ?? $data['title'] ?? null;
+            $offerSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
+            $offerDesc = $data['header']['description'] ?? $data['subtitle'] ?? null;
+            
+            $bgColor = $data['background_color'] ?? '';
+            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
+            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
+            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
+            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/10';
+            
+            $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
+            $bgFit = $data['background_image_fit'] ?? 'cover';
+            $bgPos = $data['background_image_position'] ?? 'center';
+            $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
+            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
+            $bgPullUp = $bgPullUpAmount > 0;
+            
+            $overflowClass = $bgPullUp ? '' : 'overflow-hidden';
+            $bgDivClasses = 'absolute inset-x-0 bottom-0 z-0 pointer-events-none bg-no-repeat';
+            $topStyle = $bgPullUp ? "-{$bgPullUpAmount}%" : "0";
+            $bgPositionStyle = $bgPullUp ? ($bgPos === 'center' ? 'center bottom' : $bgPos . ' bottom') : $bgPos;
+            
+            $website = \App\Models\Setting::get('website', []);
+            $whatsappNumber = data_get($website, 'features.whatsapp_widget.number', '');
+            $buttonUrl = $data['button_url'] ?? null;
+            $whatsappUrl = $whatsappNumber && empty($buttonUrl)
+                ? "https://wa.me/55" . preg_replace('/[^0-9]/', '', $whatsappNumber) . "?text=" . urlencode('Olá! Gostaria de fazer um orçamento.')
+                : $buttonUrl;
+                
+            $methodsUrl = !empty($data['payment_methods_image']) 
+                ? (str_starts_with($data['payment_methods_image'], 'http') ? $data['payment_methods_image'] : \Illuminate\Support\Facades\Storage::url($data['payment_methods_image'])) 
+                : null;
+        @endphp
+        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-12 lg:py-16 relative {{ $overflowClass }}">
+            @if($bgImg)
+                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
+            @endif
+            <div class="mx-auto max-w-4xl px-4 lg:px-8 relative z-10 text-center">
+                @if(!empty($offerTitle) || !empty($offerSubtitle))
+                    <div class="mb-10">
+                        @if(!empty($offerSubtitle))
+                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
+                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $offerSubtitle }}</span>
+                            </div>
+                        @endif
+                        @if(!empty($offerTitle))
+                            <h2 class="font-mono text-3xl font-extrabold tracking-tight text-foreground md:text-5xl drop-shadow-sm mb-4" style="text-wrap: balance;">
+                                {{ $offerTitle }}
+                            </h2>
+                        @endif
+                        @if(!empty($offerDesc))
+                            <p class="text-lg font-medium leading-relaxed text-muted-foreground max-w-2xl mx-auto" style="text-wrap: balance;">
+                                {{ $offerDesc }}
+                            </p>
+                        @endif
+                    </div>
+                @endif
+                
+                <div class="flex flex-col items-center gap-6 mt-8">
+                    @if(!empty($data['button_label']))
+                    <div class="relative group">
+                        <div class="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#25D366] to-[#128C7E] opacity-60 blur-md transition duration-1000 group-hover:opacity-100 group-hover:duration-200"></div>
+                        <a href="{{ $whatsappUrl }}" target="_blank"
+                           class="relative inline-flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-4 text-sm sm:text-base font-extrabold text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#20ba5a] border border-white/10">
+                            <i data-lucide="message-circle" class="h-5 w-5"></i>
+                            {{ $data['button_label'] }}
+                        </a>
+                    </div>
+                    @endif
+
+                    <!-- Meios de pagamento -->
+                    <div class="mt-4 opacity-70 transition-opacity hover:opacity-100">
+                        @if($methodsUrl)
+                            <img src="{{ $methodsUrl }}" alt="Meios de Pagamento Aceitos" class="h-16 sm:h-20 md:h-24 w-auto object-contain mx-auto filter drop-shadow-lg">
+                        @else
+                            <div class="flex items-center justify-center gap-5 flex-wrap text-foreground/40 [.text-scheme-dark_&]:text-white/40 text-xs sm:text-sm font-semibold tracking-widest">
+                                <div class="flex items-center gap-1.5 hover:text-[#32BCAD] transition-colors cursor-default">
+                                    <i data-lucide="scan-line" class="h-5 w-5"></i>
+                                    <span>PIX</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
+                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                    <span>VISA</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
+                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                    <span>MASTER</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
+                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                    <span>AMEX</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
+                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                    <span>ELO</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
+                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                    <span>HIPERCARD</span>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </section>
         @break
@@ -451,18 +577,33 @@
         />
         @break
 
-    @case('payment_offer')
-        <x-section-payment-offer
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
-            :badge="$data['badge'] ?? null"
-            :title="$data['title'] ?? null"
-            :subtitle="$data['subtitle'] ?? null"
-            :button-label="$data['button_label'] ?? null"
-            :button-url="$data['button_url'] ?? null"
-            :background-image="$data['background_image'] ?? null"
-            :payment-methods-image="$data['payment_methods_image'] ?? null"
-        />
+
+    @case('simple_banner')
+        @php
+            $bannerImg = !empty($data['image']) ? \Illuminate\Support\Facades\Storage::url($data['image']) : null;
+            $bannerLink = $data['link_url'] ?? null;
+            $openInNewTab = $data['open_in_new_tab'] ?? true;
+            $target = $openInNewTab ? '_blank' : '_self';
+            
+            $bgColor = $data['background_color'] ?? 'bg-transparent';
+            $textColor = ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '';
+        @endphp
+        
+        @if($bannerImg)
+            <section class="{{ $bgColor }} {{ $textColor }} py-6 lg:py-10">
+                <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                    @if($bannerLink)
+                        <a href="{{ $bannerLink }}" target="{{ $target }}" class="block overflow-hidden rounded-2xl shadow-xl transition-transform hover:-translate-y-1 hover:shadow-2xl duration-300">
+                            <img src="{{ $bannerImg }}" alt="Banner" class="w-full h-auto object-cover" />
+                        </a>
+                    @else
+                        <div class="block overflow-hidden rounded-2xl shadow-xl">
+                            <img src="{{ $bannerImg }}" alt="Banner" class="w-full h-auto object-cover" />
+                        </div>
+                    @endif
+                </div>
+            </section>
+        @endif
         @break
 
 @endswitch

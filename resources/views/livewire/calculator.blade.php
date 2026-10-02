@@ -2,8 +2,11 @@
     $isPrimaryBg = str_contains($bgColor, 'bg-primary');
     $accentText = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
     $accentBg = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)] text-white' : 'bg-primary text-primary-foreground';
-    $accentLightBg = $isPrimaryBg ? 'bg-black/20' : 'bg-primary/10';
-    $accentLightBorder = $isPrimaryBg ? 'border-black/30' : 'border-primary/30';
+    $accentLightBg = $isPrimaryBg ? 'bg-black/40' : 'bg-primary/10';
+    $accentLightBorder = $isPrimaryBg ? 'border-black/50' : 'border-primary/30';
+    
+    $boxBg = $isPrimaryBg ? 'bg-black/25' : 'bg-black/5 [.text-scheme-dark_&]:bg-white/5';
+    $boxBorder = $isPrimaryBg ? 'border-black/35' : 'border-black/10 [.text-scheme-dark_&]:border-white/10';
 @endphp
 <div class="grid items-start gap-12 lg:grid-cols-2 lg:gap-20">
     <div>
@@ -36,7 +39,7 @@
         </div>
     </div>
 
-    <div class="rounded-lg border border-black/10 bg-black/5 [.text-scheme-dark_&]:border-white/10 [.text-scheme-dark_&]:bg-white/5 p-8">
+    <div class="rounded-lg border {{ $boxBorder }} {{ $boxBg }} p-8 shadow-sm">
         <div class="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div wire:ignore class="flex h-10 w-10 items-center justify-center rounded-lg {{ $accentLightBg }}">
@@ -45,7 +48,7 @@
                 <h3 class="font-mono text-lg font-bold text-foreground">Calcule Agora</h3>
             </div>
 
-            <div class="flex rounded-md border border-black/20 bg-black/5 [.text-scheme-dark_&]:border-white/20 [.text-scheme-dark_&]:bg-white/5 p-1 w-full sm:w-auto">
+            <div class="flex rounded-md border {{ $boxBorder }} {{ $boxBg }} p-1 w-full sm:w-auto">
                 <button wire:click="$set('shape', 'retangular')" class="flex-1 rounded px-3 py-1.5 text-xs font-semibold transition-colors {{ $shape === 'retangular' ? $accentBg . ' [.text-scheme-dark_&]:bg-white [.text-scheme-dark_&]:text-primary' : 'text-foreground/60 [.text-scheme-dark_&]:text-white/60 hover:text-foreground [.text-scheme-dark_&]:hover:text-white' }}">Lajes/Pisos</button>
                 <button wire:click="$set('shape', 'cilindrico')" class="flex-1 rounded px-3 py-1.5 text-xs font-semibold transition-colors {{ $shape === 'cilindrico' ? $accentBg . ' [.text-scheme-dark_&]:bg-white [.text-scheme-dark_&]:text-primary' : 'text-foreground/60 [.text-scheme-dark_&]:text-white/60 hover:text-foreground [.text-scheme-dark_&]:hover:text-white' }}">Cilindros</button>
             </div>

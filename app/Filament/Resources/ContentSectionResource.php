@@ -516,6 +516,45 @@ class ContentSectionResource extends Resource
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_CALCULATOR)
                     ->collapsible(),
+                    
+                // Payment Offer
+                Forms\Components\Section::make('Oferta de Pagamento')
+                    ->description('Exibe uma oferta de pagamento e meios de pagamento.')
+                    ->icon('heroicon-o-credit-card')
+                    ->schema([
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('content.button_label')->label(__('Texto do Botão'))->default('Fazer orçamento grátis'),
+                            Forms\Components\TextInput::make('content.button_url')->label(__('URL do Botão (Deixe vazio p/ usar o WhatsApp)'))->helperText('Se vazio, enviará para o WhatsApp padrão.'),
+                            Forms\Components\FileUpload::make('content.payment_methods_image')->image()->directory('sections/payment')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.')->columnSpanFull(),
+                        ])
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_PAYMENT_OFFER)
+                    ->collapsible(),
+                    
+                // Simple Banner
+                Forms\Components\Section::make('Banner Simples (Imagem e Link)')
+                    ->description('Exibe uma imagem clicável, ideal para chamadas promocionais rápidas.')
+                    ->icon('heroicon-o-photo')
+                    ->schema([
+                        Forms\Components\FileUpload::make('content.image')
+                            ->label('Imagem do Banner')
+                            ->image()
+                            ->directory('sections/banners')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('content.link_url')
+                                ->label('Link de Destino')
+                                ->url()
+                                ->placeholder('Ex: https://...'),
+                            Forms\Components\Toggle::make('content.open_in_new_tab')
+                                ->label('Abrir link em nova aba?')
+                                ->default(true)
+                                ->inline(false),
+                        ])
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_SIMPLE_BANNER)
+                    ->collapsible(),
                             ]),
 
                         Forms\Components\Tabs\Tab::make('Configurações')
@@ -589,6 +628,64 @@ class ContentSectionResource extends Resource
                                             ])
                                             ->default('light')
                                             ->helperText('Ajuste isso para que o texto não "suma" se o fundo for muito escuro.'),
+                                            
+                                        Forms\Components\Fieldset::make('Fundo com Imagem')
+                                            ->schema([
+                                                Forms\Components\FileUpload::make('content.background_image')
+                                                    ->label('Imagem de Fundo')
+                                                    ->image()
+                                                    ->directory('sections/backgrounds')
+                                                    ->helperText('Selecione uma imagem para o fundo da seção.')
+                                                    ->live()
+                                                    ->columnSpanFull(),
+                                                Forms\Components\ToggleButtons::make('content.background_image_fit')
+                                                    ->label('Preenchimento')
+                                                    ->options([
+                                                        'cover' => 'Preencher (Cover)',
+                                                        'contain' => 'Conter (Contain)',
+                                                    ])
+                                                    ->default('cover')
+                                                    ->inline()
+                                                    ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image'))),
+                                                Forms\Components\ToggleButtons::make('content.background_image_position')
+                                                    ->label('Alinhamento')
+                                                    ->options([
+                                                        'center' => 'Centro',
+                                                        'left' => 'Esquerda',
+                                                        'right' => 'Direita',
+                                                        'top' => 'Topo',
+                                                        'bottom' => 'Base',
+                                                    ])
+                                                    ->default('center')
+                                                    ->inline()
+                                                    ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image'))),
+                                                Forms\Components\Select::make('content.background_image_opacity')
+                                                    ->label('Opacidade da Imagem')
+                                                    ->options([
+                                                        '10' => '10%',
+                                                        '20' => '20%',
+                                                        '30' => '30%',
+                                                        '40' => '40%',
+                                                        '50' => '50%',
+                                                        '60' => '60%',
+                                                        '70' => '70%',
+                                                        '80' => '80%',
+                                                        '90' => '90%',
+                                                        '100' => '100%',
+                                                    ])
+                                                    ->default('100')
+                                                    ->helperText('Mistura a imagem com a Cor de Fundo.')
+                                                    ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image'))),
+                                                Forms\Components\TextInput::make('content.background_image_pull_up')
+                                                    ->label('Puxar Imagem para Cima (%)')
+                                                    ->type('range')
+                                                    ->extraInputAttributes(['min' => 0, 'max' => 100, 'step' => 5])
+                                                    ->default(0)
+                                                    ->helperText('Define o quanto a imagem deve estourar o topo da seção (ex: 25%). 0 = não vaza. Ideal para fotos de pessoas recortadas.')
+                                                    ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image')))
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->columns(3),
                                     ])->columns(2),
                             ]),
                     ])

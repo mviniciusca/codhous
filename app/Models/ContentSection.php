@@ -37,6 +37,8 @@ class ContentSection extends Model
     public const TYPE_CONTACT_BANNER = 'contact_banner';
     public const TYPE_BUDGET_FORM = 'budget_form';
     public const TYPE_CALCULATOR = 'calculator';
+    public const TYPE_PAYMENT_OFFER = 'payment_offer';
+    public const TYPE_SIMPLE_BANNER = 'simple_banner';
 
 
     public static function typeLabels(): array
@@ -54,6 +56,8 @@ class ContentSection extends Model
             self::TYPE_CONTACT_BANNER => 'Banner de Atendimento',
             self::TYPE_BUDGET_FORM => 'Formulário de Orçamento',
             self::TYPE_CALCULATOR => 'Calculadora de Volume',
+            self::TYPE_PAYMENT_OFFER => 'Oferta de Pagamento',
+            self::TYPE_SIMPLE_BANNER => 'Banner Simples (Imagem e Link)',
         ];
     }
 
@@ -72,6 +76,8 @@ class ContentSection extends Model
             self::TYPE_CONTACT_BANNER => 'contact-banner',
             self::TYPE_BUDGET_FORM => 'budget-form',
             self::TYPE_CALCULATOR => 'calculator',
+            self::TYPE_PAYMENT_OFFER => 'payment-offer',
+            self::TYPE_SIMPLE_BANNER => 'simple-banner',
             default => $type,
         };
     }
