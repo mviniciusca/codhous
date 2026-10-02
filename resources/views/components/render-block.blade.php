@@ -220,6 +220,16 @@
                         @endphp
 
                         <div class="space-y-4">
+                            <a href="{{ url('/#orcamento') }}" class="flex items-center gap-4 rounded-xl bg-primary p-4 text-white shadow transition-all hover:-translate-y-0.5 hover:shadow-md group">
+                                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white transition-transform group-hover:scale-110">
+                                    <i data-lucide="calculator" class="h-6 w-6 fill-none stroke-current stroke-2"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white">Orçamento Grátis Online</p>
+                                    <p class="text-xs font-medium text-white/80">Faça uma cotação rápida agora</p>
+                                </div>
+                            </a>
+
                             @if($whatsappBtnEnabled && $whatsappNumber)
                                 <a href="{{ $whatsappUrl }}" target="_blank" class="flex items-center gap-4 rounded-xl bg-[#25D366] p-4 text-white shadow transition-all hover:-translate-y-0.5 hover:bg-[#20ba5a] hover:shadow-md group">
                                     <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white transition-transform group-hover:scale-110">
