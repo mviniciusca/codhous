@@ -61,14 +61,23 @@ class ContentSectionResource extends Resource
                     ->description('Destaque principal no topo da página.')
                     ->icon('heroicon-o-presentation-chart-line')
                     ->schema([
-                        Forms\Components\Select::make('content.layout')
-                            ->label('Layout')
-                            ->helperText('Escolha o estilo de exibição.')
-                            ->options([
-                                'default' => 'Padrão (Texto + CEP)',
-                                'whatsapp' => 'WhatsApp (Texto Central)',
-                            ])->default('default'),
                         Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\ToggleButtons::make('content.layout')
+                                ->label('Layout')
+                                ->helperText('Escolha o estilo de exibição.')
+                                ->options([
+                                    'default' => 'Formulário de CEP',
+                                    'whatsapp' => 'Cartão do WhatsApp',
+                                ])->default('default')
+                                ->inline(),
+                            Forms\Components\ToggleButtons::make('content.image_alignment')
+                                ->label('Alinhamento da Imagem / Vídeo')
+                                ->options([
+                                    'center' => 'Centro',
+                                    'top' => 'Topo',
+                                    'bottom' => 'Base',
+                                ])->default('center')
+                                ->inline(),
                             Forms\Components\FileUpload::make('content.image')
                                 ->label('Imagem de Fundo')
                                 ->helperText('Imagem principal que ficará no fundo da seção.')
@@ -80,13 +89,10 @@ class ContentSectionResource extends Resource
                                 ->acceptedFileTypes(['video/mp4'])
                                 ->directory('hero'),
                         ]),
-                        Forms\Components\Select::make('content.image_alignment')
-                            ->label('Alinhamento da Imagem / Vídeo')
-                            ->options([
-                                'center' => 'Centro',
-                                'top' => 'Topo',
-                                'bottom' => 'Base',
-                            ])->default('center'),
+                        Forms\Components\Toggle::make('content.show_action_buttons')
+                            ->label('Exibir Botões de Ação')
+                            ->helperText('Habilite para mostrar os botões adicionais no banner.')
+                            ->default(true),
                         Forms\Components\Fieldset::make('Botões de Ação')
                             ->schema([
                                 Forms\Components\Group::make([
@@ -144,6 +150,10 @@ class ContentSectionResource extends Resource
                                         ->visible(fn ($get) => $get('content.secondary_button_icon_select') === 'outro'),
                                 ])->columns(1),
                             ]),
+                        Forms\Components\Toggle::make('content.show_stats')
+                            ->label('Exibir Estatísticas')
+                            ->helperText('Habilite para exibir o bloco de estatísticas no banner.')
+                            ->default(true),
                         Forms\Components\Repeater::make('content.stats')
                             ->label('Estatísticas')
                             ->helperText('Números importantes em destaque (ex: +500 Projetos).')
@@ -154,6 +164,7 @@ class ContentSectionResource extends Resource
                             ->columns(2)
                             ->collapsible()
                             ->cloneable()
+                            ->maxItems(3)
                             ->itemLabel(fn (array $state): ?string => trim(($state['value'] ?? '') . ' ' . ($state['label'] ?? '')) ?: null)
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_HERO)

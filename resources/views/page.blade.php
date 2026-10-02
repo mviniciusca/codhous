@@ -43,29 +43,7 @@
         />
     @endif
 
-    {{-- Hero Section as a Fixed Theme Component on Home Page --}}
-    @if($isHome)
-        @php
-            $heroData = data_get($websiteSettings, 'hero', []);
-            $slides = data_get($heroData, 'slideshow', []);
-            $firstSlide = count($slides) > 0 ? $slides[0] : [];
-        @endphp
-        @if(!empty($firstSlide) || !empty($heroData))
-            <livewire:section-hero-cep
-                :main-slide="[
-                    'title' => $firstSlide['title'] ?? '',
-                    'subtitle' => $firstSlide['subtitle'] ?? '',
-                    'image' => $firstSlide['image'] ?? null,
-                    'video' => $firstSlide['video'] ?? null,
-                    'image_alignment' => $heroData['image_alignment'] ?? 'center'
-                ]"
-                :badge="$heroData['badge'] ?? ''"
-                :layout="$heroData['layout'] ?? 'default'"
-                :theme="$pageTheme"
-                :stats="$heroData['stats'] ?? []"
-            />
-        @endif
-    @endif
+
 
     @foreach($content as $block)
         <x-render-block 

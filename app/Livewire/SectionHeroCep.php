@@ -32,6 +32,10 @@ class SectionHeroCep extends Component
     /** Botões de ação adicionais */
     public array $buttons = [];
 
+    /** Controles de visibilidade */
+    public bool $showActionButtons = true;
+    public bool $showStats = true;
+
     public function updatedCep($value)
     {
         $digits = preg_replace('/[^0-9]/', '', $value);
@@ -112,6 +116,8 @@ class SectionHeroCep extends Component
             'theme' => $this->theme ?: 'default',
             'stats' => $stats,
             'buttons' => $this->buttons,
+            'showActionButtons' => $this->showActionButtons,
+            'showStats' => $this->showStats,
         ]);
     }
 }

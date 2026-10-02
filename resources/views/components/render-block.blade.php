@@ -30,10 +30,14 @@
             $heroSubtitle = $data['header']['description'] ?? $data['subtitle'] ?? '';
             
             $primaryIconSelect = $data['primary_button_icon_select'] ?? '';
-            $primaryIcon = $primaryIconSelect === 'outro' ? ($data['primary_button_icon'] ?? '') : $primaryIconSelect;
+            $primaryIcon = $primaryIconSelect === 'outro' 
+                ? ($data['primary_button_icon'] ?? '') 
+                : ($primaryIconSelect ?: ($data['primary_button_icon'] ?? ''));
 
             $secondaryIconSelect = $data['secondary_button_icon_select'] ?? '';
-            $secondaryIcon = $secondaryIconSelect === 'outro' ? ($data['secondary_button_icon'] ?? '') : $secondaryIconSelect;
+            $secondaryIcon = $secondaryIconSelect === 'outro' 
+                ? ($data['secondary_button_icon'] ?? '') 
+                : ($secondaryIconSelect ?: ($data['secondary_button_icon'] ?? ''));
         @endphp
         <livewire:section-hero-cep
             :main-slide="[
@@ -55,6 +59,8 @@
                     'icon' => $secondaryIcon,
                 ]
             ]"
+            :show-action-buttons="$data['show_action_buttons'] ?? true"
+            :show-stats="$data['show_stats'] ?? true"
             :badge="$heroBadge"
             :layout="$data['layout'] ?? 'default'"
             :theme="$theme"
