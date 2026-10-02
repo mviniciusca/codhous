@@ -89,7 +89,43 @@ class ContentSectionResource extends Resource
                                 ->acceptedFileTypes(['video/mp4'])
                                 ->directory('hero'),
                         ]),
-                        Forms\Components\Toggle::make('content.show_action_buttons')
+                        Forms\Components\Toggle::make('content.show_slideshow')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
+                            ->label('Habilitar Slideshow (Carrossel no fundo)')
+                            ->helperText('Se ativo, exibirá um carrossel rotativo atrás da Hero em vez da imagem/vídeo fixo.')
+                            ->default(false)
+                            ->live(),
+                        Forms\Components\Repeater::make('content.slideshow')
+                            ->label('Slides de Fundo')
+                            ->schema([
+                                Forms\Components\FileUpload::make('image')
+                                    ->label('Imagem')
+                                    ->image()
+                                    ->directory('hero')
+                                    ->required(),
+                                Forms\Components\Select::make('image_alignment')
+                                    ->label('Alinhamento da Imagem')
+                                    ->options([
+                                        'center' => 'Centro (Padrão)',
+                                        'top' => 'Topo',
+                                        'bottom' => 'Base',
+                                        'left' => 'Esquerda',
+                                        'right' => 'Direita',
+                                    ])->default('center'),
+                            ])
+                            ->columns(2)
+                            ->collapsible()
+                            ->cloneable()
+                            ->maxItems(3)
+                            ->itemLabel(function (array $state): string {
+                                $image = $state['image'] ?? null;
+                                if (is_array($image)) {
+                                    $image = array_values($image)[0] ?? null;
+                                }
+                                return $image ? 'Imagem: ' . basename((string) $image) : 'Novo Slide';
+                            })
+                            ->addActionLabel('Adicionar Imagem')
+                            ->visible(fn ($get) => $get('content.show_slideshow')),
+                        Forms\Components\Toggle::make('content.show_action_buttons')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                             ->label('Exibir Botões de Ação')
                             ->helperText('Habilite para mostrar os botões adicionais no banner.')
                             ->default(true),
@@ -150,7 +186,7 @@ class ContentSectionResource extends Resource
                                         ->visible(fn ($get) => $get('content.secondary_button_icon_select') === 'outro'),
                                 ])->columns(1),
                             ]),
-                        Forms\Components\Toggle::make('content.show_stats')
+                        Forms\Components\Toggle::make('content.show_stats')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                             ->label('Exibir Estatísticas')
                             ->helperText('Habilite para exibir o bloco de estatísticas no banner.')
                             ->default(true),
@@ -318,7 +354,7 @@ class ContentSectionResource extends Resource
                             ->helperText('Se não preenchido, enviará para o e-mail padrão da empresa.'),
                         Forms\Components\Fieldset::make('Botão Orçamento')
                             ->schema([
-                                Forms\Components\Toggle::make('content.budget_btn_enabled')
+                                Forms\Components\Toggle::make('content.budget_btn_enabled')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                     ->label('Mostrar botão')
                                     ->helperText('Liga ou desliga esse botão.')
                                     ->onIcon('heroicon-m-check')
@@ -339,22 +375,22 @@ class ContentSectionResource extends Resource
                             ])->columns(3),
                         Forms\Components\Fieldset::make('Botões Adicionais')
                             ->schema([
-                                Forms\Components\Toggle::make('content.whatsapp_btn_enabled')
+                                Forms\Components\Toggle::make('content.whatsapp_btn_enabled')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                     ->label('Mostrar WhatsApp')
                                     ->helperText('Puxa o número das configurações do site.')
                                     ->onIcon('heroicon-m-check')
                                     ->default(true),
-                                Forms\Components\Toggle::make('content.email_btn_enabled')
+                                Forms\Components\Toggle::make('content.email_btn_enabled')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                     ->label('Mostrar E-mail')
                                     ->helperText('Mostra o e-mail cadastrado acima.')
                                     ->onIcon('heroicon-m-check')
                                     ->default(true),
-                                Forms\Components\Toggle::make('content.phone_btn_enabled')
+                                Forms\Components\Toggle::make('content.phone_btn_enabled')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                     ->label('Mostrar Telefone')
                                     ->helperText('Puxa do cadastro da empresa.')
                                     ->onIcon('heroicon-m-check')
                                     ->default(true),
-                                Forms\Components\Toggle::make('content.address_enabled')
+                                Forms\Components\Toggle::make('content.address_enabled')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                     ->label('Mostrar Endereço')
                                     ->helperText('Puxa do cadastro da empresa.')
                                     ->onIcon('heroicon-m-check')
@@ -386,17 +422,17 @@ class ContentSectionResource extends Resource
                             ->rows(2),
                         Forms\Components\Grid::make(3)
                             ->schema([
-                                Forms\Components\Toggle::make('content.whatsapp_enabled')
+                                Forms\Components\Toggle::make('content.whatsapp_enabled')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                     ->label('Botão WhatsApp')
                                     ->helperText('Ativa o botão do WhatsApp.')
                                     ->onIcon('heroicon-m-check')
                                     ->default(true),
-                                Forms\Components\Toggle::make('content.call_enabled')
+                                Forms\Components\Toggle::make('content.call_enabled')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                     ->label('Botão Ligar')
                                     ->helperText('Ativa o botão de ligação.')
                                     ->onIcon('heroicon-m-check')
                                     ->default(true),
-                                Forms\Components\Toggle::make('content.email_enabled')
+                                Forms\Components\Toggle::make('content.email_enabled')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                     ->label('Botão E-mail')
                                     ->helperText('Ativa o botão de e-mail.')
                                     ->onIcon('heroicon-m-check')
@@ -439,7 +475,7 @@ class ContentSectionResource extends Resource
                                             ->required()
                                             ->maxLength(255)
                                             ->helperText('Nome para identificação interna nesta lista.'),
-                                        Forms\Components\Toggle::make('is_active')
+                                        Forms\Components\Toggle::make('is_active')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                             ->label('Ativo')
                                             ->onIcon('heroicon-m-check')
                                             ->default(true)

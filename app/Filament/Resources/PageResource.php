@@ -55,17 +55,8 @@ class PageResource extends Resource
                                     self::getPageHeaderBlock(),
                                     self::getCalculatorBlock(),
                                     self::getBudgetFormBlock(),
-                                    self::getPartnersBlock(),
-                                    self::getServicesBlock(),
-                                    self::getTimelineBlock(),
                                     self::getShowcaseBlock(),
-                                    self::getFaqBlock(),
-                                    self::getTestimonialsBlock(),
-                                    self::getCoverageBlock(),
-                                    self::getContactBannerBlock(),
                                     self::getMapBlock(),
-                                    self::getDifferentialsBlock(),
-                                    self::getCtaBlock(),
                                     self::getRichTextBlock(),
                                     self::getPaymentOfferBlock(),
                                     self::getModuleReferenceBlock(),
@@ -268,10 +259,12 @@ class PageResource extends Resource
             ->label(__('Galeria de Obras (Showcase)'))
             ->icon('heroicon-o-camera')
             ->schema([
-                Forms\Components\TextInput::make('badge')->label(__('Texto do Badge (Laranja)'))->helperText(__('Ex: NOSSAS OBRAS'))->placeholder('NOSSAS OBRAS'),
-                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da galeria.'))->required(),
-                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo da galeria.')),
-                Forms\Components\TextInput::make('limit')->numeric()->default(4)->label(__('Limite de itens'))->helperText(__('Quantidade máxima de obras a serem exibidas.')),
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Ex: NOSSAS OBRAS'))->placeholder('NOSSAS OBRAS'),
+                    Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da galeria.'))->required(),
+                    Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo da galeria.'))->columnSpanFull(),
+                    Forms\Components\TextInput::make('limit')->numeric()->default(4)->label(__('Limite de itens'))->helperText(__('Quantidade máxima de obras a serem exibidas.')),
+                ])
             ]);
     }
 
@@ -365,11 +358,13 @@ class PageResource extends Resource
             ->label(__('Cabeçalho da Página'))
             ->icon('heroicon-o-document-text')
             ->schema([
-                Forms\Components\TextInput::make('badge')->label(__('Texto de Apoio (Laranja)'))->helperText(__('Texto acima do título principal.'))->placeholder('NOSSOS SERVIÇOS'),
-                Forms\Components\TextInput::make('title')->label(__('Título Principal'))->helperText(__('Título grande da página.'))->required(),
-                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Subtítulo ou texto descritivo do cabeçalho.')),
-                Forms\Components\Toggle::make('show_breadcrumbs')->label(__('Mostrar Breadcrumbs'))->helperText(__('Exibe o caminho de navegação (ex: Home > Serviços).'))->onIcon('heroicon-m-check')->default(true),
-                Forms\Components\FileUpload::make('background_image')->image()->directory('headers')->label(__('Imagem de Fundo (Opcional)'))->helperText(__('Imagem de fundo para o cabeçalho.')),
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Texto acima do título principal.'))->placeholder('NOSSOS SERVIÇOS'),
+                    Forms\Components\TextInput::make('title')->label(__('Título Principal'))->helperText(__('Título grande da página.'))->required(),
+                    Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Subtítulo ou texto descritivo do cabeçalho.'))->columnSpanFull(),
+                    Forms\Components\Toggle::make('show_breadcrumbs')->label(__('Mostrar Breadcrumbs'))->helperText(__('Exibe o caminho de navegação (ex: Home > Serviços).'))->onIcon('heroicon-m-check')->default(true)->columnSpanFull(),
+                    Forms\Components\FileUpload::make('background_image')->image()->directory('headers')->label(__('Imagem de Fundo (Opcional)'))->helperText(__('Imagem de fundo para o cabeçalho.'))->columnSpanFull(),
+                ])
             ]);
     }
 
@@ -465,13 +460,15 @@ class PageResource extends Resource
             ->label(__('Oferta de Pagamento'))
             ->icon('heroicon-o-credit-card')
             ->schema([
-                Forms\Components\TextInput::make('badge')->label(__('Badge'))->default('APROVEITE ESSA MEGA OPORTUNIDADE'),
-                Forms\Components\TextInput::make('title')->label(__('Título'))->default('Parcelamento em até 12x sem juros')->required(),
-                Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->default('ou com desconto no pagamento à vista em dinheiro ou com o pix.'),
-                Forms\Components\TextInput::make('button_label')->label(__('Texto do Botão'))->default('Fazer orçamento grátis'),
-                Forms\Components\TextInput::make('button_url')->label(__('URL do Botão (Deixe vazio p/ usar o WhatsApp)'))->helperText('Se vazio, enviará para o WhatsApp padrão.'),
-                Forms\Components\FileUpload::make('background_image')->image()->directory('offers')->label(__('Imagem de Fundo (Opcional)')),
-                Forms\Components\FileUpload::make('payment_methods_image')->image()->directory('offers')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.'),
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->default('APROVEITE ESSA MEGA OPORTUNIDADE'),
+                    Forms\Components\TextInput::make('title')->label(__('Título'))->default('Parcelamento em até 12x sem juros')->required(),
+                    Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->default('ou com desconto no pagamento à vista em dinheiro ou com o pix.')->columnSpanFull(),
+                    Forms\Components\TextInput::make('button_label')->label(__('Texto do Botão'))->default('Fazer orçamento grátis'),
+                    Forms\Components\TextInput::make('button_url')->label(__('URL do Botão (Deixe vazio p/ usar o WhatsApp)'))->helperText('Se vazio, enviará para o WhatsApp padrão.'),
+                    Forms\Components\FileUpload::make('background_image')->image()->directory('offers')->label(__('Imagem de Fundo (Opcional)'))->columnSpanFull(),
+                    Forms\Components\FileUpload::make('payment_methods_image')->image()->directory('offers')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.')->columnSpanFull(),
+                ])
             ]);
     }
 

@@ -35,6 +35,10 @@ class SectionHeroCep extends Component
     /** Controles de visibilidade */
     public bool $showActionButtons = true;
     public bool $showStats = true;
+    public bool $showSlideshow = false;
+
+    /** Slideshow items */
+    public array $slideshow = [];
 
     public function updatedCep($value)
     {

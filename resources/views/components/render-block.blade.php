@@ -61,6 +61,8 @@
             ]"
             :show-action-buttons="$data['show_action_buttons'] ?? true"
             :show-stats="$data['show_stats'] ?? true"
+            :show-slideshow="$data['show_slideshow'] ?? false"
+            :slideshow="$data['slideshow'] ?? []"
             :badge="$heroBadge"
             :layout="$data['layout'] ?? 'default'"
             :theme="$theme"

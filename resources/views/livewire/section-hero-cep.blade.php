@@ -11,29 +11,80 @@
     $alignmentClass = $alignments[$mainSlide['image_alignment'] ?? 'center'] ?? 'object-center';
 @endphp
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+@endpush
 
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.querySelector('.hero-swiper')) {
+                new Swiper('.hero-swiper', {
+                    loop: true,
+                    effect: 'fade',
+                    fadeEffect: {
+                        crossFade: true
+                    },
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                });
+            }
+        });
+    </script>
+@endpush
     {{-- DEFAULT HERO (Original Layout + Layout Whatsapp toggle) --}}
     <section class="relative flex min-h-[70vh] items-center overflow-hidden bg-zinc-950 pt-8">
         
         {{-- Background Image --}}
         <div class="absolute inset-0 z-0">
             <div class="h-full w-full relative">
-                {{-- Imagem ou Vídeo de fundo --}}
-                @if(!empty($mainSlide['video']))
-                    <video autoplay muted loop playsinline class="h-full w-full object-cover {{ $alignmentClass }}">
-                        <source src="{{ str_starts_with($mainSlide['video'], 'http') ? $mainSlide['video'] : Storage::url($mainSlide['video']) }}" type="video/mp4">
-                    </video>
-                @elseif(!empty($mainSlide['image']))
-                    <img src="{{ str_starts_with($mainSlide['image'], 'http') ? $mainSlide['image'] : Storage::url($mainSlide['image']) }}" 
-                         class="h-full w-full object-cover {{ $alignmentClass }}" 
-                         alt="{{ $mainSlide['title'] ?? '' }}">
+                {{-- Background Media --}}
+                @if($showSlideshow && !empty($slideshow))
+                    <div class="swiper hero-swiper h-full w-full">
+                        <div class="swiper-wrapper">
+                            @foreach($slideshow as $slide)
+                                @php
+                                    $slideAlignments = [
+                                        'center' => 'object-center',
+                                        'top' => 'object-top',
+                                        'bottom' => 'object-bottom',
+                                        'left' => 'object-left',
+                                        'right' => 'object-right',
+                                    ];
+                                    $slideAlignmentClass = $slideAlignments[$slide['image_alignment'] ?? 'center'] ?? 'object-center';
+                                @endphp
+                                <div class="swiper-slide h-full w-full bg-zinc-900">
+                                    @if(!empty($slide['image']))
+                                        <img src="{{ str_starts_with($slide['image'], 'http') ? $slide['image'] : Storage::url($slide['image']) }}" 
+                                             class="h-full w-full object-cover {{ $slideAlignmentClass }}" 
+                                             alt="">
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 @else
-                    <div class="h-full w-full bg-zinc-900"></div>
+                    {{-- Imagem ou Vídeo de fundo único --}}
+                    @if(!empty($mainSlide['video']))
+                        <video autoplay muted loop playsinline class="h-full w-full object-cover {{ $alignmentClass }}">
+                            <source src="{{ str_starts_with($mainSlide['video'], 'http') ? $mainSlide['video'] : Storage::url($mainSlide['video']) }}" type="video/mp4">
+                        </video>
+                    @elseif(!empty($mainSlide['image']))
+                        <img src="{{ str_starts_with($mainSlide['image'], 'http') ? $mainSlide['image'] : Storage::url($mainSlide['image']) }}" 
+                             class="h-full w-full object-cover {{ $alignmentClass }}" 
+                             alt="{{ $mainSlide['title'] ?? '' }}">
+                    @else
+                        <div class="h-full w-full bg-zinc-900"></div>
+                    @endif
                 @endif
                 
                 {{-- Overlay Gradiente --}}
-                <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent"></div>
+                <div class="absolute inset-0 bg-black/40 z-10 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent z-10 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent z-10 pointer-events-none"></div>
             </div>
         </div>
 

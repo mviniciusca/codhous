@@ -75,6 +75,10 @@
                     <img src="{{ $methodsUrl }}" alt="Meios de Pagamento Aceitos" class="h-16 sm:h-20 md:h-28 w-auto object-contain mx-auto filter drop-shadow-lg">
                 @else
                     <div class="flex items-center justify-center gap-5 flex-wrap text-zinc-400 text-xs sm:text-sm font-semibold tracking-widest">
+                        <div class="flex items-center gap-1.5 hover:text-[#32BCAD] transition-colors cursor-default">
+                            <i data-lucide="scan-line" class="h-5 w-5"></i>
+                            <span>PIX</span>
+                        </div>
                         <div class="flex items-center gap-1.5 hover:text-white transition-colors cursor-default">
                             <i data-lucide="credit-card" class="h-5 w-5"></i>
                             <span>VISA</span>
