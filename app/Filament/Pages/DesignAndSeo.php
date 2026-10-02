@@ -50,34 +50,12 @@ class DesignAndSeo extends Page implements HasForms
                     ->icon('heroicon-o-swatch')
                     ->description('Defina o layout e o tema base para todo o site (Cabeçalho, Rodapé e Hero).')
                     ->schema([
-                        \Filament\Forms\Components\Select::make('settings.website.header_theme')
-                            ->label('Tema do Menu Superior (Header & Hero)')
+                        \Filament\Forms\Components\ToggleButtons::make('settings.website.theme')
+                            ->label('Tema Global')
                             ->options(['default' => 'Padrão', 'corporate' => 'Corporativo', 'creative' => 'Criativo'])
+                            ->inline()
                             ->default('default'),
-                        \Filament\Forms\Components\Select::make('settings.website.footer_theme')
-                            ->label('Tema do Rodapé (Footer)')
-                            ->options(['default' => 'Padrão', 'corporate' => 'Corporativo (Escuro)', 'creative' => 'Criativo (Colorido)'])
-                            ->default('default'),
-                    ]),
-
-                Section::make('Identidade Visual')
-                    ->icon('heroicon-o-photo')
-                    ->description('Gerencie o logotipo da sua empresa.')
-                    ->schema([
-                        FileUpload::make('settings.website.logo')
-                            ->label('Logotipo')
-                            ->helperText('Recomendado: SVG ou PNG transparente. Tamanho máx: 2MB.')
-                            ->image()
-                            ->imageEditor()
-                            ->directory('website')
-                            ->visibility('public'),
-                        FileUpload::make('settings.website.favicon')
-                            ->label('Favicon')
-                            ->helperText('Recomendado: PNG ou ICO (32x32px ou 48x48px).')
-                            ->image()
-                            ->directory('website')
-                            ->visibility('public'),
-                        \Filament\Forms\Components\Select::make('settings.website.primary_color')
+                        \Filament\Forms\Components\ToggleButtons::make('settings.website.primary_color')
                             ->label('Cor de Destaque (Branding)')
                             ->options([
                                 '239 68 68' => 'Vermelho',
@@ -99,8 +77,48 @@ class DesignAndSeo extends Page implements HasForms
                                 '244 63 94' => 'Rose',
                                 '113 113 122' => 'Zinco (Cinza)',
                             ])
+                            ->colors([
+                                '239 68 68' => \Filament\Support\Colors\Color::Red,
+                                '249 115 22' => \Filament\Support\Colors\Color::Orange,
+                                '245 158 11' => \Filament\Support\Colors\Color::Amber,
+                                '234 179 8' => \Filament\Support\Colors\Color::Yellow,
+                                '132 204 22' => \Filament\Support\Colors\Color::Lime,
+                                '34 197 94' => \Filament\Support\Colors\Color::Green,
+                                '16 185 129' => \Filament\Support\Colors\Color::Emerald,
+                                '20 184 166' => \Filament\Support\Colors\Color::Teal,
+                                '6 182 212' => \Filament\Support\Colors\Color::Cyan,
+                                '14 165 233' => \Filament\Support\Colors\Color::Sky,
+                                '59 130 246' => \Filament\Support\Colors\Color::Blue,
+                                '99 102 241' => \Filament\Support\Colors\Color::Indigo,
+                                '139 92 246' => \Filament\Support\Colors\Color::Violet,
+                                '168 85 247' => \Filament\Support\Colors\Color::Purple,
+                                '192 38 211' => \Filament\Support\Colors\Color::Fuchsia,
+                                '236 72 153' => \Filament\Support\Colors\Color::Pink,
+                                '244 63 94' => \Filament\Support\Colors\Color::Rose,
+                                '113 113 122' => \Filament\Support\Colors\Color::Zinc,
+                            ])
+                            ->inline()
                             ->default('239 68 68')
                             ->helperText('Escolha a cor principal da identidade visual da sua loja.'),
+                    ]),
+
+                Section::make('Identidade Visual')
+                    ->icon('heroicon-o-photo')
+                    ->description('Gerencie o logotipo da sua empresa.')
+                    ->schema([
+                        FileUpload::make('settings.website.logo')
+                            ->label('Logotipo')
+                            ->helperText('Recomendado: SVG ou PNG transparente. Tamanho máx: 2MB.')
+                            ->image()
+                            ->imageEditor()
+                            ->directory('website')
+                            ->visibility('public'),
+                        FileUpload::make('settings.website.favicon')
+                            ->label('Favicon')
+                            ->helperText('Recomendado: PNG ou ICO (32x32px ou 48x48px).')
+                            ->image()
+                            ->directory('website')
+                            ->visibility('public'),
                     ]),
 
                 Section::make('Identidade e SEO')
@@ -268,6 +286,16 @@ class DesignAndSeo extends Page implements HasForms
     public function getSubheading(): ?string
     {
         return 'Configure as informações globais do site, SEO, scripts e menus de navegação.';
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            \Filament\Actions\Action::make('save')
+                ->label('Salvar Alterações')
+                ->action('save')
+                ->color('primary'),
+        ];
     }
 
     public function save(): void

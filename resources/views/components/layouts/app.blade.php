@@ -14,8 +14,7 @@
     @php
         $websiteSettings = \App\Models\Setting::get('website', []);
         $primaryColor = data_get($websiteSettings, 'primary_color', '239 68 68');
-        $headerTheme = data_get($websiteSettings, 'header_theme', 'default');
-        $footerTheme = data_get($websiteSettings, 'footer_theme', 'default');
+        $theme = data_get($websiteSettings, 'theme', 'default');
     @endphp
     <style>
         :root {
@@ -35,14 +34,14 @@
 </head>
 <body class="font-sans antialiased bg-background text-foreground flex flex-col min-h-screen">
     
-    <x-site-header :theme="$headerTheme" />   
+    <x-site-header :theme="$theme" />   
     
 
     <main class="flex-grow">
         {{ $slot }}
     </main>
 
-    <x-site-footer :theme="$footerTheme" />
+    <x-site-footer :theme="$theme" />
     <x-site-whatsapp />
     <x-site-alerts />
 

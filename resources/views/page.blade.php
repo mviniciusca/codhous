@@ -11,7 +11,7 @@
         $isHome = $page->slug === '/' || $page->slug === '';
         
         $websiteSettings = \App\Models\Setting::get('website', []);
-        $pageTheme = data_get($websiteSettings, 'header_theme', 'default');
+        $pageTheme = data_get($websiteSettings, 'theme', 'default');
 
         // Dados base para o cabeçalho automático
         $autoHeader = [
