@@ -11,6 +11,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use App\Filament\Resources\PageResource\Pages;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PageResource extends Resource
 {
@@ -51,9 +53,6 @@ class PageResource extends Resource
                                 ->addActionLabel(__('Adicionar Novo Bloco'))
                                 ->blocks([
                                     self::getPageHeaderBlock(),
-                                    self::getHeroBlock(),
-                                    self::getHeroSimpleBlock(),
-                                    self::getHeroSplitBlock(),
                                     self::getCalculatorBlock(),
                                     self::getBudgetFormBlock(),
                                     self::getPartnersBlock(),
@@ -63,7 +62,6 @@ class PageResource extends Resource
                                     self::getFaqBlock(),
                                     self::getTestimonialsBlock(),
                                     self::getCoverageBlock(),
-                                    self::getContactFormBlock(),
                                     self::getContactBannerBlock(),
                                     self::getMapBlock(),
                                     self::getDifferentialsBlock(),
@@ -99,7 +97,7 @@ class PageResource extends Resource
                                                 ->label(__('Slug (URL)'))
                                                 ->helperText(__('O caminho da URL para esta página (ex: /sobre-nos).'))
                                                 ->required()
-                                                ->unique(ignoreRecord: true),
+                                                ->unique(ignoreRecord: true, modifyRuleUsing: fn (\Illuminate\Validation\Rules\Unique $rule) => $rule->withoutTrashed()),
                                             Forms\Components\Grid::make(2)
                                                 ->schema([
                                                     Forms\Components\Toggle::make('is_visible')
@@ -169,15 +167,19 @@ class PageResource extends Resource
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
             ->filters([
-                //
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -191,75 +193,15 @@ class PageResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
     // Block Definitions
-
-    protected static function getHeroBlock(): Forms\Components\Builder\Block
-    {
-        return Forms\Components\Builder\Block::make('hero')
-            ->label(__('Hero (Destaque + CEP)'))
-            ->icon('heroicon-o-presentation-chart-line')
-            ->schema([
-                Forms\Components\Select::make('layout')
-                    ->label(__('Layout'))
-                    ->helperText(__('Escolha o estilo de exibição deste destaque.'))
-                    ->options([
-                        'default' => 'Padrão (Texto + CEP)',
-                        'whatsapp' => 'WhatsApp (Texto Central)',
-                    ])->default('default'),
-                Forms\Components\TextInput::make('badge')->label(__('Texto do Badge'))->helperText(__('Pequeno texto de destaque acima do título.')),
-                Forms\Components\Repeater::make('slides')
-                    ->label(__('Slides'))
-                    ->helperText(__('Adicione as imagens e textos para o carrossel.'))
-                    ->schema([
-                        Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal do slide.'))->required(),
-                        Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto de apoio do slide.')),
-                        Forms\Components\FileUpload::make('image')->label(__('Imagem'))->helperText(__('Imagem de fundo do slide.'))->image()->directory('hero'),
-                    ])->minItems(1),
-                Forms\Components\Repeater::make('stats')
-                    ->label(__('Estatísticas'))
-                    ->helperText(__('Adicione números importantes (ex: +500 Projetos).'))
-                    ->schema([
-                        Forms\Components\TextInput::make('value')->label(__('Valor'))->helperText(__('Ex: +500'))->required(),
-                        Forms\Components\TextInput::make('label')->label(__('Rótulo'))->helperText(__('Ex: Projetos entregues'))->required(),
-                    ])->columns(2),
-            ]);
-    }
-
-    protected static function getHeroSimpleBlock(): Forms\Components\Builder\Block
-    {
-        return Forms\Components\Builder\Block::make('hero_simple')
-            ->label(__('Hero (Simples/Clean)'))
-            ->icon('heroicon-o-photo')
-            ->schema([
-                Forms\Components\TextInput::make('title')->required()->label(__('Título'))->helperText(__('Título em destaque principal.')),
-                Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Breve descrição ou chamada de apoio.')),
-                Forms\Components\FileUpload::make('image')->image()->directory('hero')->label(__('Imagem de Fundo'))->helperText(__('Imagem que cobrirá a seção inteira.')),
-                Forms\Components\TextInput::make('primaryButtonLabel')->label(__('Botão Primário (Texto)'))->helperText(__('Texto do botão de ação principal.')),
-                Forms\Components\TextInput::make('primaryButtonUrl')->label(__('Botão Primário (URL)'))->helperText(__('Link para onde o botão principal deve levar.')),
-                Forms\Components\TextInput::make('secondaryButtonLabel')->label(__('Botão Secundário (Texto)'))->helperText(__('Texto do botão de ação secundário.')),
-                Forms\Components\TextInput::make('secondaryButtonUrl')->label(__('Botão Secundário (URL)'))->helperText(__('Link para onde o botão secundário deve levar.')),
-            ]);
-    }
-
-    protected static function getHeroSplitBlock(): Forms\Components\Builder\Block
-    {
-        return Forms\Components\Builder\Block::make('hero_split')
-            ->label(__('Hero (Split 50/50)'))
-            ->icon('heroicon-o-view-columns')
-            ->schema([
-                Forms\Components\TextInput::make('title')->required()->label(__('Título'))->helperText(__('Título principal da seção.')),
-                Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto explicativo ao lado da imagem.')),
-                Forms\Components\FileUpload::make('image')->image()->directory('hero')->label(__('Imagem Lateral'))->helperText(__('Imagem que será exibida na metade da tela.')),
-                Forms\Components\Repeater::make('features')
-                    ->label(__('Tópicos (Lista)'))
-                    ->helperText(__('Adicione pontos de destaque em formato de lista.'))
-                    ->schema([
-                        Forms\Components\TextInput::make('item')->required()->label(__('Texto do Tópico'))->helperText(__('Descrição do benefício ou tópico.')),
-                    ]),
-                Forms\Components\TextInput::make('buttonLabel')->label(__('Botão (Texto)'))->helperText(__('Texto do botão de ação.')),
-                Forms\Components\TextInput::make('buttonUrl')->label(__('Botão (URL)'))->helperText(__('Link do botão de ação.')),
-            ]);
-    }
 
     protected static function getPartnersBlock(): Forms\Components\Builder\Block
     {
@@ -431,17 +373,7 @@ class PageResource extends Resource
             ]);
     }
 
-    protected static function getContactFormBlock(): Forms\Components\Builder\Block
-    {
-        return Forms\Components\Builder\Block::make('contact_form')
-            ->label(__('Formulário de Contato'))
-            ->icon('heroicon-o-envelope')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título do bloco de contato.'))->default('Entre em Contato'),
-                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Texto explicativo acima do formulário.')),
-                Forms\Components\TextInput::make('email_to')->label(__('Enviar para (e-mail)'))->helperText(__('E-mail que receberá as mensagens (se não preenchido, usará o padrão do sistema).'))->placeholder('contato@empresa.com'),
-            ]);
-    }
+
 
     protected static function getMapBlock(): Forms\Components\Builder\Block
     {
@@ -546,14 +478,21 @@ class PageResource extends Resource
     protected static function getModuleReferenceBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('module_reference')
-            ->label(__('Módulo Global (Seção Pronta)'))
+            ->label(function (?array $state): string {
+                if ($state === null) {
+                    return __('Módulo Global (Seção Pronta)');
+                }
+                $sectionName = \App\Models\ContentSection::find($state['content_section_id'] ?? null)?->name;
+                return $sectionName ? __('Seção pronta - ') . $sectionName : __('Módulo Global (Seção Pronta)');
+            })
             ->icon('heroicon-o-squares-plus')
             ->schema([
-                Forms\Components\Select::make('content_section_id')
+                Forms\Components\ToggleButtons::make('content_section_id')
                     ->label(__('Seção de Conteúdo'))
                     ->options(\App\Models\ContentSection::query()->pluck('name', 'id'))
                     ->required()
-                    ->searchable()
+                    ->inline()
+                    ->live()
                     ->helperText(__('Selecione uma seção criada no módulo "Seções do site" para reutilizá-la aqui.')),
             ]);
     }

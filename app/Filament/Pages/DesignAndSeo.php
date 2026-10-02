@@ -121,6 +121,51 @@ class DesignAndSeo extends Page implements HasForms
                             ->visibility('public'),
                     ]),
 
+                Section::make('Hero (Destaque Principal)')
+                    ->icon('heroicon-o-presentation-chart-line')
+                    ->description('Configure a seção principal do site, exibida no topo da página inicial.')
+                    ->schema([
+                        \Filament\Forms\Components\Select::make('settings.website.hero.layout')
+                            ->label('Layout')
+                            ->options([
+                                'default' => 'Padrão (texto à esquerda + CEP à direita)',
+                                'whatsapp' => 'WhatsApp (destaque central + CEP abaixo)',
+                            ])
+                            ->default('default'),
+                        \Filament\Forms\Components\TextInput::make('settings.website.hero.badge')
+                            ->label('Texto do badge')
+                            ->placeholder('Qualidade Certificada')
+                            ->maxLength(255),
+                        \Filament\Forms\Components\Repeater::make('settings.website.hero.slideshow')
+                            ->label('Slides (título e subtítulo; o primeiro é exibido na hero)')
+                            ->schema([
+                                \Filament\Forms\Components\TextInput::make('title')->label('Título')->required()->columnSpanFull(),
+                                \Filament\Forms\Components\Textarea::make('subtitle')->label('Subtítulo')->rows(2)->columnSpanFull(),
+                                \Filament\Forms\Components\FileUpload::make('image')
+                                    ->label('Imagem (opcional)')
+                                    ->image()
+                                    ->directory('hero-slideshow'),
+                                \Filament\Forms\Components\FileUpload::make('video')
+                                    ->label('Vídeo MP4 (opcional)')
+                                    ->acceptedFileTypes(['video/mp4'])
+                                    ->maxSize(20480)
+                                    ->directory('hero-slideshow')
+                                    ->helperText('O vídeo será exibido em loop e mudo por trás do conteúdo.'),
+                            ])
+                            ->columns(1)
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? 'Slide')
+                            ->defaultItems(1),
+                        \Filament\Forms\Components\Repeater::make('settings.website.hero.stats')
+                            ->label('Números (opcional; ex: 500+ Obras)')
+                            ->schema([
+                                \Filament\Forms\Components\TextInput::make('value')->label('Valor')->placeholder('500+'),
+                                \Filament\Forms\Components\TextInput::make('label')->label('Descrição')->placeholder('Obras atendidas'),
+                            ])
+                            ->columns(2)
+                            ->itemLabel(fn (array $state): ?string => ($state['value'] ?? '') . ' ' . ($state['label'] ?? ''))
+                            ->maxItems(6),
+                    ]),
+
                 Section::make('Identidade e SEO')
                     ->icon('heroicon-o-information-circle')
                     ->description('Configure as informações básicas e metatags para motores de busca.')

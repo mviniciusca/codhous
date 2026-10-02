@@ -201,10 +201,15 @@
 
             {{-- CTA --}}
             <div class="hidden lg:flex items-center gap-3 flex-shrink-0">
+                <a href="/#calculadora"
+                   class="flex items-center gap-2 rounded-lg border-2 border-zinc-900 px-5 py-2.5 text-[13px] font-bold text-zinc-900 transition-all hover:bg-zinc-900 hover:text-white">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M9 7h9V4a2 2 0 00-2-2H9a2 2 0 00-2 2v3m6 0H9"/></svg>
+                    Calculadora
+                </a>
                 <a href="#orcamento"
                    class="flex items-center gap-2 rounded-lg bg-zinc-900 px-6 py-3 text-[13px] font-bold text-white shadow-md transition-all hover:bg-primary hover:shadow-primary/20 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Solicitar Proposta
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    Orçamento Grátis
                 </a>
             </div>
 
@@ -240,11 +245,14 @@
                     @endif
                 </a>
             @endforeach
-            <div class="mt-4 pt-4 border-t border-zinc-100">
+            <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-zinc-100">
+                <a href="/#calculadora" @click="open=false"
+                   class="flex items-center justify-center gap-2 rounded-lg border-2 border-zinc-900 py-3 text-sm font-bold text-zinc-900 hover:bg-zinc-900 hover:text-white transition-colors">
+                    Calculadora
+                </a>
                 <a href="#orcamento" @click="open=false"
-                   class="flex items-center justify-center gap-2 w-full rounded-lg bg-zinc-900 py-3.5 text-sm font-bold text-white hover:bg-primary transition-colors">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Solicitar Proposta
+                   class="flex items-center justify-center gap-2 rounded-lg bg-zinc-900 py-3 text-sm font-bold text-white hover:bg-primary transition-colors">
+                    Orçamento
                 </a>
             </div>
         </nav>

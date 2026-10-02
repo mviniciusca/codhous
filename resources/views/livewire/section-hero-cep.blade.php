@@ -1,10 +1,14 @@
 @php
     $layout = $layout ?? 'default';
     $isWhatsapp = $layout === 'whatsapp';
-    $slides = $slides ?? [];
-    if (empty($slides) && !empty($mainSlide)) {
-        $slides = [$mainSlide];
-    }
+    $alignments = [
+        'center' => 'object-center',
+        'top' => 'object-top',
+        'bottom' => 'object-bottom',
+        'left' => 'object-left',
+        'right' => 'object-right',
+    ];
+    $alignmentClass = $alignments[$mainSlide['image_alignment'] ?? 'center'] ?? 'object-center';
 @endphp
 
 @php
@@ -12,22 +16,38 @@
 @endphp
 
 @if($theme === 'corporate')
-    {{-- CORPORATE HERO: Split screen (Left: Content, Right: Slider) --}}
+    {{-- CORPORATE HERO: Split screen on Desktop, Absolute background on Mobile --}}
     <section class="relative min-h-[80vh] bg-white overflow-hidden flex flex-col lg:flex-row lg:items-center">
-        {{-- Left Content --}}
-        <div class="mx-auto w-full max-w-7xl px-4 lg:px-8 relative z-20 flex-1 flex items-center pt-12 pb-8 lg:py-20">
-            <div class="w-full lg:w-1/2 lg:pr-12 xl:pr-16">
-                <div class="mb-8 inline-flex items-center gap-2 border-l-4 border-primary pl-4">
-                    <span class="text-sm font-bold uppercase tracking-widest text-zinc-500">{{ $badge }}</span>
+        
+        {{-- Image (Background on mobile, Right side on desktop) --}}
+        <div class="absolute inset-0 z-0 lg:z-10 lg:inset-y-0 lg:left-1/2 lg:right-0 lg:w-1/2 lg:h-auto">
+            <div class="h-full w-full absolute inset-0">
+                @if(!empty($mainSlide['video']))
+                    <video autoplay muted loop playsinline class="h-full w-full object-cover {{ $alignmentClass }}"><source src="{{ str_starts_with($mainSlide['video'], 'http') ? $mainSlide['video'] : Storage::url($mainSlide['video']) }}" type="video/mp4"></video>
+                @elseif(!empty($mainSlide['image']))
+                    <img src="{{ str_starts_with($mainSlide['image'], 'http') ? $mainSlide['image'] : Storage::url($mainSlide['image']) }}" class="h-full w-full object-cover {{ $alignmentClass }}" alt="{{ $mainSlide['title'] ?? '' }}">
+                @else
+                    <div class="h-full w-full bg-zinc-200"></div>
+                @endif
+            </div>
+            {{-- Black overlay for mobile --}}
+            <div class="absolute inset-0 bg-zinc-950/80 lg:hidden"></div>
+        </div>
+
+        {{-- Content --}}
+        <div class="mx-auto w-full max-w-7xl px-4 lg:px-8 relative z-20 flex-1 flex flex-col justify-center items-center text-center lg:items-start lg:text-left pt-20 pb-12 lg:py-20 min-h-[80vh] lg:min-h-0">
+            <div class="w-full lg:w-1/2 lg:pr-12 xl:pr-16 flex flex-col items-center lg:items-start">
+                <div class="mb-6 lg:mb-8 inline-flex items-center gap-2 border-l-4 border-primary pl-4">
+                    <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-zinc-300 lg:text-zinc-500">{{ $badge }}</span>
                 </div>
-                <h1 class="font-sans text-4xl font-extrabold leading-tight tracking-tight text-zinc-900 md:text-5xl lg:text-6xl" style="text-wrap: balance;">
+                <h1 class="font-sans text-3xl font-extrabold leading-tight tracking-tight text-white lg:text-zinc-900 md:text-4xl lg:text-6xl" style="text-wrap: balance;">
                     {!! str_replace('agilidade', '<span class="text-primary">agilidade</span>', e(data_get($mainSlide, 'title', 'Concreto usinado na sua obra'))) !!}
                 </h1>
-                <p class="mt-6 text-lg leading-relaxed text-zinc-600">
+                <p class="mt-4 lg:mt-6 text-base md:text-lg leading-relaxed text-zinc-300 lg:text-zinc-600">
                     {{ data_get($mainSlide, 'subtitle', 'Entrega rápida, rastreamento em tempo real e suporte especializado.') }}
                 </p>
                 
-                <div class="mt-12 w-full">
+                <div class="mt-8 lg:mt-12 w-full max-w-md lg:max-w-none text-left">
                     @if($isWhatsapp)
                         @include('livewire.partials.hero-whatsapp-card')
                     @else
@@ -36,11 +56,11 @@
                 </div>
 
                 @if(!empty($stats))
-                    <div class="mt-12 flex flex-wrap items-center gap-8 border-t border-zinc-100 pt-8">
+                    <div class="mt-10 lg:mt-12 flex flex-wrap items-center justify-center lg:justify-start gap-6 md:gap-8 border-t border-white/20 lg:border-zinc-100 pt-6 lg:pt-8 w-full">
                         @foreach($stats as $index => $stat)
                             <div>
-                                <p class="font-mono text-3xl font-black text-zinc-900">{{ $stat['value'] ?? '' }}</p>
-                                <p class="text-xs font-semibold uppercase text-zinc-500 tracking-wider">{{ $stat['label'] ?? '' }}</p>
+                                <p class="font-mono text-2xl md:text-3xl font-black text-white lg:text-zinc-900">{{ $stat['value'] ?? '' }}</p>
+                                <p class="text-[10px] md:text-xs font-semibold uppercase text-zinc-400 lg:text-zinc-500 tracking-wider">{{ $stat['label'] ?? '' }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -48,50 +68,21 @@
             </div>
         </div>
         
-        {{-- Right Slider --}}
-        <div class="relative w-full h-[50vh] lg:h-auto lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 z-10">
-            <div wire:ignore class="swiper hero-swiper h-full w-full absolute inset-0" x-data="{ initSwiper() { if (typeof Swiper !== 'undefined') { new Swiper($el, { loop: true, effect: 'fade', autoplay: { delay: 5000, disableOnInteraction: false }, speed: 1500 }); } } }" x-init="setTimeout(() => initSwiper(), 200)">
-                <div class="swiper-wrapper">
-                    @forelse($slides as $slide)
-                        <div class="swiper-slide relative">
-                            @if(!empty($slide['video']))
-                                <video autoplay muted loop playsinline class="h-full w-full object-cover"><source src="{{ str_starts_with($slide['video'], 'http') ? $slide['video'] : Storage::url($slide['video']) }}" type="video/mp4"></video>
-                            @elseif(!empty($slide['image']))
-                                <img src="{{ str_starts_with($slide['image'], 'http') ? $slide['image'] : Storage::url($slide['image']) }}" class="h-full w-full object-cover" alt="{{ $slide['title'] ?? '' }}">
-                            @else
-                                <div class="h-full w-full bg-zinc-200"></div>
-                            @endif
-                        </div>
-                    @empty
-                        <div class="swiper-slide bg-zinc-200"></div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
     </section>
 
 @elseif($theme === 'creative')
     {{-- CREATIVE HERO: Fullscreen, Centered, Huge Typography, Glassmorphism CEP Card --}}
     <section class="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 pt-20 pb-12">
         <div class="absolute inset-0 z-0">
-            <div wire:ignore class="swiper hero-swiper h-full w-full" x-data="{ initSwiper() { if (typeof Swiper !== 'undefined') { new Swiper($el, { loop: true, effect: 'fade', pagination: { el: '.swiper-pagination', clickable: true }, autoplay: { delay: 6000, disableOnInteraction: false }, speed: 2000 }); } } }" x-init="setTimeout(() => initSwiper(), 200)">
-                <div class="swiper-wrapper">
-                    @forelse($slides as $slide)
-                        <div class="swiper-slide relative">
-                            @if(!empty($slide['video']))
-                                <video autoplay muted loop playsinline class="h-full w-full object-cover"><source src="{{ str_starts_with($slide['video'], 'http') ? $slide['video'] : Storage::url($slide['video']) }}" type="video/mp4"></video>
-                            @elseif(!empty($slide['image']))
-                                <img src="{{ str_starts_with($slide['image'], 'http') ? $slide['image'] : Storage::url($slide['image']) }}" class="h-full w-full object-cover" alt="{{ $slide['title'] ?? '' }}">
-                            @else
-                                <div class="h-full w-full bg-zinc-900"></div>
-                            @endif
-                            <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px]"></div>
-                        </div>
-                    @empty
-                        <div class="swiper-slide bg-zinc-900"></div>
-                    @endforelse
-                </div>
-                <div class="swiper-pagination !bottom-8 !w-full flex justify-center"></div>
+            <div class="h-full w-full relative">
+                @if(!empty($mainSlide['video']))
+                    <video autoplay muted loop playsinline class="h-full w-full object-cover {{ $alignmentClass }}"><source src="{{ str_starts_with($mainSlide['video'], 'http') ? $mainSlide['video'] : Storage::url($mainSlide['video']) }}" type="video/mp4"></video>
+                @elseif(!empty($mainSlide['image']))
+                    <img src="{{ str_starts_with($mainSlide['image'], 'http') ? $mainSlide['image'] : Storage::url($mainSlide['image']) }}" class="h-full w-full object-cover {{ $alignmentClass }}" alt="{{ $mainSlide['title'] ?? '' }}">
+                @else
+                    <div class="h-full w-full bg-zinc-900"></div>
+                @endif
+                <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px]"></div>
             </div>
         </div>
 
@@ -123,56 +114,25 @@
     {{-- DEFAULT HERO (Original Layout + Layout Whatsapp toggle) --}}
     <section class="relative flex min-h-[70vh] items-center overflow-hidden bg-zinc-950 pt-8">
         
-        {{-- Swiper Background Slider --}}
+        {{-- Background Image --}}
         <div class="absolute inset-0 z-0">
-            <div wire:ignore class="swiper hero-swiper h-full w-full"
-                 x-data="{ 
-                    initSwiper() {
-                        if (typeof Swiper !== 'undefined') {
-                            new Swiper($el, {
-                                loop: true,
-                                effect: 'fade',
-                                pagination: {
-                                    el: '.swiper-pagination',
-                                    clickable: true,
-                                },
-                                autoplay: {
-                                    delay: 5000,
-                                    disableOnInteraction: false,
-                                },
-                                speed: 1500,
-                            });
-                        }
-                    } 
-                 }"
-                 x-init="setTimeout(() => initSwiper(), 200)">
-                <div class="swiper-wrapper">
-                    @forelse($slides as $slide)
-                        <div class="swiper-slide relative">
-                            {{-- Imagem ou Vídeo de fundo --}}
-                            @if(!empty($slide['video']))
-                                <video autoplay muted loop playsinline class="h-full w-full object-cover">
-                                    <source src="{{ str_starts_with($slide['video'], 'http') ? $slide['video'] : Storage::url($slide['video']) }}" type="video/mp4">
-                                </video>
-                            @elseif(!empty($slide['image']))
-                                <img src="{{ str_starts_with($slide['image'], 'http') ? $slide['image'] : Storage::url($slide['image']) }}" 
-                                     class="h-full w-full object-cover" 
-                                     alt="{{ $slide['title'] ?? '' }}">
-                            @else
-                                <div class="h-full w-full bg-zinc-900"></div>
-                            @endif
-                            
-                            {{-- Overlay Gradiente --}}
-                            <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent"></div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent"></div>
-                        </div>
-                    @empty
-                        <div class="swiper-slide bg-zinc-900"></div>
-                    @endforelse
-                </div>
+            <div class="h-full w-full relative">
+                {{-- Imagem ou Vídeo de fundo --}}
+                @if(!empty($mainSlide['video']))
+                    <video autoplay muted loop playsinline class="h-full w-full object-cover {{ $alignmentClass }}">
+                        <source src="{{ str_starts_with($mainSlide['video'], 'http') ? $mainSlide['video'] : Storage::url($mainSlide['video']) }}" type="video/mp4">
+                    </video>
+                @elseif(!empty($mainSlide['image']))
+                    <img src="{{ str_starts_with($mainSlide['image'], 'http') ? $mainSlide['image'] : Storage::url($mainSlide['image']) }}" 
+                         class="h-full w-full object-cover {{ $alignmentClass }}" 
+                         alt="{{ $mainSlide['title'] ?? '' }}">
+                @else
+                    <div class="h-full w-full bg-zinc-900"></div>
+                @endif
                 
-                {{-- Pontos de Navegação --}}
-                <div class="swiper-pagination !bottom-8 !left-auto !right-8 !w-auto"></div>
+                {{-- Overlay Gradiente --}}
+                <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent"></div>
             </div>
         </div>
 

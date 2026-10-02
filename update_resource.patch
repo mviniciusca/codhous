@@ -1,0 +1,367 @@
+--- app/Filament/Resources/ContentSectionResource.php
++++ app/Filament/Resources/ContentSectionResource.php
+@@ -30,9 +30,17 @@
+         return $form
+             ->schema([
+-                Forms\Components\Section::make('Identificação')
++                Forms\Components\Tabs::make('Tabs')
++                    ->tabs([
++                        Forms\Components\Tabs\Tab::make('Conteúdo Principal')
++                            ->icon('heroicon-o-document-text')
++                            ->schema([
++                                
++                Forms\Components\Section::make('Cabeçalho (opcional)')
++                    ->description('Subtítulo, título e descrição exibidos no topo da seção.')
++                    ->icon('heroicon-o-bars-3-bottom-left')
+                     ->schema([
+-                        Forms\Components\Select::make('type')
+-                            ->label('Tipo da seção')
+-                            ->options(ContentSection::typeLabels())
+-                            ->required()
+-                            ->live()
+-                            ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
+-                                if ($state) {
+-                                    $set('slug', ContentSection::slugForType($state));
+-                                    $set('name', ContentSection::typeLabels()[$state] ?? $state);
+-                                }
+-                            }),
+-                        Forms\Components\TextInput::make('slug')
+-                            ->label('Slug (identificador único)')
+-                            ->required()
+-                            ->unique(ignoreRecord: true)
+-                            ->maxLength(255)
+-                            ->helperText('Usado no código para buscar os dados. Ex: faq, partners'),
+-                        Forms\Components\TextInput::make('name')
+-                            ->label('Nome (admin)')
+-                            ->required()
+-                            ->maxLength(255),
+-                        Forms\Components\Toggle::make('is_active')
+-                            ->label('Ativo')
+-                            ->default(true)
+-                            ->helperText('Se inativo, a seção não aparece no site e usa o conteúdo estático.'),
+-                        Forms\Components\TextInput::make('sort_order')
+-                            ->label('Ordem')
+-                            ->numeric()
+-                            ->minValue(0),
+-                    ])
+-                    ->columns(2),
+-
+-                Forms\Components\Section::make('Cabeçalho (opcional)')
+-                    ->description('Subtítulo, título e descrição exibidos no topo da seção.')
+-                    ->schema([
+                         Forms\Components\TextInput::make('content.header.subtitle')
+                             ->label('Subtítulo')
++                            ->helperText('Aparece com destaque acima do título.')
+                             ->maxLength(255),
+                         Forms\Components\TextInput::make('content.header.title')
+                             ->label('Título')
++                            ->helperText('Título principal da seção.')
+                             ->maxLength(255),
+                         Forms\Components\Textarea::make('content.header.description')
+                             ->label('Descrição')
++                            ->helperText('Texto explicativo ou subtítulo abaixo do título principal.')
+                             ->rows(2),
+                     ])
+                     ->columns(1)
+                     ->collapsible(),
+ 
+-
+-
+                 // FAQ
+                 Forms\Components\Section::make('Perguntas e respostas')
++                    ->icon('heroicon-o-question-mark-circle')
+                     ->schema([
+                         Forms\Components\Repeater::make('content.items')
+                             ->label('Itens FAQ')
+                             ->schema([
+-                                Forms\Components\TextInput::make('question')->label('Pergunta')->required(),
+-                                Forms\Components\Textarea::make('answer')->label('Resposta')->required()->rows(2),
++                                Forms\Components\TextInput::make('question')->label('Pergunta')->helperText('A dúvida do usuário.')->required(),
++                                Forms\Components\Textarea::make('answer')->label('Resposta')->helperText('A resposta para a dúvida.')->required()->rows(2),
+                             ])
+                             ->columns(1)
+                             ->itemLabel(fn (array $state): ?string => $state['question'] ?? null),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_FAQ)
+                     ->collapsible(),
+ 
+                 // Partners
+                 Forms\Components\Section::make('Parceiros')
++                    ->icon('heroicon-o-building-office-2')
+                     ->schema([
+                         Forms\Components\Repeater::make('content.items')
+                             ->label('Empresas / Parceiros')
+                             ->schema([
+-                                Forms\Components\TextInput::make('name')->label('Nome')->required(),
++                                Forms\Components\TextInput::make('name')->label('Nome')->helperText('Nome do parceiro.')->required(),
+                                 Forms\Components\TextInput::make('icon')
+                                     ->label('Ícone (Lucide)')
++                                    ->helperText('Nome do ícone correspondente.')
+                                     ->placeholder('building-2, hard-hat, factory...')
+                                     ->maxLength(50),
+                             ])
+                             ->columns(2)
+                             ->itemLabel(fn (array $state): ?string => $state['name'] ?? null),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_PARTNERS)
+                     ->collapsible(),
+ 
+                 // Services
+                 Forms\Components\Section::make('Serviços')
++                    ->icon('heroicon-o-wrench-screwdriver')
+                     ->schema([
+                         Forms\Components\Repeater::make('content.items')
+                             ->label('Serviços')
+                             ->schema([
+-                                Forms\Components\TextInput::make('title')->label('Título')->required(),
+-                                Forms\Components\TextInput::make('subtitle')->label('Subtítulo (ex: por m³)'),
+-                                Forms\Components\Textarea::make('description')->label('Descrição')->rows(2),
+-                                Forms\Components\TextInput::make('icon')->label('Ícone Lucide')->placeholder('droplets, gauge, wrench'),
+-                                Forms\Components\TagsInput::make('bullets')->label('Lista de itens')->placeholder('Item'),
+-                                Forms\Components\TextInput::make('cta_label')->label('Texto do link')->default('Solicitar Orçamento'),
+-                                Forms\Components\TextInput::make('cta_url')->label('URL do link')->default('#orcamento'),
++                                Forms\Components\TextInput::make('title')->label('Título')->helperText('Nome do serviço.')->required(),
++                                Forms\Components\TextInput::make('subtitle')->label('Subtítulo (ex: por m³)')->helperText('Informação extra rápida.'),
++                                Forms\Components\Textarea::make('description')->label('Descrição')->helperText('Detalhes do serviço.')->rows(2),
++                                Forms\Components\TextInput::make('icon')->label('Ícone Lucide')->helperText('Ícone do serviço.')->placeholder('droplets, gauge, wrench'),
++                                Forms\Components\TagsInput::make('bullets')->label('Lista de itens')->helperText('Tags ou tópicos do serviço.')->placeholder('Item'),
++                                Forms\Components\TextInput::make('cta_label')->label('Texto do link')->helperText('O que vai escrito no botão.')->default('Solicitar Orçamento'),
++                                Forms\Components\TextInput::make('cta_url')->label('URL do link')->helperText('Para onde o botão leva.')->default('#orcamento'),
+                             ])
+                             ->columns(1)
+                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_SERVICES)
+                     ->collapsible(),
+ 
+                 // Testimonials
+                 Forms\Components\Section::make('Depoimentos')
++                    ->icon('heroicon-o-chat-bubble-left-right')
+                     ->schema([
+                         Forms\Components\Repeater::make('content.items')
+                             ->label('Depoimentos')
+                             ->schema([
+-                                Forms\Components\Textarea::make('quote')->label('Citação')->required()->rows(3),
+-                                Forms\Components\TextInput::make('author_name')->label('Nome do autor')->required(),
+-                                Forms\Components\TextInput::make('author_role')->label('Cargo / Obra'),
+-                                Forms\Components\TextInput::make('stars')->label('Estrelas (1-5)')->numeric()->minValue(1)->maxValue(5)->default(5),
++                                Forms\Components\Textarea::make('quote')->label('Citação')->helperText('O texto do depoimento.')->required()->rows(3),
++                                Forms\Components\TextInput::make('author_name')->label('Nome do autor')->helperText('Pessoa que deu o depoimento.')->required(),
++                                Forms\Components\TextInput::make('author_role')->label('Cargo / Obra')->helperText('Ex: Cliente Codhous'),
++                                Forms\Components\TextInput::make('stars')->label('Estrelas (1-5)')->helperText('Nota de 1 a 5.')->numeric()->minValue(1)->maxValue(5)->default(5),
+                             ])
+                             ->columns(1)
+                             ->itemLabel(fn (array $state): ?string => $state['author_name'] ?? null),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_TESTIMONIALS)
+                     ->collapsible(),
+ 
+                 // Coverage
+                 Forms\Components\Section::make('Onde atuamos')
++                    ->icon('heroicon-o-map-pin')
+                     ->schema([
+                         Forms\Components\Select::make('content.cities')
+                             ->label('Cidades Atendidas')
+                             ->multiple()
+                             ->options(\App\Models\OperationArea::query()->where('is_active', true)->pluck('city', 'city'))
+                             ->helperText('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.'),
+                         Forms\Components\Repeater::make('content.sidebar')
+                             ->label('Cards laterais')
+                             ->schema([
+-                                Forms\Components\TextInput::make('title')->label('Título')->required(),
+-                                Forms\Components\Textarea::make('description')->label('Descrição')->rows(2),
++                                Forms\Components\TextInput::make('title')->label('Título')->helperText('Título do card.')->required(),
++                                Forms\Components\Textarea::make('description')->label('Descrição')->helperText('Descrição do card.')->rows(2),
+                             ])
+                             ->columns(1)
+                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_COVERAGE)
+                     ->collapsible(),
+ 
+                 // Differentials
+                 Forms\Components\Section::make('Diferenciais')
++                    ->icon('heroicon-o-star')
+                     ->schema([
+                         Forms\Components\Repeater::make('content.items')
+                             ->label('Itens')
+                             ->schema([
+-                                Forms\Components\TextInput::make('icon')->label('Ícone Lucide')->placeholder('clock, microscope'),
+-                                Forms\Components\TextInput::make('title')->label('Título')->required(),
+-                                Forms\Components\Textarea::make('description')->label('Descrição')->rows(2),
++                                Forms\Components\TextInput::make('icon')->label('Ícone Lucide')->helperText('Ícone do diferencial.')->placeholder('clock, microscope'),
++                                Forms\Components\TextInput::make('title')->label('Título')->helperText('Nome do diferencial.')->required(),
++                                Forms\Components\Textarea::make('description')->label('Descrição')->helperText('O que isso significa.')->rows(2),
+                             ])
+                             ->columns(1)
+                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_DIFFERENTIALS)
+                     ->collapsible(),
+ 
+                 // Timeline
+                 Forms\Components\Section::make('Etapas (Como funciona)')
++                    ->icon('heroicon-o-clock')
+                     ->schema([
+                         Forms\Components\Repeater::make('content.steps')
+                             ->label('Etapas')
+                             ->schema([
+-                                Forms\Components\TextInput::make('step_label')->label('Rótulo (ex: Etapa 1)')->required(),
+-                                Forms\Components\TextInput::make('title')->label('Título')->required(),
+-                                Forms\Components\Textarea::make('description')->label('Descrição')->rows(2),
+-                                Forms\Components\TextInput::make('icon')->label('Ícone Lucide')->placeholder('message-square-text, truck'),
++                                Forms\Components\TextInput::make('step_label')->label('Rótulo (ex: Etapa 1)')->helperText('Indicador da etapa.')->required(),
++                                Forms\Components\TextInput::make('title')->label('Título')->helperText('Nome da etapa.')->required(),
++                                Forms\Components\Textarea::make('description')->label('Descrição')->helperText('Explicação do que ocorre.')->rows(2),
++                                Forms\Components\TextInput::make('icon')->label('Ícone Lucide')->helperText('Ícone da etapa.')->placeholder('message-square-text, truck'),
+                             ])
+                             ->columns(1)
+                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_TIMELINE)
+                     ->collapsible(),
+ 
+                 // Contato
+                 Forms\Components\Section::make('Contato')
++                    ->icon('heroicon-o-envelope')
+                     ->schema([
+                         Forms\Components\TextInput::make('content.title')
+                             ->label('Título Principal')
++                            ->helperText('Título do formulário de contato.')
+                             ->default('Entre em Contato'),
+                         Forms\Components\Textarea::make('content.description')
+                             ->label('Descrição / Subtítulo')
++                            ->helperText('Breve mensagem convidando para o contato.')
+                             ->rows(2),
+                         Forms\Components\TextInput::make('content.email_to')
+                             ->label('E-mail de Destino (opcional)')
+                             ->helperText('Se não preenchido, enviará para o e-mail padrão da empresa.'),
+                         Forms\Components\Fieldset::make('Botão Orçamento')
+                             ->schema([
+                                 Forms\Components\Toggle::make('content.budget_btn_enabled')
+                                     ->label('Mostrar botão')
++                                    ->helperText('Liga ou desliga esse botão.')
+                                     ->default(true),
+                                 Forms\Components\TextInput::make('content.budget_btn_title')
+                                     ->label('Título')
++                                    ->helperText('Texto maior.')
+                                     ->default('Orçamento Grátis Online'),
+                                 Forms\Components\TextInput::make('content.budget_btn_subtitle')
+                                     ->label('Subtítulo')
++                                    ->helperText('Texto menor.')
+                                     ->default('Faça uma cotação rápida agora'),
++                                Forms\Components\TextInput::make('content.budget_btn_url')
++                                    ->label('Link do Botão')
++                                    ->helperText('URL ou ID da página para redirecionar. Ex: /#orcamento')
++                                    ->default('/#orcamento')
++                                    ->columnSpanFull(),
+                             ])->columns(3),
+                         Forms\Components\Fieldset::make('Botões Adicionais')
+                             ->schema([
+                                 Forms\Components\Toggle::make('content.whatsapp_btn_enabled')
+                                     ->label('Mostrar WhatsApp')
++                                    ->helperText('Puxa o número das configurações do site.')
+                                     ->default(true),
+                                 Forms\Components\Toggle::make('content.email_btn_enabled')
+                                     ->label('Mostrar E-mail')
++                                    ->helperText('Mostra o e-mail cadastrado acima.')
+                                     ->default(true),
+                                 Forms\Components\Toggle::make('content.phone_btn_enabled')
+                                     ->label('Mostrar Telefone')
++                                    ->helperText('Puxa do cadastro da empresa.')
+                                     ->default(true),
+                                 Forms\Components\Toggle::make('content.address_enabled')
+                                     ->label('Mostrar Endereço')
++                                    ->helperText('Puxa do cadastro da empresa.')
+                                     ->default(true),
+                             ])->columns(4),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_CTA_CONTACT)
+                     ->collapsible(),
+ 
+                 // Contact Banner (Atendimento)
+                 Forms\Components\Section::make('Banner de Atendimento')
++                    ->icon('heroicon-o-megaphone')
+                     ->schema([
+                         Forms\Components\TextInput::make('content.badge')
+                             ->label('Badge (Texto Superior)')
++                            ->helperText('Exibido pequeno acima do título.')
+                             ->placeholder('ATENDIMENTO')
+                             ->default('ATENDIMENTO'),
+                         Forms\Components\TextInput::make('content.title')
+                             ->label('Título')
++                            ->helperText('Chamada principal.')
+                             ->default('Fale conosco')
+                             ->required(),
+                         Forms\Components\Textarea::make('content.description')
+                             ->label('Descrição')
++                            ->helperText('Texto de apoio.')
+                             ->default('Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.')
+                             ->rows(2),
+                         Forms\Components\Grid::make(3)
+                             ->schema([
+                                 Forms\Components\Toggle::make('content.whatsapp_enabled')
+                                     ->label('Botão WhatsApp')
++                                    ->helperText('Ativa o botão do WhatsApp.')
+                                     ->default(true),
+                                 Forms\Components\Toggle::make('content.call_enabled')
+                                     ->label('Botão Ligar')
++                                    ->helperText('Ativa o botão de ligação.')
+                                     ->default(true),
+                                 Forms\Components\Toggle::make('content.email_enabled')
+                                     ->label('Botão E-mail')
++                                    ->helperText('Ativa o botão de e-mail.')
+                                     ->default(true),
+                             ]),
+                     ])
+                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_CONTACT_BANNER)
+                     ->collapsible(),
++                            ]),
++
++                        Forms\Components\Tabs\Tab::make('Configurações')
++                            ->icon('heroicon-o-cog-6-tooth')
++                            ->schema([
++                                Forms\Components\Section::make('Identificação')
++                                    ->icon('heroicon-o-identification')
++                                    ->schema([
++                                        Forms\Components\Select::make('type')
++                                            ->label('Tipo da seção')
++                                            ->options(ContentSection::typeLabels())
++                                            ->required()
++                                            ->disabled(fn (string $operation): bool => $operation === 'edit')
++                                            ->helperText('Define os campos de conteúdo disponíveis. Não pode ser alterado depois de criado.')
++                                            ->live()
++                                            ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
++                                                if ($state) {
++                                                    $set('slug', ContentSection::slugForType($state));
++                                                    $set('name', ContentSection::typeLabels()[$state] ?? $state);
++                                                }
++                                            }),
++                                        Forms\Components\TextInput::make('slug')
++                                            ->label('Slug (identificador único)')
++                                            ->required()
++                                            ->disabled(fn (string $operation): bool => $operation === 'edit')
++                                            ->unique(ignoreRecord: true)
++                                            ->maxLength(255)
++                                            ->helperText('Identificador no sistema. Não editável após criação.'),
++                                        Forms\Components\TextInput::make('name')
++                                            ->label('Nome (admin)')
++                                            ->required()
++                                            ->maxLength(255)
++                                            ->helperText('Nome para identificação interna nesta lista.'),
++                                        Forms\Components\Toggle::make('is_active')
++                                            ->label('Ativo')
++                                            ->default(true)
++                                            ->helperText('Se inativo, a seção não aparece no site e usa o conteúdo estático.'),
++                                        Forms\Components\TextInput::make('sort_order')
++                                            ->label('Ordem')
++                                            ->numeric()
++                                            ->helperText('Ordem na listagem.')
++                                            ->minValue(0),
++                                    ])
++                                    ->columns(2),
++                            ]),
++                    ])
++                    ->columnSpanFull(),
+             ]);
+     }

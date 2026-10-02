@@ -97,9 +97,9 @@ class SectionHeroCep extends Component
             'subtitle' => 'Entrega rápida, rastreamento em tempo real e suporte técnico especializado.',
         ];
         $stats = $this->stats ?: [
-            ['value' => '500+', 'label' => 'Obras atendidas'],
-            ['value' => '98%', 'label' => 'Pontualidade'],
-            ['value' => '15+', 'label' => 'Anos de experiência'],
+            ['value' => '2.500+', 'label' => 'Obras Entregues'],
+            ['value' => '150k+', 'label' => 'm³ de Concreto'],
+            ['value' => '15+', 'label' => 'Anos de Mercado'],
         ];
 
         return view('livewire.section-hero-cep', [

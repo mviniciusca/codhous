@@ -25,8 +25,12 @@
 
     @case('hero')
         <livewire:section-hero-cep
-            :slides="$data['slideshow'] ?? $data['slides'] ?? []"
-            :main-slide="($data['slideshow'][0] ?? $data['slides'][0]) ?? []"
+            :main-slide="[
+                'title' => $data['title'] ?? '',
+                'subtitle' => $data['subtitle'] ?? '',
+                'image' => $data['image'] ?? null,
+                'image_alignment' => $data['image_alignment'] ?? 'center'
+            ]"
             :badge="$data['badge'] ?? ''"
             :layout="$data['layout'] ?? 'default'"
             :theme="$theme"
@@ -187,19 +191,30 @@
         </section>
         @break
 
+    @case('cta_contact')
     @case('contact_form')
         <section class="bg-background py-20 lg:py-28">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
                 <div class="grid lg:grid-cols-2 gap-16 items-start">
                     <div>
-                        @if(!empty($data['title']))
+                        @php
+                            $contactSubtitle = $data['header']['subtitle'] ?? $data['subtitle'] ?? null;
+                            $contactTitle = $data['header']['title'] ?? $data['title'] ?? null;
+                            $contactDesc = $data['header']['description'] ?? $data['description'] ?? null;
+                        @endphp
+                        @if(!empty($contactSubtitle))
+                            <div class="mb-4 inline-block text-xs font-bold uppercase tracking-widest text-primary">
+                                {{ $contactSubtitle }}
+                            </div>
+                        @endif
+                        @if(!empty($contactTitle))
                             <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl mb-4" style="text-wrap: balance;">
-                                {{ $data['title'] }}
+                                {{ $contactTitle }}
                             </h2>
                         @endif
-                        @if(!empty($data['description']))
+                        @if(!empty($contactDesc))
                             <p class="text-lg leading-relaxed text-muted-foreground mb-10">
-                                {{ $data['description'] }}
+                                {{ $contactDesc }}
                             </p>
                         @endif
 
@@ -211,24 +226,35 @@
                             $addr = data_get($company, 'address', []);
                             $addrStr = is_array($addr) ? implode(', ', array_filter($addr)) : (string)$addr;
 
-                            $whatsappBtnEnabled = data_get($website, 'features.whatsapp_button.enabled', false);
+                            $whatsappBtnEnabled = $data['whatsapp_btn_enabled'] ?? true;
                             $whatsappBtnText = data_get($website, 'features.whatsapp_button.text', 'Chamar no WhatsApp');
                             $whatsappNumber = data_get($website, 'features.whatsapp_widget.number');
                             $whatsappUrl = $whatsappNumber 
                                 ? "https://wa.me/55" . preg_replace('/[^0-9]/', '', $whatsappNumber) . "?text=" . urlencode('Olá! Vim pela página de contato do site.')
                                 : '#';
+
+                            $budgetBtnEnabled = $data['budget_btn_enabled'] ?? true;
+                            $budgetBtnTitle = $data['budget_btn_title'] ?? 'Orçamento Grátis Online';
+                            $budgetBtnSubtitle = $data['budget_btn_subtitle'] ?? 'Faça uma cotação rápida agora';
+                            $budgetBtnUrl = $data['budget_btn_url'] ?? url('/#orcamento');
+
+                            $emailBtnEnabled = $data['email_btn_enabled'] ?? true;
+                            $phoneBtnEnabled = $data['phone_btn_enabled'] ?? true;
+                            $addressEnabled = $data['address_enabled'] ?? true;
                         @endphp
 
                         <div class="space-y-4">
-                            <a href="{{ url('/#orcamento') }}" class="flex items-center gap-4 rounded-xl bg-primary p-4 text-white shadow transition-all hover:-translate-y-0.5 hover:shadow-md group">
+                            @if($budgetBtnEnabled)
+                            <a href="{{ $budgetBtnUrl }}" class="flex items-center gap-4 rounded-xl bg-primary p-4 text-white shadow transition-all hover:-translate-y-0.5 hover:shadow-md group">
                                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white transition-transform group-hover:scale-110">
                                     <i data-lucide="calculator" class="h-6 w-6 fill-none stroke-current stroke-2"></i>
                                 </div>
                                 <div>
-                                    <p class="font-bold text-white">Orçamento Grátis Online</p>
-                                    <p class="text-xs font-medium text-white/80">Faça uma cotação rápida agora</p>
+                                    <p class="font-bold text-white">{{ $budgetBtnTitle }}</p>
+                                    <p class="text-xs font-medium text-white/80">{{ $budgetBtnSubtitle }}</p>
                                 </div>
                             </a>
+                            @endif
 
                             @if($whatsappBtnEnabled && $whatsappNumber)
                                 <a href="{{ $whatsappUrl }}" target="_blank" class="flex items-center gap-4 rounded-xl bg-[#25D366] p-4 text-white shadow transition-all hover:-translate-y-0.5 hover:bg-[#20ba5a] hover:shadow-md group">
@@ -242,7 +268,7 @@
                                 </a>
                             @endif
 
-                            @if($contactEmail)
+                            @if($emailBtnEnabled && $contactEmail)
                                 <a href="mailto:{{ $contactEmail }}" class="flex items-center gap-4 rounded-xl border border-primary bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md group">
                                     <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-hover:scale-110">
                                         <i data-lucide="mail" class="h-6 w-6 fill-current"></i>
@@ -254,7 +280,7 @@
                                 </a>
                             @endif
 
-                            @if($phone)
+                            @if($phoneBtnEnabled && $phone)
                                 @php
                                     $phoneClean = preg_replace('/[^0-9]/', '', $phone);
                                     $phoneLink = strlen($phoneClean) >= 10 ? '55' . $phoneClean : $phoneClean;
@@ -271,7 +297,7 @@
                             @endif
                         </div>
 
-                        @if($addrStr)
+                        @if($addressEnabled && $addrStr)
                             <div class="mt-8 pt-8 border-t border-border">
                                 <div class="flex items-start gap-4">
                                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

@@ -15,27 +15,6 @@ class ContentSectionSeeder extends Seeder
     {
         $sections = [
             [
-                'slug' => 'hero',
-                'type' => ContentSection::TYPE_HERO,
-                'content' => [
-                    'layout' => ContentSection::HERO_LAYOUT_DEFAULT,
-                    'badge' => 'Qualidade Certificada',
-                    'slideshow' => [
-                        [
-                            'title' => 'Concreto usinado com agilidade e precisão no traço',
-                            'subtitle' => 'Entrega rápida, rastreamento em tempo real e suporte técnico especializado para garantir o sucesso da sua obra do início ao fim.',
-                        ],
-                    ],
-                    'stats' => [
-                        ['value' => '500+', 'label' => 'Obras atendidas'],
-                        ['value' => '98%', 'label' => 'Pontualidade'],
-                        ['value' => '15+', 'label' => 'Anos de experiência'],
-                    ],
-                ],
-                'is_active' => true,
-                'sort_order' => 0,
-            ],
-            [
                 'slug' => 'partners',
                 'type' => ContentSection::TYPE_PARTNERS,
                 'content' => [
@@ -151,8 +130,16 @@ class ContentSectionSeeder extends Seeder
                 'slug' => 'cta_contact',
                 'type' => ContentSection::TYPE_CTA_CONTACT,
                 'content' => [
-                    'title' => 'Fale conosco',
-                    'subtitle' => 'Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.',
+                    'title' => 'Entre em Contato',
+                    'description' => 'Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.',
+                    'email_to' => '',
+                    'budget_btn_enabled' => true,
+                    'budget_btn_title' => 'Orçamento Grátis Online',
+                    'budget_btn_subtitle' => 'Faça uma cotação rápida agora',
+                    'whatsapp_btn_enabled' => true,
+                    'email_btn_enabled' => true,
+                    'phone_btn_enabled' => true,
+                    'address_enabled' => true,
                 ],
                 'sort_order' => 8,
             ],

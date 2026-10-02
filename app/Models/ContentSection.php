@@ -23,7 +23,7 @@ class ContentSection extends Model
         'sort_order' => 'integer',
     ];
 
-    public const TYPE_HERO = 'hero';
+
     public const TYPE_PARTNERS = 'partners';
     public const TYPE_SERVICES = 'services';
     public const TYPE_FAQ = 'faq';
@@ -34,13 +34,10 @@ class ContentSection extends Model
     public const TYPE_CTA_CONTACT = 'cta_contact';
     public const TYPE_CONTACT_BANNER = 'contact_banner';
 
-    public const HERO_LAYOUT_DEFAULT = 'default';
-    public const HERO_LAYOUT_WHATSAPP = 'whatsapp';
 
     public static function typeLabels(): array
     {
         return [
-            self::TYPE_HERO => 'Hero (página inicial)',
             self::TYPE_PARTNERS => 'Parceiros',
             self::TYPE_SERVICES => 'Serviços',
             self::TYPE_FAQ => 'FAQ',
@@ -48,7 +45,7 @@ class ContentSection extends Model
             self::TYPE_COVERAGE => 'Onde Atuamos',
             self::TYPE_DIFFERENTIALS => 'Diferenciais',
             self::TYPE_TIMELINE => 'Como Funciona (Timeline)',
-            self::TYPE_CTA_CONTACT => 'CTA Contato',
+            self::TYPE_CTA_CONTACT => 'Contato',
             self::TYPE_CONTACT_BANNER => 'Banner de Atendimento',
         ];
     }
@@ -56,7 +53,6 @@ class ContentSection extends Model
     public static function slugForType(string $type): string
     {
         return match ($type) {
-            self::TYPE_HERO => 'hero',
             self::TYPE_PARTNERS => 'partners',
             self::TYPE_SERVICES => 'services',
             self::TYPE_FAQ => 'faq',
@@ -85,15 +81,5 @@ class ContentSection extends Model
         return static::forSlug($slug)->active()->first();
     }
 
-    /**
-     * Retorna a hero section ativa (apenas uma por vez no site).
-     * A ferramenta de CEP é sempre exibida na hero.
-     */
-    public static function getActiveHero(): ?self
-    {
-        return static::where('type', self::TYPE_HERO)
-            ->active()
-            ->orderBy('sort_order')
-            ->first();
-    }
+
 }
