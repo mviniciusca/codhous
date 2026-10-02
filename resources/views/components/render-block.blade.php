@@ -19,6 +19,7 @@
             :badge="$data['badge'] ?? null"
             :title="$data['title'] ?? null"
             :description="$data['description'] ?? null"
+            :background-image="$data['background_image'] ?? null"
             :breadcrumbs="[['label' => $data['title'] ?? 'Página']]"
         />
         @break
@@ -108,15 +109,111 @@
         @break
 
     @case('services')
-        <x-section-services
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
-            :title="$data['header']['title'] ?? $data['title'] ?? null"
-            :badge="$data['header']['subtitle'] ?? $data['badge'] ?? null"
-            :description="$data['header']['description'] ?? $data['description'] ?? null"
-            :items="$data['items'] ?? []"
-            :hide-header="$hideHeader"
-        />
+        @php
+            $servicesTitle = $data['header']['title'] ?? $data['title'] ?? 'Nossos Serviços';
+            $servicesSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? 'O que fazemos';
+            $servicesDesc = $data['header']['description'] ?? $data['description'] ?? 'Soluções completas com qualidade garantida.';
+            
+            $bgColor = $data['background_color'] ?? 'bg-background';
+            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
+            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
+            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
+            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/10';
+            
+            $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
+            $bgFit = $data['background_image_fit'] ?? 'cover';
+            $bgPos = $data['background_image_position'] ?? 'center';
+            $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
+            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
+            $bgPullUp = $bgPullUpAmount > 0;
+            
+            $overflowClass = $bgPullUp ? '' : 'overflow-hidden';
+            $bgDivClasses = 'absolute inset-x-0 bottom-0 z-0 pointer-events-none bg-no-repeat';
+            $topStyle = $bgPullUp ? "-{$bgPullUpAmount}%" : "0";
+            $bgPositionStyle = $bgPullUp ? ($bgPos === 'center' ? 'center bottom' : $bgPos . ' bottom') : $bgPos;
+            
+            $displayItems = $data['items'] ?? [];
+            if (empty($displayItems)) {
+                // Fallback de demonstração
+                $displayItems = [
+                    ['title' => 'Concreto Usinado', 'subtitle' => 'Alta Performance', 'description' => 'Concreto de alta resistência com controle rigoroso de qualidade. Entregue pontualmente na sua obra.', 'icon' => 'truck', 'bullets' => ['Até 50 MPa', 'Laudo técnico', 'Frota moderna'], 'cta_label' => 'Fazer Orçamento', 'cta_url' => '#orcamento'],
+                    ['title' => 'Bombeamento', 'subtitle' => 'Alcance Máximo', 'description' => 'Serviço de bombeamento eficiente para lajes e locais de difícil acesso, otimizando o tempo da sua equipe.', 'icon' => 'arrow-up-circle', 'bullets' => ['Bomba lança', 'Bomba estacionária', 'Operadores treinados'], 'cta_label' => 'Fazer Orçamento', 'cta_url' => '#orcamento'],
+                    ['title' => 'Locação de Máquinas', 'subtitle' => 'Frota Renovada', 'description' => 'Equipamentos pesados para terraplanagem, escavação e compactação. Disponibilidade imediata.', 'icon' => 'tractor', 'bullets' => ['Retroescavadeiras', 'Rolos compactadores', 'Manutenção em dia'], 'cta_label' => 'Fazer Orçamento', 'cta_url' => '#orcamento'],
+                ];
+            }
+        @endphp
+        <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
+            @if($bgImg)
+                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
+            @endif
+            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
+                @if(!$hideHeader && (!empty($servicesTitle) || !empty($servicesSubtitle)))
+                    <div class="mb-16 text-center max-w-3xl mx-auto">
+                        @if(!empty($servicesSubtitle))
+                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
+                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $servicesSubtitle }}</span>
+                            </div>
+                        @endif
+                        @if(!empty($servicesTitle))
+                            <h2 class="font-mono text-4xl font-extrabold tracking-tight text-foreground md:text-5xl drop-shadow-sm mb-4" style="text-wrap: balance;">
+                                {{ $servicesTitle }}
+                            </h2>
+                        @endif
+                        @if(!empty($servicesDesc))
+                            <p class="text-lg font-medium leading-relaxed text-muted-foreground mx-auto" style="text-wrap: balance;">
+                                {{ $servicesDesc }}
+                            </p>
+                        @endif
+                    </div>
+                @endif
+
+                <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach($displayItems as $index => $service)
+                        <div class="group relative flex flex-col rounded-2xl border border-primary/10 bg-card/80 backdrop-blur-sm p-8 transition-all duration-500 hover:-translate-y-2 hover:border-primary/50 hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.3)] overflow-hidden">
+                            <!-- Efeito de brilho no fundo ao passar o mouse -->
+                            <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary shadow-inner shadow-primary/20 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                                    <i data-lucide="{{ $service['icon'] ?? 'droplets' }}" class="h-8 w-8"></i>
+                                </div>
+                                
+                                <h3 class="font-mono text-2xl font-bold text-card-foreground mb-2 group-hover:text-primary transition-colors">{{ $service['title'] ?? '' }}</h3>
+                                
+                                @if(!empty($service['subtitle']))
+                                    <div class="mb-4 inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                                        {{ $service['subtitle'] }}
+                                    </div>
+                                @endif
+                                
+                                <p class="flex-1 text-base leading-relaxed text-muted-foreground mb-6">{{ $service['description'] ?? '' }}</p>
+                                
+                                @if(!empty($service['bullets']))
+                                    <ul class="flex flex-col gap-3 mb-8">
+                                        @foreach((array) $service['bullets'] as $bullet)
+                                            <li class="flex items-center gap-3 text-sm font-medium text-card-foreground/80">
+                                                <div class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+                                                    <i data-lucide="check" class="h-3 w-3"></i>
+                                                </div>
+                                                {{ $bullet }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                                
+                                <div class="mt-auto pt-4 border-t border-border/50">
+                                    <a href="{{ $service['cta_url'] ?? '#orcamento' }}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-card border border-primary/20 px-4 py-3 text-sm font-bold text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/25">
+                                        {{ $service['cta_label'] ?? 'Solicitar Orçamento' }}
+                                        <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
         @break
 
     @case('timeline')

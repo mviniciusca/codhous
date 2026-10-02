@@ -1,15 +1,27 @@
 @props([
-    'badge'       => null,
-    'title'       => null,
-    'description' => null,
-    'breadcrumbs' => [],
+    'badge'           => null,
+    'title'           => null,
+    'description'     => null,
+    'breadcrumbs'     => [],
+    'backgroundImage' => null,
 ])
+
+@php
+    $bgUrl = $backgroundImage ? \Illuminate\Support\Facades\Storage::url($backgroundImage) : null;
+@endphp
 
 {{--
     Template de Cabeçalho Padrão das Páginas Internas
 --}}
-<section class="bg-background pt-6 pb-6 lg:pt-8 lg:pb-8">
-    <div class="mx-auto max-w-7xl px-4 lg:px-8">
+<section class="relative bg-background pt-10 pb-10 lg:pt-14 lg:pb-14 overflow-hidden border-b border-border">
+    @if($bgUrl)
+        <div class="absolute inset-0 z-0">
+            <img src="{{ $bgUrl }}" alt="Header Background" class="w-full h-full object-cover opacity-[0.15]">
+            <div class="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-transparent"></div>
+        </div>
+    @endif
+
+    <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
         
         {{-- Breadcrumbs --}}
         <nav class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground" aria-label="Breadcrumb">
