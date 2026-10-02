@@ -525,7 +525,7 @@ class ContentSectionResource extends Resource
                         Forms\Components\Grid::make(2)->schema([
                             Forms\Components\TextInput::make('content.button_label')->label(__('Texto do Botão'))->default('Fazer orçamento grátis'),
                             Forms\Components\TextInput::make('content.button_url')->label(__('URL do Botão (Deixe vazio p/ usar o WhatsApp)'))->helperText('Se vazio, enviará para o WhatsApp padrão.'),
-                            Forms\Components\FileUpload::make('content.payment_methods_image')->image()->directory('sections/payment')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.')->columnSpanFull(),
+                            Forms\Components\FileUpload::make('content.payment_methods_image')->image()->imageEditor()->directory('sections/payment')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.')->columnSpanFull(),
                         ])
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_PAYMENT_OFFER)
@@ -539,6 +539,7 @@ class ContentSectionResource extends Resource
                         Forms\Components\FileUpload::make('content.image')
                             ->label('Imagem do Banner')
                             ->image()
+                            ->imageEditor()
                             ->directory('sections/banners')
                             ->required()
                             ->columnSpanFull(),
@@ -634,6 +635,7 @@ class ContentSectionResource extends Resource
                                                 Forms\Components\FileUpload::make('content.background_image')
                                                     ->label('Imagem de Fundo')
                                                     ->image()
+                                                    ->imageEditor()
                                                     ->directory('sections/backgrounds')
                                                     ->helperText('Selecione uma imagem para o fundo da seção.')
                                                     ->live()

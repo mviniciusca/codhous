@@ -590,15 +590,15 @@
         @endphp
         
         @if($bannerImg)
-            <section class="{{ $bgColor }} {{ $textColor }} py-6 lg:py-10">
+            <section class="{{ $bgColor }} {{ $textColor }} py-4">
                 <div class="mx-auto max-w-7xl px-4 lg:px-8">
                     @if($bannerLink)
-                        <a href="{{ $bannerLink }}" target="{{ $target }}" class="block overflow-hidden rounded-2xl shadow-xl transition-transform hover:-translate-y-1 hover:shadow-2xl duration-300">
-                            <img src="{{ $bannerImg }}" alt="Banner" class="w-full h-auto object-cover" />
+                        <a href="{{ $bannerLink }}" target="{{ $target }}" class="block overflow-hidden rounded-xl transition-transform hover:-translate-y-1 duration-300">
+                            <img src="{{ $bannerImg }}" alt="Banner" class="w-full h-auto object-contain" />
                         </a>
                     @else
-                        <div class="block overflow-hidden rounded-2xl shadow-xl">
-                            <img src="{{ $bannerImg }}" alt="Banner" class="w-full h-auto object-cover" />
+                        <div class="block overflow-hidden rounded-xl">
+                            <img src="{{ $bannerImg }}" alt="Banner" class="w-full h-auto object-contain" />
                         </div>
                     @endif
                 </div>
