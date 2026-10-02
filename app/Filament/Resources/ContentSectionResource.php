@@ -223,6 +223,23 @@ class ContentSectionResource extends Resource
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_FAQ)
                     ->collapsible(),
 
+                // Design e Layout (Partners)
+                Forms\Components\Section::make('Design e Layout')
+                    ->description('Configurações visuais da seção de parceiros.')
+                    ->icon('heroicon-o-paint-brush')
+                    ->schema([
+                        Forms\Components\ToggleButtons::make('content.layout')
+                            ->label('Layout')
+                            ->options([
+                                'slider' => 'Slider (Carrossel Contínuo)',
+                                'grid' => 'Grid (Lado a Lado)',
+                            ])
+                            ->default('slider')
+                            ->inline(),
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_PARTNERS)
+                    ->collapsible(),
+
                 // Partners
                 Forms\Components\Section::make('Parceiros')
                     ->description('Adicione as logomarcas ou nomes das empresas parceiras.')

@@ -95,6 +95,7 @@
 
     @case('partners')
         <x-section-partners
+            :layout="$data['layout'] ?? 'slider'"
             :subtitle="$data['header']['subtitle'] ?? $data['subtitle'] ?? null"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :description="$data['header']['description'] ?? $data['description'] ?? null"
