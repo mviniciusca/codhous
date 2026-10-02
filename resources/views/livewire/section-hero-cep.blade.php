@@ -46,6 +46,27 @@
                 <p class="mt-4 lg:mt-6 text-base md:text-lg leading-relaxed text-zinc-300 lg:text-zinc-600">
                     {{ data_get($mainSlide, 'subtitle', 'Entrega rápida, rastreamento em tempo real e suporte especializado.') }}
                 </p>
+
+                @if(!empty($buttons['primary']['text']) || !empty($buttons['secondary']['text']))
+                    <div class="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                        @if(!empty($buttons['primary']['text']))
+                            <a href="{{ $buttons['primary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl">
+                                @if(!empty($buttons['primary']['icon']))
+                                    <i data-lucide="{{ $buttons['primary']['icon'] }}" class="h-5 w-5"></i>
+                                @endif
+                                {{ $buttons['primary']['text'] }}
+                            </a>
+                        @endif
+                        @if(!empty($buttons['secondary']['text']))
+                            <a href="{{ $buttons['secondary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl border-2 border-primary bg-transparent px-6 py-3 font-bold text-primary transition-all hover:-translate-y-0.5 hover:bg-primary/5">
+                                @if(!empty($buttons['secondary']['icon']))
+                                    <i data-lucide="{{ $buttons['secondary']['icon'] }}" class="h-5 w-5"></i>
+                                @endif
+                                {{ $buttons['secondary']['text'] }}
+                            </a>
+                        @endif
+                    </div>
+                @endif
                 
                 <div class="mt-8 lg:mt-12 w-full max-w-md lg:max-w-none text-left">
                     @if($isWhatsapp)
@@ -99,6 +120,27 @@
             <p class="mt-8 mx-auto max-w-2xl text-xl font-medium leading-relaxed text-zinc-300 drop-shadow-md">
                 {{ data_get($mainSlide, 'subtitle', '') }}
             </p>
+
+            @if(!empty($buttons['primary']['text']) || !empty($buttons['secondary']['text']))
+                <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+                    @if(!empty($buttons['primary']['text']))
+                        <a href="{{ $buttons['primary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl">
+                            @if(!empty($buttons['primary']['icon']))
+                                <i data-lucide="{{ $buttons['primary']['icon'] }}" class="h-5 w-5"></i>
+                            @endif
+                            {{ $buttons['primary']['text'] }}
+                        </a>
+                    @endif
+                    @if(!empty($buttons['secondary']['text']))
+                        <a href="{{ $buttons['secondary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl border-2 border-primary bg-transparent px-6 py-3 font-bold text-primary transition-all hover:-translate-y-0.5 hover:bg-primary/5">
+                            @if(!empty($buttons['secondary']['icon']))
+                                <i data-lucide="{{ $buttons['secondary']['icon'] }}" class="h-5 w-5"></i>
+                            @endif
+                            {{ $buttons['secondary']['text'] }}
+                        </a>
+                    @endif
+                </div>
+            @endif
 
             <div class="mt-16 w-full max-w-lg rounded-3xl bg-white/10 p-6 backdrop-blur-xl border border-white/20 shadow-2xl">
                 @if($isWhatsapp)
@@ -161,6 +203,26 @@
                         <p class="mt-6 mx-auto max-w-2xl text-lg leading-relaxed text-zinc-300">
                             {{ data_get($mainSlide, 'subtitle', '') }}
                         </p>
+                        @if(!empty($buttons['primary']['text']) || !empty($buttons['secondary']['text']))
+                            <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                                @if(!empty($buttons['primary']['text']))
+                                    <a href="{{ $buttons['primary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl">
+                                        @if(!empty($buttons['primary']['icon']))
+                                            <i data-lucide="{{ $buttons['primary']['icon'] }}" class="h-5 w-5"></i>
+                                        @endif
+                                        {{ $buttons['primary']['text'] }}
+                                    </a>
+                                @endif
+                                @if(!empty($buttons['secondary']['text']))
+                                    <a href="{{ $buttons['secondary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl border-2 border-primary bg-transparent px-6 py-3 font-bold text-primary transition-all hover:-translate-y-0.5 hover:bg-primary/5">
+                                        @if(!empty($buttons['secondary']['icon']))
+                                            <i data-lucide="{{ $buttons['secondary']['icon'] }}" class="h-5 w-5"></i>
+                                        @endif
+                                        {{ $buttons['secondary']['text'] }}
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
                         @if(!empty($stats))
                             <div class="mt-10 flex flex-wrap items-center justify-center gap-6 lg:gap-10">
                                 @foreach($stats as $index => $stat)
@@ -196,6 +258,26 @@
                         <p class="mt-6 max-w-xl text-lg leading-relaxed text-zinc-300">
                             {{ data_get($mainSlide, 'subtitle', 'Entrega rápida, rastreamento em tempo real e suporte técnico especializado.') }}
                         </p>
+                        @if(!empty($buttons['primary']['text']) || !empty($buttons['secondary']['text']))
+                            <div class="mt-8 flex flex-wrap items-center justify-start gap-4">
+                                @if(!empty($buttons['primary']['text']))
+                                    <a href="{{ $buttons['primary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl">
+                                        @if(!empty($buttons['primary']['icon']))
+                                            <i data-lucide="{{ $buttons['primary']['icon'] }}" class="h-5 w-5"></i>
+                                        @endif
+                                        {{ $buttons['primary']['text'] }}
+                                    </a>
+                                @endif
+                                @if(!empty($buttons['secondary']['text']))
+                                    <a href="{{ $buttons['secondary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl border-2 border-primary bg-transparent px-6 py-3 font-bold text-primary transition-all hover:-translate-y-0.5 hover:bg-primary/5">
+                                        @if(!empty($buttons['secondary']['icon']))
+                                            <i data-lucide="{{ $buttons['secondary']['icon'] }}" class="h-5 w-5"></i>
+                                        @endif
+                                        {{ $buttons['secondary']['text'] }}
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
                         @if(!empty($stats))
                             <div class="mt-10 flex flex-wrap items-center gap-6 lg:gap-10">
                                 @foreach($stats as $index => $stat)

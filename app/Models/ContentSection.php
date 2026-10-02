@@ -24,6 +24,7 @@ class ContentSection extends Model
     ];
 
 
+    public const TYPE_HERO = 'hero';
     public const TYPE_PARTNERS = 'partners';
     public const TYPE_SERVICES = 'services';
     public const TYPE_FAQ = 'faq';
@@ -38,6 +39,7 @@ class ContentSection extends Model
     public static function typeLabels(): array
     {
         return [
+            self::TYPE_HERO => 'Hero Section',
             self::TYPE_PARTNERS => 'Parceiros',
             self::TYPE_SERVICES => 'Serviços',
             self::TYPE_FAQ => 'FAQ',
@@ -53,6 +55,7 @@ class ContentSection extends Model
     public static function slugForType(string $type): string
     {
         return match ($type) {
+            self::TYPE_HERO => 'hero',
             self::TYPE_PARTNERS => 'partners',
             self::TYPE_SERVICES => 'services',
             self::TYPE_FAQ => 'faq',

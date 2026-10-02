@@ -56,7 +56,108 @@ class ContentSectionResource extends Resource
                     ->columns(1)
                     ->collapsible(),
 
-
+                // Hero
+                Forms\Components\Section::make('Hero Section')
+                    ->description('Destaque principal no topo da página.')
+                    ->icon('heroicon-o-presentation-chart-line')
+                    ->schema([
+                        Forms\Components\Select::make('content.layout')
+                            ->label('Layout')
+                            ->helperText('Escolha o estilo de exibição.')
+                            ->options([
+                                'default' => 'Padrão (Texto + CEP)',
+                                'whatsapp' => 'WhatsApp (Texto Central)',
+                            ])->default('default'),
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\FileUpload::make('content.image')
+                                ->label('Imagem de Fundo')
+                                ->helperText('Imagem principal que ficará no fundo da seção.')
+                                ->image()
+                                ->directory('hero'),
+                            Forms\Components\FileUpload::make('content.video')
+                                ->label('Vídeo de Fundo (.mp4)')
+                                ->helperText('Se enviado, será exibido no lugar da imagem de fundo. Recomendado até 15MB.')
+                                ->acceptedFileTypes(['video/mp4'])
+                                ->directory('hero'),
+                        ]),
+                        Forms\Components\Select::make('content.image_alignment')
+                            ->label('Alinhamento da Imagem / Vídeo')
+                            ->options([
+                                'center' => 'Centro',
+                                'top' => 'Topo',
+                                'bottom' => 'Base',
+                            ])->default('center'),
+                        Forms\Components\Fieldset::make('Botões de Ação')
+                            ->schema([
+                                Forms\Components\Group::make([
+                                    Forms\Components\TextInput::make('content.primary_button_text')->label('Texto Botão 1')->helperText('Cor principal'),
+                                    Forms\Components\TextInput::make('content.primary_button_url')->label('Link Botão 1'),
+                                    Forms\Components\ToggleButtons::make('content.primary_button_icon_select')
+                                        ->label('Ícone rápido')
+                                        ->options([
+                                            'arrow-right' => 'Seta',
+                                            'phone' => 'Telefone',
+                                            'message-circle' => 'WhatsApp',
+                                            'calculator' => 'Calculadora',
+                                            'outro' => 'Outro',
+                                        ])
+                                        ->icons([
+                                            'arrow-right' => 'heroicon-o-arrow-right',
+                                            'phone' => 'heroicon-o-phone',
+                                            'message-circle' => 'heroicon-o-chat-bubble-oval-left-ellipsis',
+                                            'calculator' => 'heroicon-o-calculator',
+                                            'outro' => 'heroicon-o-magnifying-glass',
+                                        ])
+                                        ->inline()
+                                        ->live(),
+                                    Forms\Components\TextInput::make('content.primary_button_icon')
+                                        ->label('Nome do Ícone (Botão 1)')
+                                        ->placeholder('ex: arrow-right')
+                                        ->helperText('Busque o nome do ícone em lucide.dev/icons')
+                                        ->visible(fn ($get) => $get('content.primary_button_icon_select') === 'outro'),
+                                ])->columns(1),
+                                Forms\Components\Group::make([
+                                    Forms\Components\TextInput::make('content.secondary_button_text')->label('Texto Botão 2')->helperText('Borda principal (vazado)'),
+                                    Forms\Components\TextInput::make('content.secondary_button_url')->label('Link Botão 2'),
+                                    Forms\Components\ToggleButtons::make('content.secondary_button_icon_select')
+                                        ->label('Ícone rápido')
+                                        ->options([
+                                            'arrow-right' => 'Seta',
+                                            'phone' => 'Telefone',
+                                            'message-circle' => 'WhatsApp',
+                                            'calculator' => 'Calculadora',
+                                            'outro' => 'Outro',
+                                        ])
+                                        ->icons([
+                                            'arrow-right' => 'heroicon-o-arrow-right',
+                                            'phone' => 'heroicon-o-phone',
+                                            'message-circle' => 'heroicon-o-chat-bubble-oval-left-ellipsis',
+                                            'calculator' => 'heroicon-o-calculator',
+                                            'outro' => 'heroicon-o-magnifying-glass',
+                                        ])
+                                        ->inline()
+                                        ->live(),
+                                    Forms\Components\TextInput::make('content.secondary_button_icon')
+                                        ->label('Nome do Ícone (Botão 2)')
+                                        ->placeholder('ex: phone')
+                                        ->helperText('Busque o nome do ícone em lucide.dev/icons')
+                                        ->visible(fn ($get) => $get('content.secondary_button_icon_select') === 'outro'),
+                                ])->columns(1),
+                            ]),
+                        Forms\Components\Repeater::make('content.stats')
+                            ->label('Estatísticas')
+                            ->helperText('Números importantes em destaque (ex: +500 Projetos).')
+                            ->schema([
+                                Forms\Components\TextInput::make('value')->label('Valor')->helperText('Ex: +500')->required(),
+                                Forms\Components\TextInput::make('label')->label('Rótulo')->helperText('Ex: Projetos Entregues')->required(),
+                            ])
+                            ->columns(2)
+                            ->collapsible()
+                            ->cloneable()
+                            ->itemLabel(fn (array $state): ?string => trim(($state['value'] ?? '') . ' ' . ($state['label'] ?? '')) ?: null)
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_HERO)
+                    ->collapsible(),
 
                 // FAQ
                 Forms\Components\Section::make('Perguntas e respostas')

@@ -24,14 +24,38 @@
         @break
 
     @case('hero')
+        @php
+            $heroBadge = $data['header']['subtitle'] ?? $data['badge'] ?? '';
+            $heroTitle = $data['header']['title'] ?? $data['title'] ?? '';
+            $heroSubtitle = $data['header']['description'] ?? $data['subtitle'] ?? '';
+            
+            $primaryIconSelect = $data['primary_button_icon_select'] ?? '';
+            $primaryIcon = $primaryIconSelect === 'outro' ? ($data['primary_button_icon'] ?? '') : $primaryIconSelect;
+
+            $secondaryIconSelect = $data['secondary_button_icon_select'] ?? '';
+            $secondaryIcon = $secondaryIconSelect === 'outro' ? ($data['secondary_button_icon'] ?? '') : $secondaryIconSelect;
+        @endphp
         <livewire:section-hero-cep
             :main-slide="[
-                'title' => $data['title'] ?? '',
-                'subtitle' => $data['subtitle'] ?? '',
+                'title' => $heroTitle,
+                'subtitle' => $heroSubtitle,
                 'image' => $data['image'] ?? null,
+                'video' => $data['video'] ?? null,
                 'image_alignment' => $data['image_alignment'] ?? 'center'
             ]"
-            :badge="$data['badge'] ?? ''"
+            :buttons="[
+                'primary' => [
+                    'text' => $data['primary_button_text'] ?? null,
+                    'url' => $data['primary_button_url'] ?? null,
+                    'icon' => $primaryIcon,
+                ],
+                'secondary' => [
+                    'text' => $data['secondary_button_text'] ?? null,
+                    'url' => $data['secondary_button_url'] ?? null,
+                    'icon' => $secondaryIcon,
+                ]
+            ]"
+            :badge="$heroBadge"
             :layout="$data['layout'] ?? 'default'"
             :theme="$theme"
             :stats="$data['stats'] ?? []"

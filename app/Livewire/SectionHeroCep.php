@@ -29,6 +29,9 @@ class SectionHeroCep extends Component
     /** Estatísticas exibidas na hero (value + label) */
     public array $stats = [];
 
+    /** Botões de ação adicionais */
+    public array $buttons = [];
+
     public function updatedCep($value)
     {
         $digits = preg_replace('/[^0-9]/', '', $value);
@@ -108,6 +111,7 @@ class SectionHeroCep extends Component
             'layout' => $this->layout ?: 'default',
             'theme' => $this->theme ?: 'default',
             'stats' => $stats,
+            'buttons' => $this->buttons,
         ]);
     }
 }
