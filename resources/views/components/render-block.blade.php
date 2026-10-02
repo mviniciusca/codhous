@@ -216,29 +216,79 @@
         @break
 
     @case('calculator')
-        <livewire:calculator />
-        @break
-
-    @case('budget_form')
-        <section id="orcamento" class="{{ $data['background_color'] ?? 'bg-muted/50' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12">
+        @php
+            $calcTitle = $data['header']['title'] ?? $data['title'] ?? null;
+            $calcSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
+            $calcDesc = $data['header']['description'] ?? $data['description'] ?? null;
+            
+            $bgColor = $data['background_color'] ?? '';
+            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
+            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
+            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
+            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/5';
+        @endphp
+        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                @if(!empty($data['title']))
+                @if(!empty($calcTitle) || !empty($calcSubtitle))
                     <div class="mb-10">
-                        <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
-                            <span class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
-                            <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Orçamento Online</span>
-                        </div>
-                        <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                            {{ $data['title'] }}
-                        </h2>
-                        @if(!empty($data['description']))
+                        @if(!empty($calcSubtitle))
+                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse"></span>
+                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $calcSubtitle }}</span>
+                            </div>
+                        @endif
+                        @if(!empty($calcTitle))
+                            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                                {{ $calcTitle }}
+                            </h2>
+                        @endif
+                        @if(!empty($calcDesc))
                             <p class="mt-3 text-lg leading-relaxed text-muted-foreground">
-                                {{ $data['description'] }}
+                                {{ $calcDesc }}
                             </p>
                         @endif
                     </div>
                 @endif
-                <livewire:budget />
+                <livewire:calculator :bg-color="$data['background_color'] ?? ''" />
+            </div>
+        </section>
+        @break
+
+    @case('budget_form')
+        @php
+            $budgetTitle = $data['header']['title'] ?? $data['title'] ?? null;
+            $budgetSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? 'Orçamento Online';
+            $budgetDesc = $data['header']['description'] ?? $data['description'] ?? null;
+            
+            $bgColor = $data['background_color'] ?? '';
+            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
+            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
+            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
+            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/5';
+        @endphp
+        <section id="orcamento" class="{{ $data['background_color'] ?? 'bg-muted/50' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                @if(!empty($budgetTitle) || !empty($budgetSubtitle))
+                    <div class="mb-10">
+                        @if(!empty($budgetSubtitle))
+                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse"></span>
+                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $budgetSubtitle }}</span>
+                            </div>
+                        @endif
+                        @if(!empty($budgetTitle))
+                            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                                {{ $budgetTitle }}
+                            </h2>
+                        @endif
+                        @if(!empty($budgetDesc))
+                            <p class="mt-3 text-lg leading-relaxed text-muted-foreground">
+                                {{ $budgetDesc }}
+                            </p>
+                        @endif
+                    </div>
+                @endif
+                <livewire:budget :bg-color="$data['background_color'] ?? ''" />
             </div>
         </section>
         @break

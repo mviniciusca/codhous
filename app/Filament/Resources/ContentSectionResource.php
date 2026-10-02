@@ -492,6 +492,30 @@ class ContentSectionResource extends Resource
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_CONTACT_BANNER)
                     ->collapsible(),
+
+                // Budget Form
+                Forms\Components\Section::make('Formulário de Orçamento')
+                    ->description('Exibe o wizard (passo a passo) do formulário de orçamento.')
+                    ->icon('heroicon-o-calculator')
+                    ->schema([
+                        Forms\Components\Placeholder::make('info')
+                            ->label('')
+                            ->content('Esta seção não possui configurações específicas. Utilize o bloco "Cabeçalho (opcional)" acima para definir o título e a descrição. O formulário em si será exibido automaticamente com a aparência selecionada na aba "Configurações".'),
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_BUDGET_FORM)
+                    ->collapsible(),
+
+                // Calculator
+                Forms\Components\Section::make('Calculadora de Volume')
+                    ->description('Exibe a ferramenta de cálculo de volume de concreto.')
+                    ->icon('heroicon-o-variable')
+                    ->schema([
+                        Forms\Components\Placeholder::make('info_calc')
+                            ->label('')
+                            ->content('Esta seção não possui configurações específicas. Utilize o bloco "Cabeçalho (opcional)" acima para definir o título e a descrição. A calculadora será exibida automaticamente com a aparência selecionada na aba "Configurações".'),
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_CALCULATOR)
+                    ->collapsible(),
                             ]),
 
                         Forms\Components\Tabs\Tab::make('Configurações')

@@ -35,6 +35,8 @@ class ContentSection extends Model
     public const TYPE_TIMELINE = 'timeline';
     public const TYPE_CTA_CONTACT = 'cta_contact';
     public const TYPE_CONTACT_BANNER = 'contact_banner';
+    public const TYPE_BUDGET_FORM = 'budget_form';
+    public const TYPE_CALCULATOR = 'calculator';
 
 
     public static function typeLabels(): array
@@ -50,6 +52,8 @@ class ContentSection extends Model
             self::TYPE_TIMELINE => 'Como Funciona (Timeline)',
             self::TYPE_CTA_CONTACT => 'Contato',
             self::TYPE_CONTACT_BANNER => 'Banner de Atendimento',
+            self::TYPE_BUDGET_FORM => 'Formulário de Orçamento',
+            self::TYPE_CALCULATOR => 'Calculadora de Volume',
         ];
     }
 
@@ -66,6 +70,8 @@ class ContentSection extends Model
             self::TYPE_TIMELINE => 'timeline',
             self::TYPE_CTA_CONTACT => 'cta_contact',
             self::TYPE_CONTACT_BANNER => 'contact-banner',
+            self::TYPE_BUDGET_FORM => 'budget-form',
+            self::TYPE_CALCULATOR => 'calculator',
             default => $type,
         };
     }

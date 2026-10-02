@@ -53,8 +53,6 @@ class PageResource extends Resource
                                 ->addActionLabel(__('Adicionar Novo Bloco'))
                                 ->blocks([
                                     self::getPageHeaderBlock(),
-                                    self::getCalculatorBlock(),
-                                    self::getBudgetFormBlock(),
                                     self::getShowcaseBlock(),
                                     self::getMapBlock(),
                                     self::getRichTextBlock(),
@@ -393,26 +391,6 @@ class PageResource extends Resource
             ]);
     }
 
-    protected static function getCalculatorBlock(): Forms\Components\Builder\Block
-    {
-        return Forms\Components\Builder\Block::make('calculator')
-            ->label(__('Calculadora de Concreto'))
-            ->icon('heroicon-o-calculator')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da calculadora.'))->default('Calculadora de Volume'),
-            ]);
-    }
-
-    protected static function getBudgetFormBlock(): Forms\Components\Builder\Block
-    {
-        return Forms\Components\Builder\Block::make('budget_form')
-            ->label(__('Formulário de Orçamento (Wizard)'))
-            ->icon('heroicon-o-document-text')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título do formulário de orçamento.'))->default('Solicitar Orçamento'),
-                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Instruções para o preenchimento.')),
-            ]);
-    }
     protected static function getContactBannerBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('contact_banner')

@@ -38,6 +38,7 @@ class Budget extends Component implements HasForms
     use InteractsWithForms;
 
     public ?array $data = [];
+    public ?string $bgColor = '';
 
     public bool $isSubmitted = false;
     
@@ -247,7 +248,13 @@ class Budget extends Component implements HasForms
                         ->previousAction(
                             fn (\Filament\Forms\Components\Actions\Action $action) => $action->extraAttributes(['class' => '!bg-secondary !text-secondary-foreground !border !border-border hover:!bg-accent'])
                         )
-                        ->submitAction(new \Illuminate\Support\HtmlString('<button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-primary text-white hover:bg-primary/90 h-10 px-8">Solicitar Orçamento Grátis</button>')),
+                        ->submitAction(
+                            new \Illuminate\Support\HtmlString(
+                                '<button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-8 ' .
+                                (str_contains($this->bgColor ?? '', 'bg-primary') ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)] text-white hover:opacity-90' : 'bg-primary text-white hover:bg-primary/90') .
+                                '">Solicitar Orçamento Grátis</button>'
+                            )
+                        ),
             ])
             ->statePath('data');
     }

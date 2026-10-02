@@ -127,6 +127,30 @@ class ContentSectionSeeder extends Seeder
                 'created_at' => '2026-09-28 18:56:36',
                 'updated_at' => '2026-10-02 04:35:13',
             ),
+            9 => 
+            array (
+                'id' => 10,
+                'slug' => 'budget-form',
+                'name' => 'Formulário de Orçamento',
+                'type' => 'budget_form',
+                'content' => '{"header": {"title": "Solicitar Orçamento", "subtitle": "Orçamento Online", "description": "Preencha os dados abaixo e receba seu orçamento personalizado."}, "background_color": "bg-muted/30", "text_color": "light"}',
+                'is_active' => 1,
+                'sort_order' => 9,
+                'created_at' => '2026-10-02 12:00:00',
+                'updated_at' => '2026-10-02 12:00:00',
+            ),
+            10 => 
+            array (
+                'id' => 11,
+                'slug' => 'calculator',
+                'name' => 'Calculadora de Volume',
+                'type' => 'calculator',
+                'content' => '{"header": {"title": "Calculadora de Volume de Concreto", "subtitle": "Ferramenta Interativa", "description": ""}, "background_color": "bg-foreground text-background", "text_color": "dark"}',
+                'is_active' => 1,
+                'sort_order' => 10,
+                'created_at' => '2026-10-02 12:00:00',
+                'updated_at' => '2026-10-02 12:00:00',
+            ),
         ));
         
         
