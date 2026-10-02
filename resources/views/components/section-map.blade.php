@@ -1,4 +1,5 @@
 @props([
+    'textColor' => 'light',
     'title' => null,
     'iframe' => null,
 ])

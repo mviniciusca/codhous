@@ -1,4 +1,6 @@
 @props([
+    'textColor' => 'light',
+    'bgColor' => null,
     'title' => null,
     'description' => null,
     'badge' => null,
@@ -31,7 +33,7 @@
 @endphp
 
 @if(!\App\Models\ContentSection::isHidden('services'))
-<section id="servicos" class="bg-background py-12 lg:py-16">
+<section id="servicos" class="{{ $bgColor ?? 'bg-background' }} py-12 lg:py-16 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         {{-- Só mostra o header se houver título ou badge e se hideHeader for false --}}
         @if(!$hideHeader && (!empty($header['title']) || !empty($header['subtitle'])))

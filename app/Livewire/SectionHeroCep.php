@@ -25,6 +25,8 @@ class SectionHeroCep extends Component
 
     /** Tema: default, corporate, creative */
     public string $theme = 'default';
+    public ?string $bgColor = null;
+    public string $textColor = 'light';
 
     /** Estatísticas exibidas na hero (value + label) */
     public array $stats = [];

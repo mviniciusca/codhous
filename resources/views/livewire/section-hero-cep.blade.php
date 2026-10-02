@@ -36,7 +36,7 @@
     </script>
 @endpush
     {{-- DEFAULT HERO (Original Layout + Layout Whatsapp toggle) --}}
-    <section class="relative flex min-h-[70vh] items-center overflow-hidden bg-zinc-950 pt-8">
+    <section class="relative flex min-h-[70vh] items-center overflow-hidden {{ $bgColor ?? 'bg-zinc-950' }} pt-8 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
         
         {{-- Background Image --}}
         <div class="absolute inset-0 z-0">

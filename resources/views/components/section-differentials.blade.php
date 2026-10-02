@@ -1,4 +1,6 @@
 @props([
+    'textColor' => 'light',
+    'bgColor' => null,
     'title' => null,
     'subtitle' => null,
     'description' => null,
@@ -49,7 +51,7 @@
 @endphp
 
 @if(!\App\Models\ContentSection::isHidden('differentials'))
-<section class="bg-background py-16 lg:py-24">
+<section class="{{ $bgColor ?? 'bg-background' }} py-16 lg:py-24 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         @if(!empty($displayTitle) || !empty($displaySubtitle) || !empty($displayDescription))
             <div class="mb-16 text-center">

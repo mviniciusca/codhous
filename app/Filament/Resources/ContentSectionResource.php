@@ -537,6 +537,33 @@ class ContentSectionResource extends Resource
                                             ->minValue(0),
                                     ])
                                     ->columns(2),
+
+                                Forms\Components\Section::make('Aparência Global')
+                                    ->description('Configurações visuais gerais aplicadas a esta seção.')
+                                    ->icon('heroicon-o-swatch')
+                                    ->schema([
+                                        Forms\Components\ToggleButtons::make('content.background_color')
+                                            ->label('Cor de Fundo')
+                                            ->inline()
+                                            ->options([
+                                                'bg-white' => 'Claro',
+                                                'bg-muted/30' => 'Cinza',
+                                                'bg-foreground text-background' => 'Escuro',
+                                                'bg-primary text-primary-foreground' => 'Cor Principal',
+                                            ])
+                                            ->default('bg-white')
+                                            ->helperText('Define a cor de fundo preenchida atrás de todo o conteúdo.'),
+
+                                        Forms\Components\ToggleButtons::make('content.text_color')
+                                            ->label('Cor do Texto')
+                                            ->inline()
+                                            ->options([
+                                                'light' => 'Texto Escuro',
+                                                'dark' => 'Texto Claro',
+                                            ])
+                                            ->default('light')
+                                            ->helperText('Ajuste isso para que o texto não "suma" se o fundo for muito escuro.'),
+                                    ])->columns(2),
                             ]),
                     ])
                     ->columnSpanFull(),

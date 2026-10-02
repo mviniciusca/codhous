@@ -20,6 +20,8 @@ class SectionCoverage extends Component
     public $cities = null;
     public $sidebar = null;
     public $backgroundMedia = null;
+    public $bgColor = null;
+    public $textColor = 'light';
 
     public function mount($title = null, $subtitle = null, $description = null, $cities = null, $sidebar = null, $backgroundMedia = null)
     {

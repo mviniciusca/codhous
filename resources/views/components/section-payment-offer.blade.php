@@ -1,4 +1,5 @@
 @props([
+    'textColor' => 'light',
     'badge' => 'APROVEITE ESSA MEGA OPORTUNIDADE',
     'title' => 'Parcelamento em até 12x sem juros',
     'subtitle' => 'ou com desconto no pagamento à vista em dinheiro ou com o pix.',

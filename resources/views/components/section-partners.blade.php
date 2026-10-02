@@ -1,4 +1,6 @@
 @props([
+    'textColor' => 'light',
+    'bgColor' => null,
     'layout' => 'slider',
     'subtitle' => null,
     'title' => null,
@@ -39,7 +41,7 @@
 @endphp
 
 @if(!\App\Models\ContentSection::isHidden('partners'))
-<section class="bg-white py-16 overflow-hidden">
+<section class="{{ $bgColor ?? 'bg-white' }} py-16 overflow-hidden {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     @if($layout === 'grid')
         <div class="mx-auto max-w-7xl px-4 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -69,7 +71,7 @@
                             @if(!empty($brand->logo))
                                 <img src="{{ Storage::url($brand->logo) }}" 
                                      alt="{{ $brand->name }}" 
-                                     class="max-h-full max-w-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300">
+                                     class="max-h-full max-w-full object-contain transition-all duration-300">
                             @else
                                 <i data-lucide="{{ $brand->icon ?? 'building-2' }}" class="h-8 w-8 text-muted-foreground/40"></i>
                             @endif
@@ -110,18 +112,14 @@
         <div class="swiper partners-swiper w-full py-8">
             <div class="swiper-wrapper flex items-center">
                 @foreach($brands as $brand)
-                    <div class="swiper-slide flex items-center justify-center px-6">
-                        <div class="flex items-center transition-all duration-300 hover:scale-110">
+                    <div class="swiper-slide flex items-center justify-center px-4">
+                        <div class="flex h-24 w-full items-center justify-center rounded-xl bg-muted/10 border border-muted/20 p-4 transition-all duration-300 hover:bg-muted/30 hover:scale-105">
                             @if(!empty($brand->logo))
-                                <div class="flex h-14 w-full items-center justify-center">
-                                    <img src="{{ Storage::url($brand->logo) }}" 
-                                         alt="{{ $brand->name }}" 
-                                         class="h-full max-w-[160px] object-contain filter grayscale hover:grayscale-0 transition-all duration-300">
-                                </div>
+                                <img src="{{ Storage::url($brand->logo) }}" 
+                                     alt="{{ $brand->name }}" 
+                                     class="max-h-full max-w-full object-contain transition-all duration-300">
                             @else
-                                <div class="flex h-14 w-14 items-center justify-center rounded bg-foreground/5">
-                                    <i data-lucide="{{ $brand->icon ?? 'building-2' }}" class="h-7 w-7 text-foreground/40"></i>
-                                </div>
+                                <i data-lucide="{{ $brand->icon ?? 'building-2' }}" class="h-8 w-8 text-muted-foreground/40"></i>
                             @endif
                         </div>
                     </div>

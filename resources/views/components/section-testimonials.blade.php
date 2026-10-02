@@ -1,3 +1,5 @@
+@props([
+    'textColor' => 'light','bgColor' => null])
 @php
     $section = \App\Models\ContentSection::getBySlug('testimonials');
     $header = $section?->content['header'] ?? [];
@@ -12,7 +14,7 @@
     }
 @endphp
 @if(!\App\Models\ContentSection::isHidden('testimonials'))
-<section id="depoimentos" class="bg-background py-20 lg:py-28">
+<section id="depoimentos" class="{{ $bgColor ?? 'bg-background' }} py-20 lg:py-28 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <div class="mb-16 text-center">
             @if(!empty($header['subtitle']))

@@ -82,6 +82,21 @@
         --input: 213 50% 20%;
         --ring: 213 80% 60%;
     }
+    
+    .text-scheme-dark,
+    .text-scheme-dark .text-foreground,
+    .text-scheme-dark h1,
+    .text-scheme-dark h2,
+    .text-scheme-dark h3,
+    .text-scheme-dark h4 {
+        color: #ffffff !important;
+    }
+
+    .text-scheme-dark .text-muted-foreground,
+    .text-scheme-dark p:not([class*="text-primary"]),
+    .text-scheme-dark span:not([class*="text-primary"]) {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
 }
 
 @layer components {

@@ -40,6 +40,8 @@
                 : ($secondaryIconSelect ?: ($data['secondary_button_icon'] ?? ''));
         @endphp
         <livewire:section-hero-cep
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :main-slide="[
                 'title' => $heroTitle,
                 'subtitle' => $heroSubtitle,
@@ -95,6 +97,8 @@
 
     @case('partners')
         <x-section-partners
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :layout="$data['layout'] ?? 'slider'"
             :subtitle="$data['header']['subtitle'] ?? $data['subtitle'] ?? null"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
@@ -105,6 +109,8 @@
 
     @case('services')
         <x-section-services
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :badge="$data['header']['subtitle'] ?? $data['badge'] ?? null"
             :description="$data['header']['description'] ?? $data['description'] ?? null"
@@ -115,13 +121,15 @@
 
     @case('timeline')
         <x-section-timeline
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :steps="$data['steps'] ?? []"
         />
         @break
 
     @case('showcase')
-        <section class="bg-background py-8 lg:py-12">
+        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
                 @if(!empty($data['title']) || !empty($data['badge']))
                     <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -160,6 +168,8 @@
 
     @case('faq')
         <x-section-faq
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :items="$data['items'] ?? []"
         />
@@ -167,6 +177,8 @@
 
     @case('testimonials')
         <x-section-testimonials
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :items="$data['items'] ?? []"
         />
@@ -174,6 +186,8 @@
 
     @case('coverage')
         <livewire:section-coverage
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :cities="$data['cities'] ?? []"
         />
@@ -181,6 +195,8 @@
 
     @case('differentials')
         <x-section-differentials
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :items="$data['items'] ?? []"
         />
@@ -188,6 +204,8 @@
 
     @case('contact_banner')
         <x-section-contact-banner
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :badge="$data['badge'] ?? null"
             :title="$data['title'] ?? null"
             :description="$data['description'] ?? null"
@@ -202,7 +220,7 @@
         @break
 
     @case('budget_form')
-        <section id="orcamento" class="bg-muted/50 py-8 lg:py-12">
+        <section id="orcamento" class="{{ $data['background_color'] ?? 'bg-muted/50' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
                 @if(!empty($data['title']))
                     <div class="mb-10">
@@ -227,7 +245,7 @@
 
     @case('cta_contact')
     @case('contact_form')
-        <section class="bg-background py-20 lg:py-28">
+        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-20 lg:py-28">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
                 <div class="grid lg:grid-cols-2 gap-16 items-start">
                     <div>
@@ -355,13 +373,15 @@
 
     @case('map')
         <x-section-map
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :iframe="$data['iframe_code'] ?? null"
         />
         @break
 
     @case('rich_text')
-        <section class="bg-background py-16">
+        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
                 <div class="prose prose-zinc max-w-3xl">
                     {!! $data['content'] !!}
@@ -372,6 +392,8 @@
 
     @case('cta')
         <x-section-cta-contact
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['title'] ?? null"
             :subtitle="$data['subtitle'] ?? null"
             :button-label="$data['button_label'] ?? null"
@@ -381,6 +403,8 @@
 
     @case('payment_offer')
         <x-section-payment-offer
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
             :badge="$data['badge'] ?? null"
             :title="$data['title'] ?? null"
             :subtitle="$data['subtitle'] ?? null"
