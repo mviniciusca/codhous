@@ -25,8 +25,8 @@ class DataSeeder extends Seeder
         $this->call([
             ProductSeeder::class,
             LocationSeeder::class,
-            ContentSectionSeeder::class, // Aqui estão os FAQs atualizados
-            ContentSeeder::class,
+            ContentSectionSeeder::class,
+            PageSeeder::class,
         ]);
     }
 
