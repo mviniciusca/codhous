@@ -171,7 +171,7 @@
         @break
 
     @case('coverage')
-        <x-section-coverage
+        <livewire:section-coverage
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :cities="$data['cities'] ?? []"
         />

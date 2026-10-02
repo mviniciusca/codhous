@@ -42,5 +42,5 @@
 <x-section-differentials />
 <x-section-faq />
 <x-section-testimonials />
-<x-section-coverage />
+<livewire:section-coverage />
 <x-section-cta-contact />

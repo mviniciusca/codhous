@@ -290,19 +290,46 @@ class ContentSectionResource extends Resource
                     ->description('Selecione as cidades e configure os cards informativos.')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
-                        Forms\Components\Select::make('content.cities')
-                            ->label('Cidades Atendidas')
-                            ->multiple()
-                            ->options(\App\Models\OperationArea::query()->where('is_active', true)->pluck('city', 'city'))
-                            ->helperText('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.'),
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\Select::make('content.cities')
+                                ->label('Cidades Atendidas')
+                                ->multiple()
+                                ->options(\App\Models\OperationArea::query()->where('is_active', true)->pluck('city', 'city'))
+                                ->afterStateHydrated(function (Forms\Components\Select $component, $state) {
+                                    if (is_array($state)) {
+                                        $flat = [];
+                                        foreach ($state as $city) {
+                                            if (is_array($city)) {
+                                                $flat[] = $city['label'] ?? $city['city'] ?? '';
+                                            } else {
+                                                $flat[] = $city;
+                                            }
+                                        }
+                                        $component->state(array_filter($flat));
+                                    }
+                                })
+                                ->helperText('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.'),
+                            Forms\Components\FileUpload::make('content.background_media')
+                                ->label('Imagem ou Vídeo de Fundo')
+                                ->helperText('Envie uma imagem ou um vídeo curto (MP4) para sobrepor a seção.')
+                                ->directory('coverage')
+                                ->acceptedFileTypes(['image/*', 'video/mp4', 'video/webm', 'video/quicktime'])
+                                ->maxSize(20480),
+                        ]),
                         Forms\Components\Repeater::make('content.sidebar')
                             ->label('Cards laterais')
                             ->schema([
-                                Forms\Components\TextInput::make('title')->label('Título')->helperText('Título do card.')->required(),
-                                Forms\Components\Textarea::make('description')->label('Descrição')->helperText('Descrição do card.')->rows(2),
+                                Forms\Components\Grid::make(2)->schema([
+                                    Forms\Components\TextInput::make('title')->label('Título')->helperText('Título do card.')->required(),
+                                    Forms\Components\TextInput::make('icon')->label('Ícone Lucide')->helperText('Opcional. Ex: map-pin, truck'),
+                                    Forms\Components\Textarea::make('description')->label('Descrição')->helperText('Descrição do card.')->rows(2)->columnSpanFull(),
+                                ])
                             ])
-                            ->columns(1)
-                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
+                            ->cloneable()
+                            ->collapsible()
+                            ->collapsed()
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                            ->columnSpanFull(),
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_COVERAGE)
                     ->collapsible(),
