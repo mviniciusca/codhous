@@ -1,7 +1,28 @@
+@props([
+    'subtitle' => null,
+    'title' => null,
+    'description' => null,
+    'items' => [],
+])
+
 @php
-    $brands = \App\Models\Brand::where('is_active', true)->orderBy('sort_order')->get();
+    $brands = collect();
+
+    if (!empty($items)) {
+        // Use os itens passados via ContentSection
+        foreach ($items as $item) {
+            $brands->push((object)[
+                'name' => $item['name'] ?? '',
+                'logo' => $item['logo'] ?? null,
+                'icon' => $item['icon'] ?? 'building-2',
+            ]);
+        }
+    } else {
+        // Fallback para o módulo de Brands
+        $brands = \App\Models\Brand::where('is_active', true)->orderBy('sort_order')->get();
+    }
     
-    // Fallback caso não existam marcas no banco
+    // Fallback caso não existam marcas no banco nem no ContentSection
     if ($brands->isEmpty()) {
         $brands = collect([
             (object)['name' => 'MRV Engenharia', 'logo' => null, 'icon' => 'building-2'],
@@ -19,13 +40,33 @@
 @if(!\App\Models\ContentSection::isHidden('partners'))
 <section class="bg-white py-8 overflow-hidden">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <p class="mb-8 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
-            Empresas que confiam no nosso concreto
-        </p>
+        @if(!empty($title) || !empty($subtitle) || !empty($description))
+            <div class="mb-8 text-center">
+                @if(!empty($subtitle))
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
+                        {{ $subtitle }}
+                    </p>
+                @endif
+                @if(!empty($title))
+                    <h2 class="mt-2 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                        {{ $title }}
+                    </h2>
+                @endif
+                @if(!empty($description))
+                    <p class="mt-2 text-sm text-muted-foreground">
+                        {{ $description }}
+                    </p>
+                @endif
+            </div>
+        @else
+            <p class="mb-8 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
+                Empresas que confiam no nosso concreto
+            </p>
+        @endif
     </div>
 
     <!-- Swiper Container - Full Width -->
-    <div class="swiper partners-swiper w-full">
+    <div class="swiper partners-swiper w-full py-8">
             <div class="swiper-wrapper flex items-center">
                 @foreach($brands as $brand)
                     <div class="swiper-slide flex items-center justify-center px-6">
@@ -46,7 +87,6 @@
                 @endforeach
             </div>
         </div>
-    </div>
 
     <script>
         document.addEventListener('livewire:navigated', initPartnersSwiper);

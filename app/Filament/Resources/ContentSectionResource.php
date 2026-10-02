@@ -231,6 +231,11 @@ class ContentSectionResource extends Resource
                         Forms\Components\Repeater::make('content.items')
                             ->label('Empresas / Parceiros')
                             ->schema([
+                                Forms\Components\FileUpload::make('logo')
+                                    ->label('Logo da Empresa')
+                                    ->image()
+                                    ->directory('partners')
+                                    ->columnSpanFull(),
                                 Forms\Components\TextInput::make('name')->label('Nome')->helperText('Nome do parceiro.')->required(),
                                 Forms\Components\TextInput::make('icon')
                                     ->label('Ícone (Lucide)')
@@ -239,6 +244,7 @@ class ContentSectionResource extends Resource
                                     ->maxLength(50),
                             ])
                             ->columns(2)
+                            ->grid(2)
                             ->itemLabel(fn (array $state): ?string => $state['name'] ?? null),
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_PARTNERS)
