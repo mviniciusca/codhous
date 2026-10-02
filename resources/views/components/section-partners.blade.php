@@ -67,7 +67,7 @@
                 <!-- Coluna Direita: Grid de Logos -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
                     @foreach($brands as $brand)
-                        <div class="flex h-24 items-center justify-center rounded-xl bg-muted/10 border border-muted/20 p-4 transition-colors hover:bg-muted/30">
+                        <div class="flex h-24 items-center justify-center rounded-xl bg-white border border-muted/20 p-4 transition-colors shadow-sm">
                             @if(!empty($brand->logo))
                                 <img src="{{ Storage::url($brand->logo) }}" 
                                      alt="{{ $brand->name }}" 
@@ -113,7 +113,7 @@
             <div class="swiper-wrapper flex items-center">
                 @foreach($brands as $brand)
                     <div class="swiper-slide flex items-center justify-center px-4">
-                        <div class="flex h-24 w-full items-center justify-center rounded-xl bg-muted/10 border border-muted/20 p-4 transition-all duration-300 hover:bg-muted/30 hover:scale-105">
+                        <div class="flex h-24 w-full items-center justify-center rounded-xl bg-white border border-muted/20 p-4 transition-all duration-300 shadow-sm hover:scale-105">
                             @if(!empty($brand->logo))
                                 <img src="{{ Storage::url($brand->logo) }}" 
                                      alt="{{ $brand->name }}" 

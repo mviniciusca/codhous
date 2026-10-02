@@ -30,6 +30,7 @@ class ContentSectionResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Tabs::make('Tabs')
+                    ->persistTabInQueryString()
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('Conteúdo Principal')
                             ->icon('heroicon-o-document-text')
@@ -546,12 +547,13 @@ class ContentSectionResource extends Resource
                                             ->label('Cor de Fundo')
                                             ->inline()
                                             ->options([
+                                                'bg-transparent' => 'Transparente',
                                                 'bg-white' => 'Claro',
                                                 'bg-muted/30' => 'Cinza',
                                                 'bg-foreground text-background' => 'Escuro',
                                                 'bg-primary text-primary-foreground' => 'Cor Principal',
                                             ])
-                                            ->default('bg-white')
+                                            ->default('bg-transparent')
                                             ->helperText('Define a cor de fundo preenchida atrás de todo o conteúdo.'),
 
                                         Forms\Components\ToggleButtons::make('content.text_color')
