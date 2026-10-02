@@ -25,6 +25,7 @@ class ContentSection extends Model
 
 
     public const TYPE_HERO = 'hero';
+    public const HERO_LAYOUT_DEFAULT = 'default';
     public const TYPE_PARTNERS = 'partners';
     public const TYPE_SERVICES = 'services';
     public const TYPE_FAQ = 'faq';
@@ -84,5 +85,14 @@ class ContentSection extends Model
         return static::forSlug($slug)->active()->first();
     }
 
+    public static function isHidden(string $slug): bool
+    {
+        $section = static::where('slug', $slug)->first();
+        return $section ? !$section->is_active : false;
+    }
 
+    public static function getActiveHero(): ?self
+    {
+        return static::where('type', self::TYPE_HERO)->active()->first();
+    }
 }

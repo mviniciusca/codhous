@@ -9,7 +9,7 @@
         @php
             $section = \App\Models\ContentSection::find($data['content_section_id']);
         @endphp
-        @if($section)
+        @if($section && $section->is_active)
             <x-render-block :type="$section->type" :data="$section->content" :page="$page" :theme="$theme" />
         @endif
         @break

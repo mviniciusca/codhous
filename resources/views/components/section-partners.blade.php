@@ -16,6 +16,7 @@
     }
 @endphp
 
+@if(!\App\Models\ContentSection::isHidden('partners'))
 <section class="bg-white py-8 overflow-hidden">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <p class="mb-8 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
@@ -78,3 +79,4 @@
         }
     </style>
 </section>
+@endif

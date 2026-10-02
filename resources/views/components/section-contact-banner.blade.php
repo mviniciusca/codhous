@@ -27,6 +27,7 @@
     $emailUrl = $email ? "mailto:" . $email : '#';
 @endphp
 
+@if(!\App\Models\ContentSection::isHidden('contact-banner'))
 <section class="bg-background py-12">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <div class="relative overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-sm transition-all hover:shadow-md md:p-10">
@@ -79,3 +80,4 @@
         </div>
     </div>
 </section>
+@endif

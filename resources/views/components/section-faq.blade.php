@@ -18,6 +18,7 @@
         ];
     }
 @endphp
+@if(!\App\Models\ContentSection::isHidden('faq'))
 <section id="faq" class="border-b border-border bg-muted/30 py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <div class="mb-12 text-center">
@@ -45,3 +46,4 @@
         </div>
     </div>
 </section>
+@endif

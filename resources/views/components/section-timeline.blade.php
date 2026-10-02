@@ -12,6 +12,7 @@
         ];
     }
 @endphp
+@if(!\App\Models\ContentSection::isHidden('timeline'))
 <section id="como-funciona" class="bg-background py-20 lg:py-28">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <div class="mb-16 text-center">
@@ -66,3 +67,4 @@
         </div>
     </div>
 </section>
+@endif

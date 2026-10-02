@@ -30,6 +30,7 @@
     }
 @endphp
 
+@if(!\App\Models\ContentSection::isHidden('services'))
 <section id="servicos" class="bg-background py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         {{-- Só mostra o header se houver título ou badge e se hideHeader for false --}}
@@ -71,3 +72,4 @@
         </div>
     </div>
 </section>
+@endif

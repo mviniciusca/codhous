@@ -48,6 +48,7 @@
     $displayItems = array_slice((array) $displayItems, 0, 3);
 @endphp
 
+@if(!\App\Models\ContentSection::isHidden('differentials'))
 <section class="bg-background py-16 lg:py-24">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         @if(!empty($displayTitle) || !empty($displaySubtitle) || !empty($displayDescription))
@@ -84,3 +85,4 @@
         </div>
     </div>
 </section>
+@endif

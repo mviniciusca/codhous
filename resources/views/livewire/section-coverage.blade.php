@@ -27,6 +27,7 @@
     $textMuted = empty($bgMedia) ? 'text-muted-foreground' : 'text-zinc-300';
     $cardBg = empty($bgMedia) ? 'bg-card border-border' : 'bg-zinc-900/40 backdrop-blur-md border-white/10 text-white';
 @endphp
+@if(!\App\Models\ContentSection::isHidden('coverage'))
 <section id="onde-atuamos" class="relative border-b border-border {{ $bgClass }} py-20 lg:py-28 overflow-hidden">
     @php
         $isVideo = false;
@@ -116,3 +117,4 @@
     });
 </script>
 @endscript
+@endif
