@@ -41,6 +41,25 @@ class ContentSectionResource extends Resource
                     ->icon('heroicon-o-bars-3-bottom-left')
                     ->description('Subtítulo, título e descrição exibidos no topo da seção.')
                     ->schema([
+                        Forms\Components\Group::make([
+                            Forms\Components\Toggle::make('content.header.visible')
+                                ->label('Exibir Cabeçalho')
+                                ->default(true),
+                            Forms\Components\ToggleButtons::make('content.header.alignment')
+                                ->label('Alinhamento')
+                                ->options([
+                                    'left' => 'Esquerda',
+                                    'center' => 'Centro',
+                                    'right' => 'Direita',
+                                ])
+                                ->icons([
+                                    'left' => 'heroicon-m-bars-3-bottom-left',
+                                    'center' => 'heroicon-m-bars-3',
+                                    'right' => 'heroicon-m-bars-3-bottom-right',
+                                ])
+                                ->inline()
+                                ->default('center'),
+                        ])->columns(2),
                         Forms\Components\TextInput::make('content.header.subtitle')
                             ->label('Pré-título')
                             ->helperText('Aparece com destaque acima do título.')
@@ -278,13 +297,57 @@ class ContentSectionResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('title')->label('Título')->helperText('Nome do serviço.')->required(),
                                 Forms\Components\TextInput::make('subtitle')->label('Subtítulo (ex: por m³)')->helperText('Informação extra rápida.'),
-                                Forms\Components\Textarea::make('description')->label('Descrição')->helperText('Detalhes do serviço.')->rows(2),
-                                Forms\Components\TextInput::make('icon')->label('Ícone Lucide')->helperText('Ícone do serviço.')->placeholder('droplets, gauge, wrench'),
+                                Forms\Components\Textarea::make('description')->label('Descrição')->helperText('Detalhes do serviço.')->rows(2)->columnSpanFull(),
+                                Forms\Components\ToggleButtons::make('_icon_preset')
+                                    ->label('Ícone Lucide')
+                                    ->options([
+                                        'droplets' => 'Gotas',
+                                        'gauge' => 'Medidor',
+                                        'wrench' => 'Ferramenta',
+                                        'check-circle' => 'Check',
+                                        'star' => 'Estrela',
+                                        'outro' => 'Outro...',
+                                    ])
+                                    ->icons([
+                                        'droplets' => 'heroicon-o-beaker',
+                                        'gauge' => 'heroicon-o-clock',
+                                        'wrench' => 'heroicon-o-wrench-screwdriver',
+                                        'check-circle' => 'heroicon-o-check-circle',
+                                        'star' => 'heroicon-o-star',
+                                        'outro' => 'heroicon-o-plus',
+                                    ])
+                                    ->inline()
+                                    ->live()
+                                    ->afterStateHydrated(function (Forms\Set $set, Forms\Get $get) {
+                                        $icon = $get('icon');
+                                        if (in_array($icon, ['droplets', 'gauge', 'wrench', 'check-circle', 'star'])) {
+                                            $set('_icon_preset', $icon);
+                                        } elseif ($icon) {
+                                            $set('_icon_preset', 'outro');
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                        if ($state !== 'outro') {
+                                            $set('icon', $state);
+                                        } else {
+                                            $set('icon', null);
+                                        }
+                                    })
+                                    ->dehydrated(false),
+                                Forms\Components\TextInput::make('icon')
+                                    ->label('Nome do Ícone Lucide')
+                                    ->helperText('Digite o nome do ícone. Ex: camera, car')
+                                    ->hidden(fn (Forms\Get $get) => $get('_icon_preset') !== 'outro')
+                                    ->required(fn (Forms\Get $get) => $get('_icon_preset') === 'outro')
+                                    ->dehydrated(true),
                                 Forms\Components\TagsInput::make('bullets')->label('Lista de itens')->helperText('Tags ou tópicos do serviço.')->placeholder('Item'),
                                 Forms\Components\TextInput::make('cta_label')->label('Texto do link')->helperText('O que vai escrito no botão.')->default('Solicitar Orçamento'),
                                 Forms\Components\TextInput::make('cta_url')->label('URL do link')->helperText('Para onde o botão leva.')->default('#orcamento'),
                             ])
-                            ->columns(1)
+                            ->columns(2)
+                            ->cloneable()
+                            ->collapsible()
+                            ->collapsed()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_SERVICES)
@@ -525,7 +588,8 @@ class ContentSectionResource extends Resource
                         Forms\Components\Grid::make(2)->schema([
                             Forms\Components\TextInput::make('content.button_label')->label(__('Texto do Botão'))->default('Fazer orçamento grátis'),
                             Forms\Components\TextInput::make('content.button_url')->label(__('URL do Botão (Deixe vazio p/ usar o WhatsApp)'))->helperText('Se vazio, enviará para o WhatsApp padrão.'),
-                            Forms\Components\FileUpload::make('content.payment_methods_image')->image()->imageEditor()->directory('sections/payment')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.')->columnSpanFull(),
+                            Forms\Components\Toggle::make('content.show_payment_methods')->label(__('Exibir meios de pagamento?'))->default(true)->inline(false)->live()->columnSpanFull(),
+                            Forms\Components\FileUpload::make('content.payment_methods_image')->image()->imageEditor()->directory('sections/payment')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.')->columnSpanFull()->visible(fn (\Filament\Forms\Get $get) => $get('content.show_payment_methods') !== false),
                         ])
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_PAYMENT_OFFER)
@@ -645,6 +709,8 @@ class ContentSectionResource extends Resource
                                                     ->options([
                                                         'cover' => 'Preencher (Cover)',
                                                         'contain' => 'Conter (Contain)',
+                                                        '100% auto' => 'Ajustar Largura (100%)',
+                                                        'auto' => 'Original (Auto)',
                                                     ])
                                                     ->default('cover')
                                                     ->inline()
@@ -653,10 +719,10 @@ class ContentSectionResource extends Resource
                                                     ->label('Alinhamento')
                                                     ->options([
                                                         'center' => 'Centro',
-                                                        'left' => 'Esquerda',
-                                                        'right' => 'Direita',
-                                                        'top' => 'Topo',
-                                                        'bottom' => 'Base',
+                                                        'left center' => 'Esquerda',
+                                                        'right center' => 'Direita',
+                                                        'center top' => 'Topo Centro',
+                                                        'center bottom' => 'Base Centro',
                                                     ])
                                                     ->default('center')
                                                     ->inline()
@@ -679,11 +745,14 @@ class ContentSectionResource extends Resource
                                                     ->helperText('Mistura a imagem com a Cor de Fundo.')
                                                     ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image'))),
                                                 Forms\Components\TextInput::make('content.background_image_pull_up')
-                                                    ->label('Puxar Imagem para Cima (%)')
-                                                    ->type('range')
-                                                    ->extraInputAttributes(['min' => 0, 'max' => 100, 'step' => 5])
+                                                    ->label('Ajuste de Imagem (Vertical)')
+                                                    ->numeric()
+                                                    ->minValue(-100)
+                                                    ->maxValue(100)
+                                                    ->step(5)
+                                                    ->suffix('%')
                                                     ->default(0)
-                                                    ->helperText('Define o quanto a imagem deve estourar o topo da seção (ex: 25%). 0 = não vaza. Ideal para fotos de pessoas recortadas.')
+                                                    ->helperText('Desloca a imagem para cima (positivo) ou para baixo (negativo). 0 = posição original.')
                                                     ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image')))
                                                     ->columnSpanFull(),
                                             ])

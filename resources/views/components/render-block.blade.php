@@ -110,6 +110,10 @@
 
     @case('services')
         @php
+            $headerVisible = $data['header']['visible'] ?? true;
+            $headerAlignment = $data['header']['alignment'] ?? 'center';
+            $alignClass = $headerAlignment === 'left' ? 'text-left mr-auto' : ($headerAlignment === 'right' ? 'text-right ml-auto' : 'text-center mx-auto');
+
             $servicesTitle = $data['header']['title'] ?? $data['title'] ?? 'Nossos Serviços';
             $servicesSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? 'O que fazemos';
             $servicesDesc = $data['header']['description'] ?? $data['description'] ?? 'Soluções completas com qualidade garantida.';
@@ -125,12 +129,23 @@
             $bgPos = $data['background_image_position'] ?? 'center';
             $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $bgPullUp = $bgPullUpAmount > 0;
-            
-            $overflowClass = $bgPullUp ? '' : 'overflow-hidden';
-            $bgDivClasses = 'absolute inset-x-0 bottom-0 z-0 pointer-events-none bg-no-repeat';
-            $topStyle = $bgPullUp ? "-{$bgPullUpAmount}%" : "0";
-            $bgPositionStyle = $bgPullUp ? ($bgPos === 'center' ? 'center bottom' : $bgPos . ' bottom') : $bgPos;
+            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
+            $bgDivClasses = 'absolute inset-x-0 z-0 pointer-events-none bg-no-repeat';
+            $bgPosParts = explode(' ', $bgPos);
+            $bgPosHorizontal = $bgPosParts[0];
+            if ($bgPullUpAmount > 0) {
+                $topStyle = "-{$bgPullUpAmount}%";
+                $bottomStyle = "0";
+                $bgPositionStyle = $bgPosHorizontal . ' bottom';
+            } elseif ($bgPullUpAmount < 0) {
+                $topStyle = "0";
+                $bottomStyle = $bgPullUpAmount . "%";
+                $bgPositionStyle = $bgPosHorizontal . ' top';
+            } else {
+                $topStyle = "0";
+                $bottomStyle = "0";
+                $bgPositionStyle = $bgPos;
+            }
             
             $displayItems = $data['items'] ?? [];
             if (empty($displayItems)) {
@@ -144,11 +159,11 @@
         @endphp
         <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
             @if($bgImg)
-                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
+                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; bottom: {{ $bottomStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
             @endif
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                @if(!$hideHeader && (!empty($servicesTitle) || !empty($servicesSubtitle)))
-                    <div class="mb-16 text-center max-w-3xl mx-auto">
+                @if(!$hideHeader && $headerVisible && (!empty($servicesTitle) || !empty($servicesSubtitle)))
+                    <div class="mb-16 max-w-3xl {{ $alignClass }}">
                         @if(!empty($servicesSubtitle))
                             <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
                                 <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
@@ -161,57 +176,120 @@
                             </h2>
                         @endif
                         @if(!empty($servicesDesc))
-                            <p class="text-lg font-medium leading-relaxed text-muted-foreground mx-auto" style="text-wrap: balance;">
+                            <p class="text-lg font-medium leading-relaxed text-muted-foreground {{ $headerAlignment === 'center' ? 'mx-auto' : '' }}" style="text-wrap: balance;">
                                 {{ $servicesDesc }}
                             </p>
                         @endif
                     </div>
+
                 @endif
 
-                <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                @php
+                    $itemsCount = count($displayItems);
+                    $useSlider = $itemsCount > 3;
+                    $sliderId = 'services-swiper-' . Str::random(6);
+                @endphp
+
+                @if($useSlider)
+                    <div class="relative w-full">
+                        <div class="swiper {{ $sliderId }} w-full pb-16">
+                            <div class="swiper-wrapper">
+                @else
+                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                @endif
+
                     @foreach($displayItems as $index => $service)
-                        <div class="group relative flex flex-col rounded-2xl border border-primary/10 bg-card/80 backdrop-blur-sm p-8 transition-all duration-500 hover:-translate-y-2 hover:border-primary/50 hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.3)] overflow-hidden">
-                            <!-- Efeito de brilho no fundo ao passar o mouse -->
-                            <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
+                        @if($useSlider) <div class="swiper-slide h-auto"> @endif
+                        
+                        <div class="flex h-full flex-col rounded-[24px] bg-card border border-border/40 p-8 shadow-sm transition-all hover:shadow-md hover:border-primary/20">
+                            <div class="flex items-start justify-between mb-8">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                    <i data-lucide="{{ $service['icon'] ?? 'droplets' }}" class="h-6 w-6"></i>
+                                </div>
+                                <span class="font-mono text-sm font-medium text-muted-foreground/30">
+                                    {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                                </span>
+                            </div>
                             
-                            <div class="relative z-10">
-                                <div class="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary shadow-inner shadow-primary/20 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
-                                    <i data-lucide="{{ $service['icon'] ?? 'droplets' }}" class="h-8 w-8"></i>
+                            @if(!empty($service['subtitle']))
+                                <div class="mb-2 text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground">
+                                    {{ $service['subtitle'] }}
                                 </div>
-                                
-                                <h3 class="font-mono text-2xl font-bold text-card-foreground mb-2 group-hover:text-primary transition-colors">{{ $service['title'] ?? '' }}</h3>
-                                
-                                @if(!empty($service['subtitle']))
-                                    <div class="mb-4 inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                                        {{ $service['subtitle'] }}
-                                    </div>
-                                @endif
-                                
-                                <p class="flex-1 text-base leading-relaxed text-muted-foreground mb-6">{{ $service['description'] ?? '' }}</p>
-                                
-                                @if(!empty($service['bullets']))
-                                    <ul class="flex flex-col gap-3 mb-8">
-                                        @foreach((array) $service['bullets'] as $bullet)
-                                            <li class="flex items-center gap-3 text-sm font-medium text-card-foreground/80">
-                                                <div class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
-                                                    <i data-lucide="check" class="h-3 w-3"></i>
-                                                </div>
-                                                {{ $bullet }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @endif
-                                
-                                <div class="mt-auto pt-4 border-t border-border/50">
-                                    <a href="{{ $service['cta_url'] ?? '#orcamento' }}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-card border border-primary/20 px-4 py-3 text-sm font-bold text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/25">
-                                        {{ $service['cta_label'] ?? 'Solicitar Orçamento' }}
-                                        <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1"></i>
-                                    </a>
-                                </div>
+                            @endif
+                            
+                            <h3 class="mb-3 text-xl font-bold text-foreground">
+                                {{ $service['title'] ?? '' }}
+                            </h3>
+                            
+                            @if(!empty($service['description']))
+                                <p class="mb-6 text-sm leading-relaxed text-muted-foreground">
+                                    {{ $service['description'] }}
+                                </p>
+                            @endif
+                            
+                            @if(!empty($service['bullets']))
+                                <ul class="mb-8 flex flex-col gap-3">
+                                    @foreach((array) $service['bullets'] as $bullet)
+                                        <li class="flex items-start gap-3 text-sm text-muted-foreground">
+                                            <div class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                                <i data-lucide="check" class="h-2.5 w-2.5"></i>
+                                            </div>
+                                            <span>{{ $bullet }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                            
+                            <div class="mt-auto pt-6 border-t border-border/30">
+                                <a href="{{ $service['cta_url'] ?? '#orcamento' }}" class="group flex items-center justify-between text-sm font-bold text-primary hover:text-primary/80 transition-colors">
+                                    {{ $service['cta_label'] ?? 'Solicitar orçamento' }}
+                                    <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1"></i>
+                                </a>
                             </div>
                         </div>
+                        
+                        @if($useSlider) </div> @endif
                     @endforeach
-                </div>
+
+                @if($useSlider)
+                            </div>
+                            <div class="swiper-pagination !bottom-0"></div>
+                        </div>
+                        
+                        <!-- Botões de Navegação (Escondidos no mobile, visíveis a partir de md) -->
+                        <div class="{{ $sliderId }}-prev absolute top-[calc(50%-2rem)] -translate-y-1/2 -left-4 xl:-left-6 hidden md:flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] text-primary z-10 transition-transform hover:scale-110 group">
+                            <i data-lucide="chevron-left" class="h-6 w-6 transition-transform group-hover:-translate-x-0.5"></i>
+                        </div>
+                        <div class="{{ $sliderId }}-next absolute top-[calc(50%-2rem)] -translate-y-1/2 -right-4 xl:-right-6 hidden md:flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] text-primary z-10 transition-transform hover:scale-110 group">
+                            <i data-lucide="chevron-right" class="h-6 w-6 transition-transform group-hover:translate-x-0.5"></i>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            if (typeof Swiper !== 'undefined' && document.querySelector('.{{ $sliderId }}')) {
+                                new Swiper('.{{ $sliderId }}', {
+                                    slidesPerView: 1,
+                                    spaceBetween: 24,
+                                    pagination: {
+                                        el: '.{{ $sliderId }} .swiper-pagination',
+                                        clickable: true,
+                                    },
+                                    navigation: {
+                                        nextEl: '.{{ $sliderId }}-next',
+                                        prevEl: '.{{ $sliderId }}-prev',
+                                    },
+                                    breakpoints: {
+                                        768: { slidesPerView: 2 },
+                                        1024: { slidesPerView: 3 },
+                                    }
+                                });
+                            }
+                        });
+                    </script>
+                @else
+                    </div>
+                @endif
             </div>
         </section>
         @break
@@ -329,16 +407,27 @@
             $bgPos = $data['background_image_position'] ?? 'center';
             $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $bgPullUp = $bgPullUpAmount > 0;
-            
-            $overflowClass = $bgPullUp ? '' : 'overflow-hidden';
-            $bgDivClasses = 'absolute inset-x-0 bottom-0 z-0 pointer-events-none bg-no-repeat';
-            $topStyle = $bgPullUp ? "-{$bgPullUpAmount}%" : "0";
-            $bgPositionStyle = $bgPullUp ? ($bgPos === 'center' ? 'center bottom' : $bgPos . ' bottom') : $bgPos;
+            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
+            $bgDivClasses = 'absolute inset-x-0 z-0 pointer-events-none bg-no-repeat';
+            $bgPosParts = explode(' ', $bgPos);
+            $bgPosHorizontal = $bgPosParts[0];
+            if ($bgPullUpAmount > 0) {
+                $topStyle = "-{$bgPullUpAmount}%";
+                $bottomStyle = "0";
+                $bgPositionStyle = $bgPosHorizontal . ' bottom';
+            } elseif ($bgPullUpAmount < 0) {
+                $topStyle = "0";
+                $bottomStyle = $bgPullUpAmount . "%";
+                $bgPositionStyle = $bgPosHorizontal . ' top';
+            } else {
+                $topStyle = "0";
+                $bottomStyle = "0";
+                $bgPositionStyle = $bgPos;
+            }
         @endphp
         <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }}">
             @if($bgImg)
-                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
+                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; bottom: {{ $bottomStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
             @endif
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 @if(!empty($calcTitle) || !empty($calcSubtitle))
@@ -368,27 +457,37 @@
 
     @case('payment_offer')
         @php
+            $headerVisible = $data['header']['visible'] ?? true;
+            $headerAlignment = $data['header']['alignment'] ?? 'center';
+            $alignClass = $headerAlignment === 'left' ? 'text-left items-start' : ($headerAlignment === 'right' ? 'text-right items-end' : 'text-center items-center');
+
             $offerTitle = $data['header']['title'] ?? $data['title'] ?? null;
             $offerSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
             $offerDesc = $data['header']['description'] ?? $data['subtitle'] ?? null;
             
             $bgColor = $data['background_color'] ?? '';
-            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
-            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
-            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
-            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/10';
-            
             $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
             $bgFit = $data['background_image_fit'] ?? 'cover';
             $bgPos = $data['background_image_position'] ?? 'center';
             $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $bgPullUp = $bgPullUpAmount > 0;
-            
-            $overflowClass = $bgPullUp ? '' : 'overflow-hidden';
-            $bgDivClasses = 'absolute inset-x-0 bottom-0 z-0 pointer-events-none bg-no-repeat';
-            $topStyle = $bgPullUp ? "-{$bgPullUpAmount}%" : "0";
-            $bgPositionStyle = $bgPullUp ? ($bgPos === 'center' ? 'center bottom' : $bgPos . ' bottom') : $bgPos;
+            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
+            $bgDivClasses = 'absolute inset-x-0 z-0 pointer-events-none bg-no-repeat';
+            $bgPosParts = explode(' ', $bgPos);
+            $bgPosHorizontal = $bgPosParts[0];
+            if ($bgPullUpAmount > 0) {
+                $topStyle = "-{$bgPullUpAmount}%";
+                $bottomStyle = "0";
+                $bgPositionStyle = $bgPosHorizontal . ' bottom';
+            } elseif ($bgPullUpAmount < 0) {
+                $topStyle = "0";
+                $bottomStyle = $bgPullUpAmount . "%";
+                $bgPositionStyle = $bgPosHorizontal . ' top';
+            } else {
+                $topStyle = "0";
+                $bottomStyle = "0";
+                $bgPositionStyle = $bgPos;
+            }
             
             $website = \App\Models\Setting::get('website', []);
             $whatsappNumber = data_get($website, 'features.whatsapp_widget.number', '');
@@ -400,79 +499,88 @@
             $methodsUrl = !empty($data['payment_methods_image']) 
                 ? (str_starts_with($data['payment_methods_image'], 'http') ? $data['payment_methods_image'] : \Illuminate\Support\Facades\Storage::url($data['payment_methods_image'])) 
                 : null;
-        @endphp
-        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-12 lg:py-16 relative {{ $overflowClass }}">
-            @if($bgImg)
-                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
-            @endif
-            <div class="mx-auto max-w-4xl px-4 lg:px-8 relative z-10 text-center">
-                @if(!empty($offerTitle) || !empty($offerSubtitle))
-                    <div class="mb-10">
-                        @if(!empty($offerSubtitle))
-                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
-                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
-                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $offerSubtitle }}</span>
-                            </div>
-                        @endif
-                        @if(!empty($offerTitle))
-                            <h2 class="font-mono text-3xl font-extrabold tracking-tight text-foreground md:text-5xl drop-shadow-sm mb-4" style="text-wrap: balance;">
-                                {{ $offerTitle }}
-                            </h2>
-                        @endif
-                        @if(!empty($offerDesc))
-                            <p class="text-lg font-medium leading-relaxed text-muted-foreground max-w-2xl mx-auto" style="text-wrap: balance;">
-                                {{ $offerDesc }}
-                            </p>
-                        @endif
-                    </div>
-                @endif
                 
-                <div class="flex flex-col items-center gap-6 mt-8">
-                    @if(!empty($data['button_label']))
-                    <div class="relative group">
-                        <div class="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#25D366] to-[#128C7E] opacity-60 blur-md transition duration-1000 group-hover:opacity-100 group-hover:duration-200"></div>
-                        <a href="{{ $whatsappUrl }}" target="_blank"
-                           class="relative inline-flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-4 text-sm sm:text-base font-extrabold text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#20ba5a] border border-white/10">
-                            <i data-lucide="message-circle" class="h-5 w-5"></i>
-                            {{ $data['button_label'] }}
-                        </a>
-                    </div>
+            $isClickableBanner = !empty($whatsappUrl) && empty($data['button_label']);
+            $wrapperTag = $isClickableBanner ? 'a' : 'div';
+            $wrapperHref = $isClickableBanner ? 'href="' . $whatsappUrl . '" target="_blank"' : '';
+        @endphp
+        <section class="bg-transparent py-4 lg:py-8 w-full">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
+                <{{ $wrapperTag }} {!! $wrapperHref !!} class="relative {{ $overflowClass }} flex flex-col {{ $alignClass }} rounded-[24px] {{ $bgColor ?: 'bg-card' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} border border-border/40 p-8 md:p-10 shadow-sm hover:shadow-md transition-all w-full {{ $isClickableBanner ? 'cursor-pointer hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2' : '' }}">
+                    
+                    @if($bgImg)
+                        <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; bottom: {{ $bottomStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
                     @endif
-
-                    <!-- Meios de pagamento -->
-                    <div class="mt-4 opacity-70 transition-opacity hover:opacity-100">
-                        @if($methodsUrl)
-                            <img src="{{ $methodsUrl }}" alt="Meios de Pagamento Aceitos" class="h-16 sm:h-20 md:h-24 w-auto object-contain mx-auto filter drop-shadow-lg">
-                        @else
-                            <div class="flex items-center justify-center gap-5 flex-wrap text-foreground/40 [.text-scheme-dark_&]:text-white/40 text-xs sm:text-sm font-semibold tracking-widest">
-                                <div class="flex items-center gap-1.5 hover:text-[#32BCAD] transition-colors cursor-default">
-                                    <i data-lucide="scan-line" class="h-5 w-5"></i>
-                                    <span>PIX</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
-                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                    <span>VISA</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
-                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                    <span>MASTER</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
-                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                    <span>AMEX</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
-                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                    <span>ELO</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 hover:text-foreground [.text-scheme-dark_&]:hover:text-white transition-colors cursor-default">
-                                    <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                    <span>HIPERCARD</span>
-                                </div>
+                    
+                    <div class="relative z-10 flex flex-col {{ $alignClass }} w-full">
+                        @if(!$hideHeader && $headerVisible && (!empty($offerTitle) || !empty($offerSubtitle)))
+                            <div class="mb-8 max-w-3xl">
+                                @if(!empty($offerSubtitle))
+                                    <div class="mb-3 text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-white/70' : '' }}">
+                                        {{ $offerSubtitle }}
+                                    </div>
+                                @endif
+                                @if(!empty($offerTitle))
+                                    <h2 class="mb-4 font-mono text-3xl font-extrabold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                                        {{ $offerTitle }}
+                                    </h2>
+                                @endif
+                                @if(!empty($offerDesc))
+                                    <p class="text-base md:text-lg leading-relaxed text-muted-foreground {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-white/80' : '' }}" style="text-wrap: balance;">
+                                        {{ $offerDesc }}
+                                    </p>
+                                @endif
                             </div>
                         @endif
+                    
+                    <div class="flex flex-col gap-8 {{ $headerAlignment === 'center' ? 'items-center' : '' }} w-full">
+                        @if(!empty($data['button_label']))
+                            <a href="{{ $whatsappUrl }}" target="_blank" class="group flex h-14 w-fit items-center gap-3 rounded-2xl bg-primary px-8 font-bold text-primary-foreground shadow-sm hover:shadow-md hover:bg-primary/90 transition-all">
+                                <i data-lucide="message-circle" class="h-5 w-5"></i>
+                                {{ $data['button_label'] }}
+                                <i data-lucide="arrow-right" class="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1"></i>
+                            </a>
+                        @endif
+
+                        @if(($data['show_payment_methods'] ?? true) !== false)
+                        <!-- Meios de pagamento -->
+                        <div class="mt-4 pt-6 w-full {{ $headerAlignment === 'center' ? 'text-center' : 'text-left' }}">
+                            <div class="text-[10px] font-bold tracking-[0.2em] text-muted-foreground/50 uppercase mb-4 {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-white/60' : '' }}">PAGUE COM:</div>
+                            @if($methodsUrl)
+                                <img src="{{ $methodsUrl }}" alt="Meios de Pagamento" class="h-12 md:h-16 w-auto object-contain {{ $headerAlignment === 'center' ? 'mx-auto' : '' }} opacity-80 hover:opacity-100 transition-opacity">
+                            @else
+                                <div class="flex flex-wrap gap-4 md:gap-6 {{ $headerAlignment === 'center' ? 'justify-center' : '' }} text-muted-foreground/60 {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-white/60' : '' }} text-xs md:text-sm font-semibold tracking-widest">
+                                    <div class="flex items-center gap-1.5 hover:text-primary transition-colors cursor-default">
+                                        <i data-lucide="scan-line" class="h-5 w-5"></i>
+                                        <span>PIX</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
+                                        <i data-lucide="barcode" class="h-5 w-5"></i>
+                                        <span>BOLETO</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
+                                        <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                        <span>VISA</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
+                                        <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                        <span>MASTER</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
+                                        <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                        <span>AMEX</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
+                                        <i data-lucide="credit-card" class="h-5 w-5"></i>
+                                        <span>ELO</span>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        @endif
                     </div>
-                </div>
+                    </div>
+                </{{ $wrapperTag }}>
             </div>
         </section>
         @break
