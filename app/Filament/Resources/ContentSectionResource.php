@@ -377,6 +377,82 @@ class ContentSectionResource extends Resource
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_TESTIMONIALS)
                     ->collapsible(),
 
+                // Team
+                Forms\Components\Section::make('Nosso Time')
+                    ->description('Apresente os membros da equipe e profissionais da empresa.')
+                    ->icon('heroicon-o-users')
+                    ->schema([
+                        Forms\Components\Repeater::make('content.items')
+                            ->label('Membros da Equipe')
+                            ->schema([
+                                Forms\Components\FileUpload::make('avatar')
+                                    ->label('Foto')
+                                    ->image()
+                                    ->directory('team/avatars')
+                                    ->avatar()
+                                    ->columnSpanFull(),
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nome')
+                                    ->required(),
+                                Forms\Components\TextInput::make('role')
+                                    ->label('Cargo (Laranja)')
+                                    ->required(),
+                                Forms\Components\Group::make([
+                                    Forms\Components\ToggleButtons::make('icon_type')
+                                        ->label('Ícone do Cargo')
+                                        ->options([
+                                            'graduation-cap' => 'Acadêmico',
+                                            'settings' => 'Operações',
+                                            'hard-hat' => 'Obras',
+                                            'flask-conical' => 'Química',
+                                            'briefcase' => 'Negócios',
+                                            'other' => 'Outro...',
+                                        ])
+                                        ->icons([
+                                            'graduation-cap' => 'heroicon-m-academic-cap',
+                                            'settings' => 'heroicon-m-cog-8-tooth',
+                                            'hard-hat' => 'heroicon-m-wrench-screwdriver',
+                                            'flask-conical' => 'heroicon-m-beaker',
+                                            'briefcase' => 'heroicon-m-briefcase',
+                                            'other' => 'heroicon-m-pencil',
+                                        ])
+                                        ->inline()
+                                        ->default('graduation-cap')
+                                        ->live(),
+                                    Forms\Components\TextInput::make('icon')
+                                        ->label('Nome do Ícone')
+                                        ->helperText('Digite o nome do ícone do site Lucide Icons')
+                                        ->visible(fn (\Filament\Forms\Get $get) => $get('icon_type') === 'other')
+                                        ->required(fn (\Filament\Forms\Get $get) => $get('icon_type') === 'other'),
+                                ])->columns(2)->columnSpanFull(),
+                                Forms\Components\TextInput::make('sub_role')
+                                    ->label('Sub-cargo (Cinza, Opcional)'),
+                                Forms\Components\Textarea::make('bio')
+                                    ->label('Mini Biografia')
+                                    ->rows(3)
+                                    ->columnSpanFull(),
+                                Forms\Components\Fieldset::make('Destaque 1')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('highlight_1_icon')->label('Ícone')->default('building-2'),
+                                        Forms\Components\TextInput::make('highlight_1_title')->label('Título (Negrito)'),
+                                        Forms\Components\TextInput::make('highlight_1_subtitle')->label('Subtítulo'),
+                                    ])->columns(3),
+                                Forms\Components\Fieldset::make('Destaque 2')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('highlight_2_icon')->label('Ícone')->default('users'),
+                                        Forms\Components\TextInput::make('highlight_2_title')->label('Título (Negrito)'),
+                                        Forms\Components\TextInput::make('highlight_2_subtitle')->label('Subtítulo'),
+                                    ])->columns(3),
+                            ])
+                            ->columns(2)
+                            ->cloneable()
+                            ->collapsible()
+                            ->collapsed()
+                            ->itemLabel(fn (array $state): ?string => $state['name'] ?? null),
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_TEAM)
+                    ->collapsible(),
+
                 // Coverage
                 Forms\Components\Section::make('Onde atuamos')
                     ->description('Selecione as cidades e configure os cards informativos.')

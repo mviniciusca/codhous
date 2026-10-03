@@ -39,6 +39,7 @@ class ContentSection extends Model
     public const TYPE_CALCULATOR = 'calculator';
     public const TYPE_PAYMENT_OFFER = 'payment_offer';
     public const TYPE_SIMPLE_BANNER = 'simple_banner';
+    public const TYPE_TEAM = 'team';
 
 
     public static function typeLabels(): array
@@ -58,6 +59,7 @@ class ContentSection extends Model
             self::TYPE_CALCULATOR => 'Calculadora de Volume',
             self::TYPE_PAYMENT_OFFER => 'Oferta de Pagamento',
             self::TYPE_SIMPLE_BANNER => 'Banner Simples (Imagem e Link)',
+            self::TYPE_TEAM => 'Nosso Time',
         ];
     }
 
@@ -78,6 +80,7 @@ class ContentSection extends Model
             self::TYPE_CALCULATOR => 'calculator',
             self::TYPE_PAYMENT_OFFER => 'payment-offer',
             self::TYPE_SIMPLE_BANNER => 'simple-banner',
+            self::TYPE_TEAM => 'team',
             default => $type,
         };
     }

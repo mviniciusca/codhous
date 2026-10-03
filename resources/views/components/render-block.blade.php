@@ -362,6 +362,16 @@
         />
         @break
 
+    @case('team')
+        <x-section-team
+            :data="$data"
+            :bg-color="$data['background_color'] ?? null"
+            :text-color="$data['text_color'] ?? 'light'"
+            :header="$data['header'] ?? []"
+            :items="$data['items'] ?? []"
+        />
+        @break
+
     @case('coverage')
         <livewire:section-coverage
             :bg-color="$data['background_color'] ?? null"
