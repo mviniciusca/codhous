@@ -44,12 +44,16 @@
 @if(!\App\Models\ContentSection::isHidden('partners'))
 <section class="{{ $bgColor ?? 'bg-white' }} py-16 overflow-hidden {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     @if($layout === 'grid')
+        @php
+            $align = $header['alignment'] ?? 'left';
+            $isRight = $align === 'right';
+        @endphp
         <div class="mx-auto max-w-7xl px-4 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <!-- Coluna Esquerda: Texto -->
-                <div>
+                <!-- Coluna de Texto -->
+                <div class="{{ $isRight ? 'lg:order-last' : '' }}">
                     <x-ui.section-header 
-                        :header="array_merge($header ?? [], ['alignment' => 'left'])"
+                        :header="$header ?? []"
                         :fallback-title="$title"
                         :fallback-subtitle="$subtitle"
                         :fallback-description="$description"
@@ -57,8 +61,8 @@
                     />
                 </div>
 
-                <!-- Coluna Direita: Grid de Logos -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                <!-- Coluna de Logos -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 {{ $isRight ? 'lg:order-first' : '' }}">
                     @foreach($brands as $brand)
                         <div class="flex h-24 items-center justify-center rounded-xl bg-white border border-muted/20 p-4 transition-colors shadow-sm">
                             @if(!empty($brand->logo))

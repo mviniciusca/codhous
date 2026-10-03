@@ -42,6 +42,11 @@ class Budget extends Component implements HasForms
 
     public bool $isSubmitted = false;
     
+    // Request-level cache to prevent N+1 queries during schema building
+    protected static array $productsCache = [];
+    protected static array $productOptionsCache = [];
+    protected static ?array $locationsCache = null;
+    
     public ?string $turnstileToken = null;
 
     public function mount(): void
@@ -68,19 +73,18 @@ class Budget extends Component implements HasForms
                                 ->schema([
                                     Repeater::make('content.products')
                                         ->label('')
-                                        ->live()
                                         ->itemLabel(fn (array $state): ?string => $this->getItemLabel($state))
                                         ->schema([
                                             Grid::make(12)->schema([
                                                 Select::make('product')
                                                     ->label('Produto')
-                                                    ->options(Product::all()->pluck('name', 'id'))
+                                                    ->options(fn () => $this->getAllProductsPlucked())
                                                     ->required()
                                                     ->validationAttribute('Produto')
                                                     ->live()
                                                     ->afterStateUpdated(function (Set $set, $state) {
                                                         $set('product_option', null);
-                                                        $min = Product::find($state)?->min_quantity ?? 1;
+                                                        $min = $this->getProductMinQuantity($state);
                                                         $set('quantity', floatval($min));
                                                     })
                                                     ->columnSpan(5),
@@ -98,14 +102,14 @@ class Budget extends Component implements HasForms
                                                     ->numeric()
                                                     ->required()
                                                     ->default(1)
-                                                    ->minValue(fn (Get $get) => Product::find($get('product'))?->min_quantity ?? 1)
+                                                    ->minValue(fn (Get $get) => $this->getProductMinQuantity($get('product')))
                                                     ->validationAttribute('Quantidade')
                                                     ->step(1)
                                                     ->suffix(fn (Get $get) => $this->getUnitSuffix($get))
                                                     ->live(onBlur: true)
-                                                    ->placeholder(fn (Get $get) => 'Mín: ' . floatval(Product::find($get('product'))?->min_quantity ?? 1))
+                                                    ->placeholder(fn (Get $get) => 'Mín: ' . floatval($this->getProductMinQuantity($get('product'))))
                                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                                        $min = Product::find($get('product'))?->min_quantity ?? 1;
+                                                        $min = $this->getProductMinQuantity($get('product'));
                                                         $qty = max(floatval($state ?? $min), $min);
                                                         $set('quantity', ceil($qty));
                                                         $this->calculateItemSubtotal($get, $set);
@@ -122,7 +126,7 @@ class Budget extends Component implements HasForms
 
                                     \Filament\Forms\Components\ToggleButtons::make('content.location')
                                         ->label('Local da Obra')
-                                        ->options(\App\Models\Location::all()->pluck('name', 'id'))
+                                        ->options(fn () => $this->getAllLocationsPlucked())
                                         ->inline()
                                         ->required()
                                         ->validationAttribute('Local da Obra')
@@ -185,7 +189,7 @@ class Budget extends Component implements HasForms
                                             ->mask('99999-999')
                                             ->required()
                                             ->validationAttribute('CEP')
-                                            ->live(debounce: 500)
+                                            ->live(onBlur: true)
                                             ->extraInputAttributes(['class' => '!bg-white shadow-sm'])
                                             ->rules($this->getPostcodeRules())
                                             ->afterStateUpdated(function ($state, Set $set, $livewire) {
@@ -262,10 +266,64 @@ class Budget extends Component implements HasForms
     protected function getItemLabel(array $state): string
     {
         if (empty($state['product'])) return 'Novo Item';
-        $productName = Product::find($state['product'])?->name;
-        $optionName = $state['product_option'] ? ' · ' . ProductOption::find($state['product_option'])?->name : '';
-        $qty = $state['quantity'] ? ' (' . number_format(floatval($state['quantity']), 0, '', '') . ')' : '';
+        
+        $product = $this->getCachedProduct($state['product']);
+        $productName = $product?->name ?? 'Novo Item';
+        
+        $optionName = '';
+        if (!empty($state['product_option'])) {
+            $option = $this->getCachedProductOption($state['product_option']);
+            if ($option) {
+                $optionName = ' · ' . $option->name;
+            }
+        }
+        
+        $qty = !empty($state['quantity']) ? ' (' . number_format(floatval($state['quantity']), 0, '', '') . ')' : '';
+        
         return $productName . $optionName . $qty;
+    }
+
+    protected function getCachedProduct($id)
+    {
+        if (!$id) return null;
+        if (!array_key_exists($id, self::$productsCache)) {
+            self::$productsCache[$id] = Product::find($id);
+        }
+        return self::$productsCache[$id];
+    }
+
+    protected function getCachedProductOption($id)
+    {
+        if (!$id) return null;
+        if (!array_key_exists($id, self::$productOptionsCache)) {
+            self::$productOptionsCache[$id] = ProductOption::find($id);
+        }
+        return self::$productOptionsCache[$id];
+    }
+
+    protected function getProductMinQuantity($id): float
+    {
+        if (!$id) return 1;
+        $product = $this->getCachedProduct($id);
+        return $product?->min_quantity ?? 1;
+    }
+
+    protected function getAllProductsPlucked(): array
+    {
+        // For schema options, caching the array of products
+        static $productsPlucked = null;
+        if ($productsPlucked === null) {
+            $productsPlucked = Product::pluck('name', 'id')->toArray();
+        }
+        return $productsPlucked;
+    }
+
+    protected function getAllLocationsPlucked(): array
+    {
+        if (self::$locationsCache === null) {
+            self::$locationsCache = \App\Models\Location::pluck('name', 'id')->toArray();
+        }
+        return self::$locationsCache;
     }
 
     protected function getPostcodeRules(): array
@@ -354,7 +412,15 @@ class Budget extends Component implements HasForms
 
     private function getProductOptions(Get $get): Collection
     {
-        return ProductOption::where('product_id', '=', $get('product'))->get()->pluck('name', 'id');
+        $productId = $get('product');
+        if (!$productId) return collect();
+        
+        // Cache the options list per product
+        static $optionsListCache = [];
+        if (!isset($optionsListCache[$productId])) {
+            $optionsListCache[$productId] = ProductOption::where('product_id', $productId)->pluck('name', 'id');
+        }
+        return collect($optionsListCache[$productId]);
     }
 
     private function calculateTotal(Get|\Closure $get, Set $set): void
@@ -380,7 +446,11 @@ class Budget extends Component implements HasForms
 
     private function updatePrice(Get $get, Set $set, $productId): void
     {
-        $price = $productId ? (ProductOption::find($productId)?->price ?? 0) : 0;
+        $price = 0;
+        if ($productId) {
+            $option = $this->getCachedProductOption($productId);
+            $price = $option?->price ?? 0;
+        }
         $set('quantity', null);
         $set('price', $price);
         $this->calculateItemSubtotal($get, $set);
@@ -389,7 +459,9 @@ class Budget extends Component implements HasForms
 
     private function getUnitSuffix(Get $get): string
     {
-        return ProductOption::find($get('product_option'))?->unit?->value ?? '';
+        $optionId = $get('product_option');
+        if (!$optionId) return '';
+        return $this->getCachedProductOption($optionId)?->unit?->value ?? '';
     }
 
     private function calculateItemSubtotal(Get $get, Set $set): void
