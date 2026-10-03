@@ -20,6 +20,12 @@ class Budget extends Component
     use WithFileUploads;
 
     public ?string $bgColor = '';
+    public ?string $title = null;
+    public ?string $subtitle = null;
+    public ?string $description = null;
+    public bool $headerVisible = true;
+    public string $headerAlignment = 'left';
+    
     public bool $isSubmitted = false;
     public ?string $turnstileToken = null;
 
@@ -182,9 +188,14 @@ class Budget extends Component
                 'items.*.product_id' => 'required',
                 'items.*.option_id' => 'required',
                 'items.*.quantity' => 'required|numeric|min:1',
+                'photos' => 'array|max:4',
+                'photos.*' => 'image|max:4096',
             ], [
                 'items.*.product_id.required' => 'Selecione o produto.',
                 'items.*.option_id.required' => 'Selecione uma opção.',
+                'photos.max' => 'Você pode enviar no máximo 4 fotos.',
+                'photos.*.image' => 'Os arquivos devem ser imagens.',
+                'photos.*.max' => 'Cada foto deve ter no máximo 4MB.',
             ]);
         }
         

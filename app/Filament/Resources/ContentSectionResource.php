@@ -361,12 +361,17 @@ class ContentSectionResource extends Resource
                         Forms\Components\Repeater::make('content.items')
                             ->label('Depoimentos')
                             ->schema([
-                                Forms\Components\Textarea::make('quote')->label('Citação')->helperText('O texto do depoimento.')->required()->rows(3),
+                                Forms\Components\Textarea::make('quote')->label('Citação')->helperText('O texto do depoimento.')->required()->rows(3)->columnSpanFull(),
                                 Forms\Components\TextInput::make('author_name')->label('Nome do autor')->helperText('Pessoa que deu o depoimento.')->required(),
                                 Forms\Components\TextInput::make('author_role')->label('Cargo / Obra')->helperText('Ex: Cliente Codhous'),
                                 Forms\Components\TextInput::make('stars')->label('Estrelas (1-5)')->helperText('Nota de 1 a 5.')->numeric()->minValue(1)->maxValue(5)->default(5),
+                                Forms\Components\FileUpload::make('avatar')->label('Foto do Perfil (Opcional)')->image()->directory('testimonials/avatars')->avatar(),
+                                Forms\Components\FileUpload::make('image')->label('Imagem da Obra (Opcional)')->image()->directory('testimonials/images')->columnSpanFull(),
                             ])
-                            ->columns(1)
+                            ->columns(2)
+                            ->cloneable()
+                            ->collapsible()
+                            ->collapsed()
                             ->itemLabel(fn (array $state): ?string => $state['author_name'] ?? null),
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_TESTIMONIALS)

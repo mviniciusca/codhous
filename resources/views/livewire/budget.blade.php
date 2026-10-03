@@ -1,4 +1,4 @@
-<div class="relative max-w-7xl mx-auto text-scheme-light">
+<div class="relative max-w-7xl mx-auto">
     @php
         $isPrimaryBg = str_contains($bgColor ?? '', 'bg-primary');
         $primaryColor = $isPrimaryBg ? '[color-mix(in_srgb,var(--primary),black_85%)]' : 'primary';
@@ -6,7 +6,7 @@
         $accentBg = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)] text-white' : 'bg-primary text-primary-foreground';
         $accentLightBg = $isPrimaryBg ? 'bg-black/10' : 'bg-primary/5';
         $accentLightBorder = $isPrimaryBg ? 'border-black/20' : 'border-primary/20';
-        $boxBg = $isPrimaryBg ? 'bg-black/10' : 'bg-white';
+        $boxBg = $isPrimaryBg ? 'bg-black/10' : 'bg-card';
         $boxBorder = $isPrimaryBg ? 'border-black/20' : 'border-border/40';
     @endphp
 
@@ -26,7 +26,32 @@
             </div>
         </div>
     @else
-        <div class="grid gap-8 lg:grid-cols-12 items-start">
+        @if($headerVisible && (!empty($title) || !empty($subtitle)))
+            @php
+                $alignClass = $headerAlignment === 'center' ? 'text-center mx-auto' : ($headerAlignment === 'right' ? 'text-right ml-auto' : 'text-left');
+                $descAlignClass = $headerAlignment === 'center' ? 'mx-auto' : ($headerAlignment === 'right' ? 'ml-auto' : 'mr-auto');
+            @endphp
+            <div class="mb-10 max-w-3xl {{ $alignClass }}">
+                @if(!empty($subtitle))
+                    <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $accentLightBorder }} px-4 py-1.5">
+                        <span class="h-1.5 w-1.5 rounded-full {{ $accentBg }} animate-pulse"></span>
+                        <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $accentText }}">{{ $subtitle }}</span>
+                    </div>
+                @endif
+                @if(!empty($title))
+                    <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
+                        {{ $title }}
+                    </h2>
+                @endif
+                @if(!empty($description))
+                    <p class="mt-3 text-lg leading-relaxed text-muted-foreground {{ $descAlignClass }}" style="text-wrap: balance; max-width: 600px;">
+                        {{ $description }}
+                    </p>
+                @endif
+            </div>
+        @endif
+
+        <div class="grid gap-8 lg:grid-cols-12 items-start text-scheme-light">
             
             <!-- Esquerda: Formulário -->
             <div class="lg:col-span-8 flex flex-col gap-6">
@@ -35,7 +60,7 @@
                 <div class="flex items-center justify-between rounded-3xl border {{ $boxBorder }} {{ $boxBg }} p-2 shadow-sm relative overflow-hidden">
                     <div class="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none"></div>
                     
-                    <button wire:click="setStep(1)" class="relative z-10 flex flex-1 flex-col items-center gap-2 rounded-2xl p-4 transition-all {{ $currentStep === 1 ? 'bg-white shadow-md' : 'hover:bg-muted/50 opacity-60' }}">
+                    <button wire:click="setStep(1)" class="relative z-10 flex flex-1 flex-col items-center gap-2 rounded-2xl p-4 transition-all {{ $currentStep === 1 ? 'bg-card shadow-md' : 'hover:bg-muted/50 opacity-60' }}">
                         <div class="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold {{ $currentStep >= 1 ? $accentBg : 'bg-muted text-muted-foreground' }}">1</div>
                         <div class="text-center">
                             <strong class="block text-xs font-bold text-foreground">Seu pedido</strong>
@@ -45,7 +70,7 @@
                     
                     <div class="h-px w-8 bg-border"></div>
                     
-                    <button wire:click="setStep(2)" class="relative z-10 flex flex-1 flex-col items-center gap-2 rounded-2xl p-4 transition-all {{ $currentStep === 2 ? 'bg-white shadow-md' : 'hover:bg-muted/50 opacity-60' }}">
+                    <button wire:click="setStep(2)" class="relative z-10 flex flex-1 flex-col items-center gap-2 rounded-2xl p-4 transition-all {{ $currentStep === 2 ? 'bg-card shadow-md' : 'hover:bg-muted/50 opacity-60' }}">
                         <div class="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold {{ $currentStep >= 2 ? $accentBg : 'bg-muted text-muted-foreground' }}">2</div>
                         <div class="text-center">
                             <strong class="block text-xs font-bold text-foreground">Obra e contato</strong>
@@ -55,7 +80,7 @@
                     
                     <div class="h-px w-8 bg-border"></div>
                     
-                    <button wire:click="setStep(3)" class="relative z-10 flex flex-1 flex-col items-center gap-2 rounded-2xl p-4 transition-all {{ $currentStep === 3 ? 'bg-white shadow-md' : 'hover:bg-muted/50 opacity-60' }}">
+                    <button wire:click="setStep(3)" class="relative z-10 flex flex-1 flex-col items-center gap-2 rounded-2xl p-4 transition-all {{ $currentStep === 3 ? 'bg-card shadow-md' : 'hover:bg-muted/50 opacity-60' }}">
                         <div class="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold {{ $currentStep >= 3 ? $accentBg : 'bg-muted text-muted-foreground' }}">3</div>
                         <div class="text-center">
                             <strong class="block text-xs font-bold text-foreground">Revisão</strong>
@@ -78,7 +103,7 @@
                                 <div class="rounded-2xl border border-border/60 bg-muted/20 p-5 relative group transition-all hover:border-primary/30">
                                     <div class="mb-5 flex items-center justify-between border-b border-border/50 pb-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm border border-border/40 text-muted-foreground group-hover:text-primary transition-colors">
+                                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-card shadow-sm border border-border/40 text-muted-foreground group-hover:text-primary transition-colors">
                                                 <i data-lucide="package" class="h-4 w-4"></i>
                                             </div>
                                             <span class="text-sm font-bold text-foreground">Item {{ $index + 1 }}</span>
@@ -93,7 +118,7 @@
                                     <div class="grid gap-5 md:grid-cols-12 items-start">
                                         <div class="md:col-span-5">
                                             <label class="mb-1.5 block text-xs font-bold text-foreground">Produto <span class="text-red-500">*</span></label>
-                                            <select wire:model.live="items.{{ $index }}.product_id" class="w-full rounded-xl border border-border/50 bg-white px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                            <select wire:model.live="items.{{ $index }}.product_id" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                                                 <option value="">Selecione...</option>
                                                 @foreach($allProducts as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>
@@ -104,7 +129,7 @@
                                         
                                         <div class="md:col-span-5">
                                             <label class="mb-1.5 block text-xs font-bold text-foreground">Opção / Traço <span class="text-red-500">*</span></label>
-                                            <select wire:model.live="items.{{ $index }}.option_id" class="w-full rounded-xl border border-border/50 bg-white px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" {{ empty($item['product_id']) ? 'disabled' : '' }}>
+                                            <select wire:model.live="items.{{ $index }}.option_id" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" {{ empty($item['product_id']) ? 'disabled' : '' }}>
                                                 <option value="">Selecione...</option>
                                                 @if(!empty($item['product_id']))
                                                     @foreach($this->getOptionsForProduct($item['product_id']) as $id => $name)
@@ -118,7 +143,7 @@
                                         <div class="md:col-span-2">
                                             <label class="mb-1.5 block text-xs font-bold text-foreground">Qtd. <span class="text-red-500">*</span></label>
                                             <div class="relative">
-                                                <input type="number" wire:model.blur="items.{{ $index }}.quantity" step="1" min="{{ $item['min_quantity'] ?? 1 }}" class="w-full rounded-xl border border-border/50 bg-white px-4 py-3 text-sm font-bold shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" {{ empty($item['option_id']) ? 'disabled' : '' }} />
+                                                <input type="number" wire:model.blur="items.{{ $index }}.quantity" step="1" min="{{ $item['min_quantity'] ?? 1 }}" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-bold shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" {{ empty($item['option_id']) ? 'disabled' : '' }} />
                                                 @if(!empty($item['unit']))
                                                     <span class="absolute inset-y-0 right-3 flex items-center text-xs font-medium text-muted-foreground pointer-events-none">{{ $item['unit'] }}</span>
                                                 @endif
@@ -175,19 +200,19 @@
                         <div class="grid gap-6 md:grid-cols-2 mb-8">
                             <div class="md:col-span-2">
                                 <label class="mb-1.5 block text-xs font-bold text-foreground">Nome Completo <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="customer_name" placeholder="Seu nome" class="w-full rounded-xl border border-border/50 bg-white px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                                <input type="text" wire:model="customer_name" placeholder="Seu nome" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                                 @error('customer_name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                             
                             <div>
                                 <label class="mb-1.5 block text-xs font-bold text-foreground">WhatsApp <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="customer_phone" placeholder="(00) 00000-0000" class="w-full rounded-xl border border-border/50 bg-white px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" x-mask="(99) 99999-9999" />
+                                <input type="text" wire:model="customer_phone" placeholder="(00) 00000-0000" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" x-mask="(99) 99999-9999" />
                                 @error('customer_phone') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                             
                             <div>
                                 <label class="mb-1.5 block text-xs font-bold text-foreground">E-mail <span class="text-red-500">*</span></label>
-                                <input type="email" wire:model="customer_email" placeholder="seu@email.com" class="w-full rounded-xl border border-border/50 bg-white px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                                <input type="email" wire:model="customer_email" placeholder="seu@email.com" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                                 @error('customer_email') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -198,7 +223,7 @@
                             <div class="md:col-span-4">
                                 <label class="mb-1.5 block text-xs font-bold text-foreground">CEP da Obra <span class="text-red-500">*</span></label>
                                 <div class="relative">
-                                    <input type="text" wire:model.blur="postcode" placeholder="00000-000" class="w-full rounded-xl border border-border/50 bg-white px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" x-mask="99999-999" />
+                                    <input type="text" wire:model.blur="postcode" placeholder="00000-000" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" x-mask="99999-999" />
                                     <div wire:loading wire:target="postcode" class="absolute right-3 top-3">
                                         <i data-lucide="loader-2" class="h-4 w-4 animate-spin text-muted-foreground"></i>
                                     </div>
@@ -213,7 +238,7 @@
                             
                             <div class="md:col-span-2">
                                 <label class="mb-1.5 block text-xs font-bold text-foreground">Nº <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="number" placeholder="Nº ou KM" class="w-full rounded-xl border border-border/50 bg-white px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                                <input type="text" wire:model="number" placeholder="Nº ou KM" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                                 @error('number') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
@@ -263,7 +288,7 @@
                 <!-- Botões de Navegação -->
                 <div class="flex items-center justify-between px-2">
                     @if ($currentStep > 1)
-                        <button type="button" wire:click="setStep({{ $currentStep - 1 }})" class="rounded-xl border border-border bg-white px-6 py-3.5 text-sm font-bold text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground">
+                        <button type="button" wire:click="setStep({{ $currentStep - 1 }})" class="rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-bold text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground">
                             Voltar
                         </button>
                     @else
@@ -309,7 +334,7 @@
                         @foreach($items as $item)
                             @if(!empty($item['product_id']) && !empty($item['option_id']))
                                 @php $validItemsCount++; @endphp
-                                <div class="rounded-xl border border-border/60 bg-white p-4 shadow-sm relative">
+                                <div class="rounded-xl border border-border/60 bg-card p-4 shadow-sm relative">
                                     <div class="flex items-start gap-3">
                                         <div class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
                                             <i data-lucide="package" class="h-3 w-3"></i>
