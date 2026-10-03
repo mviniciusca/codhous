@@ -104,6 +104,7 @@
             :subtitle="$data['header']['subtitle'] ?? $data['subtitle'] ?? null"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :description="$data['header']['description'] ?? $data['description'] ?? null"
+            :header="$data['header'] ?? []"
             :items="$data['items'] ?? []"
         />
         @break
@@ -158,9 +159,7 @@
             }
         @endphp
         <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
-            @if($bgImg)
-                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; bottom: {{ $bottomStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
-            @endif
+            <x-ui.section-background :data="$data" />
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 @if(!$hideHeader && $headerVisible && (!empty($servicesTitle) || !empty($servicesSubtitle)))
                     <div class="mb-16 max-w-3xl {{ $alignClass }}">
@@ -299,6 +298,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
+            :header="$data['header'] ?? []"
             :steps="$data['steps'] ?? []"
         />
         @break
@@ -346,6 +346,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
+            :header="$data['header'] ?? []"
             :items="$data['items'] ?? []"
         />
         @break
@@ -355,6 +356,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
+            :header="$data['header'] ?? []"
             :items="$data['items'] ?? []"
         />
         @break
@@ -364,6 +366,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
+            :header="$data['header'] ?? []"
             :cities="$data['cities'] ?? []"
         />
         @break
@@ -373,6 +376,9 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
+            :subtitle="$data['header']['subtitle'] ?? $data['badge'] ?? null"
+            :description="$data['header']['description'] ?? $data['description'] ?? null"
+            :header="$data['header'] ?? []"
             :items="$data['items'] ?? []"
         />
         @break
@@ -395,62 +401,20 @@
             $calcTitle = $data['header']['title'] ?? $data['title'] ?? null;
             $calcSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
             $calcDesc = $data['header']['description'] ?? $data['description'] ?? null;
-            
-            $bgColor = $data['background_color'] ?? '';
-            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
-            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
-            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
-            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/5';
-            
-            $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
-            $bgFit = $data['background_image_fit'] ?? 'cover';
-            $bgPos = $data['background_image_position'] ?? 'center';
-            $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
-            $bgDivClasses = 'absolute inset-x-0 z-0 pointer-events-none bg-no-repeat';
-            $bgPosParts = explode(' ', $bgPos);
-            $bgPosHorizontal = $bgPosParts[0];
-            if ($bgPullUpAmount > 0) {
-                $topStyle = "-{$bgPullUpAmount}%";
-                $bottomStyle = "0";
-                $bgPositionStyle = $bgPosHorizontal . ' bottom';
-            } elseif ($bgPullUpAmount < 0) {
-                $topStyle = "0";
-                $bottomStyle = $bgPullUpAmount . "%";
-                $bgPositionStyle = $bgPosHorizontal . ' top';
-            } else {
-                $topStyle = "0";
-                $bottomStyle = "0";
-                $bgPositionStyle = $bgPos;
-            }
         @endphp
         <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }}">
-            @if($bgImg)
-                <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; bottom: {{ $bottomStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
-            @endif
+            <x-ui.section-background :data="$data" />
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                @if(!empty($calcTitle) || !empty($calcSubtitle))
-                    <div class="mb-10">
-                        @if(!empty($calcSubtitle))
-                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5">
-                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse"></span>
-                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $calcSubtitle }}</span>
-                            </div>
-                        @endif
-                        @if(!empty($calcTitle))
-                            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                                {{ $calcTitle }}
-                            </h2>
-                        @endif
-                        @if(!empty($calcDesc))
-                            <p class="mt-3 text-lg leading-relaxed text-muted-foreground">
-                                {{ $calcDesc }}
-                            </p>
-                        @endif
-                    </div>
-                @endif
-                <livewire:calculator :bg-color="$data['background_color'] ?? ''" />
+                <livewire:calculator 
+                    :bg-color="$data['background_color'] ?? ''" 
+                    :title="$calcTitle"
+                    :subtitle="$calcSubtitle"
+                    :description="$calcDesc"
+                    :header-visible="$data['header']['visible'] ?? true"
+                    :header-alignment="$data['header']['alignment'] ?? 'left'"
+                />
             </div>
         </section>
         @break
@@ -508,9 +472,7 @@
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 <{{ $wrapperTag }} {!! $wrapperHref !!} class="relative {{ $overflowClass }} flex flex-col {{ $alignClass }} rounded-[24px] {{ $bgColor ?: 'bg-card' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} border border-border/40 p-8 md:p-10 shadow-sm hover:shadow-md transition-all w-full {{ $isClickableBanner ? 'cursor-pointer hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2' : '' }}">
                     
-                    @if($bgImg)
-                        <div class="{{ $bgDivClasses }}" style="top: {{ $topStyle }}; bottom: {{ $bottomStyle }}; background-image: url('{{ $bgImg }}'); background-size: {{ $bgFit }}; background-position: {{ $bgPositionStyle }}; opacity: {{ $bgOp }};"></div>
-                    @endif
+                    <x-ui.section-background :data="$data" />
                     
                     <div class="relative z-10 flex flex-col {{ $alignClass }} w-full">
                         @if(!$hideHeader && $headerVisible && (!empty($offerTitle) || !empty($offerSubtitle)))
@@ -757,6 +719,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
+            :header="$data['header'] ?? []"
             :iframe="$data['iframe_code'] ?? null"
         />
         @break

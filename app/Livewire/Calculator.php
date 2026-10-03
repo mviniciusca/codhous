@@ -7,6 +7,11 @@ use Livewire\Component;
 class Calculator extends Component
 {
     public $bgColor = '';
+    public $title = null;
+    public $subtitle = null;
+    public $description = null;
+    public $headerVisible = true;
+    public $headerAlignment = 'left';
     public $shape = 'retangular'; // 'retangular' or 'cilindrico'
     public $width = 0;
     public $length = 0;

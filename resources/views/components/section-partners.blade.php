@@ -5,6 +5,7 @@
     'subtitle' => null,
     'title' => null,
     'description' => null,
+    'header' => [],
     'items' => [],
 ])
 
@@ -46,22 +47,14 @@
         <div class="mx-auto max-w-7xl px-4 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <!-- Coluna Esquerda: Texto -->
-                <div class="text-left">
-                    @if(!empty($subtitle))
-                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-2">
-                            {{ $subtitle }}
-                        </p>
-                    @endif
-                    @if(!empty($title))
-                        <h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl mb-4">
-                            {{ $title }}
-                        </h2>
-                    @endif
-                    @if(!empty($description))
-                        <p class="text-base text-muted-foreground leading-relaxed">
-                            {{ $description }}
-                        </p>
-                    @endif
+                <div>
+                    <x-ui.section-header 
+                        :header="array_merge($header ?? [], ['alignment' => 'left'])"
+                        :fallback-title="$title"
+                        :fallback-subtitle="$subtitle"
+                        :fallback-description="$description"
+                        :text-color="$textColor"
+                    />
                 </div>
 
                 <!-- Coluna Direita: Grid de Logos -->
@@ -83,24 +76,14 @@
     @else
         <div class="mx-auto max-w-7xl px-4 lg:px-8">
             <!-- SLIDER ORIGINAL -->
-            @if(!empty($title) || !empty($subtitle) || !empty($description))
-                <div class="mb-8 text-center">
-                    @if(!empty($subtitle))
-                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
-                            {{ $subtitle }}
-                        </p>
-                    @endif
-                    @if(!empty($title))
-                        <h2 class="mt-2 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                            {{ $title }}
-                        </h2>
-                    @endif
-                    @if(!empty($description))
-                        <p class="mt-2 text-sm text-muted-foreground">
-                            {{ $description }}
-                        </p>
-                    @endif
-                </div>
+            @if(!empty($title) || !empty($subtitle) || !empty($description) || !empty($header))
+                <x-ui.section-header 
+                    :header="$header ?? []"
+                    :fallback-title="$title"
+                    :fallback-subtitle="$subtitle"
+                    :fallback-description="$description"
+                    :text-color="$textColor"
+                />
             @else
                 <p class="mb-8 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
                     Empresas que confiam no nosso concreto

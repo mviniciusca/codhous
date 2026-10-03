@@ -4,6 +4,7 @@
     'title' => null,
     'subtitle' => null,
     'description' => null,
+    'header' => [],
     'items' => null,
 ])
 
@@ -53,21 +54,13 @@
 @if(!\App\Models\ContentSection::isHidden('differentials'))
 <section class="{{ $bgColor ?? 'bg-background' }} py-16 lg:py-24 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        @if(!empty($displayTitle) || !empty($displaySubtitle) || !empty($displayDescription))
-            <div class="mb-16 text-center">
-                @if(!empty($displaySubtitle))
-                    <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $displaySubtitle }}</span>
-                @endif
-                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                    {{ $displayTitle }}
-                </h2>
-                @if(!empty($displayDescription))
-                    <p class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                        {{ $displayDescription }}
-                    </p>
-                @endif
-            </div>
-        @endif
+        <x-ui.section-header 
+            :header="$header ?? []"
+            :fallback-title="$displayTitle"
+            :fallback-subtitle="$displaySubtitle"
+            :fallback-description="$displayDescription"
+            :text-color="$textColor"
+        />
         
         <div class="grid gap-12 md:grid-cols-3">
             @foreach($displayItems as $item)

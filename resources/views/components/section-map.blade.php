@@ -1,6 +1,7 @@
 @props([
     'textColor' => 'light',
     'title' => null,
+    'header' => [],
     'iframe' => null,
 ])
 
@@ -18,13 +19,11 @@
 
 <section class="bg-muted py-16">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        @if(!empty($displayTitle))
-            <div class="mb-8 max-w-2xl text-center md:text-left">
-                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                    {{ $displayTitle }}
-                </h2>
-            </div>
-        @endif
+        <x-ui.section-header 
+            :header="$header ?? []"
+            :fallback-title="$displayTitle"
+            :text-color="$textColor"
+        />
 
         <div class="overflow-hidden rounded-2xl border border-border shadow-sm h-[400px] lg:h-[500px] w-full grayscale hover:grayscale-0 transition-all duration-700 [&>iframe]:w-full [&>iframe]:h-full">
             {!! $mapsCode !!}

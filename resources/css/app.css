@@ -93,9 +93,26 @@
     }
 
     .text-scheme-dark .text-muted-foreground,
-    .text-scheme-dark p:not([class*="text-primary"]),
-    .text-scheme-dark span:not([class*="text-primary"]) {
+    .text-scheme-dark p:not([class*="text-primary"]):not(.text-scheme-light p),
+    .text-scheme-dark span:not([class*="text-primary"]):not(.text-scheme-light span) {
         color: rgba(255, 255, 255, 0.75) !important;
+    }
+
+    /* Reset for light cards inside dark schemes */
+    .text-scheme-light,
+    .text-scheme-dark .text-scheme-light,
+    .text-scheme-dark .text-scheme-light .text-foreground,
+    .text-scheme-dark .text-scheme-light h1,
+    .text-scheme-dark .text-scheme-light h2,
+    .text-scheme-dark .text-scheme-light h3,
+    .text-scheme-dark .text-scheme-light h4 {
+        color: hsl(var(--foreground)) !important;
+    }
+
+    .text-scheme-dark .text-scheme-light .text-muted-foreground,
+    .text-scheme-dark .text-scheme-light p:not([class*="text-primary"]),
+    .text-scheme-dark .text-scheme-light span:not([class*="text-primary"]) {
+        color: hsl(var(--muted-foreground)) !important;
     }
 }
 

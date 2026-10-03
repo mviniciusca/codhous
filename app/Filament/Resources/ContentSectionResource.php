@@ -755,6 +755,36 @@ class ContentSectionResource extends Resource
                                                     ->helperText('Desloca a imagem para cima (positivo) ou para baixo (negativo). 0 = posição original.')
                                                     ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image')))
                                                     ->columnSpanFull(),
+                                                Forms\Components\Toggle::make('content.background_overlay_enabled')
+                                                    ->label('Habilitar Overlay')
+                                                    ->default(false)
+                                                    ->live()
+                                                    ->columnSpanFull()
+                                                    ->helperText('Adiciona uma camada de cor sobre a imagem de fundo para melhorar a legibilidade do texto.'),
+                                                Forms\Components\ToggleButtons::make('content.background_overlay_type')
+                                                    ->label('Cor do Overlay')
+                                                    ->options([
+                                                        'light' => 'Claro',
+                                                        'dark' => 'Escuro',
+                                                    ])
+                                                    ->default('dark')
+                                                    ->inline()
+                                                    ->visible(fn (\Filament\Forms\Get $get) => $get('content.background_overlay_enabled') === true),
+                                                Forms\Components\Select::make('content.background_overlay_opacity')
+                                                    ->label('Opacidade do Overlay')
+                                                    ->options([
+                                                        '10' => '10%',
+                                                        '20' => '20%',
+                                                        '30' => '30%',
+                                                        '40' => '40%',
+                                                        '50' => '50%',
+                                                        '60' => '60%',
+                                                        '70' => '70%',
+                                                        '80' => '80%',
+                                                        '90' => '90%',
+                                                    ])
+                                                    ->default('50')
+                                                    ->visible(fn (\Filament\Forms\Get $get) => $get('content.background_overlay_enabled') === true),
                                             ])
                                             ->columns(3),
                                     ])->columns(2),

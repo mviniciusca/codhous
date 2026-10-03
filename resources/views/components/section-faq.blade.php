@@ -1,7 +1,14 @@
+@props([
+    'textColor' => 'light',
+    'bgColor' => null,
+    'title' => null,
+    'header' => null,
+    'items' => null,
+])
 @php
     $section = \App\Models\ContentSection::getBySlug('faq');
-    $header = $section?->content['header'] ?? [];
-    $items = $section?->content['items'] ?? null;
+    $header = $header ?? $section?->content['header'] ?? [];
+    $items = $items ?? $section?->content['items'] ?? null;
     $useStatic = empty($items);
     if ($useStatic) {
         $header = [
@@ -21,15 +28,12 @@
 @if(!\App\Models\ContentSection::isHidden('faq'))
 <section id="faq" class="border-b border-border bg-muted/30 py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <div class="mb-12 text-center">
-            @if(!empty($header['subtitle']))
-                <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $header['subtitle'] }}</span>
-            @endif
-            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">{{ $header['title'] ?? 'Perguntas frequentes' }}</h2>
-            @if(!empty($header['description']))
-                <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{{ $header['description'] }}</p>
-            @endif
-        </div>
+        <x-ui.section-header 
+            :header="$header ?? []"
+            :fallback-title="$header['title'] ?? 'Perguntas frequentes'"
+            :fallback-subtitle="$header['subtitle'] ?? null"
+            :fallback-description="$header['description'] ?? null"
+        />
 
         <div class="mx-auto max-w-3xl space-y-3">
             @foreach($items as $item)

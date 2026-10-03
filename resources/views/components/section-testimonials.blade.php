@@ -1,9 +1,13 @@
 @props([
-    'textColor' => 'light','bgColor' => null])
+    'textColor' => 'light',
+    'bgColor' => null,
+    'header' => null,
+    'items' => null,
+])
 @php
     $section = \App\Models\ContentSection::getBySlug('testimonials');
-    $header = $section?->content['header'] ?? [];
-    $items = $section?->content['items'] ?? null;
+    $header = $header ?? $section?->content['header'] ?? [];
+    $items = $items ?? $section?->content['items'] ?? null;
     if (empty($items)) {
         $header = ['subtitle' => 'Depoimentos', 'title' => 'O que dizem nossos clientes', 'description' => 'Empresas e obras que confiam na nossa entrega e no nosso suporte.'];
         $items = [
@@ -16,15 +20,13 @@
 @if(!\App\Models\ContentSection::isHidden('testimonials'))
 <section id="depoimentos" class="{{ $bgColor ?? 'bg-background' }} py-20 lg:py-28 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <div class="mb-16 text-center">
-            @if(!empty($header['subtitle']))
-                <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $header['subtitle'] }}</span>
-            @endif
-            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">{{ $header['title'] ?? 'Depoimentos' }}</h2>
-            @if(!empty($header['description']))
-                <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{{ $header['description'] }}</p>
-            @endif
-        </div>
+        <x-ui.section-header 
+            :header="$header ?? []"
+            :fallback-title="$header['title'] ?? 'O que dizem nossos clientes'"
+            :fallback-subtitle="$header['subtitle'] ?? null"
+            :fallback-description="$header['description'] ?? null"
+            :text-color="$textColor"
+        />
 
         <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             @foreach($items as $index => $item)

@@ -1,9 +1,13 @@
 @props([
-    'textColor' => 'light','bgColor' => null])
+    'textColor' => 'light',
+    'bgColor' => null,
+    'header' => null,
+    'steps' => null,
+])
 @php
     $section = \App\Models\ContentSection::getBySlug('timeline');
-    $header = $section?->content['header'] ?? [];
-    $steps = $section?->content['steps'] ?? null;
+    $header = $header ?? $section?->content['header'] ?? [];
+    $steps = $steps ?? $section?->content['steps'] ?? null;
     if (empty($steps)) {
         $header = ['subtitle' => 'Processo Simplificado', 'title' => 'Como funciona', 'description' => 'Do orçamento à entrega, tudo pensado para facilitar sua obra.'];
         $steps = [
@@ -17,15 +21,13 @@
 @if(!\App\Models\ContentSection::isHidden('timeline'))
 <section id="como-funciona" class="{{ $bgColor ?? 'bg-background' }} py-20 lg:py-28 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <div class="mb-16 text-center">
-            @if(!empty($header['subtitle']))
-                <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $header['subtitle'] }}</span>
-            @endif
-            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">{{ $header['title'] ?? 'Como funciona' }}</h2>
-            @if(!empty($header['description']))
-                <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{{ $header['description'] }}</p>
-            @endif
-        </div>
+        <x-ui.section-header 
+            :header="$header ?? []"
+            :fallback-title="$header['title'] ?? 'Como funciona'"
+            :fallback-subtitle="$header['subtitle'] ?? null"
+            :fallback-description="$header['description'] ?? null"
+            :text-color="$textColor"
+        />
 
         {{-- Desktop: horizontal timeline --}}
         <div class="hidden lg:block">

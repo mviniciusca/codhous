@@ -52,15 +52,13 @@
     @endif
 
     <div class="relative z-10 mx-auto max-w-7xl px-4 lg:px-8">
-        <div class="mb-16 text-center">
-            @if(!empty($subtitle))
-                <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $subtitle }}</span>
-            @endif
-            <h2 class="font-mono text-3xl font-bold tracking-tight {{ $textForeground }} md:text-4xl" style="text-wrap: balance;">{{ $title ?? 'Onde atendemos' }}</h2>
-            @if(!empty($description))
-                <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed {{ $textMuted }}">{{ $description }}</p>
-            @endif
-        </div>
+        <x-ui.section-header 
+            :header="$header ?? []"
+            :fallback-title="$title ?? 'Onde atendemos'"
+            :fallback-subtitle="$subtitle ?? null"
+            :fallback-description="$description ?? null"
+            :text-color="$textColor"
+        />
 
         <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-16">
             <div class="flex-1">
