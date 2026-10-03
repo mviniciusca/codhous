@@ -368,6 +368,11 @@
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :header="$data['header'] ?? []"
             :cities="$data['cities'] ?? []"
+            :overlay-data="[
+                'enabled' => $data['background_overlay_enabled'] ?? false,
+                'type' => $data['background_overlay_type'] ?? 'dark',
+                'opacity' => $data['background_overlay_opacity'] ?? '50',
+            ]"
         />
         @break
 

@@ -28,19 +28,19 @@
         @endphp
         <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $currentBadgeBorder }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
             <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
-            <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $currentBadgeText }}">{{ $subtitle }}</span>
+            <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $currentBadgeText }}">{!! $subtitle !!}</span>
         </div>
     @endif
     
     @if(!empty($title))
         <h2 class="font-mono text-3xl font-extrabold tracking-tight md:text-4xl drop-shadow-sm mb-4 {{ $isDark ? 'text-white' : 'text-foreground' }}" style="text-wrap: balance;">
-            {{ $title }}
+            {!! $title !!}
         </h2>
     @endif
     
     @if(!empty($description))
         <p class="text-base md:text-lg font-medium leading-relaxed {{ $isDark ? 'text-white/70' : 'text-muted-foreground' }}" style="text-wrap: balance;">
-            {{ $description }}
+            {!! $description !!}
         </p>
     @endif
 </div>

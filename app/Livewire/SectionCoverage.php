@@ -23,8 +23,9 @@ class SectionCoverage extends Component
     public $bgColor = null;
     public $textColor = 'light';
     public $header = [];
+    public $overlayData = [];
 
-    public function mount($title = null, $subtitle = null, $description = null, $cities = null, $sidebar = null, $backgroundMedia = null, $header = [])
+    public function mount($title = null, $subtitle = null, $description = null, $cities = null, $sidebar = null, $backgroundMedia = null, $header = [], $overlayData = [])
     {
         $this->title = $title;
         $this->subtitle = $subtitle;
@@ -33,6 +34,7 @@ class SectionCoverage extends Component
         $this->sidebar = $sidebar;
         $this->backgroundMedia = $backgroundMedia;
         $this->header = $header;
+        $this->overlayData = $overlayData;
     }
 
     public function updatedCep($value)

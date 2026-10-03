@@ -223,3 +223,12 @@
         @apply focus-within:ring-primary;
     }
 }
+
+/* 
+ * Alias rápido para a cor primária solicitado pelo usuário 
+ * Fica fora das @layers para não ser expurgado pelo Tailwind
+ * quando usado apenas no banco de dados.
+ */
+.tp {
+    @apply text-primary font-bold !important;
+}

@@ -20,6 +20,11 @@
             ->pluck('city')
             ->toArray();
     }
+    
+    $overlayEnabled = $overlayData['enabled'] ?? ($section?->content['background_overlay_enabled'] ?? false);
+    $overlayType = $overlayData['type'] ?? ($section?->content['background_overlay_type'] ?? 'dark');
+    $overlayOpacity = ($overlayData['opacity'] ?? ($section?->content['background_overlay_opacity'] ?? '50')) / 100;
+    $overlayColor = $overlayType === 'light' ? '255, 255, 255' : '0, 0, 0';
 @endphp
 @php
     $bgClass = empty($bgMedia) ? 'bg-muted/50' : 'bg-zinc-950 text-white';
@@ -46,8 +51,9 @@
             @else
                 <img src="{{ $mediaUrl }}" alt="Background" class="fixed inset-0 h-[100vh] w-[100vw] object-cover">
             @endif
-            <!-- Overlay preto com transparência -->
-            <div class="absolute inset-0 bg-black/70"></div>
+            @if($overlayEnabled)
+                <div class="absolute inset-0 pointer-events-none" style="background-color: rgba({{ $overlayColor }}, {{ $overlayOpacity }});"></div>
+            @endif
         </div>
     @endif
 
