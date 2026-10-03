@@ -1,0 +1,470 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Budget as BudgetModel;
+use App\Models\Location;
+use App\Models\Product;
+use App\Models\ProductOption;
+use App\Models\User;
+use App\Notifications\NewBudget;
+use App\Services\BudgetCalculatorService;
+use App\Services\OperationAreaService;
+use App\Services\PostcodeFinderService;
+use App\Services\TurnstileService;
+use App\Rules\CepInOperationAreaRule;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Livewire\Component;
+
+class Budget extends Component implements HasForms
+{
+    use InteractsWithForms;
+
+    public ?array $data = [];
+    public ?string $bgColor = '';
+
+    public bool $isSubmitted = false;
+    
+    // Request-level cache to prevent N+1 queries during schema building
+    protected static array $productsCache = [];
+    protected static array $productOptionsCache = [];
+    protected static ?array $locationsCache = null;
+    
+    public ?string $turnstileToken = null;
+
+    public function mount(): void
+    {
+        $this->form->fill();
+    }
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->model(BudgetModel::class)
+            ->schema([
+                Hidden::make('code')->default(fn () => BudgetModel::generateUniqueCode()),
+                Hidden::make('content.price'),
+                Hidden::make('content.subtotal'),
+                Hidden::make('content.total'),
+                Hidden::make('content.quantity'),
+                Hidden::make('content.shipping')->default(0),
+
+                        Wizard::make([
+                            Wizard\Step::make('Pedido')
+                                ->description('O que precisa?')
+                                ->icon('heroicon-o-shopping-bag')
+                                ->schema([
+                                    Repeater::make('content.products')
+                                        ->label('')
+                                        ->schema([
+                                            Grid::make(12)->schema([
+                                                Select::make('product')
+                                                    ->label('Produto')
+                                                    ->options(fn () => $this->getAllProductsPlucked())
+                                                    ->required()
+                                                    ->validationAttribute('Produto')
+                                                    ->live()
+                                                    ->afterStateUpdated(function (Set $set, $state) {
+                                                        $set('product_option', null);
+                                                        $min = $this->getProductMinQuantity($state);
+                                                        $set('quantity', floatval($min));
+                                                    })
+                                                    ->columnSpan(5),
+                                                Select::make('product_option')
+                                                    ->label('Opção / Traço')
+                                                    ->options(fn (Get $get) => $this->getProductOptions($get))
+                                                    ->required(fn (Get $get) => $this->getProductOptions($get)->isNotEmpty())
+                                                    ->validationAttribute('Opção / Traço')
+                                                    ->hidden(fn (Get $get) => $this->getProductOptions($get)->isEmpty())
+                                                    ->live()
+                                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state))
+                                                    ->columnSpan(5),
+                                                TextInput::make('quantity')
+                                                    ->label('Quantidade')
+                                                    ->numeric()
+                                                    ->required()
+                                                    ->default(1)
+                                                    ->minValue(fn (Get $get) => $this->getProductMinQuantity($get('product')))
+                                                    ->validationAttribute('Quantidade')
+                                                    ->step(1)
+                                                    ->suffix(fn (Get $get) => $this->getUnitSuffix($get))
+                                                    ->live(onBlur: true)
+                                                    ->placeholder(fn (Get $get) => 'Mín: ' . floatval($this->getProductMinQuantity($get('product'))))
+                                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                                        $min = $this->getProductMinQuantity($get('product'));
+                                                        $qty = max(floatval($state ?? $min), $min);
+                                                        $set('quantity', ceil($qty));
+                                                        $this->calculateItemSubtotal($get, $set);
+                                                        $this->calculateTotal($get, $set);
+                                                    })
+                                                    ->columnSpan(2),
+                                                Hidden::make('price'),
+                                            ]),
+                                        ])
+                                        ->addActionLabel('Adicionar Item')
+                                        ->cloneable()
+                                        ->collapsible()
+                                        ->defaultItems(1), // Auto-adds the first item to reduce friction!
+
+                                    \Filament\Forms\Components\ToggleButtons::make('content.location')
+                                        ->label('Local da Obra')
+                                        ->options(fn () => $this->getAllLocationsPlucked())
+                                        ->inline()
+                                        ->required()
+                                        ->validationAttribute('Local da Obra')
+                                        ->live()
+                                        ->visible(function (Get $get) {
+                                            $products = $get('content.products') ?? [];
+                                            foreach ($products as $item) {
+                                                if (!empty($item['product_option'])) {
+                                                    return true;
+                                                }
+                                            }
+                                            return false;
+                                        }),
+                                        
+                                    \Filament\Forms\Components\FileUpload::make('content.photos')
+                                        ->label('Fotos da Obra (Opcional)')
+                                        ->image()
+                                        ->multiple()
+                                        ->maxFiles(4)
+                                        ->maxSize(4096)
+                                        ->disk('public')
+                                        ->directory('budget-documents')
+                                        ->panelLayout('grid'),
+                                ]),
+
+                            Wizard\Step::make('Contato & Local')
+                                ->description('Seus dados')
+                                ->icon('heroicon-o-user')
+                                ->schema([
+                                    Grid::make(3)->schema([
+                                        TextInput::make('content.customer_name')
+                                            ->label('Nome Completo')
+                                            ->required()
+                                            ->validationAttribute('Nome Completo')
+                                            ->placeholder('Seu nome')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
+                                        TextInput::make('content.customer_phone')
+                                            ->label('WhatsApp')
+                                            ->tel()
+                                            ->mask('(99)99999-9999')
+                                            ->required()
+                                            ->validationAttribute('WhatsApp')
+                                            ->placeholder('(00) 00000-0000')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
+                                        TextInput::make('content.customer_email')
+                                            ->label('E-mail')
+                                            ->email()
+                                            ->required()
+                                            ->validationAttribute('E-mail')
+                                            ->placeholder('Seu e-mail')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
+                                    ]),
+                                    Grid::make(4)->schema([
+                                        TextInput::make('content.postcode')
+                                            ->label('CEP da Obra')
+                                            ->placeholder('00000-000')
+                                            ->mask('99999-999')
+                                            ->required()
+                                            ->validationAttribute('CEP')
+                                            ->live(onBlur: true)
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm'])
+                                            ->rules($this->getPostcodeRules())
+                                            ->afterStateUpdated(function ($state, Set $set, $livewire) {
+                                                $set('content.street', null);
+                                                $set('content.neighborhood', null);
+                                                $set('content.city', null);
+                                                $set('content.state', null);
+                                                $set('content.shipping', 0);
+                                                if (strlen($state ?? '') === 9) {
+                                                    try {
+                                                        $livewire->validateOnly('data.content.postcode');
+                                                        $postcode = new \App\Services\PostcodeFinderService($state, $set);
+                                                        $postcode->find();
+                                                        $livewire->applyShippingFromCep($state, $set);
+                                                    } catch (\Illuminate\Validation\ValidationException $e) {
+                                                        throw $e;
+                                                    }
+                                                }
+                                            }),
+                                        TextInput::make('content.street')
+                                            ->label('Rua/Av')
+                                            ->columnSpan(2)
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                        TextInput::make('content.number')
+                                            ->label('Nº')
+                                            ->required()
+                                            ->validationAttribute('Número')
+                                            ->placeholder('Nº ou KM')
+                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
+                                    ]),
+                                    Grid::make(12)
+                                        ->schema([
+                                            TextInput::make('content.neighborhood')->label('Bairro')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                            TextInput::make('content.city')->label('Cidade')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
+                                            TextInput::make('content.state')->label('UF')->columnSpan(2)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200 text-center']),
+                                        ])
+                                        ->visible(fn (Get $get) => filled($get('content.street'))),
+                                ]),
+
+                            Wizard\Step::make('Resumo')
+                                ->description('Revise e envie')
+                                ->icon('heroicon-o-check-circle')
+                                ->schema([
+                                    Placeholder::make('summary')
+                                        ->label('')
+                                        ->content(fn (Get $get) => view('livewire.budget-checkout-summary', [
+                                            'data' => ['content' => $get('content')],
+                                            'canSubmit' => \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode')),
+                                            'turnstileEnabled' => \App\Models\Setting::get('security.turnstile.enabled', false),
+                                            'turnstileSiteKey' => \App\Models\Setting::get('security.turnstile.site_key', '')
+                                        ])),
+                                ])
+                        ])
+                        ->nextAction(
+                            fn (\Filament\Forms\Components\Actions\Action $action) => $action->extraAttributes(['class' => '!bg-primary !text-white hover:!bg-primary/90 !border-0'])
+                        )
+                        ->previousAction(
+                            fn (\Filament\Forms\Components\Actions\Action $action) => $action->extraAttributes(['class' => '!bg-secondary !text-secondary-foreground !border !border-border hover:!bg-accent'])
+                        )
+                        ->submitAction(
+                            new \Illuminate\Support\HtmlString(
+                                '<button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-8 ' .
+                                (str_contains($this->bgColor ?? '', 'bg-primary') ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)] text-white hover:opacity-90' : 'bg-primary text-white hover:bg-primary/90') .
+                                '">Solicitar Orçamento Grátis</button>'
+                            )
+                        ),
+            ])
+            ->statePath('data');
+    }
+
+
+
+    protected function getCachedProduct($id)
+    {
+        if (!$id) return null;
+        if (!array_key_exists($id, self::$productsCache)) {
+            self::$productsCache[$id] = \Illuminate\Support\Facades\Cache::remember(
+                'product_' . $id,
+                86400,
+                fn () => Product::find($id)
+            );
+        }
+        return self::$productsCache[$id];
+    }
+
+    protected function getCachedProductOption($id)
+    {
+        if (!$id) return null;
+        if (!array_key_exists($id, self::$productOptionsCache)) {
+            self::$productOptionsCache[$id] = \Illuminate\Support\Facades\Cache::remember(
+                'product_option_' . $id,
+                86400,
+                fn () => ProductOption::find($id)
+            );
+        }
+        return self::$productOptionsCache[$id];
+    }
+
+    protected function getProductMinQuantity($id): float
+    {
+        if (!$id) return 1;
+        $product = $this->getCachedProduct($id);
+        return $product?->min_quantity ?? 1;
+    }
+
+    protected function getAllProductsPlucked(): array
+    {
+        // For schema options, caching the array of products
+        static $productsPlucked = null;
+        if ($productsPlucked === null) {
+            $productsPlucked = \Illuminate\Support\Facades\Cache::remember(
+                'all_products_plucked',
+                86400,
+                fn () => Product::pluck('name', 'id')->toArray()
+            );
+        }
+        return $productsPlucked;
+    }
+
+    protected function getAllLocationsPlucked(): array
+    {
+        if (self::$locationsCache === null) {
+            self::$locationsCache = \Illuminate\Support\Facades\Cache::remember(
+                'all_locations_plucked',
+                86400,
+                fn () => \App\Models\Location::pluck('name', 'id')->toArray()
+            );
+        }
+        return self::$locationsCache;
+    }
+
+    protected function getPostcodeRules(): array
+    {
+        return ['required', 'string', 'size:9', new CepInOperationAreaRule];
+    }
+
+    public function create(TurnstileService $turnstile): void
+    {
+        $this->form->validate();
+        
+        // Validação Cloudflare Turnstile
+        if (!$turnstile->verify($this->turnstileToken, request()->ip())) {
+            $this->addError('turnstileToken', 'A verificação anti-spam falhou. Por favor, tente novamente.');
+            \Filament\Notifications\Notification::make()
+                ->title('Erro de Validação')
+                ->body('A verificação anti-spam falhou. Atualize a página e tente novamente.')
+                ->danger()
+                ->send();
+            return;
+        }
+        
+        $state = $this->form->getState();
+
+        // Garantir que os totais estejam corretos antes de salvar e enviar e-mail
+        $products = $state['content']['products'] ?? [];
+        $shipping = (float) ($state['content']['shipping'] ?? 0);
+        $result = BudgetCalculatorService::calculateTotal($products, $shipping, 0, 0);
+        
+        $state['content']['quantity'] = $result['quantity'];
+        $state['content']['price'] = $result['price'];
+        $state['content']['subtotal'] = $result['subtotal'];
+        $state['content']['total'] = $result['total'];
+        
+        // Extract products for pivot table sync
+        $products = $state['content']['products'] ?? [];
+        
+        $budget = BudgetModel::create($state);
+        
+        // Save items to the pivot table (snapshot)
+        foreach ($products as $req) {
+            $budget->budgetItems()->create([
+                'product_id' => $req['product'] ?? null,
+                'product_option_id' => $req['product_option'] ?? null,
+                'location_id' => $req['location'] ?? null,
+                'quantity' => $req['quantity'] ?? 1,
+                'price' => $req['price'] ?? 0,
+                'subtotal' => $req['subtotal'] ?? 0,
+            ]);
+        }
+
+        if (!empty($state['content']['photos'])) {
+            foreach ($state['content']['photos'] as $index => $photoPath) {
+                $fullPath = storage_path('app/public/' . $photoPath);
+                $budget->documents()->create([
+                    'title' => 'Foto do Local (Anexo ' . ($index + 1) . ')',
+                    'description' => 'Foto recebida via formulário de orçamento.',
+                    'file_path' => $photoPath,
+                    'file_name' => basename($photoPath),
+                    'file_size' => file_exists($fullPath) ? filesize($fullPath) : 0,
+                    'file_type' => file_exists($fullPath) ? mime_content_type($fullPath) : 'image/jpeg',
+                    'uploaded_by' => null,
+                ]);
+            }
+        }
+
+        \Illuminate\Support\Facades\Mail::to(User::first()?->email ?? config('mail.from.address'))
+            ->send(new \App\Mail\AdminNewBudgetMail($budget));
+        
+        $this->isSubmitted = true;
+    }
+
+    public function resetForm(): void
+    {
+        $this->form->fill();
+        $this->isSubmitted = false;
+    }
+
+    public function render(TurnstileService $turnstile)
+    {
+        return view('livewire.budget', [
+            'turnstileEnabled' => $turnstile->isEnabled(),
+            'turnstileSiteKey' => $turnstile->getSiteKey(),
+        ]);
+    }
+
+    private function getProductOptions(Get $get): Collection
+    {
+        $productId = $get('product');
+        if (!$productId) return collect();
+        
+        // Cache the options list per product
+        static $optionsListCache = [];
+        if (!isset($optionsListCache[$productId])) {
+            $optionsListCache[$productId] = \Illuminate\Support\Facades\Cache::remember(
+                'product_options_plucked_' . $productId,
+                86400,
+                fn () => ProductOption::where('product_id', $productId)->pluck('name', 'id')
+            );
+        }
+        return collect($optionsListCache[$productId]);
+    }
+
+    private function calculateTotal(Get|\Closure $get, Set $set): void
+    {
+        $products = $get('content.products') ?? [];
+        $shipping = (float) ($get('content.shipping') ?? 0);
+        $result = BudgetCalculatorService::calculateTotal($products, $shipping, 0, 0);
+        $set('content.quantity', $result['quantity']);
+        $set('content.price', $result['price']);
+        $set('content.subtotal', $result['subtotal']);
+        $set('content.total', $result['total']);
+    }
+
+    public function applyShippingFromCep(?string $postcode, Set $set): void
+    {
+        if (empty($postcode) || strlen(preg_replace('/\D/', '', $postcode)) < 8) return;
+        $result = OperationAreaService::resultForCep($postcode);
+        $fee = $result['shipping_fee'] ?? 0;
+        $set('content.shipping', (string) $fee);
+        $get = fn (string $key) => data_get($this->data, $key);
+        $this->calculateTotal($get, $set);
+    }
+
+    private function updatePrice(Get $get, Set $set, $productId): void
+    {
+        $price = 0;
+        if ($productId) {
+            $option = $this->getCachedProductOption($productId);
+            $price = $option?->price ?? 0;
+        }
+        $set('quantity', null);
+        $set('price', $price);
+        $this->calculateItemSubtotal($get, $set);
+        $this->calculateTotal($get, $set);
+    }
+
+    private function getUnitSuffix(Get $get): string
+    {
+        $optionId = $get('product_option');
+        if (!$optionId) return '';
+        return $this->getCachedProductOption($optionId)?->unit?->value ?? '';
+    }
+
+    private function calculateItemSubtotal(Get $get, Set $set): void
+    {
+        $quantity = floatval($get('quantity') ?? 0);
+        $price = floatval($get('price') ?? 0);
+        $set('subtotal', BudgetCalculatorService::calculateItemSubtotal($quantity, $price));
+    }
+}
