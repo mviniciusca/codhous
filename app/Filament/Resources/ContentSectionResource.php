@@ -390,16 +390,22 @@ class ContentSectionResource extends Resource
                                     ->image()
                                     ->directory('team/avatars')
                                     ->avatar()
+                                    ->helperText('Formato ideal: retangular ou quadrado. Ficará no topo do card.')
                                     ->columnSpanFull(),
                                 Forms\Components\TextInput::make('name')
                                     ->label('Nome')
-                                    ->required(),
+                                    ->helperText('Nome completo do membro.')
+                                    ->required()
+                                    ->columnSpan(1),
                                 Forms\Components\TextInput::make('role')
                                     ->label('Cargo (Laranja)')
-                                    ->required(),
+                                    ->helperText('Cargo principal em destaque.')
+                                    ->required()
+                                    ->columnSpan(1),
                                 Forms\Components\Group::make([
                                     Forms\Components\ToggleButtons::make('icon_type')
                                         ->label('Ícone do Cargo')
+                                        ->helperText('Ícone que aparece ao lado do cargo (padrão Lucide Icons).')
                                         ->options([
                                             'graduation-cap' => 'Acadêmico',
                                             'settings' => 'Operações',
@@ -420,29 +426,32 @@ class ContentSectionResource extends Resource
                                         ->default('graduation-cap')
                                         ->live(),
                                     Forms\Components\TextInput::make('icon')
-                                        ->label('Nome do Ícone')
-                                        ->helperText('Digite o nome do ícone do site Lucide Icons')
+                                        ->label('Nome do Ícone Customizado')
+                                        ->helperText('Acesse lucide.dev/icons para ver os nomes (ex: "star", "zap").')
                                         ->visible(fn (\Filament\Forms\Get $get) => $get('icon_type') === 'other')
                                         ->required(fn (\Filament\Forms\Get $get) => $get('icon_type') === 'other'),
                                 ])->columns(2)->columnSpanFull(),
                                 Forms\Components\TextInput::make('sub_role')
-                                    ->label('Sub-cargo (Cinza, Opcional)'),
+                                    ->label('Sub-cargo (Cinza, Opcional)')
+                                    ->helperText('Informação extra abaixo do cargo principal.')
+                                    ->columnSpan(1),
                                 Forms\Components\Textarea::make('bio')
                                     ->label('Mini Biografia')
+                                    ->helperText('Resumo da pessoa. Será cortado visualmente após 3 linhas na tela.')
                                     ->rows(3)
-                                    ->columnSpanFull(),
+                                    ->columnSpan(1),
                                 Forms\Components\Fieldset::make('Destaque 1')
                                     ->schema([
-                                        Forms\Components\TextInput::make('highlight_1_icon')->label('Ícone')->default('building-2'),
-                                        Forms\Components\TextInput::make('highlight_1_title')->label('Título (Negrito)'),
-                                        Forms\Components\TextInput::make('highlight_1_subtitle')->label('Subtítulo'),
-                                    ])->columns(3),
+                                        Forms\Components\TextInput::make('highlight_1_icon')->label('Ícone (Lucide)')->default('building-2')->helperText('Ex: building-2'),
+                                        Forms\Components\TextInput::make('highlight_1_title')->label('Título (Negrito)')->helperText('Ex: 12+ anos'),
+                                        Forms\Components\TextInput::make('highlight_1_subtitle')->label('Subtítulo')->helperText('Ex: de experiência'),
+                                    ])->columns(1)->columnSpan(1),
                                 Forms\Components\Fieldset::make('Destaque 2')
                                     ->schema([
-                                        Forms\Components\TextInput::make('highlight_2_icon')->label('Ícone')->default('users'),
-                                        Forms\Components\TextInput::make('highlight_2_title')->label('Título (Negrito)'),
-                                        Forms\Components\TextInput::make('highlight_2_subtitle')->label('Subtítulo'),
-                                    ])->columns(3),
+                                        Forms\Components\TextInput::make('highlight_2_icon')->label('Ícone (Lucide)')->default('users')->helperText('Ex: users'),
+                                        Forms\Components\TextInput::make('highlight_2_title')->label('Título (Negrito)')->helperText('Ex: Liderança'),
+                                        Forms\Components\TextInput::make('highlight_2_subtitle')->label('Subtítulo')->helperText('Ex: e estratégia'),
+                                    ])->columns(1)->columnSpan(1),
                             ])
                             ->columns(2)
                             ->cloneable()
