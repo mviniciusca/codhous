@@ -434,12 +434,7 @@ class ContentSectionResource extends Resource
                                 Forms\Components\TextInput::make('sub_role')
                                     ->label('Sub-cargo (Cinza, Opcional)')
                                     ->helperText('Informação extra abaixo do cargo principal.')
-                                    ->columnSpan(1),
-                                Forms\Components\Textarea::make('bio')
-                                    ->label('Mini Biografia')
-                                    ->helperText('Resumo da pessoa. Será cortado visualmente após 3 linhas na tela.')
-                                    ->rows(3)
-                                    ->columnSpan(1),
+                                    ->columnSpanFull(),
                                 Forms\Components\Fieldset::make('Destaque 1')
                                     ->schema([
                                         Forms\Components\TextInput::make('highlight_1_icon')->label('Ícone (Lucide)')->default('building-2')->helperText('Ex: building-2'),

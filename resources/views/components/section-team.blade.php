@@ -22,7 +22,6 @@
                 'icon' => 'graduation-cap',
                 'role' => 'MESTRE DE ENGENHARIA',
                 'sub_role' => 'DIRETOR EXECUTIVO',
-                'bio' => 'Engenheiro formado pela PUC Minas. Atua desde 2012 liderando a expansão técnica e estrutural da empresa.',
                 'avatar' => 'https://randomuser.me/api/portraits/men/32.jpg',
                 'highlight_1_icon' => 'building-2',
                 'highlight_1_title' => '12+ anos',
@@ -36,7 +35,6 @@
                 'icon' => 'settings',
                 'role' => 'ENGENHEIRO-CHEFE, CEO',
                 'sub_role' => '',
-                'bio' => 'Com 11 anos de experiência, possui passagens marcantes por grandes construtoras como MTX e SAGA.',
                 'avatar' => 'https://randomuser.me/api/portraits/men/46.jpg',
                 'highlight_1_icon' => 'briefcase',
                 'highlight_1_title' => '11+ anos',
@@ -50,7 +48,6 @@
                 'icon' => 'hard-hat',
                 'role' => 'ENGENHEIRO',
                 'sub_role' => '',
-                'bio' => 'Engenheiro paulista pela Unicamp. Traz na bagagem experiência internacional por gigantes como a AT&T.',
                 'avatar' => 'https://randomuser.me/api/portraits/men/22.jpg',
                 'highlight_1_icon' => 'building-2',
                 'highlight_1_title' => '10+ anos',
@@ -64,8 +61,6 @@
                 'icon' => 'flask-conical',
                 'role' => 'ENGENHEIRA QUÍMICA',
                 'sub_role' => '',
-                'bio' => 'Especialista pela USP com foco em obras civis e química. Premiada pela Universidade de Nova York (NYU).',
-
                 'avatar' => 'https://randomuser.me/api/portraits/women/44.jpg',
                 'highlight_1_icon' => 'flask-conical',
                 'highlight_1_title' => '8+ anos',
@@ -100,7 +95,7 @@
                 <div class="group flex flex-col overflow-hidden rounded-[24px] bg-card border border-border/40 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-xl hover:border-primary/30 hover:-translate-y-2">
                     
                     <!-- Foto -->
-                    <div class="relative aspect-[4/3] overflow-hidden bg-muted">
+                    <div class="relative aspect-square overflow-hidden bg-muted">
                         @php
                             $avatarUrl = null;
                             if (!empty($item['avatar'])) {
@@ -109,7 +104,7 @@
                         @endphp
                         
                         @if($avatarUrl)
-                            <img src="{{ $avatarUrl }}" alt="{{ $item['name'] ?? '' }}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <img src="{{ $avatarUrl }}" alt="{{ $item['name'] ?? '' }}" class="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-110">
                         @else
                             <div class="flex h-full w-full items-center justify-center bg-primary/5 text-primary/40">
                                 <i data-lucide="user" class="h-16 w-16"></i>
@@ -121,7 +116,7 @@
                     </div>
                     
                     <!-- Conteúdo -->
-                    <div class="flex flex-1 flex-col p-6 lg:p-8 relative z-10 bg-card">
+                    <div class="flex flex-1 flex-col p-5 lg:p-6 relative z-10 bg-card">
                         <div class="mb-4 flex items-start gap-2">
                             @php
                                 $mainIcon = ($item['icon_type'] ?? '') === 'other' ? ($item['icon'] ?? '') : ($item['icon_type'] ?? $item['icon'] ?? '');
@@ -141,19 +136,13 @@
                             </div>
                         </div>
                         
-                        <h3 class="text-xl font-bold text-foreground mb-3 leading-tight">
+                        <h3 class="text-xl font-bold text-foreground mb-1 leading-tight">
                             {{ $item['name'] ?? '' }}
                         </h3>
                         
-                        @if(!empty($item['bio']))
-                            <p class="text-sm leading-relaxed text-muted-foreground flex-1 line-clamp-3" title="{{ $item['bio'] }}">
-                                {{ $item['bio'] }}
-                            </p>
-                        @endif
-                        
                         <!-- Destaques (Highlights) -->
                         @if(!empty($item['highlight_1_title']) || !empty($item['highlight_2_title']))
-                            <div class="mt-6 pt-5 grid grid-cols-2 gap-4 border-t border-border/30">
+                            <div class="mt-auto pt-5 grid grid-cols-2 gap-4 border-t border-border/30">
                                 <!-- Destaque 1 -->
                                 @if(!empty($item['highlight_1_title']))
                                     <div class="flex items-center gap-3">
