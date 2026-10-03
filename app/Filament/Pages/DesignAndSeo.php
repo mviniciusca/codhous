@@ -140,6 +140,11 @@ class DesignAndSeo extends Page implements HasForms
                     ->icon('heroicon-o-bars-3')
                     ->description('Gerencie os links que compõem o menu principal do site.')
                     ->schema([
+                        Toggle::make('settings.website.sticky_menu')
+                            ->label('Menu Fixo (Sticky)')
+                            ->helperText('O menu principal (barra branca com logo e links) ficará fixo no topo ao rolar a página.')
+                            ->default(true)
+                            ->onIcon('heroicon-m-check'),
                         Repeater::make('settings.website.navigation')
                             ->label('Links do Menu')
                             ->helperText('Adicione ou remova itens do menu superior.')
@@ -177,6 +182,12 @@ class DesignAndSeo extends Page implements HasForms
                                     ->label('Ferramenta de Orçamento')
                                     ->helperText('Permite que os clientes solicitem orçamentos online.')
                                     ->onIcon('heroicon-m-check')
+                                    ->inline(false),
+                                Toggle::make('settings.website.features.scroll_to_top')
+                                    ->label('Botão Voltar ao Topo')
+                                    ->helperText('Exibe um botão flutuante para subir a página rapidamente.')
+                                    ->onIcon('heroicon-m-check')
+                                    ->default(true)
                                     ->inline(false),
                             ]),
                     ]),

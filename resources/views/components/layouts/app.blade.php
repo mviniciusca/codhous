@@ -43,6 +43,7 @@
 
     <x-site-footer :theme="$theme" />
     <x-site-whatsapp />
+    <x-site-scroll-to-top />
     <x-site-alerts />
 
     @livewireScripts
