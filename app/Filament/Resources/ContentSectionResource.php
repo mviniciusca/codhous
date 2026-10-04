@@ -664,6 +664,18 @@ class ContentSectionResource extends Resource
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_CALCULATOR)
                     ->collapsible(),
+
+                // Showcase
+                Forms\Components\Section::make('Showcase de Equipamentos')
+                    ->description('Exibe a vitrine dinâmica de equipamentos com busca e filtros.')
+                    ->icon('heroicon-o-view-columns')
+                    ->schema([
+                        Forms\Components\Placeholder::make('info_showcase')
+                            ->label('')
+                            ->content('Esta seção carregará automaticamente os equipamentos cadastrados no menu "Equipamentos". Utilize o bloco "Cabeçalho (opcional)" acima para definir o título (ex: "Equipamentos para cada etapa da sua obra") e a descrição.'),
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_SHOWCASE)
+                    ->collapsible(),
                     
                 // Payment Offer
                 Forms\Components\Section::make('Oferta de Pagamento')

@@ -304,39 +304,50 @@
         @break
 
     @case('showcase')
-        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                @if(!empty($data['title']) || !empty($data['badge']))
-                    <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-                        <div class="max-w-2xl">
-                            @if(!empty($data['badge']))
-                                <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">
-                                    {{ $data['badge'] }}
-                                </span>
-                            @endif
-                            @if(!empty($data['title']))
-                                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                                    {{ $data['title'] }}
-                                </h2>
-                            @endif
-                            @if(!empty($data['description']))
-                                <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
-                                    {{ $data['description'] }}
-                                </p>
-                            @endif
-                        </div>
-                        
-                        @if($isHome)
-                            <a href="/nossas-obras" class="group inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary transition-all hover:gap-3">
-                                Ver todas <i data-lucide="arrow-right" class="h-4 w-4"></i>
-                            </a>
+        @php
+            $headerVisible = $data['header']['visible'] ?? true;
+            $headerAlignment = $data['header']['alignment'] ?? 'center';
+            $alignClass = $headerAlignment === 'left' ? 'text-left mr-auto' : ($headerAlignment === 'right' ? 'text-right ml-auto' : 'text-center mx-auto');
+
+            $showcaseTitle = $data['header']['title'] ?? $data['title'] ?? null;
+            $showcaseSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
+            $showcaseDesc = $data['header']['description'] ?? $data['description'] ?? null;
+            
+            $bgColor = $data['background_color'] ?? 'bg-background';
+            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
+            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
+            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
+            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/10';
+            
+            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
+            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
+        @endphp
+        <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
+            <x-ui.section-background :data="$data" />
+            
+            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
+                @if(!$hideHeader && $headerVisible && (!empty($showcaseTitle) || !empty($showcaseSubtitle)))
+                    <div class="mb-12 max-w-3xl {{ $alignClass }}">
+                        @if(!empty($showcaseSubtitle))
+                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
+                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $showcaseSubtitle }}</span>
+                            </div>
+                        @endif
+                        @if(!empty($showcaseTitle))
+                            <h2 class="font-mono text-3xl font-extrabold tracking-tight text-foreground md:text-5xl drop-shadow-sm mb-4" style="text-wrap: balance;">
+                                {{ $showcaseTitle }}
+                            </h2>
+                        @endif
+                        @if(!empty($showcaseDesc))
+                            <p class="text-lg font-medium leading-relaxed text-muted-foreground {{ $headerAlignment === 'center' ? 'mx-auto' : '' }}" style="text-wrap: balance;">
+                                {{ $showcaseDesc }}
+                            </p>
                         @endif
                     </div>
                 @endif
-                <livewire:showcase-feed 
-                    :limit="$data['limit'] ?? 4" 
-                    :show-pagination="!$isHome"
-                />
+                
+                <livewire:equipment-showcase />
             </div>
         </section>
         @break
