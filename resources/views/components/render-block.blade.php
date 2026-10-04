@@ -302,6 +302,19 @@
             :steps="$data['steps'] ?? []"
         />
         @break
+    @case('commercial_partners')
+        @php
+            $bgColor = $data['background_color'] ?? 'bg-background';
+            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
+            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
+        @endphp
+        <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
+            <x-ui.section-background :data="$data" />
+            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
+                <livewire:commercial-partners :data="$data" />
+            </div>
+        </section>
+        @break
 
     @case('showcase')
         @php

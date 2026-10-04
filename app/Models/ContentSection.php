@@ -27,6 +27,7 @@ class ContentSection extends Model
     public const TYPE_HERO = 'hero';
     public const HERO_LAYOUT_DEFAULT = 'default';
     public const TYPE_PARTNERS = 'partners';
+    public const TYPE_COMMERCIAL_PARTNERS = 'commercial_partners';
     public const TYPE_SERVICES = 'services';
     public const TYPE_FAQ = 'faq';
     public const TYPE_TESTIMONIALS = 'testimonials';
@@ -46,7 +47,8 @@ class ContentSection extends Model
     {
         return [
             self::TYPE_HERO => 'Hero Section',
-            self::TYPE_PARTNERS => 'Parceiros',
+            self::TYPE_PARTNERS => 'Clientes (Logos)',
+            self::TYPE_COMMERCIAL_PARTNERS => 'Parceiros Comerciais',
             self::TYPE_SERVICES => 'Serviços',
             self::TYPE_FAQ => 'FAQ',
             self::TYPE_TESTIMONIALS => 'Depoimentos',
@@ -69,6 +71,7 @@ class ContentSection extends Model
         return match ($type) {
             self::TYPE_HERO => 'hero',
             self::TYPE_PARTNERS => 'partners',
+            self::TYPE_COMMERCIAL_PARTNERS => 'commercial-partners',
             self::TYPE_SERVICES => 'services',
             self::TYPE_FAQ => 'faq',
             self::TYPE_TESTIMONIALS => 'testimonials',

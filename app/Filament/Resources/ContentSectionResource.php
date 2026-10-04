@@ -287,6 +287,33 @@ class ContentSectionResource extends Resource
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_PARTNERS)
                     ->collapsible(),
 
+                // Commercial Partners
+                Forms\Components\Section::make('Parceiros Comerciais (Automático)')
+                    ->description('Exibe os parceiros cadastrados em "Empresa > Parceiros". Você pode personalizar a imagem principal e os tópicos em destaque.')
+                    ->icon('heroicon-o-building-office')
+                    ->schema([
+                        Forms\Components\FileUpload::make('content.main_image')
+                            ->label('Imagem Principal (Direita)')
+                            ->helperText('A imagem que ficará ao lado do texto (ex: aperto de mãos).')
+                            ->image()
+                            ->directory('sections'),
+                        Forms\Components\Repeater::make('content.features')
+                            ->label('Tópicos de Destaque')
+                            ->schema([
+                                Forms\Components\TextInput::make('title')->label('Título')->required(),
+                                Forms\Components\TextInput::make('icon')
+                                    ->label('Ícone (Lucide)')
+                                    ->default('check-circle')
+                                    ->required(),
+                            ])
+                            ->columns(2)
+                            ->grid(2)
+                            ->maxItems(4)
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
+                    ])
+                    ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_COMMERCIAL_PARTNERS)
+                    ->collapsible(),
+
                 // Services
                 Forms\Components\Section::make('Serviços')
                     ->description('Cadastre os serviços oferecidos com seus respectivos detalhes.')
