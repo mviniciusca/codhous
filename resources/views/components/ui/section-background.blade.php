@@ -4,7 +4,9 @@
 
 @php
     $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
-    $bgFit = $data['background_image_fit'] ?? 'cover';
+    $bgFitOption = $data['background_image_fit'] ?? 'cover';
+    $bgScale = $data['background_image_scale'] ?? '50';
+    $bgFit = $bgFitOption === 'custom' ? "{$bgScale}% auto" : $bgFitOption;
     $bgPos = $data['background_image_position'] ?? 'center';
     $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
     $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);

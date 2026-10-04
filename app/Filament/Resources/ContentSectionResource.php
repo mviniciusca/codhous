@@ -835,10 +835,22 @@ class ContentSectionResource extends Resource
                                                         'contain' => 'Conter (Contain)',
                                                         '100% auto' => 'Ajustar Largura (100%)',
                                                         'auto' => 'Original (Auto)',
+                                                        'custom' => 'Personalizado (%)',
                                                     ])
                                                     ->default('cover')
                                                     ->inline()
+                                                    ->live()
                                                     ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image'))),
+                                                Forms\Components\TextInput::make('content.background_image_scale')
+                                                    ->label('Tamanho da Imagem (%)')
+                                                    ->numeric()
+                                                    ->default(50)
+                                                    ->minValue(1)
+                                                    ->maxValue(200)
+                                                    ->step(1)
+                                                    ->suffix('%')
+                                                    ->helperText('Defina o tamanho percentual mantendo a proporção (ex: 50).')
+                                                    ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image')) && $get('content.background_image_fit') === 'custom'),
                                                 Forms\Components\ToggleButtons::make('content.background_image_position')
                                                     ->label('Alinhamento')
                                                     ->options([
