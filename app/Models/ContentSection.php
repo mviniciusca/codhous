@@ -42,6 +42,7 @@ class ContentSection extends Model
     public const TYPE_SIMPLE_BANNER = 'simple_banner';
     public const TYPE_TEAM = 'team';
     public const TYPE_SHOWCASE = 'showcase';
+    public const TYPE_EQUIPMENT_SHOWCASE = 'equipment_showcase';
 
     public static function typeLabels(): array
     {
@@ -62,7 +63,8 @@ class ContentSection extends Model
             self::TYPE_PAYMENT_OFFER => 'Oferta de Pagamento',
             self::TYPE_SIMPLE_BANNER => 'Banner Simples (Imagem e Link)',
             self::TYPE_TEAM => 'Nosso Time',
-            self::TYPE_SHOWCASE => 'Showcase de Equipamentos',
+            self::TYPE_SHOWCASE => 'Galeria de Obras (Showcase)',
+            self::TYPE_EQUIPMENT_SHOWCASE => 'Showcase de Equipamentos',
         ];
     }
 
@@ -86,6 +88,7 @@ class ContentSection extends Model
             self::TYPE_SIMPLE_BANNER => 'simple-banner',
             self::TYPE_TEAM => 'team',
             self::TYPE_SHOWCASE => 'showcase',
+            self::TYPE_EQUIPMENT_SHOWCASE => 'equipment-showcase',
             default => $type,
         };
     }

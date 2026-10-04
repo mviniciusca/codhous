@@ -54,6 +54,7 @@ class PageResource extends Resource
                                 ->blocks([
                                     self::getPageHeaderBlock(),
                                     self::getShowcaseBlock(),
+                                    self::getEquipmentShowcaseBlock(),
                                     self::getMapBlock(),
                                     self::getRichTextBlock(),
                                     self::getPaymentOfferBlock(),
@@ -262,6 +263,20 @@ class PageResource extends Resource
                     Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da galeria.'))->required(),
                     Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo da galeria.'))->columnSpanFull(),
                     Forms\Components\TextInput::make('limit')->numeric()->default(4)->label(__('Limite de itens'))->helperText(__('Quantidade máxima de obras a serem exibidas.')),
+                ])
+            ]);
+    }
+
+    protected static function getEquipmentShowcaseBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('equipment_showcase')
+            ->label(__('Showcase de Equipamentos'))
+            ->icon('heroicon-o-truck')
+            ->schema([
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Ex: EQUIPAMENTOS'))->placeholder('EQUIPAMENTOS'),
+                    Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da vitrine de equipamentos.'))->required(),
+                    Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo.'))->columnSpanFull(),
                 ])
             ]);
     }
