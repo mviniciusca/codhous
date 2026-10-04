@@ -13,7 +13,7 @@
 
     @php
         $websiteSettings = \App\Models\Setting::get('website', []);
-        $primaryColor = data_get($websiteSettings, 'primary_color', '239 68 68');
+        $primaryColor = data_get($websiteSettings, 'primary_color', '249 115 22');
         $theme = data_get($websiteSettings, 'theme', 'default');
     @endphp
     <style>
@@ -45,6 +45,7 @@
     <x-site-whatsapp />
     <x-site-scroll-to-top />
     <x-site-alerts />
+    <x-site-cookie-consent />
 
     @livewireScripts
     @filamentScripts

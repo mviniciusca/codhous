@@ -15,11 +15,11 @@
     $finalDescription = $description ?: $defaultDescription;
     
     $scripts = data_get($website, 'scripts', []);
-    $fontFamily = data_get($scripts, 'google_font_family', 'Inter');
+    $fontFamily = data_get($scripts, 'google_font_family', 'Jost');
     
     // Constrói a URL do Google Fonts dinamicamente
-    $fonts = ['Inter:wght@400;500;600;700'];
-    if ($fontFamily && $fontFamily !== 'Inter') {
+    $fonts = ['Jost:wght@400;500;600;700'];
+    if ($fontFamily && $fontFamily !== 'Jost') {
         $fonts[] = urlencode($fontFamily) . ':wght@400;500;600;700';
     }
     $googleFontsUrl = "https://fonts.googleapis.com/css2?family=" . implode('&family=', $fonts) . "&display=swap";

@@ -93,7 +93,7 @@ class DesignAndSeo extends Page implements HasForms
                                 '113 113 122' => \Filament\Support\Colors\Color::Zinc,
                             ])
                             ->inline()
-                            ->default('239 68 68')
+                            ->default('249 115 22')
                             ->helperText('Escolha a cor principal da identidade visual da sua loja.'),
                     ]),
 

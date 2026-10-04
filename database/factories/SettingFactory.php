@@ -82,6 +82,7 @@ class SettingFactory extends Factory
                 'security' => [
                     'maintenance_mode' => false,
                     'maintenance_message' => 'Estamos realizando algumas melhorias. Voltaremos em instantes!',
+                    'cookie_consent_enabled' => true,
                     'allowed_ips' => [],
                 ],
                 'layout' => [

@@ -28,7 +28,7 @@ class SettingResource extends Resource
 
     public static function getNavigationUrl(): string
     {
-        return Pages\EditCompany::getUrl(['record' => 1]);
+        return Pages\EditCompany::getUrl(['record' => Setting::first()?->id ?? 1]);
     }
 
     public static function form(Form $form): Form

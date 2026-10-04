@@ -26,7 +26,7 @@ class Setting extends Model
     public static function current(): ?self
     {
         if (static::$current_instance === null) {
-            static::$current_instance = static::find(1);
+            static::$current_instance = static::first();
         }
         return static::$current_instance;
     }

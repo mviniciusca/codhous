@@ -43,6 +43,17 @@ class EditSecurity extends EditRecord
                             ->rows(3),
                     ]),
 
+                Section::make('Privacidade (LGPD)')
+                    ->icon('heroicon-o-shield-exclamation')
+                    ->description('Gerencie as configurações de privacidade e consentimento de cookies.')
+                    ->schema([
+                        Toggle::make('settings.security.cookie_consent_enabled')
+                            ->label('Aviso de Cookies')
+                            ->helperText('Ativa o banner de consentimento de cookies (válido por 7 dias) no site.')
+                            ->default(true)
+                            ->inline(false),
+                    ]),
+
                 Section::make('Cloudflare Turnstile (Anti-Spam)')
                     ->icon('heroicon-o-shield-check')
                     ->description('Proteja seus formulários contra bots de forma invisível.')
