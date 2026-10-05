@@ -214,8 +214,9 @@ class ContentSectionResource extends Resource
                                     Forms\Components\Toggle::make('content.show_action_buttons')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                         ->label('Exibir Botões de Ação')
                                         ->helperText('Habilite para mostrar os botões adicionais no banner.')
-                                        ->default(true),
-                                    Forms\Components\Fieldset::make('Configuração dos Botões')
+                                        ->default(true)
+                                        ->live(),
+                                    Forms\Components\Grid::make(2)
                                         ->schema([
                                             Forms\Components\Group::make([
                                                 Forms\Components\TextInput::make('content.primary_button_text')->label('Texto Botão 1')->helperText('Cor principal (fundo sólido)'),
@@ -243,7 +244,7 @@ class ContentSectionResource extends Resource
                                                     ->label('Nome do Ícone (Botão 1)')
                                                     ->placeholder('ex: arrow-right')
                                                     ->helperText('Busque o nome do ícone em lucide.dev/icons')
-                                                    ->visible(fn ($get) => $get('content.primary_button_icon_select') === 'outro'),
+                                                    ->visible(fn (\Filament\Forms\Get $get) => $get('content.primary_button_icon_select') === 'outro'),
                                             ])->columns(1),
                                             Forms\Components\Group::make([
                                                 Forms\Components\TextInput::make('content.secondary_button_text')->label('Texto Botão 2')->helperText('Cor secundária (fundo transparente com borda)'),
@@ -271,9 +272,10 @@ class ContentSectionResource extends Resource
                                                     ->label('Nome do Ícone (Botão 2)')
                                                     ->placeholder('ex: phone')
                                                     ->helperText('Busque o nome do ícone em lucide.dev/icons')
-                                                    ->visible(fn ($get) => $get('content.secondary_button_icon_select') === 'outro'),
+                                                    ->visible(fn (\Filament\Forms\Get $get) => $get('content.secondary_button_icon_select') === 'outro'),
                                             ])->columns(1),
-                                        ]),
+                                        ])
+                                        ->visible(fn (\Filament\Forms\Get $get) => $get('content.show_action_buttons') === true),
                                 ]),
                                 
                             Forms\Components\Tabs\Tab::make('Estatísticas')
