@@ -20,8 +20,14 @@ class SectionHeroCep extends Component
     /** Texto do badge (ex: Qualidade Certificada) */
     public string $badge = 'Qualidade Certificada';
 
-    /** Layout: default (texto + CEP lado a lado) | whatsapp (destaque central + CEP abaixo) */
+    /** Layout: default (texto + CEP lado a lado) | whatsapp (destaque central + CEP abaixo) | clean */
     public string $layout = 'default';
+
+    public string $alignment = 'center';
+
+    /** Overlay Configs */
+    public bool $overlayEnabled = true;
+    public string $overlayTheme = 'dark';
 
     /** Tema: default, corporate, creative */
     public string $theme = 'default';

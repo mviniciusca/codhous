@@ -44,9 +44,12 @@ class ContentSectionResource extends Resource
                         Forms\Components\Group::make([
                             Forms\Components\Toggle::make('content.header.visible')
                                 ->label('Exibir Cabeçalho')
+                                ->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
+                                ->helperText('Liga ou desliga a exibição do cabeçalho.')
                                 ->default(true),
                             Forms\Components\ToggleButtons::make('content.header.alignment')
                                 ->label('Alinhamento')
+                                ->helperText('Alinhamento do texto no cabeçalho.')
                                 ->options([
                                     'left' => 'Esquerda',
                                     'center' => 'Centro',
@@ -59,7 +62,7 @@ class ContentSectionResource extends Resource
                                 ])
                                 ->inline()
                                 ->default('center'),
-                        ])->columns(2),
+                        ])->columns(2)->columnSpanFull(),
                         Forms\Components\TextInput::make('content.header.subtitle')
                             ->label('Pré-título')
                             ->helperText('Aparece com destaque acima do título.')
@@ -71,9 +74,10 @@ class ContentSectionResource extends Resource
                         Forms\Components\Textarea::make('content.header.description')
                             ->label('Descrição')
                             ->helperText('Texto explicativo ou subtítulo abaixo do título principal.')
-                            ->rows(2),
+                            ->rows(2)
+                            ->columnSpanFull(),
                     ])
-                    ->columns(1)
+                    ->columns(2)
                     ->collapsible(),
 
                 // Hero
@@ -81,147 +85,218 @@ class ContentSectionResource extends Resource
                     ->description('Destaque principal no topo da página.')
                     ->icon('heroicon-o-presentation-chart-line')
                     ->schema([
-                        Forms\Components\Grid::make(2)->schema([
-                            Forms\Components\ToggleButtons::make('content.layout')
-                                ->label('Layout')
-                                ->helperText('Escolha o estilo de exibição.')
-                                ->options([
-                                    'default' => 'Formulário de CEP',
-                                    'whatsapp' => 'Cartão do WhatsApp',
-                                ])->default('default')
-                                ->inline(),
-                            Forms\Components\ToggleButtons::make('content.image_alignment')
-                                ->label('Alinhamento da Imagem / Vídeo')
-                                ->options([
-                                    'center' => 'Centro',
-                                    'top' => 'Topo',
-                                    'bottom' => 'Base',
-                                ])->default('center')
-                                ->inline(),
-                            Forms\Components\FileUpload::make('content.image')
-                                ->label('Imagem de Fundo')
-                                ->helperText('Imagem principal que ficará no fundo da seção.')
-                                ->image()
-                                ->directory('hero'),
-                            Forms\Components\FileUpload::make('content.video')
-                                ->label('Vídeo de Fundo (.mp4)')
-                                ->helperText('Se enviado, será exibido no lugar da imagem de fundo. Recomendado até 15MB.')
-                                ->acceptedFileTypes(['video/mp4'])
-                                ->directory('hero'),
+                        Forms\Components\Tabs::make('HeroTabs')->tabs([
+                            Forms\Components\Tabs\Tab::make('Mídia e Layout')
+                                ->icon('heroicon-o-photo')
+                                ->schema([
+                                    Forms\Components\Grid::make(2)->schema([
+                                        Forms\Components\ToggleButtons::make('content.layout')
+                                            ->label('Layout')
+                                            ->helperText('Escolha o estilo de exibição da seção principal.')
+                                            ->options([
+                                                'default' => 'Busca por CEP',
+                                                'whatsapp' => 'Contato via WhatsApp',
+                                                'clean' => 'Institucional (Minimalista)',
+                                            ])
+                                            ->icons([
+                                                'default' => 'heroicon-o-map-pin',
+                                                'whatsapp' => 'heroicon-o-chat-bubble-left-right',
+                                                'clean' => 'heroicon-o-stop',
+                                            ])
+                                            ->default('default')
+                                            ->inline(),
+                                        Forms\Components\ToggleButtons::make('content.image_alignment')
+                                            ->label('Alinhamento da Imagem / Vídeo')
+                                            ->helperText('Ajuste o foco visual da mídia de fundo.')
+                                            ->options([
+                                                'center' => 'Centro',
+                                                'top' => 'Topo',
+                                                'bottom' => 'Base',
+                                            ])
+                                            ->icons([
+                                                'center' => 'heroicon-o-arrows-pointing-in',
+                                                'top' => 'heroicon-o-arrow-up',
+                                                'bottom' => 'heroicon-o-arrow-down',
+                                            ])
+                                            ->default('center')
+                                            ->inline(),
+                                        Forms\Components\FileUpload::make('content.image')
+                                            ->label('Imagem de Fundo')
+                                            ->helperText('Imagem principal que ficará no fundo da seção.')
+                                            ->image()
+                                            ->directory('hero'),
+                                        Forms\Components\FileUpload::make('content.video')
+                                            ->label('Vídeo de Fundo (.mp4)')
+                                            ->helperText('Se enviado, será exibido no lugar da imagem de fundo. Recomendado até 15MB.')
+                                            ->acceptedFileTypes(['video/mp4'])
+                                            ->directory('hero'),
+                                        Forms\Components\Group::make([
+                                            Forms\Components\Toggle::make('content.overlay_enabled')
+                                                ->label('Ativar Overlay')
+                                                ->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
+                                                ->helperText('Adiciona uma camada sobre a imagem de fundo para melhorar a leitura do texto.')
+                                                ->default(true)
+                                                ->live(),
+                                            Forms\Components\ToggleButtons::make('content.overlay_theme')
+                                                ->label('Tema do Overlay')
+                                                ->helperText('Define se a película protetora será escura ou clara.')
+                                                ->options([
+                                                    'dark' => 'Escuro',
+                                                    'light' => 'Claro',
+                                                ])
+                                                ->icons([
+                                                    'dark' => 'heroicon-o-moon',
+                                                    'light' => 'heroicon-o-sun',
+                                                ])
+                                                ->default('dark')
+                                                ->inline()
+                                                ->visible(fn (\Filament\Forms\Get $get) => $get('content.overlay_enabled')),
+                                        ])->columns(2)->columnSpanFull(),
+                                    ]),
+
+                                ]),
+                                
+                            Forms\Components\Tabs\Tab::make('Slideshow')
+                                ->icon('heroicon-o-rectangle-stack')
+                                ->schema([
+                                    Forms\Components\Toggle::make('content.show_slideshow')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
+                                        ->label('Habilitar Slideshow (Carrossel no fundo)')
+                                        ->helperText('Se ativo, exibirá um carrossel rotativo atrás da Hero em vez da imagem/vídeo fixo.')
+                                        ->default(false)
+                                        ->live(),
+                                    Forms\Components\Repeater::make('content.slideshow')
+                                        ->label('Slides de Fundo')
+                                        ->schema([
+                                            Forms\Components\FileUpload::make('image')
+                                                ->label('Imagem')
+                                                ->helperText('Envie a imagem para o slide.')
+                                                ->image()
+                                                ->directory('hero')
+                                                ->required(),
+                                            Forms\Components\ToggleButtons::make('image_alignment')
+                                                ->label('Alinhamento da Imagem')
+                                                ->helperText('Qual parte da imagem deve ficar em foco.')
+                                                ->options([
+                                                    'center' => 'Centro',
+                                                    'top' => 'Topo',
+                                                    'bottom' => 'Base',
+                                                    'left' => 'Esq.',
+                                                    'right' => 'Dir.',
+                                                ])
+                                                ->icons([
+                                                    'center' => 'heroicon-o-arrows-pointing-in',
+                                                    'top' => 'heroicon-o-arrow-up',
+                                                    'bottom' => 'heroicon-o-arrow-down',
+                                                    'left' => 'heroicon-o-arrow-left',
+                                                    'right' => 'heroicon-o-arrow-right',
+                                                ])
+                                                ->default('center')
+                                                ->inline(),
+                                        ])
+                                        ->columns(2)
+                                        ->collapsible()
+                                        ->cloneable()
+                                        ->maxItems(3)
+                                        ->itemLabel(function (array $state): string {
+                                            $image = $state['image'] ?? null;
+                                            if (is_array($image)) {
+                                                $image = array_values($image)[0] ?? null;
+                                            }
+                                            return $image ? 'Imagem: ' . basename((string) $image) : 'Novo Slide';
+                                        })
+                                        ->addActionLabel('Adicionar Imagem')
+                                        ->visible(fn ($get) => $get('content.show_slideshow')),
+                                ]),
+                                
+                            Forms\Components\Tabs\Tab::make('Botões de Ação')
+                                ->icon('heroicon-o-cursor-arrow-rays')
+                                ->schema([
+                                    Forms\Components\Toggle::make('content.show_action_buttons')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
+                                        ->label('Exibir Botões de Ação')
+                                        ->helperText('Habilite para mostrar os botões adicionais no banner.')
+                                        ->default(true),
+                                    Forms\Components\Fieldset::make('Configuração dos Botões')
+                                        ->schema([
+                                            Forms\Components\Group::make([
+                                                Forms\Components\TextInput::make('content.primary_button_text')->label('Texto Botão 1')->helperText('Cor principal (fundo sólido)'),
+                                                Forms\Components\TextInput::make('content.primary_button_url')->label('Link Botão 1')->helperText('Para onde o botão leva (ex: /#contato)'),
+                                                Forms\Components\ToggleButtons::make('content.primary_button_icon_select')
+                                                    ->label('Ícone rápido')
+                                                    ->helperText('Escolha um ícone predefinido ou defina um personalizado.')
+                                                    ->options([
+                                                        'arrow-right' => 'Seta',
+                                                        'phone' => 'Telefone',
+                                                        'message-circle' => 'WhatsApp',
+                                                        'calculator' => 'Calculadora',
+                                                        'outro' => 'Outro',
+                                                    ])
+                                                    ->icons([
+                                                        'arrow-right' => 'heroicon-o-arrow-right',
+                                                        'phone' => 'heroicon-o-phone',
+                                                        'message-circle' => 'heroicon-o-chat-bubble-oval-left-ellipsis',
+                                                        'calculator' => 'heroicon-o-calculator',
+                                                        'outro' => 'heroicon-o-magnifying-glass',
+                                                    ])
+                                                    ->inline()
+                                                    ->live(),
+                                                Forms\Components\TextInput::make('content.primary_button_icon')
+                                                    ->label('Nome do Ícone (Botão 1)')
+                                                    ->placeholder('ex: arrow-right')
+                                                    ->helperText('Busque o nome do ícone em lucide.dev/icons')
+                                                    ->visible(fn ($get) => $get('content.primary_button_icon_select') === 'outro'),
+                                            ])->columns(1),
+                                            Forms\Components\Group::make([
+                                                Forms\Components\TextInput::make('content.secondary_button_text')->label('Texto Botão 2')->helperText('Cor secundária (fundo transparente com borda)'),
+                                                Forms\Components\TextInput::make('content.secondary_button_url')->label('Link Botão 2')->helperText('Para onde o botão leva (ex: /#servicos)'),
+                                                Forms\Components\ToggleButtons::make('content.secondary_button_icon_select')
+                                                    ->label('Ícone rápido')
+                                                    ->helperText('Escolha um ícone predefinido ou defina um personalizado.')
+                                                    ->options([
+                                                        'arrow-right' => 'Seta',
+                                                        'phone' => 'Telefone',
+                                                        'message-circle' => 'WhatsApp',
+                                                        'calculator' => 'Calculadora',
+                                                        'outro' => 'Outro',
+                                                    ])
+                                                    ->icons([
+                                                        'arrow-right' => 'heroicon-o-arrow-right',
+                                                        'phone' => 'heroicon-o-phone',
+                                                        'message-circle' => 'heroicon-o-chat-bubble-oval-left-ellipsis',
+                                                        'calculator' => 'heroicon-o-calculator',
+                                                        'outro' => 'heroicon-o-magnifying-glass',
+                                                    ])
+                                                    ->inline()
+                                                    ->live(),
+                                                Forms\Components\TextInput::make('content.secondary_button_icon')
+                                                    ->label('Nome do Ícone (Botão 2)')
+                                                    ->placeholder('ex: phone')
+                                                    ->helperText('Busque o nome do ícone em lucide.dev/icons')
+                                                    ->visible(fn ($get) => $get('content.secondary_button_icon_select') === 'outro'),
+                                            ])->columns(1),
+                                        ]),
+                                ]),
+                                
+                            Forms\Components\Tabs\Tab::make('Estatísticas')
+                                ->icon('heroicon-o-chart-bar')
+                                ->schema([
+                                    Forms\Components\Toggle::make('content.show_stats')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
+                                        ->label('Exibir Estatísticas')
+                                        ->helperText('Habilite para exibir o bloco de estatísticas no banner.')
+                                        ->default(true),
+                                    Forms\Components\Repeater::make('content.stats')
+                                        ->label('Estatísticas (Máx. 3)')
+                                        ->helperText('Números importantes em destaque (ex: +500 Projetos).')
+                                        ->schema([
+                                            Forms\Components\TextInput::make('value')->label('Valor')->helperText('Ex: +500')->required(),
+                                            Forms\Components\TextInput::make('label')->label('Rótulo')->helperText('Ex: Projetos Entregues')->required(),
+                                        ])
+                                        ->columns(2)
+                                        ->collapsible()
+                                        ->cloneable()
+                                        ->maxItems(3)
+                                        ->itemLabel(fn (array $state): ?string => trim(($state['value'] ?? '') . ' ' . ($state['label'] ?? '')) ?: null)
+                                ]),
                         ]),
-                        Forms\Components\Toggle::make('content.show_slideshow')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
-                            ->label('Habilitar Slideshow (Carrossel no fundo)')
-                            ->helperText('Se ativo, exibirá um carrossel rotativo atrás da Hero em vez da imagem/vídeo fixo.')
-                            ->default(false)
-                            ->live(),
-                        Forms\Components\Repeater::make('content.slideshow')
-                            ->label('Slides de Fundo')
-                            ->schema([
-                                Forms\Components\FileUpload::make('image')
-                                    ->label('Imagem')
-                                    ->image()
-                                    ->directory('hero')
-                                    ->required(),
-                                Forms\Components\Select::make('image_alignment')
-                                    ->label('Alinhamento da Imagem')
-                                    ->options([
-                                        'center' => 'Centro (Padrão)',
-                                        'top' => 'Topo',
-                                        'bottom' => 'Base',
-                                        'left' => 'Esquerda',
-                                        'right' => 'Direita',
-                                    ])->default('center'),
-                            ])
-                            ->columns(2)
-                            ->collapsible()
-                            ->cloneable()
-                            ->maxItems(3)
-                            ->itemLabel(function (array $state): string {
-                                $image = $state['image'] ?? null;
-                                if (is_array($image)) {
-                                    $image = array_values($image)[0] ?? null;
-                                }
-                                return $image ? 'Imagem: ' . basename((string) $image) : 'Novo Slide';
-                            })
-                            ->addActionLabel('Adicionar Imagem')
-                            ->visible(fn ($get) => $get('content.show_slideshow')),
-                        Forms\Components\Toggle::make('content.show_action_buttons')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
-                            ->label('Exibir Botões de Ação')
-                            ->helperText('Habilite para mostrar os botões adicionais no banner.')
-                            ->default(true),
-                        Forms\Components\Fieldset::make('Botões de Ação')
-                            ->schema([
-                                Forms\Components\Group::make([
-                                    Forms\Components\TextInput::make('content.primary_button_text')->label('Texto Botão 1')->helperText('Cor principal'),
-                                    Forms\Components\TextInput::make('content.primary_button_url')->label('Link Botão 1'),
-                                    Forms\Components\ToggleButtons::make('content.primary_button_icon_select')
-                                        ->label('Ícone rápido')
-                                        ->options([
-                                            'arrow-right' => 'Seta',
-                                            'phone' => 'Telefone',
-                                            'message-circle' => 'WhatsApp',
-                                            'calculator' => 'Calculadora',
-                                            'outro' => 'Outro',
-                                        ])
-                                        ->icons([
-                                            'arrow-right' => 'heroicon-o-arrow-right',
-                                            'phone' => 'heroicon-o-phone',
-                                            'message-circle' => 'heroicon-o-chat-bubble-oval-left-ellipsis',
-                                            'calculator' => 'heroicon-o-calculator',
-                                            'outro' => 'heroicon-o-magnifying-glass',
-                                        ])
-                                        ->inline()
-                                        ->live(),
-                                    Forms\Components\TextInput::make('content.primary_button_icon')
-                                        ->label('Nome do Ícone (Botão 1)')
-                                        ->placeholder('ex: arrow-right')
-                                        ->helperText('Busque o nome do ícone em lucide.dev/icons')
-                                        ->visible(fn ($get) => $get('content.primary_button_icon_select') === 'outro'),
-                                ])->columns(1),
-                                Forms\Components\Group::make([
-                                    Forms\Components\TextInput::make('content.secondary_button_text')->label('Texto Botão 2')->helperText('Borda principal (vazado)'),
-                                    Forms\Components\TextInput::make('content.secondary_button_url')->label('Link Botão 2'),
-                                    Forms\Components\ToggleButtons::make('content.secondary_button_icon_select')
-                                        ->label('Ícone rápido')
-                                        ->options([
-                                            'arrow-right' => 'Seta',
-                                            'phone' => 'Telefone',
-                                            'message-circle' => 'WhatsApp',
-                                            'calculator' => 'Calculadora',
-                                            'outro' => 'Outro',
-                                        ])
-                                        ->icons([
-                                            'arrow-right' => 'heroicon-o-arrow-right',
-                                            'phone' => 'heroicon-o-phone',
-                                            'message-circle' => 'heroicon-o-chat-bubble-oval-left-ellipsis',
-                                            'calculator' => 'heroicon-o-calculator',
-                                            'outro' => 'heroicon-o-magnifying-glass',
-                                        ])
-                                        ->inline()
-                                        ->live(),
-                                    Forms\Components\TextInput::make('content.secondary_button_icon')
-                                        ->label('Nome do Ícone (Botão 2)')
-                                        ->placeholder('ex: phone')
-                                        ->helperText('Busque o nome do ícone em lucide.dev/icons')
-                                        ->visible(fn ($get) => $get('content.secondary_button_icon_select') === 'outro'),
-                                ])->columns(1),
-                            ]),
-                        Forms\Components\Toggle::make('content.show_stats')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
-                            ->label('Exibir Estatísticas')
-                            ->helperText('Habilite para exibir o bloco de estatísticas no banner.')
-                            ->default(true),
-                        Forms\Components\Repeater::make('content.stats')
-                            ->label('Estatísticas')
-                            ->helperText('Números importantes em destaque (ex: +500 Projetos).')
-                            ->schema([
-                                Forms\Components\TextInput::make('value')->label('Valor')->helperText('Ex: +500')->required(),
-                                Forms\Components\TextInput::make('label')->label('Rótulo')->helperText('Ex: Projetos Entregues')->required(),
-                            ])
-                            ->columns(2)
-                            ->collapsible()
-                            ->cloneable()
-                            ->maxItems(3)
-                            ->itemLabel(fn (array $state): ?string => trim(($state['value'] ?? '') . ' ' . ($state['label'] ?? '')) ?: null)
                     ])
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_HERO)
                     ->collapsible(),
@@ -778,9 +853,9 @@ class ContentSectionResource extends Resource
                                             ->required()
                                             ->maxLength(255)
                                             ->helperText('Nome para identificação interna nesta lista.'),
-                                        Forms\Components\Toggle::make('is_active')->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
+                                        Forms\Components\Toggle::make('is_active')
                                             ->label('Ativo')
-                                            ->onIcon('heroicon-m-check')
+                                            ->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                             ->default(true)
                                             ->helperText('Se inativo, a seção não aparece no site e usa o conteúdo estático.'),
                                         Forms\Components\TextInput::make('sort_order')
@@ -797,6 +872,7 @@ class ContentSectionResource extends Resource
                                     ->schema([
                                         Forms\Components\ToggleButtons::make('content.background_color')
                                             ->label('Cor de Fundo')
+                                            ->helperText('Define a cor de fundo preenchida atrás de todo o conteúdo.')
                                             ->inline()
                                             ->options([
                                                 'bg-transparent' => 'Transparente',
@@ -805,18 +881,28 @@ class ContentSectionResource extends Resource
                                                 'bg-foreground text-background' => 'Escuro',
                                                 'bg-primary text-primary-foreground' => 'Cor Principal',
                                             ])
-                                            ->default('bg-transparent')
-                                            ->helperText('Define a cor de fundo preenchida atrás de todo o conteúdo.'),
+                                            ->icons([
+                                                'bg-transparent' => 'heroicon-o-stop',
+                                                'bg-white' => 'heroicon-o-sun',
+                                                'bg-muted/30' => 'heroicon-o-cloud',
+                                                'bg-foreground text-background' => 'heroicon-o-moon',
+                                                'bg-primary text-primary-foreground' => 'heroicon-o-star',
+                                            ])
+                                            ->default('bg-transparent'),
 
                                         Forms\Components\ToggleButtons::make('content.text_color')
                                             ->label('Cor do Texto')
+                                            ->helperText('Ajuste isso para que o texto não "suma" se o fundo for muito escuro.')
                                             ->inline()
                                             ->options([
                                                 'light' => 'Texto Escuro',
                                                 'dark' => 'Texto Claro',
                                             ])
-                                            ->default('light')
-                                            ->helperText('Ajuste isso para que o texto não "suma" se o fundo for muito escuro.'),
+                                            ->icons([
+                                                'light' => 'heroicon-o-pencil',
+                                                'dark' => 'heroicon-o-pencil-square',
+                                            ])
+                                            ->default('light'),
                                             
                                         Forms\Components\Fieldset::make('Fundo com Imagem')
                                             ->schema([
@@ -830,12 +916,20 @@ class ContentSectionResource extends Resource
                                                     ->columnSpanFull(),
                                                 Forms\Components\ToggleButtons::make('content.background_image_fit')
                                                     ->label('Preenchimento')
+                                                    ->helperText('Como a imagem se ajusta no fundo.')
                                                     ->options([
                                                         'cover' => 'Preencher (Cover)',
                                                         'contain' => 'Conter (Contain)',
                                                         '100% auto' => 'Ajustar Largura (100%)',
                                                         'auto' => 'Original (Auto)',
                                                         'custom' => 'Personalizado (%)',
+                                                    ])
+                                                    ->icons([
+                                                        'cover' => 'heroicon-o-arrows-pointing-out',
+                                                        'contain' => 'heroicon-o-arrows-pointing-in',
+                                                        '100% auto' => 'heroicon-o-arrows-right-left',
+                                                        'auto' => 'heroicon-o-photo',
+                                                        'custom' => 'heroicon-o-adjustments-horizontal',
                                                     ])
                                                     ->default('cover')
                                                     ->inline()
@@ -853,12 +947,20 @@ class ContentSectionResource extends Resource
                                                     ->visible(fn (\Filament\Forms\Get $get) => filled($get('content.background_image')) && $get('content.background_image_fit') === 'custom'),
                                                 Forms\Components\ToggleButtons::make('content.background_image_position')
                                                     ->label('Alinhamento')
+                                                    ->helperText('Para onde a imagem será alinhada.')
                                                     ->options([
                                                         'center' => 'Centro',
                                                         'left center' => 'Esquerda',
                                                         'right center' => 'Direita',
                                                         'center top' => 'Topo Centro',
                                                         'center bottom' => 'Base Centro',
+                                                    ])
+                                                    ->icons([
+                                                        'center' => 'heroicon-o-arrows-pointing-in',
+                                                        'left center' => 'heroicon-o-arrow-left',
+                                                        'right center' => 'heroicon-o-arrow-right',
+                                                        'center top' => 'heroicon-o-arrow-up',
+                                                        'center bottom' => 'heroicon-o-arrow-down',
                                                     ])
                                                     ->default('center')
                                                     ->inline()
@@ -893,21 +995,28 @@ class ContentSectionResource extends Resource
                                                     ->columnSpanFull(),
                                                 Forms\Components\Toggle::make('content.background_overlay_enabled')
                                                     ->label('Habilitar Overlay')
+                                                    ->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                                     ->default(false)
                                                     ->live()
                                                     ->columnSpanFull()
                                                     ->helperText('Adiciona uma camada de cor sobre a imagem de fundo para melhorar a legibilidade do texto.'),
                                                 Forms\Components\ToggleButtons::make('content.background_overlay_type')
                                                     ->label('Cor do Overlay')
+                                                    ->helperText('Define o estilo da película.')
                                                     ->options([
                                                         'light' => 'Claro',
                                                         'dark' => 'Escuro',
+                                                    ])
+                                                    ->icons([
+                                                        'light' => 'heroicon-o-sun',
+                                                        'dark' => 'heroicon-o-moon',
                                                     ])
                                                     ->default('dark')
                                                     ->inline()
                                                     ->visible(fn (\Filament\Forms\Get $get) => $get('content.background_overlay_enabled') === true),
                                                 Forms\Components\Select::make('content.background_overlay_opacity')
                                                     ->label('Opacidade do Overlay')
+                                                    ->helperText('Nível de transparência do overlay.')
                                                     ->options([
                                                         '10' => '10%',
                                                         '20' => '20%',

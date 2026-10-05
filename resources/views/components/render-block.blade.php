@@ -68,6 +68,9 @@
             :slideshow="$data['slideshow'] ?? []"
             :badge="$heroBadge"
             :layout="$data['layout'] ?? 'default'"
+            :alignment="$data['header']['alignment'] ?? 'center'"
+            :overlay-enabled="$data['overlay_enabled'] ?? true"
+            :overlay-theme="$data['overlay_theme'] ?? 'dark'"
             :theme="$theme"
             :stats="$data['stats'] ?? []"
         />
