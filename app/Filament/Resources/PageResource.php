@@ -59,6 +59,7 @@ class PageResource extends Resource
                                     self::getRichTextBlock(),
                                     self::getPaymentOfferBlock(),
                                     self::getModuleReferenceBlock(),
+                                    self::getStatsBlock(),
                                 ])
                                 ->collapsible()
                                 ->collapsed()
@@ -382,6 +383,36 @@ class PageResource extends Resource
     }
 
 
+    protected static function getStatsBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('stats')
+            ->label(__('Estatísticas'))
+            ->icon('heroicon-o-chart-bar-square')
+            ->schema([
+                Forms\Components\Repeater::make('items')
+                    ->label(__('Itens (Estatísticas)'))
+                    ->helperText(__('Adicione os números e textos explicativos (ex: 13.800+ Colaboradores). Recomendado até 4 itens.'))
+                    ->schema([
+                        Forms\Components\TextInput::make('value')
+                            ->label(__('Valor (Número)'))
+                            ->placeholder('Ex: 13.800+')
+                            ->required(),
+                        Forms\Components\TextInput::make('label')
+                            ->label(__('Rótulo (Texto)'))
+                            ->placeholder('Ex: Colaboradores')
+                            ->required(),
+                        Forms\Components\TextInput::make('icon')
+                            ->label(__('Ícone (Lucide)'))
+                            ->default('users')
+                            ->helperText('Busque em lucide.dev/icons'),
+                    ])
+                    ->columns(3)
+                    ->cloneable()
+                    ->collapsible()
+                    ->maxItems(4)
+                    ->defaultItems(4),
+            ]);
+    }
 
     protected static function getMapBlock(): Forms\Components\Builder\Block
     {

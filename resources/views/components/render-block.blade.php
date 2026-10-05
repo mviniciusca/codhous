@@ -24,6 +24,32 @@
         />
         @break
 
+    @case('stats')
+        @if(!empty($data['items']))
+            <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20 -mt-12 sm:-mt-16 mb-12">
+                <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ min(count($data['items']), 4) }} gap-8 lg:gap-12 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+                        @foreach($data['items'] as $index => $stat)
+                            <div class="flex items-center gap-6 {{ $index > 0 ? 'pt-8 sm:pt-0 sm:pl-8 lg:pl-12' : '' }}">
+                                <div class="flex-shrink-0 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <i data-lucide="{{ $stat['icon'] ?? 'check-circle' }}" class="w-8 h-8"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">
+                                        {{ $stat['value'] ?? '' }}
+                                    </h3>
+                                    <p class="text-sm md:text-base text-gray-500 font-medium mt-1">
+                                        {{ $stat['label'] ?? '' }}
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+        @break
+
     @case('hero')
         @php
             $heroBadge = $data['header']['subtitle'] ?? $data['badge'] ?? '';
