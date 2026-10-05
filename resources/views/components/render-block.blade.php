@@ -981,6 +981,48 @@
         />
         @break
 
+    @case('cards')
+        @php
+            $columns = $data['columns'] ?? '3';
+            $gridClass = match($columns) {
+                '2' => 'md:grid-cols-2',
+                '4' => 'md:grid-cols-2 lg:grid-cols-4',
+                default => 'md:grid-cols-3',
+            };
+        @endphp
+        <section class="py-16 lg:py-24 bg-background">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                @if(!empty($data['badge']) || !empty($data['title']) || !empty($data['description']))
+                <div class="mb-12 text-center max-w-3xl mx-auto">
+                    @if(!empty($data['badge']))
+                    <span class="mb-3 block font-mono text-sm font-bold uppercase tracking-wider text-primary">{{ $data['badge'] }}</span>
+                    @endif
+                    @if(!empty($data['title']))
+                    <h2 class="mb-4 font-mono text-3xl font-extrabold text-foreground md:text-5xl" style="text-wrap: balance;">{{ $data['title'] }}</h2>
+                    @endif
+                    @if(!empty($data['description']))
+                    <p class="text-lg font-medium text-muted-foreground leading-relaxed" style="text-wrap: balance;">{{ $data['description'] }}</p>
+                    @endif
+                </div>
+                @endif
+                
+                <div class="grid gap-6 {{ $gridClass }}">
+                    @foreach($data['items'] ?? [] as $item)
+                        <div class="group relative overflow-hidden rounded-2xl border bg-card p-8 shadow-sm transition-all hover:shadow-md hover:border-primary/50 flex flex-col items-center text-center">
+                            <div class="absolute right-0 top-0 -mr-8 -mt-8 h-32 w-32 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-150"></div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
+                                    <i data-lucide="{{ $item['icon'] ?? 'star' }}" class="h-8 w-8"></i>
+                                </div>
+                                <h3 class="mb-3 font-mono text-xl font-bold text-foreground">{{ $item['title'] ?? '' }}</h3>
+                                <p class="text-muted-foreground leading-relaxed">{{ $item['description'] ?? '' }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @break
 
     @case('simple_banner')
         @php

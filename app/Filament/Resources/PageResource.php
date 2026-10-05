@@ -63,6 +63,7 @@ class PageResource extends Resource
                                     self::getImageWithTextBlock(),
                                     self::getDataTableBlock(),
                                     self::getFeaturedTestimonialBlock(),
+                                    self::getCardsBlock(),
                                 ])
                                 ->collapsible()
                                 ->collapsed()
@@ -467,6 +468,34 @@ class PageResource extends Resource
                     ->columns(4)
                     ->cloneable()
                     ->collapsible(),
+            ]);
+    }
+
+    protected static function getCardsBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('cards')
+            ->label(__('Cards (Missão, Visão, Valores)'))
+            ->icon('heroicon-o-square-3-stack-3d')
+            ->schema([
+                Forms\Components\TextInput::make('badge')->label(__('Badge / Subtítulo'))->helperText(__('Ex: NOSSOS PILARES')),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Ex: O que nos move')),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->rows(3),
+                Forms\Components\ToggleButtons::make('columns')
+                    ->label(__('Colunas'))
+                    ->options([
+                        '2' => '2 Colunas',
+                        '3' => '3 Colunas',
+                        '4' => '4 Colunas',
+                    ])
+                    ->inline()
+                    ->default('3'),
+                Forms\Components\Repeater::make('items')
+                    ->label(__('Cards'))
+                    ->schema([
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone (Lucide)'))->default('check-circle'),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->rows(3)->required(),
+                    ])->columns(2)->defaultItems(3)->cloneable()->collapsible(),
             ]);
     }
 
