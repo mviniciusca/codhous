@@ -29,12 +29,68 @@ class ContentSectionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Tabs::make('Tabs')
-                    ->persistTabInQueryString()
-                    ->tabs([
-                        Forms\Components\Tabs\Tab::make('Conteúdo Principal')
-                            ->icon('heroicon-o-document-text')
-                            ->schema([
+                Forms\Components\Wizard::make([
+                    Forms\Components\Wizard\Step::make('1. Tipo da Seção')
+                        ->icon('heroicon-o-squares-2x2')
+                        ->description('Escolha o formato e a função da seção.')
+                        ->schema([
+                            Forms\Components\Section::make('Identificação')
+                                ->description('Informações básicas de identificação e configuração da seção no sistema.')
+                                ->icon('heroicon-o-identification')
+                                ->schema([
+                                        Forms\Components\ToggleButtons::make('type')
+                                            ->icons([
+                                                ContentSection::TYPE_HERO => 'heroicon-o-star',
+                                                ContentSection::TYPE_PARTNERS => 'heroicon-o-building-office',
+                                                ContentSection::TYPE_COMMERCIAL_PARTNERS => 'heroicon-o-briefcase',
+                                                ContentSection::TYPE_SERVICES => 'heroicon-o-wrench-screwdriver',
+                                                ContentSection::TYPE_FAQ => 'heroicon-o-question-mark-circle',
+                                                ContentSection::TYPE_TESTIMONIALS => 'heroicon-o-chat-bubble-left-right',
+                                                ContentSection::TYPE_COVERAGE => 'heroicon-o-map',
+                                                ContentSection::TYPE_DIFFERENTIALS => 'heroicon-o-sparkles',
+                                                ContentSection::TYPE_TIMELINE => 'heroicon-o-clock',
+                                                ContentSection::TYPE_CTA_CONTACT => 'heroicon-o-phone',
+                                                ContentSection::TYPE_CONTACT_BANNER => 'heroicon-o-megaphone',
+                                                ContentSection::TYPE_BUDGET_FORM => 'heroicon-o-currency-dollar',
+                                                ContentSection::TYPE_CALCULATOR => 'heroicon-o-calculator',
+                                                ContentSection::TYPE_PAYMENT_OFFER => 'heroicon-o-credit-card',
+                                                ContentSection::TYPE_SIMPLE_BANNER => 'heroicon-o-photo',
+                                                ContentSection::TYPE_TEAM => 'heroicon-o-users',
+                                                ContentSection::TYPE_SHOWCASE => 'heroicon-o-camera',
+                                                ContentSection::TYPE_EQUIPMENT_SHOWCASE => 'heroicon-o-truck',
+                                            ])
+                                            ->inline()
+                                            ->columnSpanFull()
+                                            ->label('Tipo da seção')
+                                            ->options(ContentSection::typeLabels())
+                                            ->required()
+                                            ->disabled(fn (string $operation): bool => $operation === 'edit')
+                                            ->helperText('Define os campos de conteúdo disponíveis. Não pode ser alterado depois de criado.')
+                                            ->live()
+                                            ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
+                                                if ($state) {
+                                                    $set('slug', ContentSection::slugForType($state));
+                                                    $set('name', ContentSection::typeLabels()[$state] ?? $state);
+                                                }
+                                            }),
+                                        Forms\Components\TextInput::make('slug')
+                                            ->label('Slug (identificador único)')
+                                            ->required()
+                                            ->disabled(fn (string $operation): bool => $operation === 'edit')
+                                            ->unique(ignoreRecord: true)
+                                            ->maxLength(255)
+                                            ->helperText('Identificador no sistema. Não editável após criação.'),
+                                        Forms\Components\TextInput::make('name')
+                                            ->label('Nome (admin)')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->helperText('Nome para identificação interna nesta lista.'),
+                                        ])->columns(2),
+                        ]),
+                    Forms\Components\Wizard\Step::make('2. Conteúdo Principal')
+                        ->icon('heroicon-o-document-text')
+                        ->description('Preencha os textos, imagens e dados da seção.')
+                        ->schema([
 
 
                 Forms\Components\Section::make('Cabeçalho (opcional)')
@@ -822,40 +878,14 @@ class ContentSectionResource extends Resource
                     ->visible(fn ($get): bool => $get('type') === ContentSection::TYPE_SIMPLE_BANNER)
                     ->collapsible(),
                             ]),
-
-                        Forms\Components\Tabs\Tab::make('Configurações')
-                            ->icon('heroicon-o-cog-6-tooth')
-                            ->schema([
-                                Forms\Components\Section::make('Identificação')
-                                    ->description('Informações básicas de identificação e configuração da seção no sistema.')
-                                    ->icon('heroicon-o-identification')
-                                    ->schema([
-                                        Forms\Components\Select::make('type')
-                                            ->label('Tipo da seção')
-                                            ->options(ContentSection::typeLabels())
-                                            ->required()
-                                            ->disabled(fn (string $operation): bool => $operation === 'edit')
-                                            ->helperText('Define os campos de conteúdo disponíveis. Não pode ser alterado depois de criado.')
-                                            ->live()
-                                            ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
-                                                if ($state) {
-                                                    $set('slug', ContentSection::slugForType($state));
-                                                    $set('name', ContentSection::typeLabels()[$state] ?? $state);
-                                                }
-                                            }),
-                                        Forms\Components\TextInput::make('slug')
-                                            ->label('Slug (identificador único)')
-                                            ->required()
-                                            ->disabled(fn (string $operation): bool => $operation === 'edit')
-                                            ->unique(ignoreRecord: true)
-                                            ->maxLength(255)
-                                            ->helperText('Identificador no sistema. Não editável após criação.'),
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Nome (admin)')
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->helperText('Nome para identificação interna nesta lista.'),
-                                        Forms\Components\Toggle::make('is_active')
+                    Forms\Components\Wizard\Step::make('3. Aparência e Publicação')
+                        ->icon('heroicon-o-sparkles')
+                        ->description('Ajuste o visual geral e publique sua seção.')
+                        ->schema([
+                            Forms\Components\Section::make('Publicação')
+                                ->icon('heroicon-o-globe-alt')
+                                ->schema([
+                                    Forms\Components\Toggle::make('is_active')
                                             ->label('Ativo')
                                             ->onIcon('heroicon-m-check')->offIcon('heroicon-m-x-mark')
                                             ->default(true)
@@ -865,13 +895,12 @@ class ContentSectionResource extends Resource
                                             ->numeric()
                                             ->helperText('Ordem na listagem.')
                                             ->minValue(0),
-                                    ])
-                                    ->columns(2),
-
-                                Forms\Components\Section::make('Aparência Global')
-                                    ->description('Configurações visuais gerais aplicadas a esta seção.')
-                                    ->icon('heroicon-o-swatch')
-                                    ->schema([
+                                    
+                                ])->columns(2),
+                            Forms\Components\Section::make('Aparência Global')
+                                ->description('Configurações visuais gerais aplicadas a esta seção.')
+                                ->icon('heroicon-o-swatch')
+                                ->schema([
                                         Forms\Components\ToggleButtons::make('content.background_color')
                                             ->label('Cor de Fundo')
                                             ->helperText('Define a cor de fundo preenchida atrás de todo o conteúdo.')
@@ -1035,9 +1064,8 @@ class ContentSectionResource extends Resource
                                             ])
                                             ->columns(3),
                                     ])->columns(2),
-                            ]),
-                    ])
-                    ->columnSpanFull(),
+                        ]),
+                ])->skippable()->columnSpanFull(),
             ]);
     }
 

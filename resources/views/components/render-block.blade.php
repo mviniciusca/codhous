@@ -50,6 +50,139 @@
         @endif
         @break
 
+    @case('image_with_text')
+        <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+            <div class="flex flex-col {{ ($data['image_position'] ?? 'left') === 'right' ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
+                <div class="w-full lg:w-1/2">
+                    @if(!empty($data['image']))
+                        <div class="rounded-3xl overflow-hidden shadow-2xl relative">
+                            <img src="{{ Storage::url($data['image']) }}" alt="{{ $data['title'] ?? '' }}" class="w-full h-auto object-cover aspect-square md:aspect-[4/3] lg:aspect-[3/4]">
+                        </div>
+                    @endif
+                </div>
+                <div class="w-full lg:w-1/2">
+                    @if(!empty($data['badge']))
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold tracking-wider text-xs uppercase mb-6">
+                            <i data-lucide="circle" class="w-2 h-2 fill-current"></i> {{ $data['badge'] }}
+                        </div>
+                    @endif
+                    
+                    @if(!empty($data['title']))
+                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight mb-6">
+                            {{ $data['title'] }}
+                        </h2>
+                    @endif
+                    
+                    @if(!empty($data['description']))
+                        <div class="prose prose-lg text-gray-600 mb-8">
+                            {!! nl2br(e($data['description'])) !!}
+                        </div>
+                    @endif
+                    
+                    @if(!empty($data['button_text']) && !empty($data['button_url']))
+                        <a href="{{ $data['button_url'] }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary rounded-xl hover:bg-primary/90 transition-colors duration-200">
+                            {{ $data['button_text'] }}
+                            <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @break
+
+    @case('data_table')
+        <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-8 border-b border-gray-100 flex items-center justify-between">
+                    @if(!empty($data['title']))
+                        <h3 class="text-xl font-bold text-gray-900">{{ $data['title'] }}</h3>
+                    @endif
+                    @if(!empty($data['badge']))
+                        <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-semibold uppercase tracking-wider">{{ $data['badge'] }}</span>
+                    @endif
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50/50">
+                                <th class="px-6 py-4 text-sm font-semibold text-gray-500 border-b border-gray-100">Projeto</th>
+                                <th class="px-6 py-4 text-sm font-semibold text-gray-500 border-b border-gray-100">Local</th>
+                                <th class="px-6 py-4 text-sm font-semibold text-gray-500 border-b border-gray-100">Status</th>
+                                <th class="px-6 py-4 text-sm font-semibold text-gray-500 border-b border-gray-100">Prazo</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($data['rows'] ?? [] as $row)
+                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $row['col1'] ?? '' }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">{{ $row['col2'] ?? '' }}</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        @php
+                                            $statusColors = [
+                                                'success' => 'bg-green-100 text-green-700',
+                                                'warning' => 'bg-amber-100 text-amber-700',
+                                                'danger' => 'bg-red-100 text-red-700',
+                                                'info' => 'bg-blue-100 text-blue-700',
+                                            ];
+                                            $statusLabels = [
+                                                'success' => 'Concluído',
+                                                'warning' => 'Em andamento',
+                                                'danger' => 'Atrasado',
+                                                'info' => 'Planejamento',
+                                            ];
+                                            $status = $row['col3'] ?? 'success';
+                                            $colorClass = $statusColors[$status] ?? $statusColors['success'];
+                                            $label = $statusLabels[$status] ?? $statusLabels['success'];
+                                        @endphp
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium {{ $colorClass }}">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                                            {{ $label }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">{{ $row['col4'] ?? '' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @break
+
+    @case('featured_testimonial')
+        <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="relative rounded-3xl overflow-hidden bg-gray-900 text-white shadow-2xl">
+                @if(!empty($data['background_image']))
+                    <div class="absolute inset-0">
+                        <img src="{{ Storage::url($data['background_image']) }}" alt="" class="w-full h-full object-cover opacity-40 mix-blend-overlay">
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent"></div>
+                @endif
+                <div class="relative px-8 py-16 md:px-16 md:py-20 lg:p-24">
+                    <div class="flex flex-col md:flex-row gap-12 items-center md:items-start justify-between">
+                        <div class="max-w-2xl">
+                            <i data-lucide="quote" class="w-12 h-12 text-primary opacity-50 mb-8"></i>
+                            <blockquote class="text-2xl md:text-3xl font-medium leading-relaxed mb-8">
+                                "{{ $data['quote'] ?? '' }}"
+                            </blockquote>
+                            <div class="flex items-center gap-4">
+                                @if(!empty($data['author_image']))
+                                    <img src="{{ Storage::url($data['author_image']) }}" alt="{{ $data['author'] ?? '' }}" class="w-14 h-14 rounded-full object-cover border-2 border-primary">
+                                @endif
+                                <div>
+                                    <div class="font-bold text-lg">{{ $data['author'] ?? '' }}</div>
+                                    @if(!empty($data['role']))
+                                        <div class="text-gray-400 text-sm">{{ $data['role'] }}</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @break
+
     @case('hero')
         @php
             $heroBadge = $data['header']['subtitle'] ?? $data['badge'] ?? '';

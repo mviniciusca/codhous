@@ -60,6 +60,9 @@ class PageResource extends Resource
                                     self::getPaymentOfferBlock(),
                                     self::getModuleReferenceBlock(),
                                     self::getStatsBlock(),
+                                    self::getImageWithTextBlock(),
+                                    self::getDataTableBlock(),
+                                    self::getFeaturedTestimonialBlock(),
                                 ])
                                 ->collapsible()
                                 ->collapsed()
@@ -411,6 +414,75 @@ class PageResource extends Resource
                     ->collapsible()
                     ->maxItems(4)
                     ->defaultItems(4),
+            ]);
+    }
+
+    protected static function getImageWithTextBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('image_with_text')
+            ->label(__('Seção de Imagem + Texto'))
+            ->icon('heroicon-o-photo')
+            ->schema([
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\Group::make([
+                        Forms\Components\TextInput::make('badge')->label(__('Badge (Sobre nós)'))->placeholder('Ex: SOBRE NÓS'),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->rows(4),
+                        Forms\Components\TextInput::make('button_text')->label(__('Texto do Botão')),
+                        Forms\Components\TextInput::make('button_url')->label(__('Link do Botão')),
+                    ])->columns(1),
+                    Forms\Components\Group::make([
+                        Forms\Components\FileUpload::make('image')->label(__('Imagem'))->image()->directory('blocks')->required(),
+                        Forms\Components\ToggleButtons::make('image_position')->label(__('Posição da Imagem'))
+                            ->options(['left' => 'Esquerda', 'right' => 'Direita'])
+                            ->default('left')
+                            ->inline(),
+                    ])->columns(1),
+                ]),
+            ]);
+    }
+
+    protected static function getDataTableBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('data_table')
+            ->label(__('Tabela / Dados'))
+            ->icon('heroicon-o-table-cells')
+            ->schema([
+                Forms\Components\TextInput::make('title')->label(__('Título da Tabela')),
+                Forms\Components\TextInput::make('badge')->label(__('Badge superior')),
+                Forms\Components\Repeater::make('rows')
+                    ->label(__('Linhas de Dados'))
+                    ->schema([
+                        Forms\Components\TextInput::make('col1')->label(__('Projeto (Coluna 1)'))->required(),
+                        Forms\Components\TextInput::make('col2')->label(__('Local (Coluna 2)'))->required(),
+                        Forms\Components\Select::make('col3')->label(__('Status (Coluna 3)'))
+                            ->options([
+                                'success' => 'Concluído',
+                                'warning' => 'Em andamento',
+                                'danger' => 'Atrasado',
+                                'info' => 'Planejamento',
+                            ])->default('success'),
+                        Forms\Components\TextInput::make('col4')->label(__('Prazo (Coluna 4)'))->required(),
+                    ])
+                    ->columns(4)
+                    ->cloneable()
+                    ->collapsible(),
+            ]);
+    }
+
+    protected static function getFeaturedTestimonialBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('featured_testimonial')
+            ->label(__('Depoimento em Destaque'))
+            ->icon('heroicon-o-chat-bubble-bottom-center-text')
+            ->schema([
+                Forms\Components\Textarea::make('quote')->label(__('Depoimento (Citação)'))->required()->rows(3),
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('author')->label(__('Nome do Autor'))->required(),
+                    Forms\Components\TextInput::make('role')->label(__('Cargo / Empresa')),
+                    Forms\Components\FileUpload::make('author_image')->label(__('Foto do Autor'))->image()->avatar()->directory('testimonials'),
+                    Forms\Components\FileUpload::make('background_image')->label(__('Imagem de Fundo (Opcional)'))->image()->directory('blocks'),
+                ]),
             ]);
     }
 
