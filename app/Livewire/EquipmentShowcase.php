@@ -25,21 +25,30 @@ class EquipmentShowcase extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+        $this->dispatch('scroll-to-equipment');
     }
 
     public function updatingCategory()
     {
         $this->resetPage();
+        $this->dispatch('scroll-to-equipment');
     }
 
     public function updatingAvailability()
     {
         $this->resetPage();
+        $this->dispatch('scroll-to-equipment');
     }
 
     public function updatingSort()
     {
         $this->resetPage();
+        $this->dispatch('scroll-to-equipment');
+    }
+
+    public function updatingPage()
+    {
+        $this->dispatch('scroll-to-equipment');
     }
 
     public function render()
@@ -72,7 +81,7 @@ class EquipmentShowcase extends Component
         $categories = Equipment::select('category')->distinct()->whereNotNull('category')->pluck('category');
 
         return view('livewire.equipment-showcase', [
-            'equipments' => $query->paginate(12),
+            'equipments' => $query->paginate(12)->fragment('locacao-equipamentos'),
             'categories' => $categories,
         ]);
     }

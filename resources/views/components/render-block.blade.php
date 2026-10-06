@@ -354,22 +354,19 @@
                 @if($useSlider)
                     <div class="relative w-full">
                         <div class="swiper {{ $sliderId }} w-full pb-16">
-                            <div class="swiper-wrapper">
+                            <div class="swiper-wrapper items-stretch">
                 @else
                     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @endif
 
                     @foreach($displayItems as $index => $service)
-                        @if($useSlider) <div class="swiper-slide h-auto"> @endif
+                        @if($useSlider) <div class="swiper-slide !h-auto flex"> @endif
                         
-                        <div class="flex h-full flex-col rounded-[24px] bg-card border border-border/40 p-8 shadow-sm transition-all hover:shadow-md hover:border-primary/20">
+                        <div class="flex w-full h-full flex-col rounded-[24px] bg-card border border-border/40 p-8 shadow-sm transition-all hover:shadow-md hover:border-primary/20">
                             <div class="flex items-start justify-between mb-8">
                                 <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                                     <i data-lucide="{{ $service['icon'] ?? 'droplets' }}" class="h-6 w-6"></i>
                                 </div>
-                                <span class="font-mono text-sm font-medium text-muted-foreground/30">
-                                    {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
-                                </span>
                             </div>
                             
                             @if(!empty($service['subtitle']))
