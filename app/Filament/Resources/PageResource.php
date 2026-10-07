@@ -69,7 +69,8 @@ class PageResource extends Resource
                                 ->collapsed()
                                 ->cloneable()
                                 ->blockPickerColumns(2)
-                                ->blockNumbers(false),
+                                ->blockNumbers(false)
+                                ->blockPreviews(),
                         ]),
 
                     Forms\Components\Wizard\Step::make('Configurações e SEO')
@@ -203,12 +204,57 @@ class PageResource extends Resource
 
     // Block Definitions
 
+    protected static function getBlockTabs(array $contentSchema, array $styleSchema = [], array $advancedSchema = []): array
+    {
+        return [
+            \Filament\Forms\Components\Tabs::make('Tabs')
+                ->tabs([
+                    \Filament\Forms\Components\Tabs\Tab::make('Conteúdo')
+                        ->icon('heroicon-o-document-text')
+                        ->schema($contentSchema),
+                    \Filament\Forms\Components\Tabs\Tab::make('Estilo')
+                        ->icon('heroicon-o-paint-brush')
+                        ->schema(array_merge([
+                            \Filament\Forms\Components\Select::make('background_color')
+                                ->label(__('Cor de Fundo'))
+                                ->options([
+                                    'bg-white' => 'Branco',
+                                    'bg-background' => 'Padrão (Fundo do site)',
+                                    'bg-muted/30' => 'Cinza Claro',
+                                    'bg-primary' => 'Cor Primária (Destaque)',
+                                    'bg-foreground' => 'Escuro (Contraste)',
+                                ])
+                                ->default('bg-white'),
+                            \Filament\Forms\Components\Select::make('text_color')
+                                ->label(__('Esquema de Cores (Texto)'))
+                                ->options([
+                                    'light' => 'Claro (Texto Escuro)',
+                                    'dark' => 'Escuro (Texto Branco)',
+                                ])
+                                ->default('light'),
+                        ], $styleSchema)),
+                    \Filament\Forms\Components\Tabs\Tab::make('Avançado')
+                        ->icon('heroicon-o-cog-8-tooth')
+                        ->schema(array_merge([
+                            \Filament\Forms\Components\TextInput::make('custom_id')
+                                ->label(__('ID da Seção (HTML)'))
+                                ->helperText(__('Útil para links âncora. Ex: sobre-nos')),
+                            \Filament\Forms\Components\TextInput::make('custom_css_classes')
+                                ->label(__('Classes CSS Extras'))
+                                ->helperText(__('Para desenvolvedores. Ex: pb-0 pt-32')),
+                        ], $advancedSchema)),
+                ])
+                ->contained(false)
+        ];
+    }
+
     protected static function getPartnersBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('partners')
+            ->preview('filament.block-previews.partners')
             ->label(__('Parceiros'))
             ->icon('heroicon-o-building-office')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de parceiros.')),
                 Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto sobre a parceria.')),
                 Forms\Components\Repeater::make('items')
@@ -218,15 +264,16 @@ class PageResource extends Resource
                         Forms\Components\TextInput::make('name')->label(__('Nome'))->helperText(__('Nome da empresa parceira.'))->required(),
                         Forms\Components\TextInput::make('icon')->label(__('Ícone (Lucide)'))->helperText(__('Nome do ícone Lucide, se houver.')),
                     ])->columns(2),
-            ]);
+            ]));
     }
 
     protected static function getServicesBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('services')
+            ->preview('filament.block-previews.services')
             ->label(__('Serviços'))
             ->icon('heroicon-o-wrench-screwdriver')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da área de serviços.')),
                 Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Descrição geral sobre os serviços oferecidos.')),
                 Forms\Components\Repeater::make('items')
@@ -240,15 +287,16 @@ class PageResource extends Resource
                         Forms\Components\TextInput::make('cta_label')->label(__('Rótulo do Botão (CTA)'))->helperText(__('Texto do botão de ação do serviço.')),
                         Forms\Components\TextInput::make('cta_url')->label(__('URL do Botão (CTA)'))->helperText(__('Link para a página do serviço.')),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getTimelineBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('timeline')
+            ->preview('filament.block-previews.timeline')
             ->label(__('Linha do Tempo (Etapas)'))
             ->icon('heroicon-o-clock')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título para a linha do tempo.')),
                 Forms\Components\Repeater::make('steps')
                     ->label(__('Etapas'))
@@ -259,44 +307,47 @@ class PageResource extends Resource
                         Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Explicação da etapa.')),
                         Forms\Components\TextInput::make('icon')->label(__('Ícone'))->helperText(__('Ícone representativo da etapa.')),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getShowcaseBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('showcase')
+            ->preview('filament.block-previews.showcase')
             ->label(__('Galeria de Obras (Showcase)'))
             ->icon('heroicon-o-camera')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(2)->schema([
                     Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Ex: NOSSAS OBRAS'))->placeholder('NOSSAS OBRAS'),
                     Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da galeria.'))->required(),
                     Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo da galeria.'))->columnSpanFull(),
                     Forms\Components\TextInput::make('limit')->numeric()->default(4)->label(__('Limite de itens'))->helperText(__('Quantidade máxima de obras a serem exibidas.')),
                 ])
-            ]);
+            ]));
     }
 
     protected static function getEquipmentShowcaseBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('equipment_showcase')
+            ->preview('filament.block-previews.equipment_showcase')
             ->label(__('Showcase de Equipamentos'))
             ->icon('heroicon-o-truck')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(2)->schema([
                     Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Ex: EQUIPAMENTOS'))->placeholder('EQUIPAMENTOS'),
                     Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da vitrine de equipamentos.'))->required(),
                     Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo.'))->columnSpanFull(),
                 ])
-            ]);
+            ]));
     }
 
     protected static function getFaqBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('faq')
+            ->preview('filament.block-previews.faq')
             ->label(__('FAQ (Perguntas Frequentes)'))
             ->icon('heroicon-o-question-mark-circle')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de perguntas frequentes.')),
                 Forms\Components\Repeater::make('items')
                     ->label(__('Perguntas'))
@@ -305,15 +356,16 @@ class PageResource extends Resource
                         Forms\Components\TextInput::make('question')->label(__('Pergunta'))->helperText(__('A dúvida frequente.'))->required(),
                         Forms\Components\Textarea::make('answer')->label(__('Resposta'))->helperText(__('A resposta para a dúvida.'))->required(),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getTestimonialsBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('testimonials')
+            ->preview('filament.block-previews.testimonials')
             ->label(__('Depoimentos'))
             ->icon('heroicon-o-chat-bubble-bottom-center-text')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de depoimentos.')),
                 Forms\Components\Repeater::make('items')
                     ->label(__('Depoimentos'))
@@ -324,43 +376,46 @@ class PageResource extends Resource
                         Forms\Components\TextInput::make('author_role')->label(__('Cargo / Empresa'))->helperText(__('Cargo ou empresa do autor.')),
                         Forms\Components\TextInput::make('stars')->label(__('Estrelas'))->helperText(__('Quantidade de estrelas (ex: 5).'))->numeric()->default(5),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getCoverageBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('coverage')
+            ->preview('filament.block-previews.coverage')
             ->label(__('Área de Atendimento'))
             ->icon('heroicon-o-map-pin')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de área de cobertura.')),
                 Forms\Components\Select::make('cities')
                     ->label(__('Cidades Atendidas'))
                     ->multiple()
                     ->options(\App\Models\OperationArea::query()->where('is_active', true)->pluck('city', 'city'))
                     ->helperText(__('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.')),
-            ]);
+            ]));
     }
 
     protected static function getCtaBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('cta')
+            ->preview('filament.block-previews.cta')
             ->label(__('Chamada para Ação (CTA)'))
             ->icon('heroicon-o-megaphone')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da chamada principal.')),
                 Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto de apoio da chamada.')),
                 Forms\Components\TextInput::make('button_label')->label(__('Rótulo do Botão'))->helperText(__('Texto do botão de ação.')),
                 Forms\Components\TextInput::make('button_url')->label(__('URL do Botão'))->helperText(__('Link para onde o botão deve levar.')),
-            ]);
+            ]));
     }
 
     protected static function getDifferentialsBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('differentials')
+            ->preview('filament.block-previews.differentials')
             ->label(__('Diferenciais (Pilar / Missão / Visão)'))
             ->icon('heroicon-o-shield-check')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto pequeno acima do título.')),
                 Forms\Components\TextInput::make('title')->label(__('Título Principal'))->helperText(__('Título de destaque da seção.')),
                 Forms\Components\Textarea::make('description')->label(__('Descrição / Texto de Apoio'))->helperText(__('Explicação geral dos diferenciais.')),
@@ -372,15 +427,16 @@ class PageResource extends Resource
                         Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Explicação do diferencial.'))->required(),
                         Forms\Components\TextInput::make('icon')->label(__('Ícone (Lucide)'))->helperText(__('Ícone representativo.'))->default('check-circle'),
                     ])->columns(2),
-            ]);
+            ]));
     }
 
     protected static function getPageHeaderBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('page_header')
+            ->preview('filament.block-previews.page_header')
             ->label(__('Cabeçalho da Página'))
             ->icon('heroicon-o-document-text')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(2)->schema([
                     Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Texto acima do título principal.'))->placeholder('NOSSOS SERVIÇOS'),
                     Forms\Components\TextInput::make('title')->label(__('Título Principal'))->helperText(__('Título grande da página.'))->required(),
@@ -388,16 +444,17 @@ class PageResource extends Resource
                     Forms\Components\Toggle::make('show_breadcrumbs')->label(__('Mostrar Breadcrumbs'))->helperText(__('Exibe o caminho de navegação (ex: Home > Serviços).'))->onIcon('heroicon-m-check')->default(true)->columnSpanFull(),
                     Forms\Components\FileUpload::make('background_image')->image()->directory('headers')->label(__('Imagem de Fundo (Opcional)'))->helperText(__('Imagem de fundo para o cabeçalho.'))->columnSpanFull(),
                 ])
-            ]);
+            ]));
     }
 
 
     protected static function getStatsBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('stats')
+            ->preview('filament.block-previews.stats')
             ->label(__('Estatísticas'))
             ->icon('heroicon-o-chart-bar-square')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\Repeater::make('items')
                     ->label(__('Itens (Estatísticas)'))
                     ->helperText(__('Adicione os números e textos explicativos (ex: 13.800+ Colaboradores). Recomendado até 4 itens.'))
@@ -420,15 +477,16 @@ class PageResource extends Resource
                     ->collapsible()
                     ->maxItems(4)
                     ->defaultItems(4),
-            ]);
+            ]));
     }
 
     protected static function getImageWithTextBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('image_with_text')
+            ->preview('filament.block-previews.image_with_text')
             ->label(__('Seção de Imagem + Texto'))
             ->icon('heroicon-o-photo')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(2)->schema([
                     Forms\Components\Group::make([
                         Forms\Components\TextInput::make('badge')->label(__('Badge (Sobre nós)'))->placeholder('Ex: SOBRE NÓS'),
@@ -445,15 +503,16 @@ class PageResource extends Resource
                             ->inline(),
                     ])->columns(1),
                 ]),
-            ]);
+            ]));
     }
 
     protected static function getDataTableBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('data_table')
+            ->preview('filament.block-previews.data_table')
             ->label(__('Tabela / Dados'))
             ->icon('heroicon-o-table-cells')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título da Tabela')),
                 Forms\Components\TextInput::make('badge')->label(__('Badge superior')),
                 Forms\Components\Repeater::make('rows')
@@ -473,15 +532,16 @@ class PageResource extends Resource
                     ->columns(4)
                     ->cloneable()
                     ->collapsible(),
-            ]);
+            ]));
     }
 
     protected static function getCardsBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('cards')
+            ->preview('filament.block-previews.cards')
             ->label(__('Cards (Missão, Visão, Valores)'))
             ->icon('heroicon-o-square-3-stack-3d')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('badge')->label(__('Badge / Subtítulo'))->helperText(__('Ex: NOSSOS PILARES')),
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Ex: O que nos move')),
                 Forms\Components\Textarea::make('description')->label(__('Descrição'))->rows(3),
@@ -501,15 +561,16 @@ class PageResource extends Resource
                         Forms\Components\TextInput::make('title')->label(__('Título'))->required(),
                         Forms\Components\Textarea::make('description')->label(__('Descrição'))->rows(3)->required(),
                     ])->columns(2)->defaultItems(3)->cloneable()->collapsible(),
-            ]);
+            ]));
     }
 
     protected static function getFeaturedTestimonialBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('featured_testimonial')
+            ->preview('filament.block-previews.featured_testimonial')
             ->label(__('Depoimento em Destaque'))
             ->icon('heroicon-o-chat-bubble-bottom-center-text')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\Textarea::make('quote')->label(__('Depoimento (Citação)'))->required()->rows(3),
                 Forms\Components\Grid::make(2)->schema([
                     Forms\Components\TextInput::make('author')->label(__('Nome do Autor'))->required(),
@@ -517,38 +578,41 @@ class PageResource extends Resource
                     Forms\Components\FileUpload::make('author_image')->label(__('Foto do Autor'))->image()->avatar()->directory('testimonials'),
                     Forms\Components\FileUpload::make('background_image')->label(__('Imagem de Fundo (Opcional)'))->image()->directory('blocks'),
                 ]),
-            ]);
+            ]));
     }
 
     protected static function getMapBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('map')
+            ->preview('filament.block-previews.map')
             ->label(__('Mapa (Google Maps)'))
             ->icon('heroicon-o-map')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título do mapa.')),
                 Forms\Components\Textarea::make('iframe_code')
                     ->label(__('Código de Incorporação (iframe)'))
                     ->helperText(__('Cole aqui o <iframe> gerado pelo Google Maps.')),
-            ]);
+            ]));
     }
 
     protected static function getRichTextBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('rich_text')
+            ->preview('filament.block-previews.rich_text')
             ->label(__('Texto Livre (Editor)'))
             ->icon('heroicon-o-document-text')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\RichEditor::make('content')->label(__('Conteúdo'))->helperText(__('Digite o conteúdo livremente usando o editor.'))->required(),
-            ]);
+            ]));
     }
 
     protected static function getContactBannerBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('contact_banner')
+            ->preview('filament.block-previews.contact_banner')
             ->label(__('Banner de Atendimento (Call Actions)'))
             ->icon('heroicon-o-chat-bubble-left-right')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('badge')
                     ->label(__('Badge (Texto Superior)'))
                     ->helperText(__('Pequeno texto de destaque.'))
@@ -581,15 +645,16 @@ class PageResource extends Resource
                             ->onIcon('heroicon-m-check')
                             ->default(true),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getPaymentOfferBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('payment_offer')
+            ->preview('filament.block-previews.payment_offer')
             ->label(__('Oferta de Pagamento'))
             ->icon('heroicon-o-credit-card')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(2)->schema([
                     Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->default('APROVEITE ESSA MEGA OPORTUNIDADE'),
                     Forms\Components\TextInput::make('title')->label(__('Título'))->default('Parcelamento em até 12x sem juros')->required(),
@@ -599,12 +664,13 @@ class PageResource extends Resource
                     Forms\Components\FileUpload::make('background_image')->image()->directory('offers')->label(__('Imagem de Fundo (Opcional)'))->columnSpanFull(),
                     Forms\Components\FileUpload::make('payment_methods_image')->image()->directory('offers')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.')->columnSpanFull(),
                 ])
-            ]);
+            ]));
     }
 
     protected static function getModuleReferenceBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('module_reference')
+            ->preview('filament.block-previews.module_reference')
             ->label(function (?array $state): string {
                 if ($state === null) {
                     return __('Módulo Global (Seção Pronta)');
@@ -613,7 +679,7 @@ class PageResource extends Resource
                 return $sectionName ? __('Seção pronta - ') . $sectionName : __('Módulo Global (Seção Pronta)');
             })
             ->icon('heroicon-o-squares-plus')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\ToggleButtons::make('content_section_id')
                     ->label(__('Seção de Conteúdo'))
                     ->options(\App\Models\ContentSection::query()->pluck('name', 'id'))
@@ -621,6 +687,6 @@ class PageResource extends Resource
                     ->inline()
                     ->live()
                     ->helperText(__('Selecione uma seção criada no módulo "Seções do site" para reutilizá-la aqui.')),
-            ]);
+            ]));
     }
 }

@@ -6,9 +6,20 @@ use App\Filament\Resources\PageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
+use Pboivin\FilamentPeek\Pages\Actions\PreviewAction;
+use Pboivin\FilamentPeek\Pages\Concerns\HasPreviewModal;
+
 class EditPage extends EditRecord
 {
+    use HasPreviewModal;
+
     protected static string $resource = PageResource::class;
+
+    protected function getPreviewModalUrl(): ?string
+    {
+        $record = $this->getRecord();
+        return url($record->slug === '/' || $record->slug === 'home' || $record->slug === 'index' ? '/' : '/' . ltrim($record->slug, '/'));
+    }
 
     public function getTitle(): string
     {
@@ -24,15 +35,9 @@ class EditPage extends EditRecord
                 ->color('gray')
                 ->url(fn ($record) => url($record->slug === '/' || $record->slug === 'home' || $record->slug === 'index' ? '/' : '/' . ltrim($record->slug, '/')))
                 ->openUrlInNewTab(),
-            Actions\Action::make('preview')
+            PreviewAction::make()
                 ->label('Preview Interno')
-                ->icon('heroicon-o-eye')
-                ->color('gray')
-                ->modalHeading(fn ($record) => 'Preview: ' . $record->title)
-                ->modalContent(fn ($record) => view('filament.pages.preview-modal', ['record' => $record]))
-                ->modalSubmitAction(false)
-                ->modalCancelAction(false)
-                ->modalWidth(\Filament\Support\Enums\MaxWidth::Screen),
+                ->color('gray'),
             Actions\Action::make('save')
                 ->label('Salvar')
                 ->action('save')

@@ -10,7 +10,17 @@
             $section = \App\Models\ContentSection::find($data['content_section_id']);
         @endphp
         @if($section && $section->is_active)
-            <x-render-block :type="$section->type" :data="$section->content" :page="$page" :theme="$theme" />
+            @php
+                // Merge style and advanced overrides from the Page Builder
+                $overrides = array_filter([
+                    'background_color' => $data['background_color'] ?? null,
+                    'text_color' => $data['text_color'] ?? null,
+                    'custom_id' => $data['custom_id'] ?? null,
+                    'custom_css_classes' => $data['custom_css_classes'] ?? null,
+                ]);
+                $mergedData = array_merge($section->content ?? [], $overrides);
+            @endphp
+            <x-render-block :type="$section->type" :data="$mergedData" :page="$page" :theme="$theme" />
         @endif
         @break
 
@@ -281,7 +291,7 @@
             $servicesSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? 'O que fazemos';
             $servicesDesc = $data['header']['description'] ?? $data['description'] ?? 'Soluções completas com qualidade garantida.';
             
-            $bgColor = $data['background_color'] ?? 'bg-background';
+            $bgColor = $data['background_color'] ?? 'bg-white';
             $isPrimaryBg = str_contains($bgColor, 'bg-primary');
             $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
             $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
@@ -320,7 +330,7 @@
                 ];
             }
         @endphp
-        <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 @if(!$hideHeader && $headerVisible && (!empty($servicesTitle) || !empty($servicesSubtitle)))
@@ -463,11 +473,11 @@
         @break
     @case('commercial_partners')
         @php
-            $bgColor = $data['background_color'] ?? 'bg-background';
+            $bgColor = $data['background_color'] ?? 'bg-white';
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
         @endphp
-        <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 <livewire:commercial-partners :data="$data" />
@@ -485,7 +495,7 @@
             $showcaseSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
             $showcaseDesc = $data['header']['description'] ?? $data['description'] ?? null;
             
-            $bgColor = $data['background_color'] ?? 'bg-background';
+            $bgColor = $data['background_color'] ?? 'bg-white';
             $isPrimaryBg = str_contains($bgColor, 'bg-primary');
             $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
             $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
@@ -494,7 +504,7 @@
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
         @endphp
-        <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
@@ -534,7 +544,7 @@
             $showcaseSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
             $showcaseDesc = $data['header']['description'] ?? $data['description'] ?? null;
             
-            $bgColor = $data['background_color'] ?? 'bg-background';
+            $bgColor = $data['background_color'] ?? 'bg-white';
             $isPrimaryBg = str_contains($bgColor, 'bg-primary');
             $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
             $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
@@ -543,7 +553,7 @@
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
         @endphp
-        <section class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
@@ -652,7 +662,7 @@
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
         @endphp
-        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $data['background_color'] ?? 'bg-white' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 <livewire:calculator 
@@ -716,7 +726,7 @@
             $wrapperTag = $isClickableBanner ? 'a' : 'div';
             $wrapperHref = $isClickableBanner ? 'href="' . $whatsappUrl . '" target="_blank"' : '';
         @endphp
-        <section class="bg-transparent py-4 lg:py-8 w-full">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="bg-transparent py-4 lg:py-8 w-full {{ $data['custom_css_classes'] ?? '' }}">
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 <{{ $wrapperTag }} {!! $wrapperHref !!} class="relative {{ $overflowClass }} flex flex-col {{ $alignClass }} rounded-[24px] {{ $bgColor ?: 'bg-card' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} border border-border/40 p-8 md:p-10 shadow-sm hover:shadow-md transition-all w-full {{ $isClickableBanner ? 'cursor-pointer hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2' : '' }}">
                     
@@ -821,7 +831,7 @@
 
     @case('cta_contact')
     @case('contact_form')
-        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-20 lg:py-28">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ !empty($data['background_color']) && $data['background_color'] !== 'bg-white' ? $data['background_color'] : 'bg-white' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-20 lg:py-28 {{ $data['custom_css_classes'] ?? '' }}">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
                 <div class="grid lg:grid-cols-2 gap-16 items-start">
                     <div>
@@ -958,7 +968,7 @@
         @break
 
     @case('rich_text')
-        <section class="{{ $data['background_color'] ?? 'bg-background' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $data['background_color'] ?? 'bg-white' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 {{ $data['custom_css_classes'] ?? '' }}">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
                 <div class="prose prose-zinc max-w-3xl">
                     {!! $data['content'] !!}
@@ -987,7 +997,7 @@
                 default => 'md:grid-cols-3',
             };
         @endphp
-        <section class="py-16 lg:py-24 bg-background">
+        <section id="{{ $data['custom_id'] ?? '' }}" class="py-16 lg:py-24 bg-background {{ $data['custom_css_classes'] ?? '' }}">
             <div class="mx-auto max-w-7xl px-4 lg:px-8">
                 @if(!empty($data['badge']) || !empty($data['title']) || !empty($data['description']))
                 <div class="mb-12 text-center max-w-3xl mx-auto">
@@ -1033,7 +1043,7 @@
         @endphp
         
         @if($bannerImg)
-            <section class="{{ $bgColor }} {{ $textColor }} py-4">
+            <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ $textColor }} py-4 {{ $data['custom_css_classes'] ?? '' }}">
                 <div class="mx-auto max-w-7xl px-4 lg:px-8">
                     @if($bannerLink)
                         <a href="{{ $bannerLink }}" target="{{ $target }}" class="block overflow-hidden rounded-xl transition-transform hover:-translate-y-1 duration-300">

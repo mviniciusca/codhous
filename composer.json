@@ -17,6 +17,7 @@
         "intervention/image": "^4.0",
         "laravel/framework": "^11.41",
         "laravel/tinker": "^2.9",
+        "pboivin/filament-peek": "^2.4",
         "predis/predis": "^2.0",
         "pxlrbt/filament-excel": "^2.5",
         "spatie/image": "^3.9",
