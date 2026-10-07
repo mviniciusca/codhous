@@ -17,14 +17,14 @@
                     <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground" for="name">
                         Nome Completo <span class="text-danger-600">*</span>
                     </label>
-                    <input type="text" id="name" wire:model="name" placeholder="Seu nome completo" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                    <input type="text" id="name" wire:model="name" placeholder="Seu nome completo" class="flex h-10 w-full rounded-md border border-input !bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     @error('name') <span class="text-xs text-danger-600">{{ $message }}</span> @enderror
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground" for="email">
                         E-mail <span class="text-danger-600">*</span>
                     </label>
-                    <input type="email" id="email" wire:model="email" placeholder="seu@email.com" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                    <input type="email" id="email" wire:model="email" placeholder="seu@email.com" class="flex h-10 w-full rounded-md border border-input !bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     @error('email') <span class="text-xs text-danger-600">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -34,7 +34,7 @@
                     Telefone <span class="text-danger-600">*</span>
                 </label>
                 <div x-data>
-                    <input type="tel" id="phone" x-mask="(99) 99999-9999" wire:model="phone" placeholder="(21) 90000-0000" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                    <input type="tel" id="phone" x-mask="(99) 99999-9999" wire:model="phone" placeholder="(21) 90000-0000" class="flex h-10 w-full rounded-md border border-input !bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                 </div>
                 @error('phone') <span class="text-xs text-danger-600">{{ $message }}</span> @enderror
             </div>
@@ -43,7 +43,7 @@
                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground" for="subject">
                     Assunto <span class="text-danger-600">*</span>
                 </label>
-                <select id="subject" wire:model="subject" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                <select id="subject" wire:model="subject" class="flex h-10 w-full rounded-md border border-input !bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     <option value="Dúvida">Dúvida</option>
                     <option value="Elogio">Elogio</option>
                     <option value="Outro">Outro</option>
@@ -55,7 +55,7 @@
                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground" for="message">
                     Mensagem <span class="text-danger-600">*</span>
                 </label>
-                <textarea id="message" wire:model="message" rows="4" placeholder="Como podemos ajudar?" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                <textarea id="message" wire:model="message" rows="4" placeholder="Como podemos ajudar?" class="flex w-full rounded-md border border-input !bg-gray-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                 @error('message') <span class="text-xs text-danger-600">{{ $message }}</span> @enderror
             </div>
 

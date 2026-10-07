@@ -330,7 +330,7 @@
                 ];
             }
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" data-aos="fade-up" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 @if(!$hideHeader && $headerVisible && (!empty($servicesTitle) || !empty($servicesSubtitle)))
@@ -477,7 +477,7 @@
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" data-aos="fade-up" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 <livewire:commercial-partners :data="$data" />
@@ -504,7 +504,7 @@
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" data-aos="fade-up" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
@@ -553,7 +553,7 @@
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" data-aos="fade-up" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
@@ -662,7 +662,7 @@
             $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
             $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $data['background_color'] ?? 'bg-white' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" data-aos="fade-up" class="{{ $data['background_color'] ?? 'bg-white' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
             <x-ui.section-background :data="$data" />
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 <livewire:calculator 
@@ -726,7 +726,7 @@
             $wrapperTag = $isClickableBanner ? 'a' : 'div';
             $wrapperHref = $isClickableBanner ? 'href="' . $whatsappUrl . '" target="_blank"' : '';
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="bg-transparent py-4 lg:py-8 w-full {{ $data['custom_css_classes'] ?? '' }}">
+        <section id="{{ $data['custom_id'] ?? '' }}" data-aos="fade-up" class="bg-transparent py-4 lg:py-8 w-full {{ $data['custom_css_classes'] ?? '' }}">
             <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
                 <{{ $wrapperTag }} {!! $wrapperHref !!} class="relative {{ $overflowClass }} flex flex-col {{ $alignClass }} rounded-[24px] {{ $bgColor ?: 'bg-card' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} border border-border/40 p-8 md:p-10 shadow-sm hover:shadow-md transition-all w-full {{ $isClickableBanner ? 'cursor-pointer hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2' : '' }}">
                     

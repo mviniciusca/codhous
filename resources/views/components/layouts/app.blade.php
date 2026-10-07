@@ -31,6 +31,9 @@
     @livewireStyles
     @filamentStyles
     @stack('styles')
+    
+    <!-- AOS Animation CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body class="font-sans antialiased bg-background text-foreground flex flex-col min-h-screen">
     
@@ -50,5 +53,18 @@
     @livewireScripts
     @filamentScripts
     @stack('scripts')
+
+    <!-- AOS Animation JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                once: true,
+                offset: 50,
+                duration: 800,
+                easing: 'ease-in-out-cubic',
+            });
+        });
+    </script>
 </body>
 </html>

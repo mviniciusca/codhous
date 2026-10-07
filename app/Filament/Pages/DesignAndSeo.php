@@ -114,6 +114,12 @@ class DesignAndSeo extends Page implements HasForms
                             ->image()
                             ->directory('website')
                             ->visibility('public'),
+                        FileUpload::make('settings.website.mascot')
+                            ->label('Mascote da Empresa')
+                            ->helperText('Imagem transparente (PNG) do mascote. Usado na geração de artes.')
+                            ->image()
+                            ->directory('website')
+                            ->visibility('public'),
                     ]),
 
 

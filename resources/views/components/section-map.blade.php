@@ -17,16 +17,8 @@
     $displayTitle = $title ?? 'Nossa Localização';
 @endphp
 
-<section class="bg-muted py-16">
-    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <x-ui.section-header 
-            :header="$header ?? []"
-            :fallback-title="$displayTitle"
-            :text-color="$textColor"
-        />
-
-        <div class="overflow-hidden rounded-2xl border border-border shadow-sm h-[400px] lg:h-[500px] w-full grayscale hover:grayscale-0 transition-all duration-700 [&>iframe]:w-full [&>iframe]:h-full">
-            {!! $mapsCode !!}
-        </div>
+<section class="w-full bg-muted">
+    <div class="w-full h-[400px] lg:h-[500px] grayscale hover:grayscale-0 transition-all duration-700 [&>iframe]:w-full [&>iframe]:h-full">
+        {!! $mapsCode !!}
     </div>
 </section>

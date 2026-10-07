@@ -156,7 +156,10 @@
     textarea,
     select,
     input[type="text"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"] {
         @apply bg-white dark:bg-secondary;
     }
 
