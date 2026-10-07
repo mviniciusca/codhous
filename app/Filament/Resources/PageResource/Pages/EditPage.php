@@ -18,6 +18,12 @@ class EditPage extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('visit')
+                ->label('Visitar Página')
+                ->icon('heroicon-o-arrow-top-right-on-square')
+                ->color('gray')
+                ->url(fn ($record) => url($record->slug === '/' || $record->slug === 'home' || $record->slug === 'index' ? '/' : '/' . ltrim($record->slug, '/')))
+                ->openUrlInNewTab(),
             Actions\Action::make('preview')
                 ->label('Preview Interno')
                 ->icon('heroicon-o-eye')
@@ -25,7 +31,7 @@ class EditPage extends EditRecord
                 ->modalHeading(fn ($record) => 'Preview: ' . $record->title)
                 ->modalContent(fn ($record) => view('filament.pages.preview-modal', ['record' => $record]))
                 ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Fechar')
+                ->modalCancelAction(false)
                 ->modalWidth(\Filament\Support\Enums\MaxWidth::Screen),
             Actions\Action::make('save')
                 ->label('Salvar')

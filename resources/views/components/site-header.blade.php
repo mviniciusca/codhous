@@ -91,12 +91,12 @@
             {{-- Dual CTA --}}
             <div class="hidden lg:flex items-center gap-3 flex-shrink-0">
                 <a href="/#calculadora"
-                   class="flex items-center gap-2 rounded-full border-2 border-primary px-5 py-2 text-[12px] font-bold tracking-wide text-primary transition-all hover:bg-primary hover:text-primary-foreground">
+                   class="flex items-center gap-2 rounded-xl border-2 border-primary px-5 py-2 text-[12px] font-bold tracking-wide text-primary transition-all hover:bg-primary hover:text-primary-foreground">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M9 7h9V4a2 2 0 00-2-2H9a2 2 0 00-2 2v3m6 0H9"/></svg>
                     Calculadora
                 </a>
                 <a href="#orcamento"
-                   class="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-[12px] font-bold tracking-wide text-primary-foreground shadow-md shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0">
+                   class="flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-[12px] font-bold tracking-wide text-primary-foreground shadow-md shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                     Orçamento Grátis
                 </a>
@@ -104,7 +104,7 @@
 
             {{-- MOBILE BURGER --}}
             <button @click="open = !open"
-                    class="lg:hidden ml-auto flex items-center justify-center w-10 h-10 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+                    class="lg:hidden ml-auto flex items-center justify-center w-10 h-10 rounded-xl border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all">
                 <svg x-show="!open" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 <svg x-show="open" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
@@ -134,11 +134,11 @@
             @endforeach
             <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-zinc-100">
                 <a href="/#calculadora" @click="open=false"
-                   class="flex items-center justify-center gap-2 rounded-full border-2 border-primary py-3 text-sm font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                   class="flex items-center justify-center gap-2 rounded-xl border-2 border-primary py-3 text-sm font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
                     Calculadora
                 </a>
                 <a href="#orcamento" @click="open=false"
-                   class="flex items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors">
+                   class="flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors">
                     Orçamento
                 </a>
             </div>
