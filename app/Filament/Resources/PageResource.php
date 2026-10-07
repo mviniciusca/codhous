@@ -314,7 +314,7 @@ class PageResource extends Resource
     {
         return Forms\Components\Builder\Block::make('showcase')
             ->preview('filament.block-previews.showcase')
-            ->label(__('Galeria de Obras (Showcase)'))
+            ->label(__('Galeria de Projetos / Portfólio'))
             ->icon('heroicon-o-camera')
             ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(2)->schema([
@@ -330,7 +330,7 @@ class PageResource extends Resource
     {
         return Forms\Components\Builder\Block::make('equipment_showcase')
             ->preview('filament.block-previews.equipment_showcase')
-            ->label(__('Showcase de Equipamentos'))
+            ->label(__('Catálogo de Itens / Showcase'))
             ->icon('heroicon-o-truck')
             ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(2)->schema([
@@ -413,7 +413,7 @@ class PageResource extends Resource
     {
         return Forms\Components\Builder\Block::make('differentials')
             ->preview('filament.block-previews.differentials')
-            ->label(__('Diferenciais (Pilar / Missão / Visão)'))
+            ->label(__('Diferenciais / Recursos'))
             ->icon('heroicon-o-shield-check')
             ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto pequeno acima do título.')),
@@ -539,7 +539,7 @@ class PageResource extends Resource
     {
         return Forms\Components\Builder\Block::make('cards')
             ->preview('filament.block-previews.cards')
-            ->label(__('Cards (Missão, Visão, Valores)'))
+            ->label(__('Cards de Conteúdo'))
             ->icon('heroicon-o-square-3-stack-3d')
             ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('badge')->label(__('Badge / Subtítulo'))->helperText(__('Ex: NOSSOS PILARES')),
@@ -585,7 +585,7 @@ class PageResource extends Resource
     {
         return Forms\Components\Builder\Block::make('map')
             ->preview('filament.block-previews.map')
-            ->label(__('Mapa (Google Maps)'))
+            ->label(__('Mapa (Localização)'))
             ->icon('heroicon-o-map')
             ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título do mapa.')),
@@ -610,7 +610,7 @@ class PageResource extends Resource
     {
         return Forms\Components\Builder\Block::make('contact_banner')
             ->preview('filament.block-previews.contact_banner')
-            ->label(__('Banner de Atendimento (Call Actions)'))
+            ->label(__('Banner de Atendimento / Contato'))
             ->icon('heroicon-o-chat-bubble-left-right')
             ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('badge')
@@ -652,7 +652,7 @@ class PageResource extends Resource
     {
         return Forms\Components\Builder\Block::make('payment_offer')
             ->preview('filament.block-previews.payment_offer')
-            ->label(__('Oferta de Pagamento'))
+            ->label(__('Tabela de Preços / Planos'))
             ->icon('heroicon-o-credit-card')
             ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(2)->schema([

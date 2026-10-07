@@ -41,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
                 config('filament-logger.activity_resource'),
             ])
             ->plugins([
+                \Pboivin\FilamentPeek\FilamentPeekPlugin::make(),
                 // FilamentShieldPlugin::make(),
             ])
             ->login()
