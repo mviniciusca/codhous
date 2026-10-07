@@ -49,15 +49,15 @@
                     @endphp
                     <div 
                         x-on:click="$wire.{{ $wireClickAction }}"
-                        class="group cursor-pointer flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all"
+                        class="group cursor-pointer flex items-center gap-3 p-2 hover:bg-primary-500 dark:hover:bg-primary-500 hover:shadow-md rounded-lg border border-transparent transition-all"
                     >
-                        <div class="flex-shrink-0 w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 group-hover:text-primary-500 group-hover:bg-primary-50 dark:group-hover:bg-primary-500/10 transition-colors">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 group-hover:bg-transparent group-hover:text-white transition-colors">
                             <x-filament::icon
                                 :icon="$block->getIcon()"
                                 class="h-4 w-4"
                             />
                         </div>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                        <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-white dark:group-hover:text-white transition-colors">
                             {{ $block->getLabel() }}
                         </span>
                     </div>

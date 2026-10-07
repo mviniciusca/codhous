@@ -34,13 +34,13 @@
 
                 <div 
                     x-on:click="close; $wire.{{ $wireClickAction }}"
-                    class="flex flex-col items-center justify-center text-center p-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 cursor-pointer hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/10 hover:shadow-sm transition-all duration-200 group"
+                    class="flex flex-col items-center justify-center text-center p-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 cursor-pointer hover:border-primary-500 hover:bg-primary-500 hover:shadow-md transition-all duration-200 group"
                 >
                     <x-filament::icon
                         :icon="$block->getIcon()"
-                        class="w-6 h-6 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors"
+                        class="w-6 h-6 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-white transition-colors"
                     />
-                    <span class="text-xs font-semibold text-gray-900 dark:text-white leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    <span class="text-xs font-semibold text-gray-900 dark:text-gray-200 leading-tight group-hover:text-white transition-colors">
                         {{ $block->getLabel() }}
                     </span>
                 </div>
