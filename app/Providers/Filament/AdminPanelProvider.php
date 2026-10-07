@@ -74,7 +74,6 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 \App\Filament\Widgets\WelcomeWidget::class,
                 \App\Filament\Widgets\StatsWidget::class,
-                \App\Filament\Widgets\CalculatorWidget::class,
             ])
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->middleware([

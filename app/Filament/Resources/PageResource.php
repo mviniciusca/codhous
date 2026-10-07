@@ -100,6 +100,11 @@ class PageResource extends Resource
                                                         ->helperText(__('Ative para tornar esta página pública.'))
                                                         ->onIcon('heroicon-m-check')
                                                         ->default(true),
+                                                    Forms\Components\Toggle::make('is_active_in_menu')
+                                                        ->label(__('Aparecer no Menu'))
+                                                        ->helperText(__('Adiciona automaticamente a página no menu de navegação do topo.'))
+                                                        ->onIcon('heroicon-m-bars-3')
+                                                        ->default(true),
                                                     Forms\Components\TextInput::make('sort_order')
                                                         ->label(__('Ordem'))
                                                         ->helperText(__('Ordem de exibição em menus.'))

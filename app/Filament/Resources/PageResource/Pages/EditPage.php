@@ -18,6 +18,15 @@ class EditPage extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('preview')
+                ->label('Preview Interno')
+                ->icon('heroicon-o-eye')
+                ->color('gray')
+                ->modalHeading(fn ($record) => 'Preview: ' . $record->title)
+                ->modalContent(fn ($record) => view('filament.pages.preview-modal', ['record' => $record]))
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Fechar')
+                ->modalWidth(\Filament\Support\Enums\MaxWidth::Screen),
             Actions\Action::make('save')
                 ->label('Salvar')
                 ->action('save')

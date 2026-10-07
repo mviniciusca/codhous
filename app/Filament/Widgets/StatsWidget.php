@@ -20,6 +20,8 @@ class StatsWidget extends BaseWidget
 
     protected static bool $isLazy = false;
 
+    protected int | string | array $columnSpan = 'full';
+
     protected int|string|array $columns = [
         'default' => 1,
         'sm'      => 2,

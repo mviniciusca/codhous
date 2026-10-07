@@ -12,6 +12,11 @@ class WelcomeWidget extends Widget
     protected static ?int $sort = 0;
  
     protected int | string | array $columnSpan = 'full';
+
+    public static function canView(): bool
+    {
+        return false;
+    }
  
     public function getGreeting(): string
     {

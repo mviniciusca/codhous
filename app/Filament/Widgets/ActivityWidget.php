@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ActivityWidget extends BaseWidget
 {
-    protected static ?int $sort = 99;
+    protected static ?int $sort = 10;
 
     protected int | string | array $columnSpan = 'full';
 

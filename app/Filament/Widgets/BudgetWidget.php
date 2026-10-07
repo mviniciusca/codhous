@@ -15,9 +15,9 @@ use Illuminate\Support\Carbon;
 
 class BudgetWidget extends BaseWidget
 {
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 6;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {

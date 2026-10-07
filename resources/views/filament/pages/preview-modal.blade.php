@@ -1,0 +1,1 @@
+<iframe src="{{ url($record->slug === '/' || $record->slug === 'home' || $record->slug === 'index' ? '/' : '/' . ltrim($record->slug, '/')) }}" class="w-full border-0 rounded-lg" style="height: 80vh;"></iframe>
