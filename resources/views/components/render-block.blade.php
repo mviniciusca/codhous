@@ -2,12 +2,30 @@
 
 @php
     $isHome = $page ? ($page->slug === '/' || $page->slug === '') : false;
+
+    if (!function_exists('resolveFilamentImagePath')) {
+        function resolveFilamentImagePath($image) {
+            if (empty($image)) return null;
+            if (is_array($image)) {
+                $image = count($image) > 0 ? array_values($image)[0] : null;
+            }
+            if (empty($image)) return null;
+            if (is_string($image)) {
+                return str_starts_with($image, 'http') ? $image : \Illuminate\Support\Facades\Storage::url($image);
+            }
+            if (is_object($image) && method_exists($image, 'temporaryUrl')) {
+                return $image->temporaryUrl();
+            }
+            return null;
+        }
+    }
 @endphp
 
 @switch($type)
     @case('module_reference')
         @php
-            $section = \App\Models\ContentSection::find($data['content_section_id']);
+            $sectionId = $data['content_section_id'] ?? null;
+            $section = $sectionId ? \App\Models\ContentSection::find($sectionId) : null;
         @endphp
         @if($section && $section->is_active)
             @php
@@ -61,43 +79,94 @@
         @break
 
     @case('image_with_text')
-        <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-            <div class="flex flex-col {{ ($data['image_position'] ?? 'left') === 'right' ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
+        @php
+            $bgColor = !empty($data['background_color']) && $data['background_color'] !== 'bg-white' ? $data['background_color'] : 'bg-white';
+            $isDark = ($data['text_color'] ?? 'light') === 'dark';
+            $titleColor = $isDark ? 'text-white' : 'text-gray-900';
+            $descColor = $isDark ? 'text-gray-300' : 'text-gray-600';
+            $badgeBgClass = $isDark ? 'bg-primary/20' : 'bg-primary/10';
+            $badgeTextColor = $isDark ? 'text-primary-300' : 'text-primary';
+
+            $badgeIcon = ($data['badge_icon_select'] ?? 'zap') === 'other' ? ($data['badge_icon_custom'] ?? 'zap') : ($data['badge_icon_select'] ?? 'zap');
+            $btn1Icon = ($data['button_icon_select'] ?? 'arrow-right') === 'other' ? ($data['button_icon_custom'] ?? 'arrow-right') : ($data['button_icon_select'] ?? 'arrow-right');
+            $btn2Icon = ($data['secondary_button_icon_select'] ?? 'play') === 'other' ? ($data['secondary_button_icon_custom'] ?? 'play') : ($data['secondary_button_icon_select'] ?? 'play');
+
+            $vAlign = $data['image_vertical_alignment'] ?? 'center';
+            $vAlignClass = $vAlign === 'start' ? 'lg:items-start items-center' : ($vAlign === 'end' ? 'lg:items-end items-center' : 'items-center');
+        @endphp
+        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ $isDark ? 'text-scheme-dark' : '' }} {{ $data['custom_css_classes'] ?? '' }}">
+            <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+                <div class="flex flex-col {{ ($data['image_position'] ?? 'left') === 'right' ? 'lg:flex-row-reverse' : 'lg:flex-row' }} {{ $vAlignClass }} gap-12 lg:gap-20">
                 <div class="w-full lg:w-1/2">
                     @if(!empty($data['image']))
-                        <div class="rounded-3xl overflow-hidden shadow-2xl relative">
-                            <img src="{{ Storage::url($data['image']) }}" alt="{{ $data['title'] ?? '' }}" class="w-full h-auto object-cover aspect-square md:aspect-[4/3] lg:aspect-[3/4]">
+                        <div class="relative flex justify-center lg:justify-end">
+                            <img src="{{ resolveFilamentImagePath($data['image']) }}" alt="{{ $data['title'] ?? '' }}" class="w-full max-w-lg lg:max-w-none h-auto object-contain">
                         </div>
                     @endif
                 </div>
                 <div class="w-full lg:w-1/2">
                     @if(!empty($data['badge']))
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold tracking-wider text-xs uppercase mb-6">
-                            <i data-lucide="circle" class="w-2 h-2 fill-current"></i> {{ $data['badge'] }}
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full {{ $badgeBgClass }} {{ $badgeTextColor }} font-semibold tracking-wider text-xs uppercase mb-6">
+                            <i data-lucide="{{ $badgeIcon }}" class="w-4 h-4 {{ !empty($badgeIcon) ? '' : 'fill-current' }}"></i> {{ $data['badge'] }}
                         </div>
                     @endif
                     
                     @if(!empty($data['title']))
-                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight mb-6">
+                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold {{ $titleColor }} tracking-tight leading-tight mb-6">
                             {{ $data['title'] }}
                         </h2>
                     @endif
                     
                     @if(!empty($data['description']))
-                        <div class="prose prose-lg text-gray-600 mb-8">
+                        <div class="prose prose-lg {{ $descColor }} mb-10 max-w-2xl">
                             {!! nl2br(e($data['description'])) !!}
                         </div>
                     @endif
                     
-                    @if(!empty($data['button_text']) && !empty($data['button_url']))
-                        <a href="{{ $data['button_url'] }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary rounded-xl hover:bg-primary/90 transition-colors duration-200">
-                            {{ $data['button_text'] }}
-                            <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
-                        </a>
+                    <div class="flex flex-wrap items-center gap-4 mb-4">
+                        @if(!empty($data['button_text']) && !empty($data['button_url']))
+                            <a href="{{ $data['button_url'] }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary rounded-xl hover:bg-primary/90 transition-colors duration-200">
+                                {{ $data['button_text'] }}
+                                @if(!empty($btn1Icon))
+                                    <i data-lucide="{{ $btn1Icon }}" class="w-5 h-5 ml-2"></i>
+                                @endif
+                            </a>
+                        @endif
+                        @if(!empty($data['secondary_button_text']) && !empty($data['secondary_button_url']))
+                            <a href="{{ $data['secondary_button_url'] }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold {{ $isDark ? 'text-gray-300 border-gray-700 hover:text-white hover:bg-gray-800' : 'text-gray-700 border-gray-300 hover:text-gray-900 hover:bg-gray-50' }} border rounded-xl transition-colors duration-200">
+                                {{ $data['secondary_button_text'] }}
+                                @if(!empty($btn2Icon))
+                                    <i data-lucide="{{ $btn2Icon }}" class="w-5 h-5 ml-2"></i>
+                                @endif
+                            </a>
+                        @endif
+                    </div>
+
+                    @if(!empty($data['mini_stats']) && count($data['mini_stats']) > 0)
+                        <div class="flex flex-row flex-nowrap overflow-x-auto items-center mt-8 py-4 divide-x {{ $isDark ? 'divide-white/10' : 'divide-gray-200' }}">
+                            @foreach($data['mini_stats'] as $index => $stat)
+                                @php
+                                    $statIcon = ($stat['icon_select'] ?? 'check-circle') === 'other' ? ($stat['icon_custom'] ?? 'check-circle') : ($stat['icon_select'] ?? 'check-circle');
+                                @endphp
+                                <div class="flex items-center gap-3 px-4 first:pl-0 last:pr-0">
+                                    <div class="flex-shrink-0 w-11 h-11 rounded-xl {{ $isDark ? 'bg-white/5 border border-white/10 text-white shadow-inner shadow-white/10' : 'bg-gray-50 border border-gray-200 text-gray-900 shadow-sm' }} flex items-center justify-center">
+                                        <i data-lucide="{{ $statIcon }}" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex flex-col min-w-[80px]">
+                                        @if(!empty($stat['title']))
+                                            <span class="font-medium text-xs lg:text-sm {{ $isDark ? 'text-gray-200' : 'text-gray-900' }} leading-tight whitespace-normal">{{ $stat['title'] }}</span>
+                                        @endif
+                                        @if(!empty($stat['subtitle']))
+                                            <span class="font-medium text-xs {{ $isDark ? 'text-gray-400' : 'text-gray-500' }} leading-tight whitespace-normal mt-0.5">{{ $stat['subtitle'] }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     @endif
                 </div>
             </div>
-        </div>
+        </section>
         @break
 
     @case('data_table')
@@ -164,7 +233,7 @@
             <div class="relative rounded-3xl overflow-hidden bg-gray-900 text-white shadow-2xl">
                 @if(!empty($data['background_image']))
                     <div class="absolute inset-0">
-                        <img src="{{ Storage::url($data['background_image']) }}" alt="" class="w-full h-full object-cover opacity-40 mix-blend-overlay">
+                        <img src="{{ resolveFilamentImagePath($data['background_image']) }}" alt="" class="w-full h-full object-cover opacity-40 mix-blend-overlay">
                     </div>
                     <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent"></div>
                 @endif
@@ -177,7 +246,7 @@
                             </blockquote>
                             <div class="flex items-center gap-4">
                                 @if(!empty($data['author_image']))
-                                    <img src="{{ Storage::url($data['author_image']) }}" alt="{{ $data['author'] ?? '' }}" class="w-14 h-14 rounded-full object-cover border-2 border-primary">
+                                    <img src="{{ resolveFilamentImagePath($data['author_image']) }}" alt="{{ $data['author'] ?? '' }}" class="w-14 h-14 rounded-full object-cover border-2 border-primary">
                                 @endif
                                 <div>
                                     <div class="font-bold text-lg">{{ $data['author'] ?? '' }}</div>
@@ -297,7 +366,7 @@
             $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
             $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/10';
             
-            $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
+            $bgImg = !empty($data['background_image']) ? resolveFilamentImagePath($data['background_image']) : null;
             $bgFit = $data['background_image_fit'] ?? 'cover';
             $bgPos = $data['background_image_position'] ?? 'center';
             $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
@@ -688,7 +757,7 @@
             $offerDesc = $data['header']['description'] ?? $data['subtitle'] ?? null;
             
             $bgColor = $data['background_color'] ?? '';
-            $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
+            $bgImg = !empty($data['background_image']) ? resolveFilamentImagePath($data['background_image']) : null;
             $bgFit = $data['background_image_fit'] ?? 'cover';
             $bgPos = $data['background_image_position'] ?? 'center';
             $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
@@ -719,7 +788,7 @@
                 : $buttonUrl;
                 
             $methodsUrl = !empty($data['payment_methods_image']) 
-                ? (str_starts_with($data['payment_methods_image'], 'http') ? $data['payment_methods_image'] : \Illuminate\Support\Facades\Storage::url($data['payment_methods_image'])) 
+                ? resolveFilamentImagePath($data['payment_methods_image']) 
                 : null;
                 
             $isClickableBanner = !empty($whatsappUrl) && empty($data['button_label']);
@@ -1033,7 +1102,7 @@
 
     @case('simple_banner')
         @php
-            $bannerImg = !empty($data['image']) ? \Illuminate\Support\Facades\Storage::url($data['image']) : null;
+            $bannerImg = !empty($data['image']) ? resolveFilamentImagePath($data['image']) : null;
             $bannerLink = $data['link_url'] ?? null;
             $openInNewTab = $data['open_in_new_tab'] ?? true;
             $target = $openInNewTab ? '_blank' : '_self';

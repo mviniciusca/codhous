@@ -48,13 +48,79 @@ class PageResource extends Resource
                         ->description('Construa o conteúdo da sua página')
                         ->icon('heroicon-o-document-text')
                         ->schema([
+                            Forms\Components\Actions::make([
+                                Forms\Components\Actions\Action::make('loadTemplate')
+                                    ->label('Carregar Template')
+                                    ->icon('heroicon-m-sparkles')
+                                    ->color('primary')
+                                    ->form([
+                                        Forms\Components\Select::make('template')
+                                            ->label('Escolha o Template')
+                                            ->options([
+                                                'landing_vendas' => 'Landing Page de Vendas',
+                                                'institucional' => 'Página Institucional Padrão',
+                                                'contato' => 'Página de Contato',
+                                            ])
+                                            ->required(),
+                                        Forms\Components\Radio::make('behavior')
+                                            ->label('Como deseja inserir?')
+                                            ->options([
+                                                'append' => 'Adicionar ao final (Manter blocos atuais)',
+                                                'replace' => 'Substituir tudo (Apagar blocos atuais)',
+                                            ])
+                                            ->default('append')
+                                            ->required(),
+                                    ])
+                                    ->action(function (Set $set, \Filament\Forms\Get $get, array $data) {
+                                        $blocks = [];
+
+                                        if ($data['template'] === 'landing_vendas') {
+                                            $blocks = [
+                                                ['type' => 'page_header', 'data' => ['title' => 'Landing Page de Vendas', 'badge' => 'OFERTA']],
+                                                ['type' => 'services', 'data' => ['title' => 'Nossos Serviços']],
+                                                ['type' => 'module_reference', 'data' => []], // Módulo Global (Formulário, por exemplo)
+                                                ['type' => 'faq', 'data' => ['title' => 'Perguntas Frequentes']],
+                                            ];
+                                        } elseif ($data['template'] === 'institucional') {
+                                            $blocks = [
+                                                ['type' => 'page_header', 'data' => ['title' => 'Sobre a Empresa', 'badge' => 'QUEM SOMOS']],
+                                                ['type' => 'image_with_text', 'data' => ['title' => 'Nossa História']],
+                                                ['type' => 'stats', 'data' => []],
+                                                ['type' => 'differentials', 'data' => ['title' => 'Nossos Diferenciais']],
+                                            ];
+                                        } elseif ($data['template'] === 'contato') {
+                                            $blocks = [
+                                                ['type' => 'page_header', 'data' => ['title' => 'Fale Conosco', 'badge' => 'CONTATO']],
+                                                ['type' => 'contact_banner', 'data' => ['title' => 'Atendimento']],
+                                                ['type' => 'map', 'data' => ['title' => 'Nossa Localização']],
+                                            ];
+                                        }
+
+                                        $state = $data['behavior'] === 'replace' ? [] : ($get('content') ?? []);
+
+                                        foreach ($blocks as $block) {
+                                            $state[(string) \Illuminate\Support\Str::uuid()] = $block;
+                                        }
+
+                                        $set('content', $state);
+                                    }),
+                            ]),
                             Forms\Components\Builder::make('content')
                                 ->label('')
                                 ->addActionLabel(__('Adicionar Novo Bloco'))
                                 ->blocks([
                                     self::getPageHeaderBlock(),
+                                    self::getServicesBlock(),
+                                    self::getDifferentialsBlock(),
                                     self::getShowcaseBlock(),
                                     self::getEquipmentShowcaseBlock(),
+                                    self::getPartnersBlock(),
+                                    self::getTimelineBlock(),
+                                    self::getFaqBlock(),
+                                    self::getTestimonialsBlock(),
+                                    self::getCoverageBlock(),
+                                    self::getCtaBlock(),
+                                    self::getContactBannerBlock(),
                                     self::getMapBlock(),
                                     self::getRichTextBlock(),
                                     self::getPaymentOfferBlock(),
@@ -70,7 +136,8 @@ class PageResource extends Resource
                                 ->cloneable()
                                 ->blockPickerColumns(2)
                                 ->blockNumbers(false)
-                                ->blockPreviews(),
+                                ->blockPreviews()
+                                ->editAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action->modalWidth('7xl')),
                         ]),
 
                     Forms\Components\Wizard\Step::make('Configurações e SEO')
@@ -215,33 +282,50 @@ class PageResource extends Resource
                     \Filament\Forms\Components\Tabs\Tab::make('Estilo')
                         ->icon('heroicon-o-paint-brush')
                         ->schema(array_merge([
-                            \Filament\Forms\Components\Select::make('background_color')
-                                ->label(__('Cor de Fundo'))
+                            \Filament\Forms\Components\ToggleButtons::make('background_color')
+                                ->label(__('Cor de Fundo da Seção'))
+                                ->helperText(__('Escolha a cor predominante no fundo deste bloco.'))
                                 ->options([
                                     'bg-white' => 'Branco',
-                                    'bg-background' => 'Padrão (Fundo do site)',
+                                    'bg-background' => 'Padrão',
                                     'bg-muted/30' => 'Cinza Claro',
-                                    'bg-primary' => 'Cor Primária (Destaque)',
-                                    'bg-foreground' => 'Escuro (Contraste)',
+                                    'bg-primary' => 'Primária',
+                                    'bg-foreground' => 'Escuro',
                                 ])
-                                ->default('bg-white'),
-                            \Filament\Forms\Components\Select::make('text_color')
+                                ->icons([
+                                    'bg-white' => 'heroicon-o-sun',
+                                    'bg-background' => 'heroicon-o-stop',
+                                    'bg-muted/30' => 'heroicon-o-stop',
+                                    'bg-primary' => 'heroicon-o-star',
+                                    'bg-foreground' => 'heroicon-o-moon',
+                                ])
+                                ->default('bg-white')
+                                ->inline(),
+                            \Filament\Forms\Components\ToggleButtons::make('text_color')
                                 ->label(__('Esquema de Cores (Texto)'))
+                                ->helperText(__('Define se os textos devem ser escuros ou brancos para contrastar com o fundo.'))
                                 ->options([
                                     'light' => 'Claro (Texto Escuro)',
                                     'dark' => 'Escuro (Texto Branco)',
                                 ])
-                                ->default('light'),
+                                ->icons([
+                                    'light' => 'heroicon-o-sun',
+                                    'dark' => 'heroicon-o-moon',
+                                ])
+                                ->default('light')
+                                ->inline(),
                         ], $styleSchema)),
                     \Filament\Forms\Components\Tabs\Tab::make('Avançado')
                         ->icon('heroicon-o-cog-8-tooth')
                         ->schema(array_merge([
                             \Filament\Forms\Components\TextInput::make('custom_id')
                                 ->label(__('ID da Seção (HTML)'))
-                                ->helperText(__('Útil para links âncora. Ex: sobre-nos')),
+                                ->prefixIcon('heroicon-o-hashtag')
+                                ->helperText(__('Útil para links âncora no menu. Ex: "sobre-nos"')),
                             \Filament\Forms\Components\TextInput::make('custom_css_classes')
                                 ->label(__('Classes CSS Extras'))
-                                ->helperText(__('Para desenvolvedores. Ex: pb-0 pt-32')),
+                                ->prefixIcon('heroicon-o-code-bracket')
+                                ->helperText(__('Classes do Tailwind para desenvolvedores fazerem ajustes finos. Ex: "pb-0 pt-32"')),
                         ], $advancedSchema)),
                 ])
                 ->contained(false)
@@ -480,6 +564,43 @@ class PageResource extends Resource
             ]));
     }
 
+    protected static function getIconSelection(string $name, string $label, string $default = 'arrow-right'): array
+    {
+        return [
+            Forms\Components\Group::make()->schema([
+                Forms\Components\ToggleButtons::make("{$name}_select")
+                    ->label($label)
+                    ->helperText(__('Escolha um ícone rápido ou selecione "Outro".'))
+                    ->options([
+                        'arrow-right' => 'Seta',
+                        'play' => 'Play',
+                        'check-circle' => 'Check',
+                        'star' => 'Estrela',
+                        'zap' => 'Raio',
+                        'other' => 'Outro',
+                    ])
+                    ->icons([
+                        'arrow-right' => 'heroicon-o-arrow-right',
+                        'play' => 'heroicon-o-play',
+                        'check-circle' => 'heroicon-o-check-circle',
+                        'star' => 'heroicon-o-star',
+                        'zap' => 'heroicon-o-bolt',
+                        'other' => 'heroicon-o-ellipsis-horizontal-circle',
+                    ])
+                    ->inline()
+                    ->live()
+                    ->default(in_array($default, ['arrow-right', 'play', 'check-circle', 'star', 'zap']) ? $default : 'other'),
+                Forms\Components\TextInput::make("{$name}_custom")
+                    ->label(__('Nome do Ícone Lucide'))
+                    ->helperText(__('Digite o nome (ex: shield). Veja lucide.dev/icons'))
+                    ->prefixIcon('heroicon-o-magnifying-glass')
+                    ->visible(fn (\Filament\Forms\Get $get) => $get("{$name}_select") === 'other')
+                    ->required(fn (\Filament\Forms\Get $get) => $get("{$name}_select") === 'other')
+                    ->default(!in_array($default, ['arrow-right', 'play', 'check-circle', 'star', 'zap']) ? $default : ''),
+            ])->columnSpanFull()
+        ];
+    }
+
     protected static function getImageWithTextBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('image_with_text')
@@ -487,21 +608,109 @@ class PageResource extends Resource
             ->label(__('Seção de Imagem + Texto'))
             ->icon('heroicon-o-photo')
             ->schema(self::getBlockTabs([
-                Forms\Components\Grid::make(2)->schema([
-                    Forms\Components\Group::make([
-                        Forms\Components\TextInput::make('badge')->label(__('Badge (Sobre nós)'))->placeholder('Ex: SOBRE NÓS'),
-                        Forms\Components\TextInput::make('title')->label(__('Título'))->required(),
-                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->rows(4),
-                        Forms\Components\TextInput::make('button_text')->label(__('Texto do Botão')),
-                        Forms\Components\TextInput::make('button_url')->label(__('Link do Botão')),
-                    ])->columns(1),
-                    Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('image')->label(__('Imagem'))->image()->directory('blocks')->required(),
-                        Forms\Components\ToggleButtons::make('image_position')->label(__('Posição da Imagem'))
-                            ->options(['left' => 'Esquerda', 'right' => 'Direita'])
-                            ->default('left')
+                Forms\Components\Grid::make(1)->schema([
+                    Forms\Components\Section::make('Conteúdo Principal')->schema([
+                        ...self::getIconSelection('badge_icon', 'Ícone do Badge', 'zap'),
+                        Forms\Components\TextInput::make('badge')
+                            ->label(__('Badge (Ex: Sobre Nós)'))
+                            ->helperText(__('Pequeno texto de destaque acima do título.'))
+                            ->prefixIcon('heroicon-o-tag')
+                            ->placeholder('SOBRE NÓS'),
+                        
+                        Forms\Components\TextInput::make('title')
+                            ->label(__('Título Principal'))
+                            ->helperText(__('O título grande da seção.'))
+                            ->prefixIcon('heroicon-o-h1')
+                            ->required(),
+                            
+                        Forms\Components\Textarea::make('description')
+                            ->label(__('Descrição / Texto de Apoio'))
+                            ->helperText(__('O texto principal descrevendo os detalhes. Aceita múltiplas linhas.'))
+                            ->rows(4),
+                    ])->collapsible(),
+
+                    Forms\Components\Section::make('Botão Primário')->schema([
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('button_text')
+                                ->label(__('Texto do Botão'))
+                                ->helperText(__('Ex: Começar Agora'))
+                                ->prefixIcon('heroicon-o-cursor-arrow-rays'),
+                            Forms\Components\TextInput::make('button_url')
+                                ->label(__('URL do Botão'))
+                                ->helperText(__('Link para onde o botão leva.'))
+                                ->prefixIcon('heroicon-o-link'),
+                        ]),
+                        ...self::getIconSelection('button_icon', 'Ícone do Botão Primário', 'arrow-right'),
+                    ])->collapsible()->collapsed(),
+
+                    Forms\Components\Section::make('Botão Secundário')->schema([
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('secondary_button_text')
+                                ->label(__('Texto do Botão'))
+                                ->helperText(__('Ex: Ver Demonstração'))
+                                ->prefixIcon('heroicon-o-cursor-arrow-rays'),
+                            Forms\Components\TextInput::make('secondary_button_url')
+                                ->label(__('URL do Botão'))
+                                ->helperText(__('Link para onde o botão leva.'))
+                                ->prefixIcon('heroicon-o-link'),
+                        ]),
+                        ...self::getIconSelection('secondary_button_icon', 'Ícone do Botão Secundário', 'play'),
+                    ])->collapsible()->collapsed(),
+
+                    Forms\Components\Section::make('Mini Cards (Rodapé)')->schema([
+                        Forms\Components\Repeater::make('mini_stats')
+                            ->label(__('Mini Cards de Estatísticas/Features'))
+                            ->helperText(__('Adicione pequenos itens de destaque abaixo dos botões.'))
+                            ->schema([
+                                ...self::getIconSelection('icon', 'Ícone do Card', 'check-circle'),
+                                Forms\Components\TextInput::make('title')
+                                    ->label(__('Título'))
+                                    ->helperText(__('Ex: Mais Produtividade'))
+                                    ->prefixIcon('heroicon-o-h3')
+                                    ->required(),
+                                Forms\Components\TextInput::make('subtitle')
+                                    ->label(__('Subtítulo'))
+                                    ->helperText(__('Ex: Descrição curta do card.'))
+                                    ->prefixIcon('heroicon-o-bars-3-bottom-left'),
+                            ])->collapsible()->cloneable(),
+                    ])->collapsible()->collapsed(),
+
+                    Forms\Components\Section::make('Imagem')->schema([
+                        Forms\Components\FileUpload::make('image')
+                            ->label(__('Imagem Principal'))
+                            ->helperText(__('Faça o upload da imagem da seção.'))
+                            ->image()
+                            ->directory('blocks')
+                            ->required(),
+                        Forms\Components\ToggleButtons::make('image_position')
+                            ->label(__('Posição da Imagem'))
+                            ->helperText(__('Deseja a imagem na direita ou na esquerda?'))
+                            ->options([
+                                'left' => 'Esquerda', 
+                                'right' => 'Direita'
+                            ])
+                            ->icons([
+                                'left' => 'heroicon-o-bars-3-bottom-left',
+                                'right' => 'heroicon-o-bars-3-bottom-right',
+                            ])
+                            ->default('right')
                             ->inline(),
-                    ])->columns(1),
+                        Forms\Components\ToggleButtons::make('image_vertical_alignment')
+                            ->label(__('Alinhamento Vertical da Imagem'))
+                            ->helperText(__('Define como a imagem se alinha verticalmente em relação ao texto.'))
+                            ->options([
+                                'start' => 'Topo',
+                                'center' => 'Meio',
+                                'end' => 'Base'
+                            ])
+                            ->icons([
+                                'start' => 'heroicon-o-bars-arrow-up',
+                                'center' => 'heroicon-o-bars-2',
+                                'end' => 'heroicon-o-bars-arrow-down',
+                            ])
+                            ->default('center')
+                            ->inline(),
+                    ])->collapsible()->collapsed(),
                 ]),
             ]));
     }
