@@ -76,13 +76,13 @@ class Alert extends Model
     public static function positionLabels(): array
     {
         return [
-            self::POSITION_TOP => 'Topo (largura total)',
-            self::POSITION_BOTTOM => 'Rodapé (largura total)',
-            self::POSITION_TOP_LEFT => 'Canto superior esquerdo',
-            self::POSITION_TOP_RIGHT => 'Canto superior direito',
-            self::POSITION_BOTTOM_LEFT => 'Canto inferior esquerdo',
-            self::POSITION_BOTTOM_RIGHT => 'Canto inferior direito',
-            self::POSITION_CENTER => 'Centro (modal)',
+            self::POSITION_TOP => 'Topo',
+            self::POSITION_BOTTOM => 'Rodapé',
+            self::POSITION_TOP_LEFT => 'Topo Esq.',
+            self::POSITION_TOP_RIGHT => 'Topo Dir.',
+            self::POSITION_BOTTOM_LEFT => 'Rodapé Esq.',
+            self::POSITION_BOTTOM_RIGHT => 'Rodapé Dir.',
+            self::POSITION_CENTER => 'Centro',
         ];
     }
 

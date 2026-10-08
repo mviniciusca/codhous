@@ -31,117 +31,169 @@ class AlertResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Identificação')
-                    ->description('Defina como este alerta será identificado internamente.')
-                    ->icon('heroicon-o-identification')
+                Forms\Components\Grid::make(3)
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Nome Interno')
-                            ->helperText('Nome para identificação administrativa (ex: Promoção Verão 2024).')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Ex: Banner Black Friday'),
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('Alerta Ativo')
-                            ->helperText('Define se o alerta será exibido no site imediatamente.')
-                            ->default(true)
-                            ->inline(),
-                        Forms\Components\TextInput::make('sort_order')
-                            ->label('Ordem de Exibição')
-                            ->helperText('Define a prioridade caso existam múltiplos alertas ativos.')
-                            ->numeric()
-                            ->default(0)
-                            ->minValue(0),
-                    ])
-                    ->columns(2),
+                        // Coluna Principal - Conteúdo (Esquerda - 2/3)
+                        Forms\Components\Group::make()
+                            ->columnSpan(['default' => 3, 'lg' => 2])
+                            ->schema([
+                                Forms\Components\Section::make('Conteúdo da Mensagem')
+                                    ->description('Escreva o texto que será exibido para os usuários.')
+                                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('title')
+                                            ->label('Título do Alerta')
+                                            ->helperText('Título em destaque (opcional).')
+                                            ->prefixIcon('heroicon-o-bars-3-bottom-left')
+                                            ->maxLength(255)
+                                            ->placeholder('Ex: Atenção!'),
+                                        Forms\Components\Textarea::make('message')
+                                            ->label('Mensagem Principal')
+                                            ->helperText('Texto descritivo que o usuário irá ler.')
+                                            ->required()
+                                            ->rows(5)
+                                            ->columnSpanFull(),
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('cta_label')
+                                                    ->label('Texto do Botão')
+                                                    ->helperText('Texto de ação (ex: Saiba Mais).')
+                                                    ->prefixIcon('heroicon-o-cursor-arrow-rays')
+                                                    ->maxLength(255)
+                                                    ->placeholder('Ex: Clique aqui'),
+                                                Forms\Components\TextInput::make('cta_url')
+                                                    ->label('Link de Destino (URL)')
+                                                    ->helperText('Para onde o usuário será levado.')
+                                                    ->prefixIcon('heroicon-o-link')
+                                                    ->url()
+                                                    ->maxLength(500)
+                                                    ->placeholder('https://...'),
+                                            ]),
+                                    ]),
 
-                Forms\Components\Section::make('Configurações de Estilo')
-                    ->description('Personalize a aparência e o local onde o alerta será exibido.')
-                    ->icon('heroicon-o-swatch')
-                    ->schema([
-                        Forms\Components\Select::make('type')
-                            ->label('Tipo de Alerta')
-                            ->helperText('Define o propósito do alerta (ex: Aviso, Promoção).')
-                            ->options(Alert::typeLabels())
-                            ->required()
-                            ->live()
-                            ->native(false),
-                        Forms\Components\Select::make('style')
-                            ->label('Cores e Estilo')
-                            ->helperText('Esquema de cores do alerta (Sucesso, Atenção, Erro).')
-                            ->options(Alert::styleLabels())
-                            ->default(Alert::STYLE_INFO)
-                            ->required()
-                            ->native(false),
-                        Forms\Components\Select::make('position')
-                            ->label('Posição na Tela')
-                            ->helperText('Onde o alerta aparecerá (Topo, Rodapé, Flutuante).')
-                            ->options(Alert::positionLabels())
-                            ->default(Alert::POSITION_TOP)
-                            ->required()
-                            ->native(false),
-                    ])
-                    ->columns(3),
+                                Forms\Components\Section::make('Configurações de Estilo')
+                                    ->description('Personalize a aparência e o local onde o alerta será exibido.')
+                                    ->icon('heroicon-o-swatch')
+                                    ->schema([
+                                        Forms\Components\ToggleButtons::make('type')
+                                            ->label('Tipo de Alerta')
+                                            ->helperText('Define o propósito do alerta.')
+                                            ->options(Alert::typeLabels())
+                                            ->icons([
+                                                Alert::TYPE_MODAL => 'heroicon-o-square-3-stack-3d',
+                                                Alert::TYPE_TOAST => 'heroicon-o-bell-alert',
+                                                Alert::TYPE_BANNER => 'heroicon-o-view-columns',
+                                            ])
+                                            ->inline()
+                                            ->required()
+                                            ->live()
+                                            ->columnSpanFull(),
+                                            
+                                        Forms\Components\ToggleButtons::make('style')
+                                            ->label('Cores e Estilo')
+                                            ->options(Alert::styleLabels())
+                                            ->colors([
+                                                Alert::STYLE_INFO => 'info',
+                                                Alert::STYLE_PROMO => 'primary',
+                                                Alert::STYLE_ANNOUNCEMENT => 'gray',
+                                                Alert::STYLE_CONSENT => 'gray',
+                                                Alert::STYLE_WARNING => 'warning',
+                                                Alert::STYLE_SUCCESS => 'success',
+                                            ])
+                                            ->icons([
+                                                Alert::STYLE_INFO => 'heroicon-o-information-circle',
+                                                Alert::STYLE_PROMO => 'heroicon-o-sparkles',
+                                                Alert::STYLE_ANNOUNCEMENT => 'heroicon-o-megaphone',
+                                                Alert::STYLE_CONSENT => 'heroicon-o-shield-check',
+                                                Alert::STYLE_WARNING => 'heroicon-o-exclamation-triangle',
+                                                Alert::STYLE_SUCCESS => 'heroicon-o-check-circle',
+                                            ])
+                                            ->inline()
+                                            ->default(Alert::STYLE_INFO)
+                                            ->required()
+                                            ->columnSpanFull(),
+                                            
+                                        Forms\Components\ToggleButtons::make('position')
+                                            ->label('Posição na Tela')
+                                            ->options(Alert::positionLabels())
+                                            ->icons([
+                                                Alert::POSITION_TOP => 'heroicon-o-arrow-up',
+                                                Alert::POSITION_BOTTOM => 'heroicon-o-arrow-down',
+                                                Alert::POSITION_TOP_LEFT => 'heroicon-o-arrow-up-left',
+                                                Alert::POSITION_TOP_RIGHT => 'heroicon-o-arrow-up-right',
+                                                Alert::POSITION_BOTTOM_LEFT => 'heroicon-o-arrow-down-left',
+                                                Alert::POSITION_BOTTOM_RIGHT => 'heroicon-o-arrow-down-right',
+                                                Alert::POSITION_CENTER => 'heroicon-o-arrows-pointing-in',
+                                            ])
+                                            ->inline()
+                                            ->default(Alert::POSITION_TOP)
+                                            ->required()
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
 
-                Forms\Components\Section::make('Conteúdo da Mensagem')
-                    ->description('Escreva o texto que será exibido para os usuários.')
-                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
-                    ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->label('Título do Alerta')
-                            ->helperText('Título em destaque (opcional).')
-                            ->maxLength(255)
-                            ->placeholder('Ex: Atenção!'),
-                        Forms\Components\Textarea::make('message')
-                            ->label('Mensagem Principal')
-                            ->helperText('Texto descritivo que o usuário irá ler.')
-                            ->required()
-                            ->rows(3)
-                            ->columnSpanFull(),
-                        Forms\Components\TextInput::make('cta_label')
-                            ->label('Texto do Botão')
-                            ->helperText('Texto de ação (ex: Saiba Mais, Ver Oferta).')
-                            ->maxLength(255)
-                            ->placeholder('Ex: Clique aqui'),
-                        Forms\Components\TextInput::make('cta_url')
-                            ->label('Link de Destino (URL)')
-                            ->helperText('Endereço para onde o usuário será levado ao clicar.')
-                            ->url()
-                            ->maxLength(500)
-                            ->placeholder('https://...'),
-                    ])
-                    ->columns(2),
-
-                Forms\Components\Section::make('Comportamento e Cookies')
-                    ->description('Controle como o usuário interage e fecha o alerta.')
-                    ->icon('heroicon-o-cog-8-tooth')
-                    ->schema([
-                        Forms\Components\Toggle::make('is_dismissible')
-                            ->label('Permitir Fechar')
-                            ->helperText('Exibe um botão "X" para o usuário ocultar o alerta.')
-                            ->default(true)
-                            ->inline(),
-                        Forms\Components\Toggle::make('use_cookie')
-                            ->label('Lembrar Fechamento')
-                            ->helperText('Se ativado, o alerta não aparecerá novamente após ser fechado.')
-                            ->default(false)
-                            ->live()
-                            ->inline(),
-                        Forms\Components\TextInput::make('cookie_key')
-                            ->label('Chave do Cookie')
-                            ->helperText('Identificador único para o cookie. Deixe vazio para automático.')
-                            ->maxLength(100)
-                            ->placeholder('alert_black_friday')
-                            ->visible(fn (Forms\Get $get) => (bool) $get('use_cookie')),
-                        Forms\Components\TextInput::make('cookie_duration_days')
-                            ->label('Duração (Dias)')
-                            ->helperText('Por quantos dias o alerta ficará oculto após o fechamento.')
-                            ->numeric()
-                            ->minValue(1)
-                            ->default(30)
-                            ->visible(fn (Forms\Get $get) => (bool) $get('use_cookie')),
-                    ])
-                    ->columns(2),
+                        // Coluna Lateral - Configurações (Direita - 1/3)
+                        Forms\Components\Group::make()
+                            ->columnSpan(['default' => 3, 'lg' => 1])
+                            ->schema([
+                                Forms\Components\Section::make('Identificação')
+                                    ->schema([
+                                        Forms\Components\Toggle::make('is_active')
+                                            ->label('Alerta Ativo')
+                                            ->helperText('Exibir o alerta no site.')
+                                            ->onIcon('heroicon-m-check')
+                                            ->offIcon('heroicon-m-x-mark')
+                                            ->default(true),
+                                            
+                                        Forms\Components\TextInput::make('name')
+                                            ->label('Nome Interno')
+                                            ->prefixIcon('heroicon-o-tag')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->placeholder('Ex: Banner Black Friday'),
+                                            
+                                        Forms\Components\TextInput::make('sort_order')
+                                            ->label('Ordem de Exibição')
+                                            ->prefixIcon('heroicon-o-list-bullet')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->minValue(0),
+                                    ]),
+                                    
+                                Forms\Components\Section::make('Comportamento')
+                                    ->schema([
+                                        Forms\Components\Toggle::make('is_dismissible')
+                                            ->label('Permitir Fechar')
+                                            ->helperText('Exibe um botão "X".')
+                                            ->onIcon('heroicon-m-check')
+                                            ->offIcon('heroicon-m-x-mark')
+                                            ->default(true),
+                                            
+                                        Forms\Components\Toggle::make('use_cookie')
+                                            ->label('Lembrar Fechamento')
+                                            ->helperText('Não mostrar de novo se fechado.')
+                                            ->onIcon('heroicon-m-check')
+                                            ->offIcon('heroicon-m-x-mark')
+                                            ->default(false)
+                                            ->live(),
+                                            
+                                        Forms\Components\TextInput::make('cookie_key')
+                                            ->label('Chave do Cookie')
+                                            ->prefixIcon('heroicon-o-key')
+                                            ->maxLength(100)
+                                            ->placeholder('Automático')
+                                            ->visible(fn (Forms\Get $get) => (bool) $get('use_cookie')),
+                                            
+                                        Forms\Components\TextInput::make('cookie_duration_days')
+                                            ->label('Duração (Dias)')
+                                            ->prefixIcon('heroicon-o-clock')
+                                            ->numeric()
+                                            ->minValue(1)
+                                            ->default(30)
+                                            ->visible(fn (Forms\Get $get) => (bool) $get('use_cookie')),
+                                    ]),
+                            ]),
+                    ]),
             ]);
     }
 
