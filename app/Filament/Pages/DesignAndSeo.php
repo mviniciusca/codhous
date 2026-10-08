@@ -195,6 +195,12 @@ class DesignAndSeo extends Page implements HasForms
                                     ->onIcon('heroicon-m-check')
                                     ->default(true)
                                     ->inline(false),
+                                Toggle::make('settings.website.features.newsletter')
+                                    ->label('Formulário de Newsletter')
+                                    ->helperText('Exibe um formulário de inscrição na newsletter no rodapé do site.')
+                                    ->onIcon('heroicon-m-check')
+                                    ->default(true)
+                                    ->inline(false),
                             ]),
                     ]),
 

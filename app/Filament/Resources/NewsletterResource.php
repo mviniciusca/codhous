@@ -22,10 +22,9 @@ class NewsletterResource extends Resource
 
     protected static ?string $slug = 'subscribers';
 
-    protected static ?string $navigationIcon = 'heroicon-o-envelope';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Website';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $cluster = \App\Filament\Clusters\NewsletterCluster::class;
 
     public static function getNavigationBadge(): ?string
     {
@@ -126,9 +125,7 @@ class NewsletterResource extends Resource
 
     public static function getWidgets(): array
     {
-        return [
-            NewsletterOverwview::class,
-        ];
+        return [];
     }
 
     public static function getPages(): array

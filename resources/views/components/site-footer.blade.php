@@ -92,6 +92,10 @@
                             </div>
                         </div>
                     @endif
+
+                    @if(data_get($website, 'features.newsletter', true))
+                        @livewire('newsletter-form')
+                    @endif
                 </div>
 
                 <div>

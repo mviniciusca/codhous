@@ -29,8 +29,6 @@ class ListNewsletters extends ListRecords
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            NewsletterResource\Widgets\NewsletterOverwview::class,
-        ];
+        return [];
     }
 }
