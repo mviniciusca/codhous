@@ -22,8 +22,9 @@ class PosterBuilder extends Page implements HasForms
 
     protected static string $view = 'filament.pages.poster-builder';
 
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static ?int $navigationSort = 3;
     protected static ?string $title = 'Gerador de Posters';
+    protected ?string $subheading = 'Gere e baixe artes personalizadas com a sua logo e telefone para postar nas redes sociais, enviar por WhatsApp, etc.';
 
     public ?array $data = [];
     public ?string $generatedImageUrl = null;
@@ -45,13 +46,6 @@ class PosterBuilder extends Page implements HasForms
                             ->columnSpanFull()
                             ->label('Template de Fundo')
                             ->helperText('Adicione imagens na pasta public/img/templates para que apareçam aqui.'),
-                            
-                        FileUpload::make('logo')
-                            ->label('Logo da Empresa (PNG transparente)')
-                            ->image()
-                            ->directory('temp-logos')
-                            ->required(),
-
                     ])->columns(1)
             ])
             ->statePath('data');
@@ -62,27 +56,56 @@ class PosterBuilder extends Page implements HasForms
         $data = $this->form->getState();
 
         $templatePath = public_path('img/templates/' . $data['template']);
-        $logoPath = Storage::disk('public')->path($data['logo']);
-
+        
+        $settings = \App\Models\Setting::first()->settings ?? [];
+        $logoPath = $settings['website']['logo'] ?? $settings['layout']['logo'] ?? null;
+        $phone = $settings['company']['phone'] ?? '';
 
         // Instancia o Intervention Image Manager (versão 3)
         $manager = new ImageManager(new Driver());
+
+        if (!$logoPath || !Storage::disk('public')->exists($logoPath)) {
+            \Filament\Notifications\Notification::make()
+                ->title('Aviso: Logo não encontrada')
+                ->body('O poster será gerado sem a logo da empresa. Configure a logo em Configurações.')
+                ->warning()
+                ->send();
+        }
+
+        if (!$phone) {
+            \Filament\Notifications\Notification::make()
+                ->title('Aviso: Telefone não encontrado')
+                ->body('O poster será gerado sem o número de telefone. Configure o telefone em Configurações.')
+                ->warning()
+                ->send();
+        }
 
         try {
             // Carrega o template
             $image = $manager->decodePath($templatePath);
 
             // Carrega a logo
-            $logo = $manager->decodePath($logoPath);
-            
-            // Redimensiona a logo para não ficar gigante (ex: máx 300px largura)
-            $logo->scaleDown(width: 300);
+            if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+                $logo = $manager->decodePath(Storage::disk('public')->path($logoPath));
+                
+                // Redimensiona a logo para não ficar gigante (ex: máx 300px largura)
+                $logo->scaleDown(width: 300);
 
-            // Insere a logo na imagem (ex: topo-esquerda com margem)
-            $image->insert($logo, 50, 50, 'top-left');
+                // Insere a logo na imagem (ex: topo-esquerda com margem)
+                $image->insert($logo, 50, 50, 'top-left');
+            }
+
+            // Adiciona o telefone
+            if ($phone) {
+                $image->text($phone, 470, 1150, function ($font) {
+                    $font->file(base_path('vendor/dompdf/dompdf/lib/fonts/DejaVuSans-Bold.ttf'));
+                    $font->size(54);
+                    $font->color('#ea580c');
+                    $font->align('center', 'center');
+                });
+            }
 
             // Busca o mascote nas configurações globais
-            $settings = \App\Models\Setting::first()->settings ?? [];
             $mascotPath = $settings['website']['mascot'] ?? null;
 
             if ($mascotPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($mascotPath)) {
@@ -110,8 +133,7 @@ class PosterBuilder extends Page implements HasForms
             // Define a URL para exibir no Blade
             $this->generatedImageUrl = Storage::url($filename);
 
-            // Deleta a logo temporária
-            Storage::disk('public')->delete($data['logo']);
+
 
         } catch (\Exception $e) {
             // Em caso de erro
