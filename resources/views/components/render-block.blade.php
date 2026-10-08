@@ -95,7 +95,7 @@
             $vAlignClass = $vAlign === 'start' ? 'lg:items-start items-center' : ($vAlign === 'end' ? 'lg:items-end items-center' : 'items-center');
         @endphp
         <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ $isDark ? 'text-scheme-dark' : '' }} {{ $data['custom_css_classes'] ?? '' }}">
-            <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+            <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
                 <div class="flex flex-col {{ ($data['image_position'] ?? 'left') === 'right' ? 'lg:flex-row-reverse' : 'lg:flex-row' }} {{ $vAlignClass }} gap-12 lg:gap-20">
                 <div class="w-full lg:w-2/5">
                     @if(!empty($data['image']))
