@@ -52,7 +52,7 @@
 @endphp
 
 @php
-    $footerClasses = 'border-t border-border bg-card';
+    $footerClasses = 'bg-card';
 @endphp
 
 {{-- DEFAULT FOOTER --}}
@@ -63,6 +63,11 @@
             ->filter(fn ($n) => filled($n['url']));
     @endphp
     <footer class="{{ $footerClasses }} overflow-hidden relative">
+        <div class="absolute top-0 left-0 flex w-full items-center">
+            <div class="h-px flex-1 bg-primary opacity-50"></div>
+            <div class="h-[5px] w-[40%] bg-primary"></div>
+            <div class="h-px flex-1 bg-primary opacity-50"></div>
+        </div>
         <div class="mx-auto max-w-7xl px-4 py-12 lg:px-8 relative">
             <div class="grid gap-10 md:grid-cols-2 {{ $websiteMascot ? 'lg:grid-cols-5' : 'lg:grid-cols-4' }} relative z-10">
                 <div class="lg:col-span-2 flex flex-col gap-6">
