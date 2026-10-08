@@ -97,14 +97,14 @@
         <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ $isDark ? 'text-scheme-dark' : '' }} {{ $data['custom_css_classes'] ?? '' }}">
             <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
                 <div class="flex flex-col {{ ($data['image_position'] ?? 'left') === 'right' ? 'lg:flex-row-reverse' : 'lg:flex-row' }} {{ $vAlignClass }} gap-12 lg:gap-20">
-                <div class="w-full lg:w-1/2">
+                <div class="w-full lg:w-2/5">
                     @if(!empty($data['image']))
                         <div class="relative flex justify-center lg:justify-end">
                             <img src="{{ resolveFilamentImagePath($data['image']) }}" alt="{{ $data['title'] ?? '' }}" class="w-full max-w-lg lg:max-w-none h-auto object-contain">
                         </div>
                     @endif
                 </div>
-                <div class="w-full lg:w-1/2">
+                <div class="w-full lg:w-3/5">
                     @if(!empty($data['badge']))
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full {{ $badgeBgClass }} {{ $badgeTextColor }} font-semibold tracking-wider text-xs uppercase mb-6">
                             <i data-lucide="{{ $badgeIcon }}" class="w-4 h-4 {{ !empty($badgeIcon) ? '' : 'fill-current' }}"></i> {{ $data['badge'] }}
@@ -136,7 +136,7 @@
                             <a href="{{ $data['secondary_button_url'] }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold {{ $isDark ? 'text-gray-300 border-gray-700 hover:text-white hover:bg-gray-800' : 'text-gray-700 border-gray-300 hover:text-gray-900 hover:bg-gray-50' }} border rounded-xl transition-colors duration-200">
                                 {{ $data['secondary_button_text'] }}
                                 @if(!empty($btn2Icon))
-                                    <i data-lucide="{{ $btn2Icon }}" class="w-5 h-5 ml-2"></i>
+                                    <i data-lucide="{{ $btn2Icon }}" class="w-5 h-5 ml-2 text-primary"></i>
                                 @endif
                             </a>
                         @endif
@@ -149,7 +149,7 @@
                                     $statIcon = ($stat['icon_select'] ?? 'check-circle') === 'other' ? ($stat['icon_custom'] ?? 'check-circle') : ($stat['icon_select'] ?? 'check-circle');
                                 @endphp
                                 <div class="flex items-center gap-3 px-4 first:pl-0 last:pr-0">
-                                    <div class="flex-shrink-0 w-11 h-11 rounded-xl {{ $isDark ? 'bg-white/5 border border-white/10 text-white shadow-inner shadow-white/10' : 'bg-gray-50 border border-gray-200 text-gray-900 shadow-sm' }} flex items-center justify-center">
+                                    <div class="flex-shrink-0 w-11 h-11 rounded-xl {{ $isDark ? 'bg-white/5 border border-white/10 text-primary-400 shadow-inner shadow-white/10' : 'bg-gray-50 border border-gray-200 text-primary shadow-sm' }} flex items-center justify-center">
                                         <i data-lucide="{{ $statIcon }}" class="w-5 h-5"></i>
                                     </div>
                                     <div class="flex flex-col min-w-[80px]">
