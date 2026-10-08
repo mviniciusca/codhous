@@ -137,7 +137,7 @@ class PageResource extends Resource
                                 ->blockPickerColumns(2)
                                 ->blockNumbers(false)
                                 ->blockPreviews()
-                                ->editAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action->modalWidth('7xl')),
+                                ->editAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action->modalWidth('screen')),
                         ]),
 
                     Forms\Components\Wizard\Step::make('Configurações e SEO')
@@ -610,23 +610,63 @@ class PageResource extends Resource
             ->schema(self::getBlockTabs([
                 Forms\Components\Grid::make(1)->schema([
                     Forms\Components\Section::make('Conteúdo Principal')->schema([
-                        ...self::getIconSelection('badge_icon', 'Ícone do Badge', 'zap'),
-                        Forms\Components\TextInput::make('badge')
-                            ->label(__('Badge (Ex: Sobre Nós)'))
-                            ->helperText(__('Pequeno texto de destaque acima do título.'))
-                            ->prefixIcon('heroicon-o-tag')
-                            ->placeholder('SOBRE NÓS'),
-                        
-                        Forms\Components\TextInput::make('title')
-                            ->label(__('Título Principal'))
-                            ->helperText(__('O título grande da seção.'))
-                            ->prefixIcon('heroicon-o-h1')
-                            ->required(),
-                            
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('Descrição / Texto de Apoio'))
-                            ->helperText(__('O texto principal descrevendo os detalhes. Aceita múltiplas linhas.'))
-                            ->rows(4),
+                        Forms\Components\Grid::make(3)->schema([
+                            // Coluna de Texto (Ocupa 2)
+                            Forms\Components\Group::make()->schema([
+                                ...self::getIconSelection('badge_icon', 'Ícone do Badge', 'zap'),
+                                Forms\Components\TextInput::make('badge')
+                                    ->label(__('Badge (Ex: Sobre Nós)'))
+                                    ->helperText(__('Pequeno texto de destaque acima do título.'))
+                                    ->prefixIcon('heroicon-o-tag')
+                                    ->placeholder('SOBRE NÓS'),
+                                
+                                Forms\Components\TextInput::make('title')
+                                    ->label(__('Título Principal'))
+                                    ->helperText(__('O título grande da seção.'))
+                                    ->prefixIcon('heroicon-o-h1')
+                                    ->required(),
+                                    
+                                Forms\Components\Textarea::make('description')
+                                    ->label(__('Descrição / Texto de Apoio'))
+                                    ->helperText(__('O texto principal descrevendo os detalhes.'))
+                                    ->rows(4),
+                            ])->columnSpan(2),
+
+                            // Coluna da Imagem (Ocupa 1)
+                            Forms\Components\Group::make()->schema([
+                                Forms\Components\FileUpload::make('image')
+                                    ->label(__('Imagem Principal'))
+                                    ->image()
+                                    ->directory('blocks')
+                                    ->required(),
+                                Forms\Components\ToggleButtons::make('image_position')
+                                    ->label(__('Posição da Imagem'))
+                                    ->options([
+                                        'left' => 'Esquerda', 
+                                        'right' => 'Direita'
+                                    ])
+                                    ->icons([
+                                        'left' => 'heroicon-o-bars-3-bottom-left',
+                                        'right' => 'heroicon-o-bars-3-bottom-right',
+                                    ])
+                                    ->default('right')
+                                    ->inline(),
+                                Forms\Components\ToggleButtons::make('image_vertical_alignment')
+                                    ->label(__('Alinhamento Vertical'))
+                                    ->options([
+                                        'start' => 'Topo',
+                                        'center' => 'Meio',
+                                        'end' => 'Base'
+                                    ])
+                                    ->icons([
+                                        'start' => 'heroicon-o-bars-arrow-up',
+                                        'center' => 'heroicon-o-bars-2',
+                                        'end' => 'heroicon-o-bars-arrow-down',
+                                    ])
+                                    ->default('center')
+                                    ->inline(),
+                            ])->columnSpan(1),
+                        ]),
                     ])->collapsible(),
 
                     Forms\Components\Section::make('Botão Primário')->schema([
@@ -675,42 +715,7 @@ class PageResource extends Resource
                             ])->collapsible()->cloneable(),
                     ])->collapsible()->collapsed(),
 
-                    Forms\Components\Section::make('Imagem')->schema([
-                        Forms\Components\FileUpload::make('image')
-                            ->label(__('Imagem Principal'))
-                            ->helperText(__('Faça o upload da imagem da seção.'))
-                            ->image()
-                            ->directory('blocks')
-                            ->required(),
-                        Forms\Components\ToggleButtons::make('image_position')
-                            ->label(__('Posição da Imagem'))
-                            ->helperText(__('Deseja a imagem na direita ou na esquerda?'))
-                            ->options([
-                                'left' => 'Esquerda', 
-                                'right' => 'Direita'
-                            ])
-                            ->icons([
-                                'left' => 'heroicon-o-bars-3-bottom-left',
-                                'right' => 'heroicon-o-bars-3-bottom-right',
-                            ])
-                            ->default('right')
-                            ->inline(),
-                        Forms\Components\ToggleButtons::make('image_vertical_alignment')
-                            ->label(__('Alinhamento Vertical da Imagem'))
-                            ->helperText(__('Define como a imagem se alinha verticalmente em relação ao texto.'))
-                            ->options([
-                                'start' => 'Topo',
-                                'center' => 'Meio',
-                                'end' => 'Base'
-                            ])
-                            ->icons([
-                                'start' => 'heroicon-o-bars-arrow-up',
-                                'center' => 'heroicon-o-bars-2',
-                                'end' => 'heroicon-o-bars-arrow-down',
-                            ])
-                            ->default('center')
-                            ->inline(),
-                    ])->collapsible()->collapsed(),
+                    // A aba de imagem foi movida para o Conteúdo Principal
                 ]),
             ]));
     }
