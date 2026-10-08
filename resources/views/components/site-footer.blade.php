@@ -52,7 +52,7 @@
 @endphp
 
 @php
-    $footerClasses = 'bg-card';
+    $footerClasses = 'bg-primary text-primary-foreground';
 @endphp
 
 {{-- DEFAULT FOOTER --}}
@@ -62,7 +62,7 @@
             ->map(fn ($icon, $key) => ['icon' => $icon, 'key' => $key, 'url' => data_get($website, "social_networks.$key")])
             ->filter(fn ($n) => filled($n['url']));
     @endphp
-    <footer class="{{ $footerClasses }} overflow-hidden relative">
+    <footer class="bg-slate-950 overflow-hidden relative text-white">
         <div class="absolute top-0 left-0 flex w-full items-center">
             <div class="h-px flex-1 bg-primary opacity-50"></div>
             <div class="h-[5px] w-[40%] bg-primary"></div>
@@ -78,18 +78,18 @@
                             <div class="flex h-10 w-10 items-center justify-center rounded-md bg-primary">
                                 <i data-lucide="truck" class="h-5 w-5 text-primary-foreground"></i>
                             </div>
-                            <span class="font-mono text-xl font-bold tracking-tight text-foreground">{{ $websiteName }}</span>
+                            <span class="font-mono text-xl font-bold tracking-tight text-white">{{ $websiteName }}</span>
                         @endif
                     </a>
 
                     @if($activeNetworks->isNotEmpty())
                         <div>
-                            <p class="mb-3 font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground">Siga a gente</p>
+                            <p class="mb-3 font-mono text-xs font-bold uppercase tracking-wider text-white/70">Siga a gente</p>
                             <div class="flex flex-wrap gap-3">
                                 @foreach($activeNetworks as $network)
                                     <a href="{{ $network['url'] }}" target="_blank" rel="noopener noreferrer"
                                        aria-label="{{ ucfirst($network['key']) }}"
-                                       class="group flex items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-lg"
+                                       class="group flex items-center justify-center rounded-full border border-white/20 bg-white/5 text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-lg"
                                        style="width: 42px; height: 42px;">
                                         <ion-icon name="{{ $network['icon'] }}" style="font-size: 20px;"></ion-icon>
                                     </a>
@@ -99,13 +99,15 @@
                     @endif
 
                     @if(data_get($website, 'features.newsletter', true))
-                        @livewire('newsletter-form')
+                        <div class="dark">
+                            @livewire('newsletter-form')
+                        </div>
                     @endif
                 </div>
 
                 <div>
-                    <h4 class="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-foreground">Navegação</h4>
-                    <ul class="flex flex-col gap-2 text-sm text-muted-foreground">
+                    <h4 class="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-white">Navegação</h4>
+                    <ul class="flex flex-col gap-2 text-sm text-white/70">
                         @foreach($navigation as $item)
                             <li><a href="{{ data_get($item, 'url') }}" class="transition-colors hover:text-primary">{{ data_get($item, 'label') }}</a></li>
                         @endforeach
@@ -113,8 +115,8 @@
                 </div>
 
                 <div>
-                    <h4 class="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-foreground">Contato</h4>
-                    <ul class="flex flex-col gap-3 text-sm text-muted-foreground">
+                    <h4 class="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-white">Contato</h4>
+                    <ul class="flex flex-col gap-3 text-sm text-white/70">
                         <li class="flex items-center gap-2">
                             <i data-lucide="phone" class="h-4 w-4 shrink-0 text-primary"></i>
                             @if($companyPhoneTel)
@@ -132,12 +134,12 @@
             @if($websiteMascot)
             <div class="hidden md:block absolute bottom-0 right-0 z-20 pointer-events-none" style="margin-right: -2rem;">
                 <div class="absolute rounded-full bg-primary" style="width: 260px; height: 260px; left: 50%; top: 45%; transform: translate(-50%, -50%); opacity: .12; filter: blur(60px);"></div>
-                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($websiteMascot) }}" alt="Mascote" style="height: 350px; width: auto;" class="relative object-contain drop-shadow-2xl" />
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($websiteMascot) }}" alt="Mascote" style="height: 460px; width: auto;" class="relative object-contain drop-shadow-2xl" />
             </div>
             @endif
 
-            <div class="relative z-10 mt-12 pt-8 text-xs text-muted-foreground {{ $websiteMascot ? 'md:text-left' : 'text-center' }} text-center">
-                <div class="absolute top-0 left-0 h-px bg-border"
+            <div class="relative z-10 mt-12 pt-8 text-xs text-white/50 {{ $websiteMascot ? 'md:text-left' : 'text-center' }} text-center">
+                <div class="absolute top-0 left-0 h-px bg-primary"
                      style="width: {{ $websiteMascot ? '70%' : '100%' }}; -webkit-mask-image: linear-gradient(to right, #000 0%, #000 70%, transparent 100%); mask-image: linear-gradient(to right, #000 0%, #000 70%, transparent 100%);"></div>
                 {{ $companyName }} &copy; {{ date('Y') }}. Todos os direitos reservados.
             </div>
