@@ -30,7 +30,7 @@ class QuickActionsWidget extends Widget implements HasForms, HasActions
     protected static ?int $sort = 3;
 
     protected int | string | array $columnSpan = [
-        'default' => 1,
+        'default' => 'full',
         'md' => 4,
         'xl' => 4,
     ];

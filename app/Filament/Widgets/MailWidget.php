@@ -19,13 +19,17 @@ use Illuminate\Support\Str;
 
 class MailWidget extends BaseWidget
 {
-    protected static ?int $sort = 7;
+    protected static ?int $sort = 4;
 
     public Mail $mail;
 
     protected static ?string $model = Mail::class;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = [
+        'default' => 'full',
+        'md' => 8,
+        'xl' => 8,
+    ];
 
     public function table(Table $table): Table
     {
@@ -65,13 +69,11 @@ class MailWidget extends BaseWidget
 
                 TextColumn::make('name')
                     ->label('Remetente')
-                    ->searchable()
                     ->limit(20)
                     ->tooltip(fn (Mail $record): string => "{$record->name} <{$record->email}>"),
 
                 TextColumn::make('subject')
                     ->label('Assunto')
-                    ->searchable()
                     ->limit(40)
                     ->tooltip(fn (Mail $record): ?string => strlen($record->subject) > 40 ? $record->subject : null
                     ),
