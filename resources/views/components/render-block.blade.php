@@ -1048,6 +1048,11 @@
 
     @case('cta')
         <x-section-cta-contact
+            :image="$data['image'] ?? null"
+            :image-size="$data['image_size'] ?? 155"
+            :image-offset-x="$data['image_offset_x'] ?? 0"
+            :image-offset-y="$data['image_offset_y'] ?? 0"
+            :show-features="$data['show_features'] ?? true"
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['title'] ?? null"

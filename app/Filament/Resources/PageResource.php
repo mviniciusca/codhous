@@ -483,14 +483,34 @@ class PageResource extends Resource
     {
         return Forms\Components\Builder\Block::make('cta')
             ->preview('filament.block-previews.cta')
-            ->label(__('Chamada para Ação (CTA)'))
+            ->label(__('CTA de Atendimento'))
             ->icon('heroicon-o-megaphone')
-            ->schema(self::getBlockTabs([
-                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da chamada principal.')),
-                Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto de apoio da chamada.')),
-                Forms\Components\TextInput::make('button_label')->label(__('Rótulo do Botão'))->helperText(__('Texto do botão de ação.')),
-                Forms\Components\TextInput::make('button_url')->label(__('URL do Botão'))->helperText(__('Link para onde o botão deve levar.')),
-            ]));
+            ->schema([
+                Forms\Components\FileUpload::make('image')
+                    ->label(__('Imagem do Atendente'))
+                    ->helperText(__('PNG com fundo transparente. A imagem ficará um pouco para fora do topo do card.'))
+                    ->image()
+                    ->directory('blocks')
+                    ->columnSpanFull(),
+                Forms\Components\Grid::make(3)->schema([
+                    Forms\Components\TextInput::make('image_size')
+                        ->label(__('Tamanho da Imagem (%)'))
+                        ->helperText(__('100 = cabe dentro; >100 sobressai pelo topo.'))
+                        ->numeric()->minValue(100)->maxValue(220)->default(155),
+                    Forms\Components\TextInput::make('image_offset_x')
+                        ->label(__('Posição Horizontal (px)'))
+                        ->helperText(__('Negativo = esquerda, positivo = direita.'))
+                        ->numeric()->minValue(-200)->maxValue(200)->default(0),
+                    Forms\Components\TextInput::make('image_offset_y')
+                        ->label(__('Ajuste da Base (px)'))
+                        ->helperText(__('0 = encostado na base. Negativo desce, positivo sobe.'))
+                        ->numeric()->minValue(-100)->maxValue(100)->default(0),
+                ]),
+                Forms\Components\Toggle::make('show_features')
+                    ->label(__('Mostrar lista de diferenciais'))
+                    ->helperText(__('Atendimento rápido, orçamento sem compromisso e canal preferido.'))
+                    ->default(true),
+            ]);
     }
 
     protected static function getDifferentialsBlock(): Forms\Components\Builder\Block
