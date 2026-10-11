@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BudgetDownloadController;
 use App\Http\Controllers\BudgetPdfController;
+use App\Http\Controllers\PageBuilderPreviewController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ShowcaseController;
 use Illuminate\Http\RedirectResponse;
@@ -35,6 +36,12 @@ Route::get('/budget/pdf/{token}', [BudgetPdfController::class, 'download'])
     ->name('budget.pdf.download');
 
 Route::get('nossas-obras/{id}', [ShowcaseController::class, 'show'])->name('showcase.show');
+
+// Page Builder live preview (painel administrativo)
+Route::get('/admin/page-builder/preview/{token}', PageBuilderPreviewController::class)
+    ->middleware('auth')
+    ->where('token', '[a-f0-9]{64}')
+    ->name('page-builder.preview');
 
 // Dynamic Pages Catch-all (must be at the end)
 Route::get('/{slug?}', [PageController::class, 'show'])

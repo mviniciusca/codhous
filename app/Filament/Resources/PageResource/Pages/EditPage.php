@@ -6,12 +6,14 @@ use App\Filament\Resources\PageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
+use App\Filament\Resources\PageResource\Concerns\InteractsWithLivePreview;
 use Pboivin\FilamentPeek\Pages\Actions\PreviewAction;
 use Pboivin\FilamentPeek\Pages\Concerns\HasPreviewModal;
 
 class EditPage extends EditRecord
 {
     use HasPreviewModal;
+    use InteractsWithLivePreview;
 
     protected static string $resource = PageResource::class;
 

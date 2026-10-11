@@ -4,6 +4,7 @@
     'keywords' => null,
     'ogImage' => null,
     'meta' => null,
+    'builderPreview' => false,
 ])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
@@ -43,10 +44,12 @@
     </main>
 
     <x-site-footer :theme="$theme" />
-    <x-site-whatsapp />
-    <x-site-scroll-to-top />
-    <x-site-alerts />
-    <x-site-cookie-consent />
+    @unless($builderPreview)
+        <x-site-whatsapp />
+        <x-site-scroll-to-top />
+        <x-site-alerts />
+        <x-site-cookie-consent />
+    @endunless
 
     @livewireScripts
     @filamentScripts

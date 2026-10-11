@@ -137,7 +137,36 @@ class PageResource extends Resource
                                 ->blockPickerColumns(2)
                                 ->blockNumbers(false)
                                 ->blockPreviews()
-                                ->editAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action->modalWidth('screen')),
+                                // Layout estilo WordPress: Blocos | Live Preview | Estrutura
+                                ->view('filament.forms.components.page-builder')
+                                // Adiciona o bloco direto (com valores padrão) e abre o painel de edição.
+                                // O `blockPreviews()` injeta o schema do bloco como form da ação de adicionar,
+                                // o que valida campos obrigatórios antes de inserir (e falha em silêncio com o
+                                // modal oculto). Removemos o form: a validação acontece no painel de edição/salvar.
+                                ->addAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action
+                                    ->form(null)
+                                    ->modalHidden()
+                                    ->after(function (\Filament\Forms\Components\Builder $component, $livewire): void {
+                                        $uuid = array_key_last($component->getState() ?? []);
+
+                                        if (filled($uuid)) {
+                                            $livewire->dispatch('page-builder-block-added', uuid: (string) $uuid);
+                                        }
+                                    }))
+                                // Painel lateral de edição: mantém o live preview visível enquanto edita
+                                ->editAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action
+                                    ->slideOver()
+                                    ->modalWidth(\Filament\Support\Enums\MaxWidth::TwoExtraLarge)
+                                    ->modalHeading(function (array $arguments, \Filament\Forms\Components\Builder $component): string {
+                                        $type = $component->getState()[$arguments['item'] ?? '']['type'] ?? null;
+                                        $label = $type ? $component->getBlock($type)?->getLabel() : null;
+
+                                        return 'Editar: ' . ($label ?? 'Bloco');
+                                    })
+                                    ->modalDescription('As alterações aparecem no preview em tempo real. Clique em "Aplicar" para confirmar.')
+                                    ->modalSubmitActionLabel('Aplicar')
+                                    ->closeModalByClickingAway(false)
+                                    ->extraModalWindowAttributes(['class' => 'pb-inspector'])),
                         ]),
 
                     Forms\Components\Wizard\Step::make('Configurações e SEO')
