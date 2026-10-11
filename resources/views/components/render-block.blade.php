@@ -536,7 +536,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
-            :header="$data['header'] ?? []"
+            :header="$data['header'] ?? array_filter(['title' => $data['title'] ?? null])"
             :steps="$data['steps'] ?? []"
         />
         @break
@@ -657,7 +657,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
-            :header="$data['header'] ?? []"
+            :header="$data['header'] ?? array_filter(['title' => $data['title'] ?? null])"
             :items="$data['items'] ?? []"
         />
         @break
@@ -668,7 +668,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
-            :header="$data['header'] ?? []"
+            :header="$data['header'] ?? array_filter(['title' => $data['title'] ?? null])"
             :items="$data['items'] ?? []"
         />
         @break
@@ -703,7 +703,7 @@
             :bg-color="$data['background_color'] ?? null"
             :text-color="$data['text_color'] ?? 'light'"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
-            :subtitle="$data['header']['subtitle'] ?? $data['badge'] ?? null"
+            :subtitle="$data['header']['subtitle'] ?? $data['subtitle'] ?? $data['badge'] ?? null"
             :description="$data['header']['description'] ?? $data['description'] ?? null"
             :header="$data['header'] ?? []"
             :items="$data['items'] ?? []"

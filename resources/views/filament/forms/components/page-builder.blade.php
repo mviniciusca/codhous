@@ -12,6 +12,7 @@
     $moveDownAction = $getAction($getMoveDownActionName());
     $moveUpAction = $getAction($getMoveUpActionName());
     $reorderAction = $getAction($getReorderActionName());
+    $templateAction = $getAction('loadTemplate');
     $extraItemActions = $getExtraItemActions();
 
     $isAddable = $isAddable() && $addAction->isVisible();
@@ -19,6 +20,8 @@
     $isDeletable = $isDeletable();
     $isReorderableWithButtons = $isReorderableWithButtons();
     $isReorderableWithDragAndDrop = $isReorderableWithDragAndDrop();
+    $hasTemplates = $templateAction?->isVisible() && ! $isDisabled();
+    $openTemplates = $hasTemplates ? '$wire.mountFormComponentAction(' . \Illuminate\Support\Js::from($getStatePath()) . ', \'loadTemplate\')' : null;
 
     $statePath = $getStatePath();
 
@@ -156,6 +159,13 @@
                     </h3>
                     <p class="pb-col-subtitle">Arraste para reordenar · clique para editar</p>
                 </div>
+
+                @if ($hasTemplates)
+                    <button type="button" id="page-builder-templates" class="pb-template-btn" x-on:click="{{ $openTemplates }}" title="Carregar um template de página">
+                        <x-filament::icon icon="heroicon-m-sparkles" />
+                        <span>Templates</span>
+                    </button>
+                @endif
             </header>
 
             @if (count($containers))
@@ -250,7 +260,14 @@
                         <x-filament::icon icon="heroicon-o-squares-plus" />
                     </div>
                     <p class="pb-layers-empty-title">Nenhum bloco ainda</p>
-                    <p class="pb-layers-empty-text">Escolha um bloco na biblioteca à esquerda ou carregue um template.</p>
+                    <p class="pb-layers-empty-text">Escolha um bloco na biblioteca à esquerda ou comece por uma página pronta.</p>
+
+                    @if ($hasTemplates)
+                        <button type="button" id="page-builder-templates-empty" class="pb-template-cta" x-on:click="{{ $openTemplates }}">
+                            <x-filament::icon icon="heroicon-m-sparkles" />
+                            <span>Escolher um template</span>
+                        </button>
+                    @endif
                 </div>
             @endif
         </aside>

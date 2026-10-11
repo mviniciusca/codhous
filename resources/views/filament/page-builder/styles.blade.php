@@ -437,6 +437,36 @@
     .pb-layers-empty-title { font-size: 13px; font-weight: 700; color: var(--pb-text); }
     .pb-layers-empty-text { margin-top: 4px; font-size: 12px; color: var(--pb-muted); }
 
+    /* Botões de templates (cabeçalho da Estrutura e estado vazio) */
+    .pb-template-btn,
+    .pb-template-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: background .15s, color .15s, transform .15s, box-shadow .15s;
+    }
+    .pb-template-btn svg,
+    .pb-template-cta svg { width: 16px; height: 16px; }
+    .pb-template-btn {
+        flex-shrink: 0;
+        padding: 6px 10px;
+        font-size: 12px;
+        color: rgb(var(--pb-accent));
+        background: var(--pb-accent-soft);
+    }
+    .pb-template-btn:hover { background: rgba(var(--primary-500), .18); }
+    .pb-template-cta {
+        margin-top: 16px;
+        padding: 9px 16px;
+        font-size: 13px;
+        color: #fff;
+        background: rgb(var(--primary-600));
+        box-shadow: 0 6px 16px -8px rgba(var(--primary-600), .7);
+    }
+    .pb-template-cta:hover { background: rgb(var(--primary-500)); transform: translateY(-1px); }
+
     /* Enquanto um bloco está sendo editado, as colunas laterais ficam bloqueadas */
     .pb-shell.is-editing .pb-col--palette,
     .pb-shell.is-editing .pb-col--layers { opacity: .55; pointer-events: none; filter: saturate(.6); transition: opacity .2s; }

@@ -11,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use App\Filament\Resources\PageResource\Pages;
+use App\Filament\Resources\PageResource\PageTemplates;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -48,63 +49,6 @@ class PageResource extends Resource
                         ->description('Construa o conteúdo da sua página')
                         ->icon('heroicon-o-document-text')
                         ->schema([
-                            Forms\Components\Actions::make([
-                                Forms\Components\Actions\Action::make('loadTemplate')
-                                    ->label('Carregar Template')
-                                    ->icon('heroicon-m-sparkles')
-                                    ->color('primary')
-                                    ->form([
-                                        Forms\Components\Select::make('template')
-                                            ->label('Escolha o Template')
-                                            ->options([
-                                                'landing_vendas' => 'Landing Page de Vendas',
-                                                'institucional' => 'Página Institucional Padrão',
-                                                'contato' => 'Página de Contato',
-                                            ])
-                                            ->required(),
-                                        Forms\Components\Radio::make('behavior')
-                                            ->label('Como deseja inserir?')
-                                            ->options([
-                                                'append' => 'Adicionar ao final (Manter blocos atuais)',
-                                                'replace' => 'Substituir tudo (Apagar blocos atuais)',
-                                            ])
-                                            ->default('append')
-                                            ->required(),
-                                    ])
-                                    ->action(function (Set $set, \Filament\Forms\Get $get, array $data) {
-                                        $blocks = [];
-
-                                        if ($data['template'] === 'landing_vendas') {
-                                            $blocks = [
-                                                ['type' => 'page_header', 'data' => ['title' => 'Landing Page de Vendas', 'badge' => 'OFERTA']],
-                                                ['type' => 'services', 'data' => ['title' => 'Nossos Serviços']],
-                                                ['type' => 'module_reference', 'data' => []], // Módulo Global (Formulário, por exemplo)
-                                                ['type' => 'faq', 'data' => ['title' => 'Perguntas Frequentes']],
-                                            ];
-                                        } elseif ($data['template'] === 'institucional') {
-                                            $blocks = [
-                                                ['type' => 'page_header', 'data' => ['title' => 'Sobre a Empresa', 'badge' => 'QUEM SOMOS']],
-                                                ['type' => 'image_with_text', 'data' => ['title' => 'Nossa História']],
-                                                ['type' => 'stats', 'data' => []],
-                                                ['type' => 'differentials', 'data' => ['title' => 'Nossos Diferenciais']],
-                                            ];
-                                        } elseif ($data['template'] === 'contato') {
-                                            $blocks = [
-                                                ['type' => 'page_header', 'data' => ['title' => 'Fale Conosco', 'badge' => 'CONTATO']],
-                                                ['type' => 'contact_banner', 'data' => ['title' => 'Atendimento']],
-                                                ['type' => 'map', 'data' => ['title' => 'Nossa Localização']],
-                                            ];
-                                        }
-
-                                        $state = $data['behavior'] === 'replace' ? [] : ($get('content') ?? []);
-
-                                        foreach ($blocks as $block) {
-                                            $state[(string) \Illuminate\Support\Str::uuid()] = $block;
-                                        }
-
-                                        $set('content', $state);
-                                    }),
-                            ]),
                             Forms\Components\Builder::make('content')
                                 ->label('')
                                 ->addActionLabel(__('Adicionar Novo Bloco'))
@@ -137,6 +81,7 @@ class PageResource extends Resource
                                 ->blockPickerColumns(2)
                                 ->blockNumbers(false)
                                 ->blockPreviews()
+                                ->registerActions([self::getLoadTemplateAction()])
                                 // Layout estilo WordPress: Blocos | Live Preview | Estrutura
                                 ->view('filament.forms.components.page-builder')
                                 // Adiciona o bloco direto (com valores padrão) e abre o painel de edição.
@@ -296,6 +241,91 @@ class PageResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    /**
+     * Ação "Templates" do Page Builder. Registrada no próprio Builder para poder ser
+     * disparada de dentro do layout customizado (cabeçalho da Estrutura e estado vazio).
+     */
+    protected static function getLoadTemplateAction(): Forms\Components\Actions\Action
+    {
+        return Forms\Components\Actions\Action::make('loadTemplate')
+            ->label(__('Templates'))
+            ->icon('heroicon-m-sparkles')
+            ->modalIcon('heroicon-o-sparkles')
+            ->modalHeading(__('Biblioteca de templates'))
+            ->modalDescription(__('Escolha uma estrutura pronta. Os textos são sugestões: edite cada bloco depois de aplicar.'))
+            ->modalWidth(\Filament\Support\Enums\MaxWidth::SixExtraLarge)
+            ->modalSubmitActionLabel(__('Aplicar template'))
+            ->form(fn (Forms\Components\Builder $component): array => [
+                Forms\Components\ViewField::make('template')
+                    ->hiddenLabel()
+                    ->required()
+                    ->validationMessages(['required' => __('Selecione um template.')])
+                    ->view('filament.forms.components.page-template-picker')
+                    ->viewData([
+                        'templates' => PageTemplates::summaries($component),
+                        'categories' => PageTemplates::CATEGORIES,
+                    ]),
+                Forms\Components\ToggleButtons::make('behavior')
+                    ->label(__('O que fazer com os blocos atuais?'))
+                    ->options([
+                        'append' => __('Adicionar ao final'),
+                        'replace' => __('Substituir tudo'),
+                    ])
+                    ->icons([
+                        'append' => 'heroicon-m-plus',
+                        'replace' => 'heroicon-m-arrow-path',
+                    ])
+                    ->colors([
+                        'append' => 'primary',
+                        'replace' => 'danger',
+                    ])
+                    ->default('append')
+                    ->inline()
+                    ->required()
+                    ->visible(filled($component->getState())),
+            ])
+            ->action(function (array $data, Forms\Components\Builder $component): void {
+                $template = PageTemplates::find($data['template'] ?? null);
+
+                if (! $template) {
+                    return;
+                }
+
+                ['blocks' => $blocks, 'skipped' => $skipped] = PageTemplates::resolve($template);
+
+                $items = ($data['behavior'] ?? 'replace') === 'replace' ? [] : ($component->getState() ?? []);
+
+                foreach ($blocks as $block) {
+                    $uuid = $component->generateUuid();
+                    $items[$uuid] = ['type' => $block['type'], 'data' => []];
+                    $component->state($items);
+
+                    // Preenche os valores padrão do bloco e aplica o conteúdo do template por cima,
+                    // passando pelos hooks de hidratação (ex.: Repeater gera as chaves dos itens).
+                    $container = $component->getChildComponentContainer($uuid);
+                    $container->fill();
+                    $container->fill(array_merge($container->getRawState(), $block['data']));
+
+                    $items = $component->getState();
+                }
+
+                $component->state($items);
+                $component->callAfterStateUpdated();
+
+                $body = trans_choice('{1} :count bloco adicionado.|[2,*] :count blocos adicionados.', count($blocks), ['count' => count($blocks)]);
+
+                if ($skipped) {
+                    $body .= ' ' . __('Ignorados por falta de seção global ativa: :list. Cadastre-as em "Seções do site".', ['list' => implode(', ', $skipped)]);
+                }
+
+                \Filament\Notifications\Notification::make()
+                    ->title(__('Template ":name" aplicado', ['name' => $template['label']]))
+                    ->body($body)
+                    ->status($skipped ? 'warning' : 'success')
+                    ->send();
+            });
     }
 
     // Block Definitions
