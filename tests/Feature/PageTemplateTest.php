@@ -27,11 +27,11 @@ test('template aplica os blocos esperados e a página é salva', function (strin
     livewire(CreatePage::class)
         ->callFormComponentAction('content', 'loadTemplate', ['template' => $key])
         ->assertHasNoFormComponentActionErrors()
-        ->fillForm(['title' => 'Página '.$key, 'slug' => 'pagina-'.$key])
+        ->fillForm(['title' => 'Página '.$key, 'slug' => 'pagina-'.str_replace('_', '-', $key)])
         ->call('create')
         ->assertHasNoFormErrors();
 
-    $page = Page::where('slug', 'pagina-'.$key)->firstOrFail();
+    $page = Page::where('slug', 'pagina-'.str_replace('_', '-', $key))->firstOrFail();
 
     expect(collect($page->content)->pluck('type')->all())->toBe($expectedTypes);
 

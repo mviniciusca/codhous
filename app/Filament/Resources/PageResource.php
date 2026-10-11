@@ -44,143 +44,195 @@ class PageResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Conteúdo')
-                        ->description('Construa o conteúdo da sua página')
+                // As abas ficam no cabeçalho do editor (resources/views/filament/page-builder/editor.blade.php);
+                // os painéis só são escondidos via Alpine para que tudo continue sendo salvo.
+                Forms\Components\Group::make()
+                    ->extraAttributes(['x-show' => "tab === 'content'"])
+                    ->columnSpanFull()
+                    ->schema([
+                        Forms\Components\Builder::make('content')
+                            ->label('')
+                            ->addActionLabel(__('Adicionar Novo Bloco'))
+                            ->blocks([
+                                self::getPageHeaderBlock(),
+                                self::getServicesBlock(),
+                                self::getDifferentialsBlock(),
+                                self::getShowcaseBlock(),
+                                self::getEquipmentShowcaseBlock(),
+                                self::getPartnersBlock(),
+                                self::getTimelineBlock(),
+                                self::getFaqBlock(),
+                                self::getTestimonialsBlock(),
+                                self::getCoverageBlock(),
+                                self::getCtaBlock(),
+                                self::getContactBannerBlock(),
+                                self::getMapBlock(),
+                                self::getRichTextBlock(),
+                                self::getPaymentOfferBlock(),
+                                self::getModuleReferenceBlock(),
+                                self::getStatsBlock(),
+                                self::getImageWithTextBlock(),
+                                self::getDataTableBlock(),
+                                self::getFeaturedTestimonialBlock(),
+                                self::getCardsBlock(),
+                            ])
+                            ->collapsible()
+                            ->collapsed()
+                            ->cloneable()
+                            ->blockPickerColumns(2)
+                            ->blockNumbers(false)
+                            ->blockPreviews()
+                            ->registerActions([self::getLoadTemplateAction()])
+                            // Layout estilo WordPress: Blocos | Live Preview | Estrutura
+                            ->view('filament.forms.components.page-builder')
+                            // Adiciona o bloco direto (com valores padrão) e abre o painel de edição.
+                            // O `blockPreviews()` injeta o schema do bloco como form da ação de adicionar,
+                            // o que valida campos obrigatórios antes de inserir (e falha em silêncio com o
+                            // modal oculto). Removemos o form: a validação acontece no painel de edição/salvar.
+                            ->addAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action
+                                ->form(null)
+                                ->modalHidden()
+                                ->after(function (\Filament\Forms\Components\Builder $component, $livewire): void {
+                                    $uuid = array_key_last($component->getState() ?? []);
+
+                                    if (filled($uuid)) {
+                                        $livewire->dispatch('page-builder-block-added', uuid: (string) $uuid);
+                                    }
+                                }))
+                            // Painel lateral de edição: mantém o live preview visível enquanto edita
+                            ->editAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action
+                                ->slideOver()
+                                ->modalWidth(\Filament\Support\Enums\MaxWidth::TwoExtraLarge)
+                                ->modalHeading(function (array $arguments, \Filament\Forms\Components\Builder $component): string {
+                                    $type = $component->getState()[$arguments['item'] ?? '']['type'] ?? null;
+                                    $label = $type ? $component->getBlock($type)?->getLabel() : null;
+
+                                    return 'Editar: ' . ($label ?? 'Bloco');
+                                })
+                                ->modalDescription('As alterações aparecem no preview em tempo real. Clique em "Aplicar" para confirmar.')
+                                ->modalSubmitActionLabel('Aplicar')
+                                ->closeModalByClickingAway(false)
+                                ->extraModalWindowAttributes(['class' => 'pb-inspector'])),
+                    ]),
+
+                Forms\Components\Group::make()
+                    ->extraAttributes(['x-show' => "tab === 'settings'", 'x-cloak' => true, 'class' => 'pe-settings'])
+                    ->columnSpanFull()
+                    ->schema(self::getSettingsSchema()),
+            ]);
+    }
+
+    protected static function getSettingsSchema(): array
+    {
+        $host = preg_replace('#^https?://#', '', url('/')) . '/';
+
+        return [
+            Forms\Components\Grid::make(['default' => 1, 'lg' => 3])->schema([
+                Forms\Components\Group::make()->columnSpan(['lg' => 2])->schema([
+                    Forms\Components\Section::make(__('Página'))
+                        ->description(__('Nome e endereço da página no site.'))
                         ->icon('heroicon-o-document-text')
                         ->schema([
-                            Forms\Components\Builder::make('content')
-                                ->label('')
-                                ->addActionLabel(__('Adicionar Novo Bloco'))
-                                ->blocks([
-                                    self::getPageHeaderBlock(),
-                                    self::getServicesBlock(),
-                                    self::getDifferentialsBlock(),
-                                    self::getShowcaseBlock(),
-                                    self::getEquipmentShowcaseBlock(),
-                                    self::getPartnersBlock(),
-                                    self::getTimelineBlock(),
-                                    self::getFaqBlock(),
-                                    self::getTestimonialsBlock(),
-                                    self::getCoverageBlock(),
-                                    self::getCtaBlock(),
-                                    self::getContactBannerBlock(),
-                                    self::getMapBlock(),
-                                    self::getRichTextBlock(),
-                                    self::getPaymentOfferBlock(),
-                                    self::getModuleReferenceBlock(),
-                                    self::getStatsBlock(),
-                                    self::getImageWithTextBlock(),
-                                    self::getDataTableBlock(),
-                                    self::getFeaturedTestimonialBlock(),
-                                    self::getCardsBlock(),
+                            Forms\Components\TextInput::make('title')
+                                ->label(__('Nome da página'))
+                                ->helperText(__('Usado no menu, no topo da página e na aba do navegador.'))
+                                ->placeholder(__('Ex.: Sobre a empresa'))
+                                ->required()
+                                ->maxLength(120)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function (Set $set, Forms\Get $get, ?string $old, ?string $state, string $operation): void {
+                                    // Só sugere o endereço em páginas novas e enquanto ele não foi editado à mão
+                                    if ($operation === 'create' && (blank($get('slug')) || $get('slug') === Str::slug((string) $old))) {
+                                        $set('slug', Str::slug((string) $state));
+                                    }
+                                }),
+                            Forms\Components\TextInput::make('slug')
+                                ->label(__('Endereço'))
+                                ->prefix($host)
+                                ->placeholder(fn (?Page $record) => $record?->isHomepage() ? __('página inicial') : 'sobre-a-empresa')
+                                ->formatStateUsing(fn (?string $state, ?Page $record) => $record?->isHomepage() ? null : $state)
+                                ->disabled(fn (?Page $record) => (bool) $record?->isHomepage())
+                                ->required(fn (?Page $record) => ! $record?->isHomepage())
+                                ->regex('/^[a-z0-9]+(?:[-\/][a-z0-9]+)*$/')
+                                ->validationMessages([
+                                    'regex' => __('Use apenas letras minúsculas, números e hífens (ex.: sobre-a-empresa).'),
+                                    'unique' => __('Já existe uma página com este endereço.'),
                                 ])
-                                ->collapsible()
-                                ->collapsed()
-                                ->cloneable()
-                                ->blockPickerColumns(2)
-                                ->blockNumbers(false)
-                                ->blockPreviews()
-                                ->registerActions([self::getLoadTemplateAction()])
-                                // Layout estilo WordPress: Blocos | Live Preview | Estrutura
-                                ->view('filament.forms.components.page-builder')
-                                // Adiciona o bloco direto (com valores padrão) e abre o painel de edição.
-                                // O `blockPreviews()` injeta o schema do bloco como form da ação de adicionar,
-                                // o que valida campos obrigatórios antes de inserir (e falha em silêncio com o
-                                // modal oculto). Removemos o form: a validação acontece no painel de edição/salvar.
-                                ->addAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action
-                                    ->form(null)
-                                    ->modalHidden()
-                                    ->after(function (\Filament\Forms\Components\Builder $component, $livewire): void {
-                                        $uuid = array_key_last($component->getState() ?? []);
-
-                                        if (filled($uuid)) {
-                                            $livewire->dispatch('page-builder-block-added', uuid: (string) $uuid);
-                                        }
-                                    }))
-                                // Painel lateral de edição: mantém o live preview visível enquanto edita
-                                ->editAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action
-                                    ->slideOver()
-                                    ->modalWidth(\Filament\Support\Enums\MaxWidth::TwoExtraLarge)
-                                    ->modalHeading(function (array $arguments, \Filament\Forms\Components\Builder $component): string {
-                                        $type = $component->getState()[$arguments['item'] ?? '']['type'] ?? null;
-                                        $label = $type ? $component->getBlock($type)?->getLabel() : null;
-
-                                        return 'Editar: ' . ($label ?? 'Bloco');
-                                    })
-                                    ->modalDescription('As alterações aparecem no preview em tempo real. Clique em "Aplicar" para confirmar.')
-                                    ->modalSubmitActionLabel('Aplicar')
-                                    ->closeModalByClickingAway(false)
-                                    ->extraModalWindowAttributes(['class' => 'pb-inspector'])),
+                                ->unique(ignoreRecord: true, modifyRuleUsing: fn (\Illuminate\Validation\Rules\Unique $rule) => $rule->withoutTrashed())
+                                ->helperText(fn (?Page $record, string $operation) => match (true) {
+                                    (bool) $record?->isHomepage() => __('Esta é a página inicial do site, por isso o endereço é fixo.'),
+                                    $operation === 'create' => __('Gerado a partir do nome. Use letras minúsculas, números e hífens.'),
+                                    default => __('Atenção: mudar o endereço quebra links que já foram compartilhados.'),
+                                }),
                         ]),
 
-                    Forms\Components\Wizard\Step::make('Configurações e SEO')
-                        ->description('Configure a página para os motores de busca')
-                        ->icon('heroicon-o-cog-6-tooth')
+                    Forms\Components\Section::make(__('Visibilidade'))
+                        ->description(__('Quem vê a página e onde ela aparece. Vale a partir da próxima publicação.'))
+                        ->icon('heroicon-o-eye')
+                        ->columns(['default' => 1, 'md' => 2])
                         ->schema([
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    Forms\Components\Section::make(__('Configurações Básicas'))
-                                        ->description(__('Informações essenciais para a publicação e identificação da página.'))
-                                        ->icon('heroicon-o-adjustments-horizontal')
-                                        ->schema([
-                                            Forms\Components\TextInput::make('title')
-                                                ->label(__('Título da Página'))
-                                                ->helperText(__('O título principal que aparecerá na guia do navegador e nos resultados de busca.'))
-                                                ->required()
-                                                ->lazy()
-                                                ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                                            Forms\Components\TextInput::make('slug')
-                                                ->label(__('Slug (URL)'))
-                                                ->helperText(__('O caminho da URL para esta página (ex: /sobre-nos).'))
-                                                ->required()
-                                                ->unique(ignoreRecord: true, modifyRuleUsing: fn (\Illuminate\Validation\Rules\Unique $rule) => $rule->withoutTrashed()),
-                                            Forms\Components\Grid::make(2)
-                                                ->schema([
-                                                    Forms\Components\Toggle::make('is_visible')
-                                                        ->label(__('Publicar Página'))
-                                                        ->helperText(__('Ative para tornar esta página pública.'))
-                                                        ->onIcon('heroicon-m-check')
-                                                        ->default(true),
-                                                    Forms\Components\Toggle::make('is_active_in_menu')
-                                                        ->label(__('Aparecer no Menu'))
-                                                        ->helperText(__('Adiciona automaticamente a página no menu de navegação do topo.'))
-                                                        ->onIcon('heroicon-m-bars-3')
-                                                        ->default(true),
-                                                    Forms\Components\TextInput::make('sort_order')
-                                                        ->label(__('Ordem'))
-                                                        ->helperText(__('Ordem de exibição em menus.'))
-                                                        ->numeric()
-                                                        ->default(0),
-                                                ]),
-                                        ])->columnSpan(1),
-
-                                    Forms\Components\Section::make(__('Otimização de Busca (SEO)'))
-                                        ->description(__('Ajustes finos para melhorar o ranqueamento no Google e redes sociais.'))
-                                        ->icon('heroicon-o-magnifying-glass-circle')
-                                        ->schema([
-                                            Forms\Components\TextInput::make('meta.title')
-                                                ->label(__('Título SEO (Opcional)'))
-                                                ->helperText(__('Se deixado em branco, será usado o Título da Página.')),
-                                            Forms\Components\Textarea::make('meta.description')
-                                                ->label(__('Meta Descrição'))
-                                                ->helperText(__('Resumo exibido nos resultados do Google. Recomendado até 160 caracteres.'))
-                                                ->rows(3),
-                                            Forms\Components\TextInput::make('meta.keywords')
-                                                ->label(__('Palavras-chave'))
-                                                ->helperText(__('Ex: serviços, produtos, empresa. Separadas por vírgula.')),
-                                            Forms\Components\FileUpload::make('meta.og_image')
-                                                ->label(__('Imagem de Compartilhamento (OG Image)'))
-                                                ->helperText(__('Imagem que aparecerá ao compartilhar a URL no WhatsApp, Facebook, etc.'))
-                                                ->image()
-                                                ->directory('seo'),
-                                        ])->columnSpan(1),
-                                ]),
+                            Forms\Components\Toggle::make('is_visible')
+                                ->label(__('Visível para os visitantes'))
+                                ->helperText(__('Desligada, a página fica acessível só pelo painel.'))
+                                ->onIcon('heroicon-m-eye')
+                                ->offIcon('heroicon-m-eye-slash')
+                                ->default(true),
+                            Forms\Components\Toggle::make('is_active_in_menu')
+                                ->label(__('Mostrar no menu do site'))
+                                ->helperText(__('Adiciona um link no menu do topo com o nome da página.'))
+                                ->onIcon('heroicon-m-bars-3')
+                                ->default(true),
                         ]),
-                ])
-                ->skippable()
-                ->columnSpanFull()
-            ]);
+
+                    Forms\Components\Section::make(__('Aparência no Google e nas redes sociais'))
+                        ->description(__('Como a página aparece nas buscas e quando alguém compartilha o link.'))
+                        ->icon('heroicon-o-magnifying-glass')
+                        ->schema([
+                            Forms\Components\TextInput::make('meta.title')
+                                ->label(__('Título na busca'))
+                                ->placeholder(fn (Forms\Get $get) => $get('title'))
+                                ->helperText(__('Opcional. Em branco, usa o nome da página. Ideal: até 60 caracteres.'))
+                                ->maxLength(120),
+                            Forms\Components\Textarea::make('meta.description')
+                                ->label(__('Descrição na busca'))
+                                ->placeholder(__('Ex.: Concreto usinado com entrega no horário para obras de todos os portes. Peça seu orçamento online.'))
+                                ->helperText(__('Resuma em uma ou duas frases o que o visitante encontra aqui. Ideal: 120 a 160 caracteres.'))
+                                ->rows(3)
+                                ->autosize()
+                                ->maxLength(320),
+                            Forms\Components\FileUpload::make('meta.og_image')
+                                ->label(__('Imagem ao compartilhar'))
+                                ->helperText(__('Aparece no WhatsApp, Facebook e LinkedIn. Tamanho ideal: 1200 × 630 px.'))
+                                ->image()
+                                ->imageEditor()
+                                ->directory('seo'),
+                        ]),
+
+                    Forms\Components\Section::make(__('Avançado'))
+                        ->icon('heroicon-o-cog-6-tooth')
+                        ->collapsible()
+                        ->collapsed()
+                        ->columns(['default' => 1, 'md' => 2])
+                        ->schema([
+                            Forms\Components\TextInput::make('sort_order')
+                                ->label(__('Posição no menu'))
+                                ->helperText(__('Número menor aparece antes. Também dá para arrastar na lista de páginas.'))
+                                ->numeric()
+                                ->default(0),
+                            Forms\Components\TextInput::make('meta.keywords')
+                                ->label(__('Palavras-chave'))
+                                ->helperText(__('Opcional, separadas por vírgula. O Google não usa mais este campo.')),
+                        ]),
+                ]),
+
+                Forms\Components\View::make('filament.page-builder.seo-preview')
+                    ->columnSpan(['lg' => 1])
+                    ->viewData([
+                        'siteName' => (string) (\App\Models\Setting::get('website.name') ?: config('app.name')),
+                        'host' => rtrim($host, '/'),
+                    ]),
+            ]),
+        ];
     }
 
     public static function table(Table $table): Table
@@ -198,9 +250,22 @@ class PageResource extends Resource
                     ->badge()
                     ->color('gray'),
 
-                Tables\Columns\IconColumn::make('is_visible')
-                    ->label(__('Visível'))
-                    ->boolean()
+                Tables\Columns\TextColumn::make('is_visible')
+                    ->label(__('Situação'))
+                    ->badge()
+                    ->formatStateUsing(fn (Page $record): string => match (true) {
+                        ! $record->published_at => __('Rascunho'),
+                        ! $record->is_visible => __('Oculta'),
+                        default => __('Publicada'),
+                    })
+                    ->color(fn (Page $record): string => match (true) {
+                        ! $record->published_at => 'warning',
+                        ! $record->is_visible => 'gray',
+                        default => 'success',
+                    })
+                    ->description(fn (Page $record): ?string => $record->published_at && $record->hasDraft()
+                        ? __('Alterações não publicadas')
+                        : null)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('Ordem'))

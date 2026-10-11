@@ -41,7 +41,7 @@
                     if (component.id !== this.$wire.id) return;
 
                     const calls = (commit.calls || []).map((call) => call.method);
-                    const isOwn = calls.length > 0 && calls.every((method) => method === 'generateLivePreviewUrl');
+                    const isOwn = calls.length > 0 && calls.every((method) => ['generateLivePreviewUrl', 'saveDraft'].includes(method));
 
                     succeed(() => {
                         queueMicrotask(() => {

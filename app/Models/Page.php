@@ -18,7 +18,25 @@ class Page extends Model
         'meta' => 'array',
         'is_active_in_menu' => 'boolean',
         'is_visible' => 'boolean',
+        'draft' => 'array',
+        'draft_saved_at' => 'datetime',
+        'published_at' => 'datetime',
     ];
+
+    public function hasDraft(): bool
+    {
+        return filled($this->draft);
+    }
+
+    public function isHomepage(): bool
+    {
+        return in_array($this->slug, ['/', 'home', 'index'], true);
+    }
+
+    public function getPublicUrl(): string
+    {
+        return url($this->isHomepage() ? '/' : '/' . ltrim($this->slug, '/'));
+    }
 
     public function scopeVisible($query)
     {
