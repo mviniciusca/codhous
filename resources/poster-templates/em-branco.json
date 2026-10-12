@@ -1,0 +1,56 @@
+{
+  "id": "em-branco",
+  "order": 99,
+  "name": "Em branco",
+  "category": "Geral",
+  "description": "Somente a logo. Monte a arte do zero.",
+  "tags": [
+    "branco",
+    "livre"
+  ],
+  "background": {
+    "role": "background"
+  },
+  "caption": "",
+  "elements": [
+    {
+      "id": "logo",
+      "type": "image",
+      "name": "Logo",
+      "x": 60,
+      "y": 60,
+      "width": 240,
+      "height": 90,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.logo",
+      "src": null,
+      "fit": "contain",
+      "radius": 0,
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": 0,
+      "placeholder": true
+    }
+  ],
+  "layouts": {
+    "portrait": {
+      "logo": {
+        "x": 60,
+        "y": 60,
+        "width": 240,
+        "height": 90
+      }
+    },
+    "story": {
+      "logo": {
+        "x": 60,
+        "y": 260,
+        "width": 240,
+        "height": 90
+      }
+    }
+  }
+}

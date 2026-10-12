@@ -60,7 +60,7 @@ CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 
 
 ### Other pieces
 - Livewire front-end components live in `app/Livewire` (budget wizard, calculator, cart, newsletter, showcase feed, contact `Mail/Form`).
-- `PosterBuilder` Filament page + `Services/Studio/LayerManager`: a marketing poster generator.
+- Estúdio de Posts (`PosterDesignResource`, `/admin/poster-builder`): a Fabric.js editor for social media posts with JSON templates in `resources/poster-templates/`, config in `config/poster-studio.php`, services in `app/Services/PosterStudio`. See `docs/POSTER_STUDIO.md`.
 - Integrations: Mailgun/SMTP mail, Cloudflare Turnstile (`TurnstileService`), WhatsApp links (`WhatsappService`), CEP/address lookup (`PostcodeFinderService`, `AddressFinderService`).
 
 ## Gotchas

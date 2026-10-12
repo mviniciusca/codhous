@@ -1,0 +1,365 @@
+{
+  "id": "depoimento",
+  "order": 6,
+  "name": "Depoimento de cliente",
+  "category": "Depoimentos",
+  "description": "Citação em destaque. Use somente depoimentos reais e autorizados.",
+  "tags": [
+    "depoimento",
+    "cliente",
+    "prova social"
+  ],
+  "background": {
+    "role": "dark"
+  },
+  "caption": "A opinião de quem confia no nosso trabalho. 💬\n\nObrigado pela parceria!\n\n#depoimento #clientesatisfeito",
+  "elements": [
+    {
+      "id": "logo_bg",
+      "type": "rect",
+      "name": "Fundo da logo",
+      "x": 60,
+      "y": 60,
+      "width": 260,
+      "height": 96,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "fill": "#FFFFFF",
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 16
+    },
+    {
+      "id": "logo",
+      "type": "image",
+      "name": "Logo",
+      "x": 76,
+      "y": 70,
+      "width": 228,
+      "height": 76,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.logo",
+      "src": null,
+      "fit": "contain",
+      "radius": 0,
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": 0,
+      "placeholder": true
+    },
+    {
+      "id": "label",
+      "type": "text",
+      "name": "Etiqueta",
+      "x": 620,
+      "y": 92,
+      "width": 400,
+      "height": 26,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "DEPOIMENTO",
+      "fontFamily": "Inter",
+      "fontSize": 22,
+      "fontWeight": 800,
+      "fontStyle": "normal",
+      "textAlign": "right",
+      "lineHeight": 1.0,
+      "charSpacing": 300,
+      "fill": {
+        "role": "primary"
+      }
+    },
+    {
+      "id": "quote_icon",
+      "type": "icon",
+      "name": "Aspas",
+      "x": 60,
+      "y": 200,
+      "width": 110,
+      "height": 110,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "Quote",
+      "fill": {
+        "role": "primary"
+      },
+      "strokeWidth": 2
+    },
+    {
+      "id": "quote",
+      "type": "text",
+      "name": "Depoimento",
+      "x": 60,
+      "y": 335,
+      "width": 960,
+      "height": 260,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "“Escreva aqui o depoimento real do cliente, com as palavras dele e com autorização.”",
+      "fontFamily": "Playfair Display",
+      "fontSize": 50,
+      "fontWeight": 700,
+      "fontStyle": "italic",
+      "textAlign": "left",
+      "lineHeight": 1.25,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onDark"
+      }
+    },
+    {
+      "id": "author",
+      "type": "text",
+      "name": "Nome do cliente",
+      "x": 60,
+      "y": 700,
+      "width": 900,
+      "height": 42,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Nome do cliente",
+      "fontFamily": "Montserrat",
+      "fontSize": 38,
+      "fontWeight": 800,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 0,
+      "fill": {
+        "role": "primary"
+      }
+    },
+    {
+      "id": "author_role",
+      "type": "text",
+      "name": "Cargo e empresa",
+      "x": 60,
+      "y": 752,
+      "width": 900,
+      "height": 34,
+      "angle": 0,
+      "opacity": 0.7,
+      "locked": false,
+      "hidden": false,
+      "text": "Cargo · Empresa",
+      "fontFamily": "Inter",
+      "fontSize": 26,
+      "fontWeight": 500,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onDark"
+      }
+    },
+    {
+      "id": "divider",
+      "type": "rect",
+      "name": "Linha",
+      "x": 60,
+      "y": 910,
+      "width": 960,
+      "height": 2,
+      "angle": 0,
+      "opacity": 0.2,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "onDark"
+      },
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 0
+    },
+    {
+      "id": "footer_name",
+      "type": "text",
+      "name": "Nome da empresa",
+      "x": 60,
+      "y": 945,
+      "width": 500,
+      "height": 36,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.name",
+      "text": "Sua empresa",
+      "fontFamily": "Inter",
+      "fontSize": 28,
+      "fontWeight": 700,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onDark"
+      }
+    },
+    {
+      "id": "footer_social",
+      "type": "text",
+      "name": "Instagram",
+      "x": 520,
+      "y": 945,
+      "width": 500,
+      "height": 36,
+      "angle": 0,
+      "opacity": 0.8,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.instagram",
+      "text": "@suaempresa",
+      "fontFamily": "Inter",
+      "fontSize": 28,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "right",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onDark"
+      }
+    }
+  ],
+  "layouts": {
+    "portrait": {
+      "logo_bg": {
+        "x": 60,
+        "y": 60,
+        "width": 260,
+        "height": 96
+      },
+      "logo": {
+        "x": 76,
+        "y": 70,
+        "width": 228,
+        "height": 76
+      },
+      "label": {
+        "x": 620,
+        "y": 92,
+        "width": 400,
+        "height": 26
+      },
+      "quote_icon": {
+        "x": 60,
+        "y": 335,
+        "width": 110,
+        "height": 110
+      },
+      "quote": {
+        "x": 60,
+        "y": 470,
+        "width": 960,
+        "height": 260
+      },
+      "author": {
+        "x": 60,
+        "y": 835,
+        "width": 900,
+        "height": 42
+      },
+      "author_role": {
+        "x": 60,
+        "y": 887,
+        "width": 900,
+        "height": 34
+      },
+      "divider": {
+        "x": 60,
+        "y": 1180,
+        "width": 960,
+        "height": 2
+      },
+      "footer_name": {
+        "x": 60,
+        "y": 1215,
+        "width": 500,
+        "height": 36
+      },
+      "footer_social": {
+        "x": 520,
+        "y": 1215,
+        "width": 500,
+        "height": 36
+      }
+    },
+    "story": {
+      "logo_bg": {
+        "x": 60,
+        "y": 260,
+        "width": 260,
+        "height": 96
+      },
+      "logo": {
+        "x": 76,
+        "y": 270,
+        "width": 228,
+        "height": 76
+      },
+      "label": {
+        "x": 620,
+        "y": 292,
+        "width": 400,
+        "height": 26
+      },
+      "quote_icon": {
+        "x": 60,
+        "y": 580,
+        "width": 110,
+        "height": 110
+      },
+      "quote": {
+        "x": 60,
+        "y": 715,
+        "width": 960,
+        "height": 260
+      },
+      "author": {
+        "x": 60,
+        "y": 1080,
+        "width": 900,
+        "height": 42
+      },
+      "author_role": {
+        "x": 60,
+        "y": 1132,
+        "width": 900,
+        "height": 34
+      },
+      "divider": {
+        "x": 60,
+        "y": 1470,
+        "width": 960,
+        "height": 2
+      },
+      "footer_name": {
+        "x": 60,
+        "y": 1505,
+        "width": 500,
+        "height": 36
+      },
+      "footer_social": {
+        "x": 520,
+        "y": 1505,
+        "width": 500,
+        "height": 36
+      }
+    }
+  }
+}

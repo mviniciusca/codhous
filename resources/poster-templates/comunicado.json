@@ -1,0 +1,430 @@
+{
+  "id": "comunicado",
+  "order": 5,
+  "name": "Comunicado",
+  "category": "Institucional",
+  "description": "Avisos de feriado, horário de atendimento e novidades.",
+  "tags": [
+    "aviso",
+    "feriado",
+    "horário",
+    "institucional"
+  ],
+  "background": {
+    "role": "background"
+  },
+  "caption": "📢 Comunicado\n\nInformamos que, em razão do feriado, não haverá expediente na próxima segunda-feira.\n\nAtendimento: {{brand.phone}}",
+  "elements": [
+    {
+      "id": "band",
+      "type": "rect",
+      "name": "Faixa superior",
+      "x": 0,
+      "y": 0,
+      "width": 1080,
+      "height": 16,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "primary"
+      },
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 0
+    },
+    {
+      "id": "logo",
+      "type": "image",
+      "name": "Logo",
+      "x": 60,
+      "y": 70,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.logo",
+      "src": null,
+      "fit": "contain",
+      "radius": 0,
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": 0,
+      "placeholder": true
+    },
+    {
+      "id": "icon",
+      "type": "icon",
+      "name": "Ícone",
+      "x": 60,
+      "y": 255,
+      "width": 80,
+      "height": 80,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "Megaphone",
+      "fill": {
+        "role": "primary"
+      },
+      "strokeWidth": 2.2
+    },
+    {
+      "id": "title",
+      "type": "text",
+      "name": "Título",
+      "x": 60,
+      "y": 355,
+      "width": 960,
+      "height": 100,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Comunicado",
+      "fontFamily": "Montserrat",
+      "fontSize": 96,
+      "fontWeight": 900,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 0,
+      "fill": {
+        "role": "text"
+      }
+    },
+    {
+      "id": "body",
+      "type": "text",
+      "name": "Mensagem",
+      "x": 60,
+      "y": 485,
+      "width": 900,
+      "height": 200,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Informamos que, em razão do feriado, não haverá expediente na próxima segunda-feira. Retornamos normalmente na terça.",
+      "fontFamily": "Inter",
+      "fontSize": 36,
+      "fontWeight": 400,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.35,
+      "charSpacing": 0,
+      "fill": {
+        "role": "text"
+      }
+    },
+    {
+      "id": "divider",
+      "type": "rect",
+      "name": "Divisor",
+      "x": 60,
+      "y": 760,
+      "width": 120,
+      "height": 8,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "primary"
+      },
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 4
+    },
+    {
+      "id": "hours_label",
+      "type": "text",
+      "name": "Rótulo do horário",
+      "x": 60,
+      "y": 795,
+      "width": 600,
+      "height": 32,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Horário de atendimento",
+      "fontFamily": "Inter",
+      "fontSize": 24,
+      "fontWeight": 700,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "muted"
+      }
+    },
+    {
+      "id": "hours",
+      "type": "text",
+      "name": "Horário",
+      "x": 60,
+      "y": 832,
+      "width": 960,
+      "height": 38,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.hours",
+      "text": "Segunda a sexta, das 8h às 18h",
+      "fontFamily": "Inter",
+      "fontSize": 30,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "text"
+      }
+    },
+    {
+      "id": "footer",
+      "type": "rect",
+      "name": "Rodapé",
+      "x": 0,
+      "y": 960,
+      "width": 1080,
+      "height": 120,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "dark"
+      },
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 0
+    },
+    {
+      "id": "footer_icon",
+      "type": "icon",
+      "name": "Ícone do telefone",
+      "x": 60,
+      "y": 995,
+      "width": 50,
+      "height": 50,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "Phone",
+      "fill": {
+        "role": "onDark"
+      },
+      "strokeWidth": 2.2
+    },
+    {
+      "id": "phone",
+      "type": "text",
+      "name": "Telefone",
+      "x": 128,
+      "y": 996,
+      "width": 480,
+      "height": 46,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.phone",
+      "text": "(00) 00000-0000",
+      "fontFamily": "Montserrat",
+      "fontSize": 42,
+      "fontWeight": 800,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onDark"
+      }
+    },
+    {
+      "id": "instagram",
+      "type": "text",
+      "name": "Instagram",
+      "x": 600,
+      "y": 1002,
+      "width": 420,
+      "height": 36,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.instagram",
+      "text": "@suaempresa",
+      "fontFamily": "Inter",
+      "fontSize": 28,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "right",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onDark"
+      }
+    }
+  ],
+  "layouts": {
+    "portrait": {
+      "band": {
+        "x": 0,
+        "y": 0,
+        "width": 1080,
+        "height": 16
+      },
+      "logo": {
+        "x": 60,
+        "y": 70,
+        "width": 280,
+        "height": 100
+      },
+      "icon": {
+        "x": 60,
+        "y": 255,
+        "width": 80,
+        "height": 80
+      },
+      "title": {
+        "x": 60,
+        "y": 490,
+        "width": 960,
+        "height": 100
+      },
+      "body": {
+        "x": 60,
+        "y": 620,
+        "width": 900,
+        "height": 200
+      },
+      "divider": {
+        "x": 60,
+        "y": 895,
+        "width": 120,
+        "height": 8
+      },
+      "hours_label": {
+        "x": 60,
+        "y": 930,
+        "width": 600,
+        "height": 32
+      },
+      "hours": {
+        "x": 60,
+        "y": 967,
+        "width": 960,
+        "height": 38
+      },
+      "footer": {
+        "x": 0,
+        "y": 1230,
+        "width": 1080,
+        "height": 120
+      },
+      "footer_icon": {
+        "x": 60,
+        "y": 1265,
+        "width": 50,
+        "height": 50
+      },
+      "phone": {
+        "x": 128,
+        "y": 1266,
+        "width": 480,
+        "height": 46
+      },
+      "instagram": {
+        "x": 600,
+        "y": 1272,
+        "width": 420,
+        "height": 36
+      }
+    },
+    "story": {
+      "band": {
+        "x": 0,
+        "y": 0,
+        "width": 1080,
+        "height": 16
+      },
+      "logo": {
+        "x": 60,
+        "y": 270,
+        "width": 280,
+        "height": 100
+      },
+      "icon": {
+        "x": 60,
+        "y": 455,
+        "width": 80,
+        "height": 80
+      },
+      "title": {
+        "x": 60,
+        "y": 735,
+        "width": 960,
+        "height": 100
+      },
+      "body": {
+        "x": 60,
+        "y": 865,
+        "width": 900,
+        "height": 200
+      },
+      "divider": {
+        "x": 60,
+        "y": 1140,
+        "width": 120,
+        "height": 8
+      },
+      "hours_label": {
+        "x": 60,
+        "y": 1175,
+        "width": 600,
+        "height": 32
+      },
+      "hours": {
+        "x": 60,
+        "y": 1212,
+        "width": 960,
+        "height": 38
+      },
+      "footer": {
+        "x": 0,
+        "y": 1550,
+        "width": 1080,
+        "height": 120
+      },
+      "footer_icon": {
+        "x": 60,
+        "y": 1585,
+        "width": 50,
+        "height": 50
+      },
+      "phone": {
+        "x": 128,
+        "y": 1586,
+        "width": 480,
+        "height": 46
+      },
+      "instagram": {
+        "x": 600,
+        "y": 1592,
+        "width": 420,
+        "height": 36
+      }
+    }
+  }
+}
