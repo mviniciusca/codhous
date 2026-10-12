@@ -104,6 +104,7 @@ Toda tela do construtor fica dentro de `.cx-ui` e usa os tokens de `filament/adm
   - `sb-`: construtor (layout, prévia, inspetor);
   - `stp-`: biblioteca;
   - `sk-`: primitivas de skeleton;
+  - `cs-`: listagem de seções (cards com o skeleton de cada tipo);
   - para uma tela nova, crie um prefixo próprio.
 - **CSS puro em partials Blade** com `@once` (sem depender do build do Tailwind), como nas outras telas do painel.
 
@@ -318,4 +319,5 @@ O inspetor é estreito (368–440px). Os formulários precisam ser pensados para
 | Integração com a página | `app/Filament/Resources/ContentSectionResource/Concerns/InteractsWithSectionBuilder.php` |
 | Formulário por tipo | `app/Filament/Resources/ContentSectionResource.php` (`get*Section()`) |
 | Catálogo de tipos | `app/Models/ContentSection.php` (`typeCatalog()`, `typeCategories()`) |
-| Testes | `tests/Feature/ContentSectionTypePickerTest.php` |
+| Listagem (cards, filtros, uso nas páginas, arrastar para ordenar) | `app/Filament/Resources/ContentSectionResource/Pages/ListContentSections.php`, `resources/views/filament/content-sections/` (reaproveita os skeletons de `section-type-picker/previews`), uso em `ContentSection::usageMap()` |
+| Testes | `tests/Feature/ContentSectionTypePickerTest.php`, `tests/Feature/ContentSectionListTest.php` |

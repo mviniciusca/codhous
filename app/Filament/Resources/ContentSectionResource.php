@@ -12,8 +12,6 @@ use App\Models\OperationArea;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 
@@ -1122,54 +1120,6 @@ class ContentSectionResource extends Resource
                                     ->minValue(0),
                             ]),
                     ]),
-            ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('Ativo')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->label('Slug')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('name')
-                    ->label('Nome')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->label('Tipo')
-                    ->formatStateUsing(fn (string $state): string => ContentSection::typeLabels()[$state] ?? $state)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('sort_order')
-                    ->label('Ordem')
-                    ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Atualizado')
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->defaultSort('sort_order')
-            ->reorderable('sort_order')
-            ->filters([
-                Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Ativo')
-                    ->placeholder('Todos')
-                    ->trueLabel('Ativos')
-                    ->falseLabel('Inativos'),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

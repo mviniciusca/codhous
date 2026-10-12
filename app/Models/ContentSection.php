@@ -150,6 +150,49 @@ class ContentSection extends Model
         };
     }
 
+    /**
+     * Ordem da listagem: sort_order (vazios por último) e, no empate, a mais antiga primeiro.
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderByRaw('sort_order is null')->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Onde cada seção é usada: blocos `module_reference` do conteúdo publicado das páginas.
+     * A posição é a ordem do bloco na página (1 = primeiro). A homepage vem primeiro.
+     *
+     * @return array<int, array<int, array{page_id: int, title: string, is_home: bool, is_visible: bool, position: int}>>
+     */
+    public static function usageMap(): array
+    {
+        $map = [];
+
+        Page::query()->get(['id', 'title', 'slug', 'content', 'is_visible'])->each(function (Page $page) use (&$map) {
+            foreach (array_values($page->content ?? []) as $index => $block) {
+                $sectionId = (int) data_get($block, 'data.content_section_id');
+
+                if (data_get($block, 'type') !== 'module_reference' || $sectionId === 0) {
+                    continue;
+                }
+
+                $map[$sectionId][] = [
+                    'page_id' => $page->id,
+                    'title' => (string) $page->title,
+                    'is_home' => $page->isHomepage(),
+                    'is_visible' => (bool) $page->is_visible,
+                    'position' => $index + 1,
+                ];
+            }
+        });
+
+        foreach ($map as &$usages) {
+            usort($usages, fn (array $a, array $b): int => [$b['is_home'], $a['position']] <=> [$a['is_home'], $b['position']]);
+        }
+
+        return $map;
+    }
+
     public function scopeForSlug($query, string $slug)
     {
         return $query->where('slug', $slug);
