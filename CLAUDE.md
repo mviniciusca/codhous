@@ -50,7 +50,7 @@ CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 
 
 ### Filament overrides
 - `resources/views/vendor/filament-forms/` contains **published, customized** Filament form views (builder, block-picker, wizard, …), and `resources/views/vendor/filament-panels/` overrides panel components (page header, user menu). They are committed. Filament upgrades may require re-syncing them.
-- The panel is configured in `app/Providers/Filament/AdminPanelProvider.php`. Resources, pages, widgets and clusters are auto-discovered. Navigation groups: Orçamentos, Website, Empresa, Configurações. The Shield plugin is installed but commented out.
+- The panel is configured in `app/Providers/Filament/AdminPanelProvider.php`. Resources, pages, widgets and clusters are auto-discovered. Navigation groups: Orçamentos, Website, Marketing, Empresa, Configurações (Visão geral, Meu Workspace and Caixa de Entrada sit ungrouped at the top). Sidebar badges are reserved for things that need action (pending budgets, unread mail, pending invites), not total counts. The Shield plugin is installed but commented out.
 
 ### Budgets (orçamentos)
 - `Budget` stores most of its data in a `content` JSON column. A code is generated on create, and the model has items, products, PDFs and documents.

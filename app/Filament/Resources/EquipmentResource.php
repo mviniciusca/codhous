@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\EquipmentResource\Pages;
 use App\Models\Equipment;
 use Filament\Forms;
@@ -12,17 +14,23 @@ use Filament\Tables\Table;
 
 class EquipmentResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Catalogo;
+        return AccessArea::Catalogo;
     }
 
     protected static ?string $model = Equipment::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+
     protected static ?string $navigationGroup = 'Empresa';
+
+    protected static ?int $navigationSort = 4;
+
     protected static ?string $modelLabel = 'Equipamento';
+
     protected static ?string $pluralModelLabel = 'Equipamentos';
 
     public static function form(Form $form): Form

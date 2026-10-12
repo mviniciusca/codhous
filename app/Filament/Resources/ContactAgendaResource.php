@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\ContactAgendaResource\Pages;
 use App\Models\ContactAgenda;
 use Filament\Forms;
@@ -9,15 +11,14 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class ContactAgendaResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Comercial;
+        return AccessArea::Comercial;
     }
 
     protected static ?string $model = ContactAgenda::class;
@@ -35,11 +36,6 @@ class ContactAgendaResource extends Resource
     protected static ?string $pluralModelLabel = 'Agenda de contatos';
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function getNavigationBadge(): ?string
-    {
-        return (string) static::getModel()::count();
-    }
 
     public static function form(Form $form): Form
     {
@@ -187,13 +183,13 @@ class ContactAgendaResource extends Resource
                     Tables\Actions\Action::make('email')
                         ->label(__('E-mail'))
                         ->icon('heroicon-o-envelope')
-                        ->url(fn (ContactAgenda $record): string => $record->email ? 'mailto:' . $record->email : '#')
+                        ->url(fn (ContactAgenda $record): string => $record->email ? 'mailto:'.$record->email : '#')
                         ->openUrlInNewTab()
                         ->visible(fn (ContactAgenda $record): bool => (bool) $record->email),
                     Tables\Actions\Action::make('call')
                         ->label(__('Ligar'))
                         ->icon('heroicon-o-phone')
-                        ->url(fn (ContactAgenda $record): string => $record->phone ? 'tel:' . preg_replace('/\D/', '', $record->phone) : '#')
+                        ->url(fn (ContactAgenda $record): string => $record->phone ? 'tel:'.preg_replace('/\D/', '', $record->phone) : '#')
                         ->visible(fn (ContactAgenda $record): bool => (bool) $record->phone),
                 ])->icon('heroicon-o-paper-airplane'),
                 Tables\Actions\EditAction::make(),

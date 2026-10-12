@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\MailResource\Pages;
 use App\Models\Mail;
 use Filament\Resources\Resource;
@@ -14,11 +16,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
  */
 class MailResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Comercial;
+        return AccessArea::Comercial;
     }
 
     protected static ?string $model = Mail::class;
@@ -27,9 +29,7 @@ class MailResource extends Resource
 
     protected static ?string $activeNavigationIcon = 'heroicon-s-inbox';
 
-    protected static ?string $navigationGroup = 'Website';
-
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 0;
 
     /** Pastas da caixa, na ordem das abas */
     public const FOLDERS = [

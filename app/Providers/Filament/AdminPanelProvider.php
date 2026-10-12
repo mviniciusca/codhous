@@ -62,6 +62,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('16rem')
             ->breadcrumbs(true)
             ->maxContentWidth('full')
             ->id('admin')
@@ -69,6 +70,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 __('Orçamentos'),
                 __('Website'),
+                __('Marketing'),
                 __('Empresa'),
                 __('Configurações'),
             ])
@@ -128,7 +130,8 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('Google Analytics')
                     ->url('https://analytics.google.com', shouldOpenInNewTab: true)
                     ->icon('heroicon-o-presentation-chart-line')
-                    ->sort(2),
+                    ->group(__('Marketing'))
+                    ->sort(3),
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')

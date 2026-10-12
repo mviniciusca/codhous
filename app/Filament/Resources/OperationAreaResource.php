@@ -2,35 +2,36 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\OperationAreaResource\Pages;
 use App\Models\OperationArea;
-use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\RawJs;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Http;
 
 class OperationAreaResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Catalogo;
+        return AccessArea::Catalogo;
     }
 
     protected static ?string $model = OperationArea::class;
 
     protected static ?string $navigationGroup = 'Orçamentos';
+
     protected static ?int $navigationSort = 5;
 
     // the heroicon set included in the project doesn't contain a `location-marker` glyph,
@@ -50,11 +51,6 @@ class OperationAreaResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return 'Áreas de Operação';
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return (string) OperationArea::count();
     }
 
     public static function form(Form $form): Form
@@ -143,7 +139,7 @@ class OperationAreaResource extends Resource
                             ->helperText('Valor fixo cobrado para entregas nesta região.')
                             ->prefix('R$')
                             ->required()
-                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                            ->mask(RawJs::make('$money($input, \',\', \'.\', 2)'))
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state)))
                             ->step(0.01),
@@ -183,7 +179,7 @@ class OperationAreaResource extends Resource
                 Tables\Columns\BadgeColumn::make('is_base')
                     // only render text when value is truthy - otherwise badge will
                     // be empty and visually absent
-                    ->formatStateUsing(fn($state) => $state ? 'Base' : '')
+                    ->formatStateUsing(fn ($state) => $state ? 'Base' : '')
                     ->colors([
                         'success' => true,
                     ])

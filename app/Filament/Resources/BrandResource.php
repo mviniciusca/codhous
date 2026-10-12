@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use Filament\Forms;
@@ -12,25 +14,25 @@ use Filament\Tables\Table;
 
 class BrandResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Website;
+        return AccessArea::Website;
     }
 
     protected static ?string $model = Brand::class;
 
     protected static ?string $navigationGroup = 'Website';
-    
+
     protected static ?string $navigationIcon = 'heroicon-o-star';
 
-    protected static ?int $navigationSort = 2;
-    
+    protected static ?int $navigationSort = 6;
+
     protected static ?string $navigationLabel = 'Marcas e Parceiros';
-    
+
     protected static ?string $modelLabel = 'Marca/Parceiro';
-    
+
     protected static ?string $pluralModelLabel = 'Marcas e Parceiros';
 
     public static function form(Form $form): Form
@@ -62,7 +64,7 @@ class BrandResource extends Resource
                             ->numeric()
                             ->default(0)
                             ->required(),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 

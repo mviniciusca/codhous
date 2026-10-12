@@ -2,48 +2,42 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use App\Models\Setting;
 use App\Services\AddressFinder;
-use App\Services\PostcodeFinder;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class PartnerResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Website;
+        return AccessArea::Website;
     }
 
     protected static ?string $model = Partner::class;
 
     protected static ?string $navigationGroup = 'Empresa';
+
     protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
-
-    public static function getNavigationBadge(): ?string
-    {
-        $count = static::getModel()::count();
-
-        return $count != 0 ? $count : null;
-    }
 
     public static function getNavigationLabel(): string
     {
@@ -128,18 +122,18 @@ class PartnerResource extends Resource
                                                     $livewire->validateOnly('data.postcode');
                                                     $fieldMap = [
                                                         'logradouro' => 'content.address',
-                                                        'bairro'     => 'content.neighborhood',
+                                                        'bairro' => 'content.neighborhood',
                                                         'localidade' => 'content.city',
-                                                        'uf'         => 'content.state',
+                                                        'uf' => 'content.state',
                                                     ];
                                                     $finder = new AddressFinder($state, $set, $fieldMap, 'data.postcode');
                                                     $finder->find();
-                                                    \Filament\Notifications\Notification::make()
+                                                    Notification::make()
                                                         ->title('CEP encontrado!')
                                                         ->success()
                                                         ->send();
                                                 } catch (\Exception $e) {
-                                                    \Filament\Notifications\Notification::make()
+                                                    Notification::make()
                                                         ->title('Erro ao buscar CEP')
                                                         ->body($e->getMessage())
                                                         ->danger()
@@ -242,9 +236,9 @@ class PartnerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListPartners::route('/'),
+            'index' => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
-            'edit'   => Pages\EditPartner::route('/{record}/edit'),
+            'edit' => Pages\EditPartner::route('/{record}/edit'),
         ];
     }
 }
