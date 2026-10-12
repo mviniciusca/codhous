@@ -2,23 +2,27 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\SettingResource\Pages;
 use App\Models\Setting;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Resources\Pages\Page;
 
 class SettingResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Configuracoes;
+        return AccessArea::Configuracoes;
     }
 
     protected static ?string $model = Setting::class;
+
+    protected static ?string $modelLabel = 'configuração';
+
+    protected static ?string $pluralModelLabel = 'configurações';
 
     public static function getNavigationGroup(): ?string
     {
@@ -31,8 +35,6 @@ class SettingResource extends Resource
 
     protected static ?string $navigationLabel = 'Configurações';
 
-    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
-
     public static function getNavigationUrl(): string
     {
         return Pages\EditCompany::getUrl(['record' => Setting::first()?->id ?? 1]);
@@ -40,16 +42,8 @@ class SettingResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // O formulário agora é definido individualmente em cada página de edição
+        // O formulário é definido na página de edição
         return $form;
-    }
-
-    public static function getRecordSubNavigation(Page $page): array
-    {
-        return $page->generateNavigationItems([
-            Pages\EditCompany::class,
-            Pages\EditSecurity::class,
-        ]);
     }
 
     public static function getPages(): array
@@ -57,7 +51,6 @@ class SettingResource extends Resource
         return [
             'index' => Pages\ListSettings::route('/'),
             'company' => Pages\EditCompany::route('/{record}/company'),
-            'security' => Pages\EditSecurity::route('/{record}/security'),
         ];
     }
 }

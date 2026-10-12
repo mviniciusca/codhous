@@ -23,11 +23,16 @@ CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 
 - Commits use Conventional Commits (`feat:`, `refactor:`, `style:`, `chore:`, `fix:`), written in English.
 - Work happens on feature branches. PRs target `main`.
 - Admin "builder" screens (component library + live preview + step inspector) follow `docs/PADRAO_UI_BUILDER.md`. Every admin page gets the compact one-line header (breadcrumb › title, subheading as a `?` tooltip, actions on the right) from the overridden `resources/views/vendor/filament-panels/components/header/index.blade.php`; set heading/subheading/actions through Filament methods, never build a header inside the view. Public-site blocks follow `docs/estilo-minimalista-design.md`.
+- **Admin form fields (required on every form):**
+  - every field has a `->helperText()` (short, in Portuguese);
+  - every field that supports it has a `->prefixIcon()` (TextInput, Select, DatePicker/DateTimePicker, ColorPicker…; Textarea, FileUpload, RichEditor and Toggle have no prefix icon in Filament 3);
+  - every `Toggle` has `->onIcon('heroicon-m-check')`;
+  - every button group (`ToggleButtons`, `Radio` styled as buttons) has an icon on each option (`->icons([...])`).
 
 ## Architecture
 
 ### Settings singleton
-`App\Models\Setting` is a single row whose `settings` column is a JSON array. Read values with `Setting::get('website.navigation')` (dot notation, memoized per request). The top-level keys are `website`, `company`, `layout` and `security`. Admins edit them in `app/Filament/Pages/DesignAndSeo.php` and `SettingResource`. Maintenance mode is enforced by `CheckMaintenanceMode` middleware, which is appended globally in `bootstrap/app.php` and skips `admin*` and `livewire*` routes.
+`App\Models\Setting` is a single row whose `settings` column is a JSON array. Read values with `Setting::get('website.navigation')` (dot notation, memoized per request). The top-level keys are `website`, `company`, `layout` and `security`. Admins edit them in `app/Filament/Pages/DesignAndSeo.php` and `SettingResource`, which is a single centered page without tabs (`EditCompany`: company, address, PDF, rental and security sections) built like Design e SEO: save/discard in the header, a "Tudo salvo" footer, aside sections (view and styles in `resources/views/filament/settings/`). Maintenance mode is enforced by `CheckMaintenanceMode` middleware, which is appended globally in `bootstrap/app.php` and skips `admin*` and `livewire*` routes.
 
 ### Public site = Page Builder
 - `routes/web.php` ends with a catch-all `/{slug?}` → `PageController@show`. Any new public route **must be registered above it**.
