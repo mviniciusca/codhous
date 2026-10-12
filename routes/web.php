@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AlertPreviewController;
 use App\Http\Controllers\BudgetDownloadController;
 use App\Http\Controllers\BudgetPdfController;
 use App\Http\Controllers\ContentSectionPreviewController;
@@ -56,6 +57,11 @@ Route::get('/admin/section-builder/preview/{token}', ContentSectionPreviewContro
     ->middleware('auth')
     ->where('token', '[a-f0-9]{64}')
     ->name('content-sections.preview');
+
+// Prévia de alertas e notificações (painel administrativo)
+Route::get('/admin/alert-preview', AlertPreviewController::class)
+    ->middleware('auth')
+    ->name('alerts.preview');
 
 // Pré-visualização do Design e SEO (configurações não salvas sobre o site real)
 Route::get('/admin/design-preview/{token}', DesignPreviewController::class)

@@ -6,6 +6,8 @@
     'meta' => null,
     'builderPreview' => false,
     'sitePreview' => false,
+    // Prévia de alertas do painel: coleção de alertas a exibir no lugar dos ativos
+    'alertPreview' => null,
     // Sem cabeçalho e rodapé do site (prévia isolada de uma seção)
     'bare' => false,
 ])
@@ -55,13 +57,15 @@
         <x-site-whatsapp />
         <x-site-scroll-to-top />
         {{-- Na prévia do Design e SEO, avisos e cookies cobririam o que está sendo ajustado --}}
-        @unless($sitePreview)
+        @if($alertPreview !== null)
+            @include('filament.alerts.preview-bridge', ['alerts' => $alertPreview])
+        @elseif(! $sitePreview)
             <x-site-alerts />
             <x-site-cookie-consent />
-        @endunless
+        @endif
     @endunless
 
-    @if($sitePreview)
+    @if($sitePreview || $alertPreview !== null)
         @include('filament.design.preview-bridge')
     @endif
 

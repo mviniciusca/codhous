@@ -5,6 +5,7 @@
     :ogImage="$meta['og_image'] ?? null"
     :builder-preview="$builderPreview ?? false"
     :site-preview="$sitePreview ?? false"
+    :alert-preview="$alertPreview ?? null"
 >
     @php
         $content = $page->content ?? [];
