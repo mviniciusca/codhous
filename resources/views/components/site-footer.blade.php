@@ -6,7 +6,9 @@
     $websiteLogo = data_get($website, 'logo');
     $websiteDescription = data_get($website, 'description', 'Excelência em concreto usinado e locação de equipamentos.');
     $scripts = data_get($website, 'scripts', []);
-    $footerScripts = data_get($scripts, 'footer_scripts');
+    // 'footer' era a chave gravada pelo painel antes de alinhar com 'footer_scripts'.
+    // Na prévia do painel, scripts de terceiros (Analytics, Pixel) não rodam.
+    $footerScripts = \App\Models\Setting::isPreviewing() ? null : (data_get($scripts, 'footer_scripts') ?: data_get($scripts, 'footer'));
 
     $navigation = data_get($website, 'navigation', []);
     if (empty($navigation)) {

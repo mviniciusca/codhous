@@ -4,6 +4,7 @@
     :keywords="$meta['keywords'] ?? null"
     :ogImage="$meta['og_image'] ?? null"
     :builder-preview="$builderPreview ?? false"
+    :site-preview="$sitePreview ?? false"
 >
     @php
         $content = $page->content ?? [];

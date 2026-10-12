@@ -5,6 +5,7 @@
     'ogImage' => null,
     'meta' => null,
     'builderPreview' => false,
+    'sitePreview' => false,
 ])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
@@ -47,9 +48,16 @@
     @unless($builderPreview)
         <x-site-whatsapp />
         <x-site-scroll-to-top />
-        <x-site-alerts />
-        <x-site-cookie-consent />
+        {{-- Na prévia do Design e SEO, avisos e cookies cobririam o que está sendo ajustado --}}
+        @unless($sitePreview)
+            <x-site-alerts />
+            <x-site-cookie-consent />
+        @endunless
     @endunless
+
+    @if($sitePreview)
+        @include('filament.design.preview-bridge')
+    @endif
 
     @livewireScripts
     @filamentScripts

@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\BudgetDownloadController;
 use App\Http\Controllers\BudgetPdfController;
+use App\Http\Controllers\DesignPreviewController;
 use App\Http\Controllers\PageBuilderPreviewController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ShowcaseController;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -18,8 +20,9 @@ Route::get('/admin/login', function (): RedirectResponse {
         return redirect('/admin');
     }
 
-    if ($user = \App\Models\User::first()) {
+    if ($user = User::first()) {
         Auth::login($user);
+
         return redirect('/admin');
     }
 
@@ -42,6 +45,12 @@ Route::get('/admin/page-builder/preview/{token}', PageBuilderPreviewController::
     ->middleware('auth')
     ->where('token', '[a-f0-9]{64}')
     ->name('page-builder.preview');
+
+// Pré-visualização do Design e SEO (configurações não salvas sobre o site real)
+Route::get('/admin/design-preview/{token}', DesignPreviewController::class)
+    ->middleware('auth')
+    ->where('token', '[a-f0-9]{64}')
+    ->name('design.preview');
 
 // Dynamic Pages Catch-all (must be at the end)
 Route::get('/{slug?}', [PageController::class, 'show'])

@@ -24,7 +24,9 @@
     }
     $googleFontsUrl = "https://fonts.googleapis.com/css2?family=" . implode('&family=', $fonts) . "&display=swap";
     
-    $headScripts = data_get($scripts, 'head_scripts');
+    // 'head' era a chave gravada pelo painel antes de alinhar com 'head_scripts'.
+    // Na prévia do painel, scripts de terceiros (Analytics, Pixel) não rodam.
+    $headScripts = \App\Models\Setting::isPreviewing() ? null : (data_get($scripts, 'head_scripts') ?: data_get($scripts, 'head'));
     $favicon = data_get($website, 'favicon');
 @endphp
 

@@ -2,25 +2,41 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Forms\Components\ColorSwatches;
+use App\Http\Controllers\DesignPreviewController;
+use App\Models\Page as SitePage;
 use App\Models\Setting;
+use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Pages\Page;
+use Filament\Forms\Components\View;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Renderless;
 
+/**
+ * Identidade, SEO, navegação, atendimento e scripts do site, com prévia ao vivo
+ * do site real ao lado (DesignPreviewController).
+ */
 class DesignAndSeo extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
+    protected static ?string $navigationIcon = 'heroicon-o-paint-brush';
 
     protected static ?string $navigationGroup = 'Website';
 
@@ -32,357 +48,400 @@ class DesignAndSeo extends Page implements HasForms
 
     protected static string $view = 'filament.pages.design-and-seo';
 
+    /** Campos de imagem: aparecem na prévia antes de salvar */
+    protected const IMAGE_FIELDS = ['logo', 'favicon', 'mascot'];
+
+    /** Cores de destaque disponíveis para o site ("R G B" => nome) */
+    public const COLORS = [
+        '239 68 68' => 'Vermelho',
+        '249 115 22' => 'Laranja',
+        '245 158 11' => 'Âmbar',
+        '234 179 8' => 'Amarelo',
+        '132 204 22' => 'Lima',
+        '34 197 94' => 'Verde',
+        '16 185 129' => 'Esmeralda',
+        '20 184 166' => 'Teal',
+        '6 182 212' => 'Ciano',
+        '14 165 233' => 'Sky',
+        '59 130 246' => 'Azul',
+        '99 102 241' => 'Índigo',
+        '139 92 246' => 'Violeta',
+        '168 85 247' => 'Roxo',
+        '192 38 211' => 'Fúcsia',
+        '236 72 153' => 'Pink',
+        '244 63 94' => 'Rose',
+        '113 113 122' => 'Zinco (Cinza)',
+    ];
+
     public ?array $data = [];
 
     public function mount(): void
     {
-        $setting = Setting::firstOrCreate(['id' => 1]);
-        $this->form->fill([
-            'settings' => $setting->settings,
-        ]);
+        $this->fillFromDatabase();
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Identidade, busca, menu e atendimento do site, com prévia ao vivo.';
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('discard')
+                ->label('Descartar')
+                ->color('gray')
+                ->icon('heroicon-o-arrow-uturn-left')
+                ->requiresConfirmation()
+                ->modalHeading('Descartar alterações?')
+                ->modalDescription('O formulário volta para a última versão salva.')
+                ->modalSubmitActionLabel('Descartar')
+                ->action('discard')
+                // Só aparece com alterações pendentes (a view marca <html class="ds-dirty">)
+                ->extraAttributes(['data-ds-discard' => true]),
+            Action::make('save')
+                ->label('Salvar alterações')
+                ->icon('heroicon-o-check')
+                ->keyBindings(['mod+s'])
+                ->action('save'),
+        ];
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                \Filament\Forms\Components\Tabs::make('Tabs')
+                Tabs::make('design')
+                    ->id('ds')
+                    ->contained(false)
+                    ->persistTabInQueryString('aba')
                     ->tabs([
-                        \Filament\Forms\Components\Tabs\Tab::make('Identidade e SEO')
+                        Tab::make('Identidade')
+                            ->id('identidade')
                             ->icon('heroicon-o-swatch')
                             ->schema([
-                                \Filament\Forms\Components\Section::make('Identidade Visual')
-                                    ->description('Defina as cores e logotipos da sua marca.')
+                                Section::make('Identidade visual')
+                                    ->description('Cor e imagens da marca no site.')
+                                    ->compact()
                                     ->schema([
-                                        \Filament\Forms\Components\ToggleButtons::make('settings.website.primary_color')
-                                            ->label('Cor de Destaque (Branding)')
-                                            ->options([
-                                                '239 68 68' => 'Vermelho',
-                                                '249 115 22' => 'Laranja',
-                                                '245 158 11' => 'Âmbar',
-                                                '234 179 8' => 'Amarelo',
-                                                '132 204 22' => 'Lima',
-                                                '34 197 94' => 'Verde',
-                                                '16 185 129' => 'Esmeralda',
-                                                '20 184 166' => 'Teal',
-                                                '6 182 212' => 'Ciano',
-                                                '14 165 233' => 'Sky',
-                                                '59 130 246' => 'Azul',
-                                                '99 102 241' => 'Índigo',
-                                                '139 92 246' => 'Violeta',
-                                                '168 85 247' => 'Roxo',
-                                                '192 38 211' => 'Fúcsia',
-                                                '236 72 153' => 'Pink',
-                                                '244 63 94' => 'Rose',
-                                                '113 113 122' => 'Zinco (Cinza)',
-                                            ])
-                                            ->colors([
-                                                '239 68 68' => \Filament\Support\Colors\Color::Red,
-                                                '249 115 22' => \Filament\Support\Colors\Color::Orange,
-                                                '245 158 11' => \Filament\Support\Colors\Color::Amber,
-                                                '234 179 8' => \Filament\Support\Colors\Color::Yellow,
-                                                '132 204 22' => \Filament\Support\Colors\Color::Lime,
-                                                '34 197 94' => \Filament\Support\Colors\Color::Green,
-                                                '16 185 129' => \Filament\Support\Colors\Color::Emerald,
-                                                '20 184 166' => \Filament\Support\Colors\Color::Teal,
-                                                '6 182 212' => \Filament\Support\Colors\Color::Cyan,
-                                                '14 165 233' => \Filament\Support\Colors\Color::Sky,
-                                                '59 130 246' => \Filament\Support\Colors\Color::Blue,
-                                                '99 102 241' => \Filament\Support\Colors\Color::Indigo,
-                                                '139 92 246' => \Filament\Support\Colors\Color::Violet,
-                                                '168 85 247' => \Filament\Support\Colors\Color::Purple,
-                                                '192 38 211' => \Filament\Support\Colors\Color::Fuchsia,
-                                                '236 72 153' => \Filament\Support\Colors\Color::Pink,
-                                                '244 63 94' => \Filament\Support\Colors\Color::Rose,
-                                                '113 113 122' => \Filament\Support\Colors\Color::Zinc,
-                                            ])
-                                            ->icons([
-                                                '239 68 68' => 'heroicon-m-swatch',
-                                                '249 115 22' => 'heroicon-m-swatch',
-                                                '245 158 11' => 'heroicon-m-swatch',
-                                                '234 179 8' => 'heroicon-m-swatch',
-                                                '132 204 22' => 'heroicon-m-swatch',
-                                                '34 197 94' => 'heroicon-m-swatch',
-                                                '16 185 129' => 'heroicon-m-swatch',
-                                                '20 184 166' => 'heroicon-m-swatch',
-                                                '6 182 212' => 'heroicon-m-swatch',
-                                                '14 165 233' => 'heroicon-m-swatch',
-                                                '59 130 246' => 'heroicon-m-swatch',
-                                                '99 102 241' => 'heroicon-m-swatch',
-                                                '139 92 246' => 'heroicon-m-swatch',
-                                                '168 85 247' => 'heroicon-m-swatch',
-                                                '192 38 211' => 'heroicon-m-swatch',
-                                                '236 72 153' => 'heroicon-m-swatch',
-                                                '244 63 94' => 'heroicon-m-swatch',
-                                                '113 113 122' => 'heroicon-m-swatch',
-                                            ])
-                                            ->inline()
-                                            ->default('249 115 22')
-                                            ->helperText('Escolha a cor principal da identidade visual da sua loja.'),
+                                        ColorSwatches::make('settings.website.primary_color')
+                                            ->label('Cor de destaque')
+                                            ->helperText('Usada em botões, links e destaques do site.')
+                                            ->options(self::COLORS)
+                                            ->default('249 115 22'),
 
-                                        \Filament\Forms\Components\Grid::make(3)->schema([
-                                            \Filament\Forms\Components\FileUpload::make('settings.website.logo')
-                                                ->label('Logotipo')
-                                                ->helperText('Recomendado: SVG ou PNG transparente. Tamanho máx: 2MB.')
-                                                ->image()
-                                                ->imageEditor()
-                                                ->directory('website')
-                                                ->visibility('public'),
-                                            \Filament\Forms\Components\FileUpload::make('settings.website.favicon')
+                                        FileUpload::make('settings.website.logo')
+                                            ->label('Logotipo')
+                                            ->helperText('SVG ou PNG transparente, até 2 MB.')
+                                            ->image()
+                                            ->imageEditor()
+                                            ->imagePreviewHeight('96')
+                                            ->directory('website')
+                                            ->visibility('public'),
+
+                                        Grid::make(['default' => 1, 'sm' => 2])->schema([
+                                            FileUpload::make('settings.website.favicon')
                                                 ->label('Favicon')
-                                                ->helperText('Recomendado: PNG ou ICO (32x32px ou 48x48px).')
+                                                ->helperText('PNG ou ICO, 32×32 ou 48×48 px.')
                                                 ->image()
+                                                ->imagePreviewHeight('72')
                                                 ->directory('website')
                                                 ->visibility('public'),
-                                            \Filament\Forms\Components\FileUpload::make('settings.website.mascot')
-                                                ->label('Mascote da Empresa')
-                                                ->helperText('Imagem transparente (PNG) do mascote. Usado na geração de artes.')
+                                            FileUpload::make('settings.website.mascot')
+                                                ->label('Mascote')
+                                                ->helperText('PNG transparente, usado no Estúdio de Posts.')
                                                 ->image()
+                                                ->imagePreviewHeight('72')
                                                 ->directory('website')
                                                 ->visibility('public'),
                                         ]),
                                     ]),
 
-                                \Filament\Forms\Components\Section::make('SEO e Informações Básicas')
-                                    ->description('Metadados para motores de busca e aba do navegador.')
+                                Section::make('Busca no Google')
+                                    ->description('Como o site aparece nos resultados de busca e na aba do navegador.')
+                                    ->compact()
                                     ->schema([
-                                        \Filament\Forms\Components\TextInput::make('settings.website.name')
-                                            ->label('Nome do Website')
-                                            ->prefixIcon('heroicon-o-globe-alt')
-                                            ->helperText('O nome oficial do seu site.')
-                                            ->required(),
-                                        \Filament\Forms\Components\TextInput::make('settings.website.title')
+                                        TextInput::make('settings.website.name')
+                                            ->label('Nome do site')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('settings.website.title')
                                             ->label('Título (SEO)')
-                                            ->prefixIcon('heroicon-o-document-text')
-                                            ->helperText('Título que aparece na aba do navegador e no Google.')
-                                            ->placeholder('Ex: Codhous - Software Sob Medida'),
-                                        \Filament\Forms\Components\Textarea::make('settings.website.description')
+                                            ->placeholder('Ex: Concreto usinado no Rio de Janeiro')
+                                            ->helperText('Aparece depois do nome na aba do navegador. Ideal: até 60 caracteres.')
+                                            ->maxLength(255),
+                                        Textarea::make('settings.website.description')
                                             ->label('Descrição (SEO)')
-                                            ->helperText('Breve resumo do site para os resultados de busca.')
+                                            ->helperText('Resumo exibido abaixo do título no Google. Ideal: até 160 caracteres.')
                                             ->rows(3),
+                                        View::make('filament.design.search-preview'),
                                     ]),
                             ]),
 
-                        \Filament\Forms\Components\Tabs\Tab::make('Navegação e Redes')
+                        Tab::make('Navegação')
+                            ->id('navegacao')
                             ->icon('heroicon-o-bars-3')
                             ->schema([
-                                \Filament\Forms\Components\Section::make('Menus e Navegação')
-                                    ->description('Gerencie o comportamento e os links do menu principal.')
+                                Section::make('Menu principal')
+                                    ->description('Links do topo do site. Arraste para reordenar.')
+                                    ->compact()
                                     ->schema([
-                                        \Filament\Forms\Components\Toggle::make('settings.website.sticky_menu')
-                                            ->label('Menu Fixo (Sticky)')
-                                            ->helperText('O menu principal (barra branca com logo e links) ficará fixo no topo ao rolar a página.')
-                                            ->default(true)
-                                            ->onIcon('heroicon-m-check')
-                                            ->offIcon('heroicon-m-x-mark'),
-                                        \Filament\Forms\Components\Repeater::make('settings.website.navigation')
-                                            ->label('Links do Menu')
-                                            ->helperText('Adicione ou remova itens do menu superior.')
+                                        Toggle::make('settings.website.sticky_menu')
+                                            ->label('Menu fixo ao rolar a página')
+                                            ->default(true),
+                                        Repeater::make('settings.website.navigation')
+                                            ->hiddenLabel()
+                                            ->addActionLabel('Adicionar link')
                                             ->collapsible()
                                             ->collapsed()
                                             ->cloneable()
-                                            ->collapseAllAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action->label('Recolher Tudo'))
-                                            ->expandAllAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action->label('Expandir Tudo'))
                                             ->schema([
-                                                \Filament\Forms\Components\TextInput::make('label')
-                                                    ->label('Rótulo')
-                                                    ->prefixIcon('heroicon-o-tag')
-                                                    ->helperText('Nome do link exibido no menu.')
+                                                TextInput::make('label')
+                                                    ->label('Texto')
                                                     ->placeholder('Ex: Início')
                                                     ->required(),
-                                                \Filament\Forms\Components\TextInput::make('url')
-                                                    ->label('URL/Rota')
-                                                    ->prefixIcon('heroicon-o-link')
-                                                    ->helperText('Destino do link.')
-                                                    ->placeholder('Ex: /produtos')
+                                                TextInput::make('url')
+                                                    ->label('Destino')
+                                                    ->placeholder('Ex: /servicos')
                                                     ->required(),
                                             ])
                                             ->columns(2)
-                                            ->itemLabel(fn(array $state): ?string => $state['label'] ?? null),
+                                            ->itemLabel(fn (array $state): ?string => filled($state['label'] ?? null)
+                                                ? $state['label'].(filled($state['url'] ?? null) ? '  ·  '.$state['url'] : '')
+                                                : 'Novo link'),
                                     ]),
 
-                                \Filament\Forms\Components\Section::make('Redes Sociais')
-                                    ->description('Links para as redes sociais da sua empresa.')
+                                Section::make('Redes sociais')
+                                    ->description('Exibidas no rodapé do site.')
+                                    ->compact()
                                     ->schema([
-                                        \Filament\Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                \Filament\Forms\Components\TextInput::make('settings.website.social_networks.instagram')
-                                                    ->label('Instagram')
-                                                    ->prefixIcon('heroicon-o-link')
-                                                    ->helperText('URL completa ou apenas o @usuario.')
-                                                    ->prefix('instagr.am/'),
-                                                \Filament\Forms\Components\TextInput::make('settings.website.social_networks.facebook')
-                                                    ->label('Facebook')
-                                                    ->prefixIcon('heroicon-o-link')
-                                                    ->helperText('Link da sua página no Facebook.')
-                                                    ->prefix('fb.com/'),
-                                                \Filament\Forms\Components\TextInput::make('settings.website.social_networks.linkedin')
-                                                    ->label('LinkedIn')
-                                                    ->prefixIcon('heroicon-o-link')
-                                                    ->helperText('Link do perfil profissional ou empresa.')
-                                                    ->prefix('linkedin.com/in/'),
-                                                \Filament\Forms\Components\TextInput::make('settings.website.social_networks.twitter')
-                                                    ->label('Twitter / X')
-                                                    ->prefixIcon('heroicon-o-link')
-                                                    ->helperText('Link do seu perfil no Twitter/X.')
-                                                    ->prefix('x.com/'),
-                                                \Filament\Forms\Components\TextInput::make('settings.website.social_networks.whatsapp')
-                                                    ->label('Link Direto WhatsApp')
-                                                    ->prefixIcon('heroicon-o-link')
-                                                    ->helperText('URL gerada (ex: wa.me/...).')
-                                                    ->placeholder('https://wa.me/55...'),
-                                            ]),
+                                        Grid::make(['default' => 1, 'md' => 2])->schema([
+                                            TextInput::make('settings.website.social_networks.instagram')
+                                                ->label('Instagram')
+                                                ->prefix('instagr.am/'),
+                                            TextInput::make('settings.website.social_networks.facebook')
+                                                ->label('Facebook')
+                                                ->prefix('fb.com/'),
+                                            TextInput::make('settings.website.social_networks.linkedin')
+                                                ->label('LinkedIn')
+                                                ->prefix('linkedin.com/in/'),
+                                            TextInput::make('settings.website.social_networks.twitter')
+                                                ->label('X (Twitter)')
+                                                ->prefix('x.com/'),
+                                        ]),
+                                        TextInput::make('settings.website.social_networks.whatsapp')
+                                            ->label('Link direto do WhatsApp')
+                                            ->placeholder('https://wa.me/55...'),
                                     ]),
                             ]),
 
-                        \Filament\Forms\Components\Tabs\Tab::make('Atendimento e Ferramentas')
+                        Tab::make('Atendimento')
+                            ->id('atendimento')
                             ->icon('heroicon-o-chat-bubble-left-right')
                             ->schema([
-                                \Filament\Forms\Components\Section::make('Atendimento via WhatsApp')
-                                    ->description('Configurações do número de atendimento e botões flutuantes.')
+                                Section::make('WhatsApp')
+                                    ->description('Número oficial usado no botão flutuante e na página de contato.')
+                                    ->compact()
                                     ->schema([
-                                        \Filament\Forms\Components\TextInput::make('settings.website.features.whatsapp_widget.number')
-                                            ->label('Número do WhatsApp Oficial')
-                                            ->prefixIcon('heroicon-o-phone')
+                                        TextInput::make('settings.website.features.whatsapp_widget.number')
+                                            ->label('Número')
                                             ->prefix('+55')
                                             ->mask('(99) 99999-9999')
                                             ->placeholder('(21) 90000-0000')
-                                            ->helperText('O código +55 já está incluído. Usado tanto para o widget quanto para os botões.')
                                             ->required()
                                             ->tel(),
-
-                                        \Filament\Forms\Components\Fieldset::make('Widget Flutuante')
-                                            ->schema([
-                                                \Filament\Forms\Components\Toggle::make('settings.website.features.whatsapp_widget.enabled')
-                                                    ->label('Habilitar Widget')
-                                                    ->helperText('Ativa o botão flutuante no canto da tela em todas as páginas.')
-                                                    ->onIcon('heroicon-m-check')
-                                                    ->offIcon('heroicon-m-x-mark')
-                                                    ->reactive()
-                                                    ->columnSpanFull(),
-                                                \Filament\Forms\Components\TextInput::make('settings.website.features.whatsapp_widget.message')
-                                                    ->label('Mensagem Inicial do Widget')
-                                                    ->prefixIcon('heroicon-o-chat-bubble-bottom-center-text')
-                                                    ->helperText('Texto pré-preenchido para o cliente no widget flutuante.')
-                                                    ->placeholder('Olá! Gostaria de um orçamento.')
-                                                    ->required(fn($get) => $get('settings.website.features.whatsapp_widget.enabled'))
-                                                    ->visible(fn($get) => $get('settings.website.features.whatsapp_widget.enabled'))
-                                                    ->columnSpanFull(),
-                                            ]),
-
-                                        \Filament\Forms\Components\Fieldset::make('Botão na Página de Contato')
-                                            ->schema([
-                                                \Filament\Forms\Components\Toggle::make('settings.website.features.whatsapp_button.enabled')
-                                                    ->label('Habilitar Botão de Contato')
-                                                    ->helperText('Adiciona um botão chamativo de WhatsApp acima do e-mail no formulário de contato.')
-                                                    ->onIcon('heroicon-m-check')
-                                                    ->offIcon('heroicon-m-x-mark')
-                                                    ->reactive()
-                                                    ->columnSpanFull(),
-                                                \Filament\Forms\Components\TextInput::make('settings.website.features.whatsapp_button.text')
-                                                    ->label('Texto do Botão')
-                                                    ->prefixIcon('heroicon-o-cursor-arrow-rays')
-                                                    ->helperText('Texto que será exibido no botão da página de contato.')
-                                                    ->default('Chamar no WhatsApp')
-                                                    ->placeholder('Ex: Falar com Especialista')
-                                                    ->required(fn($get) => $get('settings.website.features.whatsapp_button.enabled'))
-                                                    ->visible(fn($get) => $get('settings.website.features.whatsapp_button.enabled'))
-                                                    ->columnSpanFull(),
-                                            ]),
+                                        Toggle::make('settings.website.features.whatsapp_widget.enabled')
+                                            ->label('Botão flutuante em todas as páginas')
+                                            ->live(),
+                                        TextInput::make('settings.website.features.whatsapp_widget.message')
+                                            ->label('Mensagem inicial')
+                                            ->placeholder('Olá! Gostaria de um orçamento.')
+                                            ->required(fn (Get $get) => $get('settings.website.features.whatsapp_widget.enabled'))
+                                            ->visible(fn (Get $get) => $get('settings.website.features.whatsapp_widget.enabled')),
+                                        Toggle::make('settings.website.features.whatsapp_button.enabled')
+                                            ->label('Botão no formulário de contato')
+                                            ->live(),
+                                        TextInput::make('settings.website.features.whatsapp_button.text')
+                                            ->label('Texto do botão')
+                                            ->default('Chamar no WhatsApp')
+                                            ->placeholder('Ex: Falar com um especialista')
+                                            ->required(fn (Get $get) => $get('settings.website.features.whatsapp_button.enabled'))
+                                            ->visible(fn (Get $get) => $get('settings.website.features.whatsapp_button.enabled')),
                                     ]),
 
-                                \Filament\Forms\Components\Section::make('Ferramentas Ativas')
-                                    ->description('Ative ou desative ferramentas e formulários do site.')
+                                Section::make('Ferramentas do site')
+                                    ->compact()
                                     ->schema([
-                                        \Filament\Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                \Filament\Forms\Components\Toggle::make('settings.website.features.concrete_calculator')
-                                                    ->label('Calculadora de Concreto')
-                                                    ->helperText('Exibe a ferramenta de cálculo de volume na frente do site.')
-                                                    ->onIcon('heroicon-m-check')
-                                                    ->offIcon('heroicon-m-x-mark')
-                                                    ->inline(false),
-                                                \Filament\Forms\Components\Toggle::make('settings.website.features.budget_tool')
-                                                    ->label('Ferramenta de Orçamento')
-                                                    ->helperText('Permite que os clientes solicitem orçamentos online.')
-                                                    ->onIcon('heroicon-m-check')
-                                                    ->offIcon('heroicon-m-x-mark')
-                                                    ->inline(false),
-                                                \Filament\Forms\Components\Toggle::make('settings.website.features.scroll_to_top')
-                                                    ->label('Botão Voltar ao Topo')
-                                                    ->helperText('Exibe um botão flutuante para subir a página rapidamente.')
-                                                    ->onIcon('heroicon-m-check')
-                                                    ->offIcon('heroicon-m-x-mark')
-                                                    ->default(true)
-                                                    ->inline(false),
-                                                \Filament\Forms\Components\Toggle::make('settings.website.features.newsletter')
-                                                    ->label('Formulário de Newsletter')
-                                                    ->helperText('Exibe um formulário de inscrição na newsletter no rodapé do site.')
-                                                    ->onIcon('heroicon-m-check')
-                                                    ->offIcon('heroicon-m-x-mark')
-                                                    ->default(true)
-                                                    ->inline(false),
-                                            ]),
+                                        Toggle::make('settings.website.features.budget_tool')
+                                            ->label('Solicitação de orçamento online'),
+                                        Toggle::make('settings.website.features.concrete_calculator')
+                                            ->label('Calculadora de volume de concreto'),
+                                        Toggle::make('settings.website.features.newsletter')
+                                            ->label('Inscrição na newsletter (rodapé)')
+                                            ->default(true),
+                                        Toggle::make('settings.website.features.scroll_to_top')
+                                            ->label('Botão “voltar ao topo”')
+                                            ->default(true),
                                     ]),
                             ]),
 
-                        \Filament\Forms\Components\Tabs\Tab::make('Integrações e Scripts')
+                        Tab::make('Integrações')
+                            ->id('integracoes')
                             ->icon('heroicon-o-code-bracket')
                             ->schema([
-                                \Filament\Forms\Components\Section::make('Fontes e Scripts Customizados')
-                                    ->description('Adicione fontes do Google e scripts para injeção no cabeçalho ou rodapé (ex: Analytics, Pixel).')
+                                Section::make('Fonte dos títulos')
+                                    ->compact()
                                     ->schema([
-                                        \Filament\Forms\Components\TextInput::make('settings.website.scripts.google_font_family')
-                                            ->label('Nome da Fonte (Google Fonts)')
-                                            ->prefixIcon('heroicon-o-language')
-                                            ->helperText('Digite apenas o nome da fonte. Ex: Montserrat, Poppins, Outfit.')
-                                            ->placeholder('Ex: Outfit'),
-                                        \Filament\Forms\Components\Textarea::make('settings.website.scripts.head')
-                                            ->label('Scripts no <head>')
-                                            ->helperText('Ex: Google Analytics, Tag Manager, Facebook Pixel. Código a ser injetado no cabeçalho.')
-                                            ->rows(4),
-                                        \Filament\Forms\Components\Textarea::make('settings.website.scripts.footer')
-                                            ->label('Scripts no <footer>')
-                                            ->helperText('Scripts que devem ser carregados ao final da página.')
-                                            ->rows(4),
+                                        TextInput::make('settings.website.scripts.google_font_family')
+                                            ->label('Google Fonts')
+                                            ->placeholder('Ex: Outfit')
+                                            ->helperText('Só o nome da família, como aparece no Google Fonts.'),
+                                    ]),
+                                Section::make('Scripts')
+                                    ->description('Analytics, Tag Manager, Pixel. Não rodam na prévia, só no site publicado.')
+                                    ->compact()
+                                    ->schema([
+                                        Textarea::make('settings.website.scripts.head_scripts')
+                                            ->label('No <head>')
+                                            ->rows(5)
+                                            ->extraInputAttributes(['class' => 'font-mono text-xs', 'spellcheck' => 'false']),
+                                        Textarea::make('settings.website.scripts.footer_scripts')
+                                            ->label('Antes de </body>')
+                                            ->rows(5)
+                                            ->extraInputAttributes(['class' => 'font-mono text-xs', 'spellcheck' => 'false']),
                                     ]),
                             ]),
-                    ])
-                    ->columnSpanFull(),
+                    ]),
             ])
             ->statePath('data');
-    }
-
-    public function getSubheading(): ?string
-    {
-        return 'Configure as informações globais do site, SEO, scripts e menus de navegação.';
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            \Filament\Actions\Action::make('save')
-                ->label('Salvar Alterações')
-                ->action('save')
-                ->color('primary'),
-        ];
     }
 
     public function save(): void
     {
         $data = $this->form->getState();
         $setting = Setting::firstOrCreate(['id' => 1]);
-        
-        $currentSettings = $setting->settings ?? [];
-        $data['settings'] = array_replace_recursive($currentSettings, $data['settings'] ?? []);
 
-        $setting->update([
-            'settings' => $data['settings'],
-        ]);
+        $settings = Setting::merge($setting->settings ?? [], $data['settings'] ?? []);
+
+        // Chaves antigas, gravadas antes de alinhar o formulário com o que o site lê
+        unset($settings['website']['scripts']['head'], $settings['website']['scripts']['footer']);
+
+        $setting->update(['settings' => $settings]);
+
+        $this->dispatch('design-saved');
 
         Notification::make()
             ->success()
             ->title('Configurações salvas')
             ->send();
+    }
+
+    public function discard(): void
+    {
+        $this->fillFromDatabase();
+        $this->dispatch('design-saved');
+
+        Notification::make()->title('Alterações descartadas')->send();
+    }
+
+    /**
+     * Guarda o estado atual (sem salvar) e devolve a URL da prévia.
+     */
+    #[Renderless]
+    public function previewUrl(string $path = '/'): string
+    {
+        $saved = Setting::firstOrCreate(['id' => 1])->settings ?? [];
+        $draft = $this->normalizeDraft(data_get($this->data, 'settings', []));
+
+        $token = hash_hmac('sha256', session()->getId().'|'.auth()->id().'|design', (string) config('app.key'));
+
+        Cache::put(DesignPreviewController::CACHE_PREFIX.$token, [
+            'user_id' => (string) auth()->id(),
+            'settings' => Setting::merge($saved, $draft),
+        ], now()->addMinutes(DesignPreviewController::TTL_MINUTES));
+
+        return route('design.preview', ['token' => $token, 'pagina' => $path, 'v' => now()->getTimestampMs()]);
+    }
+
+    /**
+     * @return array<int, array{title: string, path: string}>
+     */
+    public function getPreviewPages(): array
+    {
+        return SitePage::query()
+            ->visible()
+            ->orderByRaw("CASE WHEN slug = '/' THEN 0 ELSE 1 END")
+            ->orderBy('sort_order')
+            ->get(['title', 'slug'])
+            ->map(fn (SitePage $page) => [
+                'title' => $page->title,
+                'path' => $page->slug === '/' ? '/' : '/'.ltrim($page->slug, '/'),
+            ])
+            ->all();
+    }
+
+    protected function fillFromDatabase(): void
+    {
+        $settings = Setting::firstOrCreate(['id' => 1])->settings ?? [];
+
+        // Leva valores das chaves antigas para as que o site realmente lê
+        foreach (['head', 'footer'] as $old) {
+            $new = "{$old}_scripts";
+            if (blank(data_get($settings, "website.scripts.{$new}")) && filled(data_get($settings, "website.scripts.{$old}"))) {
+                data_set($settings, "website.scripts.{$new}", data_get($settings, "website.scripts.{$old}"));
+            }
+        }
+
+        $this->form->fill(['settings' => $settings]);
+    }
+
+    /**
+     * Estado bruto do formulário no formato salvo: uploads viram caminhos no disco público.
+     */
+    protected function normalizeDraft(array $settings): array
+    {
+        foreach (self::IMAGE_FIELDS as $field) {
+            $state = data_get($settings, "website.{$field}");
+            if (! is_array($state)) {
+                continue;
+            }
+
+            $file = collect($state)->filter()->first();
+
+            if ($file instanceof UploadedFile) {
+                $file = $this->storePreviewImage($file, $field);
+            }
+
+            data_set($settings, "website.{$field}", is_string($file) ? $file : null);
+        }
+
+        return $this->dropObjects($settings);
+    }
+
+    /**
+     * Upload ainda não salvo: copia para um caminho fixo por usuário e campo
+     * (sobrescrito a cada prévia), servido pelo disco público como os demais.
+     */
+    protected function storePreviewImage(UploadedFile $file, string $field): ?string
+    {
+        try {
+            $path = 'website/preview/'.auth()->id().'-'.$field.'.'.($file->guessExtension() ?: 'png');
+            Storage::disk('public')->put($path, $file->get());
+
+            return $path;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return null;
+        }
+    }
+
+    protected function dropObjects(array $value): array
+    {
+        return array_map(fn ($item) => match (true) {
+            is_array($item) => $this->dropObjects($item),
+            is_object($item) => null,
+            default => $item,
+        }, $value);
     }
 }

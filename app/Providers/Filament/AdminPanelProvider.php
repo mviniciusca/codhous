@@ -15,6 +15,7 @@ use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Platform;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -83,6 +84,20 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::HEAD_END,
                 fn () => view('filament.admin.theme'),
             )
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->globalSearchFieldSuffix(fn (): ?string => match (Platform::detect()) {
+                Platform::Mac => '⌘K',
+                Platform::Windows, Platform::Linux => 'Ctrl K',
+                default => null,
+            })
+            ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_AFTER,
+                fn () => view('filament.admin.topbar-actions'),
+            )
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_BEFORE,
+                fn () => view('filament.admin.topbar-user'),
+            )
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn () => view('filament.budget.styles'),
@@ -110,10 +125,6 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->navigationItems([
-                NavigationItem::make('Ver Website')
-                    ->url('/', shouldOpenInNewTab: true)
-                    ->icon('heroicon-o-globe-alt')
-                    ->sort(1),
                 NavigationItem::make('Google Analytics')
                     ->url('https://analytics.google.com', shouldOpenInNewTab: true)
                     ->icon('heroicon-o-presentation-chart-line')
