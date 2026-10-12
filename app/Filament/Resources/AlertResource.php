@@ -202,7 +202,7 @@ class AlertResource extends Resource
                             ->helperText('Depois de fechado, não aparece de novo para o mesmo visitante.')
                             ->onIcon('heroicon-m-check')
                             ->offIcon('heroicon-m-x-mark')
-                            ->default(false)
+                            ->default(true)
                             ->live()
                             ->visible(fn (Get $get): bool => (bool) $get('is_dismissible')),
                     ]),
@@ -219,7 +219,7 @@ class AlertResource extends Resource
                             ->integer()
                             ->minValue(1)
                             ->maxValue(3650)
-                            ->default(30),
+                            ->default(Alert::DEFAULT_COOKIE_DAYS),
 
                         Forms\Components\TextInput::make('cookie_key')
                             ->label('Identificador do cookie')

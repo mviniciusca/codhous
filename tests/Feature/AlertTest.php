@@ -279,6 +279,14 @@ test('trocar o tipo ajusta a posição e o modal não mostra o campo', function 
         ->assertFormFieldIsHidden('position');
 });
 
+test('novo alerta já vem com lembrar fechamento ligado por 3 dias', function () {
+    livewire(CreateAlert::class)
+        ->assertFormSet(['use_cookie' => true, 'cookie_duration_days' => 3])
+        ->assertFormFieldIsVisible('cookie_duration_days');
+
+    expect((new Alert)->getCookieDurationDays())->toBe(3);
+});
+
 test('lembrar fechamento só aparece quando o alerta pode ser fechado', function () {
     livewire(CreateAlert::class)
         ->fillForm(['is_dismissible' => false])
@@ -324,6 +332,20 @@ test('editar alerta publicado mantém publicado ao salvar e despublica pela aç�
         ->assertNotified('Alerta despublicado');
 
     expect($this->banner->fresh()->is_active)->toBeFalse();
+});
+
+test('salvar não duplica a barra de ações e ela acompanha o novo status', function () {
+    $count = fn ($page) => count($page->instance()->getCachedFormActions());
+
+    $page = livewire(EditAlert::class, ['record' => $this->banner->getRouteKey()]);
+    expect($count($page))->toBe(3);
+
+    $page->call('save')->assertHasNoFormErrors();
+    expect($count($page))->toBe(3);
+
+    $page->callAction('unpublish');
+    expect($count($page))->toBe(3)
+        ->and(array_map(fn ($action) => $action->getName(), $page->instance()->getCachedFormActions()))->toBe(['cancel', 'save', 'publish']);
 });
 
 test('editar rascunho e publicar', function () {

@@ -77,7 +77,9 @@ class EditAlert extends EditRecord
 
     protected function afterSave(): void
     {
-        // As ações da barra dependem do status, que pode ter mudado neste salvamento
+        // As ações da barra dependem do status, que pode ter mudado neste salvamento.
+        // cacheFormActions() acrescenta à lista em vez de substituir: zera antes para não duplicar a barra
+        $this->cachedFormActions = [];
         $this->cacheFormActions();
     }
 

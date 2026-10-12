@@ -263,6 +263,9 @@ class Alert extends Model
         return self::STATUS_ACTIVE;
     }
 
+    /** Dias que um alerta fechado fica oculto quando "Lembrar fechamento" está ligado */
+    public const DEFAULT_COOKIE_DAYS = 3;
+
     /** Nome interno do aviso de cookies padrão (seeder e migração de instalações antigas) */
     public const COOKIE_CONSENT_NAME = 'Consentimento de cookies';
 
@@ -301,7 +304,7 @@ class Alert extends Model
 
     public function getCookieDurationDays(): int
     {
-        return (int) ($this->cookie_duration_days ?? 30);
+        return (int) ($this->cookie_duration_days ?? self::DEFAULT_COOKIE_DAYS);
     }
 
     public function scopeActive($query)
