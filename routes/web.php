@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BudgetDownloadController;
 use App\Http\Controllers\BudgetPdfController;
+use App\Http\Controllers\ContentSectionPreviewController;
 use App\Http\Controllers\DesignPreviewController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\PageBuilderPreviewController;
@@ -48,6 +49,12 @@ Route::get('/admin/page-builder/preview/{token}', PageBuilderPreviewController::
     ->middleware('auth')
     ->where('token', '[a-f0-9]{64}')
     ->name('page-builder.preview');
+
+// Live preview da criação/edição de seções (painel administrativo)
+Route::get('/admin/section-builder/preview/{token}', ContentSectionPreviewController::class)
+    ->middleware('auth')
+    ->where('token', '[a-f0-9]{64}')
+    ->name('content-sections.preview');
 
 // Pré-visualização do Design e SEO (configurações não salvas sobre o site real)
 Route::get('/admin/design-preview/{token}', DesignPreviewController::class)

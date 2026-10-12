@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\PageResource\Concerns;
 
+use App\Filament\Concerns\NormalizesPreviewState;
 use App\Http\Controllers\PageBuilderPreviewController;
 use Filament\Forms\Components\Builder;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Renderless;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 /**
  * Live preview (estilo WordPress) para o Page Builder.
@@ -17,6 +17,8 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
  */
 trait InteractsWithLivePreview
 {
+    use NormalizesPreviewState;
+
     #[Renderless]
     public function generateLivePreviewUrl(): ?string
     {
@@ -161,38 +163,6 @@ trait InteractsWithLivePreview
 
     protected function normalizeLivePreviewValue(mixed $value): mixed
     {
-        if ($value instanceof TemporaryUploadedFile) {
-            try {
-                return $value->temporaryUrl();
-            } catch (\Throwable) {
-                return null;
-            }
-        }
-
-        if (is_array($value)) {
-            return array_map(fn ($item) => $this->normalizeLivePreviewValue($item), $value);
-        }
-
-        if ($value instanceof \BackedEnum) {
-            return $value->value;
-        }
-
-        if ($value instanceof \DateTimeInterface) {
-            return $value->format('Y-m-d H:i:s');
-        }
-
-        if ($value instanceof \Illuminate\Contracts\Support\Arrayable) {
-            return $this->normalizeLivePreviewValue($value->toArray());
-        }
-
-        if ($value instanceof \Stringable) {
-            return (string) $value;
-        }
-
-        if (is_object($value)) {
-            return null;
-        }
-
-        return $value;
+        return $this->normalizePreviewValue($value);
     }
 }

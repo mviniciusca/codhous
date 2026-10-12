@@ -68,6 +68,63 @@ class ContentSection extends Model
         ];
     }
 
+    /**
+     * Categorias da galeria de tipos (etapa "Tipo da Seção").
+     *
+     * @return array<string, array{label: string, icon: string}>
+     */
+    public static function typeCategories(): array
+    {
+        return [
+            'highlight' => ['label' => 'Destaques', 'icon' => 'heroicon-o-star'],
+            'company' => ['label' => 'Empresa', 'icon' => 'heroicon-o-building-office-2'],
+            'portfolio' => ['label' => 'Portfólio', 'icon' => 'heroicon-o-photo'],
+            'social_proof' => ['label' => 'Prova social', 'icon' => 'heroicon-o-hand-thumb-up'],
+            'service' => ['label' => 'Atendimento', 'icon' => 'heroicon-o-chat-bubble-left-ellipsis'],
+            'conversion' => ['label' => 'Conversão', 'icon' => 'heroicon-o-cursor-arrow-rays'],
+        ];
+    }
+
+    /**
+     * Metadados de cada tipo para a biblioteca: ícone, descrição curta, categorias
+     * e termos de busca extras. A miniatura (skeleton) fica em resources/views/filament/forms/components/section-type-picker/previews/{type}.
+     *
+     * @return array<string, array{label: string, description: string, icon: string, categories: array<int, string>, keywords: string}>
+     */
+    public static function typeCatalog(): array
+    {
+        $meta = [
+            self::TYPE_HERO => ['Destaque principal no topo da página, com mídia de fundo e chamada.', 'heroicon-o-star', ['highlight'], 'banner topo capa cep whatsapp slideshow video'],
+            self::TYPE_PARTNERS => ['Faixa com os logotipos dos seus clientes.', 'heroicon-o-building-office', ['social_proof'], 'logos marcas empresas'],
+            self::TYPE_COMMERCIAL_PARTNERS => ['Parceiros e fornecedores com logo e descrição.', 'heroicon-o-briefcase', ['social_proof'], 'fornecedores parceria'],
+            self::TYPE_SERVICES => ['Cards com os serviços oferecidos pela empresa.', 'heroicon-o-wrench-screwdriver', ['company'], 'servicos produtos cards'],
+            self::TYPE_FAQ => ['Perguntas e respostas em acordeão.', 'heroicon-o-question-mark-circle', ['service'], 'perguntas duvidas respostas acordeao'],
+            self::TYPE_TESTIMONIALS => ['Carrossel com depoimentos e avaliações de clientes.', 'heroicon-o-chat-bubble-left-right', ['social_proof'], 'avaliacoes opinioes reviews carrossel'],
+            self::TYPE_COVERAGE => ['Mapa e cidades onde a empresa atende.', 'heroicon-o-map', ['service'], 'mapa cidades regiao area atendimento'],
+            self::TYPE_DIFFERENTIALS => ['Vantagens competitivas com ícones.', 'heroicon-o-sparkles', ['company'], 'vantagens beneficios porque escolher'],
+            self::TYPE_TIMELINE => ['Passo a passo do processo, em etapas numeradas.', 'heroicon-o-clock', ['company'], 'etapas processo como funciona passos'],
+            self::TYPE_CTA_CONTACT => ['Informações de contato com formulário de mensagem.', 'heroicon-o-phone', ['service', 'conversion'], 'formulario email telefone endereco mensagem'],
+            self::TYPE_CONTACT_BANNER => ['Faixa de chamada rápida para atendimento.', 'heroicon-o-megaphone', ['service'], 'cta chamada whatsapp faixa'],
+            self::TYPE_BUDGET_FORM => ['Formulário em etapas para solicitar orçamento.', 'heroicon-o-currency-dollar', ['conversion'], 'orcamento cotacao pedido wizard'],
+            self::TYPE_CALCULATOR => ['Calcula o volume de concreto da obra.', 'heroicon-o-calculator', ['conversion'], 'volume metros cubicos m3 concreto'],
+            self::TYPE_PAYMENT_OFFER => ['Condições de pagamento e meios aceitos.', 'heroicon-o-credit-card', ['highlight', 'conversion'], 'parcelamento cartao pix oferta promocao'],
+            self::TYPE_SIMPLE_BANNER => ['Imagem em largura total com link.', 'heroicon-o-photo', ['highlight'], 'imagem link anuncio'],
+            self::TYPE_TEAM => ['Membros da equipe com foto e cargo.', 'heroicon-o-users', ['company'], 'equipe pessoas colaboradores time'],
+            self::TYPE_SHOWCASE => ['Galeria com fotos de obras realizadas.', 'heroicon-o-camera', ['portfolio'], 'galeria obras fotos projetos'],
+            self::TYPE_EQUIPMENT_SHOWCASE => ['Vitrine de equipamentos e máquinas.', 'heroicon-o-truck', ['portfolio'], 'equipamentos maquinas locacao frota'],
+        ];
+
+        $catalog = [];
+
+        foreach (static::typeLabels() as $type => $label) {
+            [$description, $icon, $categories, $keywords] = $meta[$type] ?? ['', 'heroicon-o-squares-2x2', [], ''];
+
+            $catalog[$type] = compact('label', 'description', 'icon', 'categories', 'keywords');
+        }
+
+        return $catalog;
+    }
+
     public static function slugForType(string $type): string
     {
         return match ($type) {
