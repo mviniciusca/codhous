@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "bootstrap-sha": "5351bf891633cad03b00e7e0bb84da338a6b0429",
+    "include-v-in-tag": true,
+    "packages": {
+        ".": {
+            "release-type": "simple",
+            "package-name": "codhous",
+            "changelog-path": "CHANGELOG.md",
+            "bump-minor-pre-major": true,
+            "changelog-sections": [
+                { "type": "feat", "section": "Novidades" },
+                { "type": "fix", "section": "Correções" },
+                { "type": "perf", "section": "Desempenho" },
+                { "type": "refactor", "section": "Melhorias internas" },
+                { "type": "style", "section": "Visual", "hidden": true },
+                { "type": "chore", "section": "Manutenção", "hidden": true },
+                { "type": "docs", "section": "Documentação", "hidden": true },
+                { "type": "test", "section": "Testes", "hidden": true }
+            ]
+        }
+    }
+}
