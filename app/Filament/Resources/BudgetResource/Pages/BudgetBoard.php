@@ -135,7 +135,7 @@ class BudgetBoard extends Page
             'total' => BudgetResource::parseMoney($content['total'] ?? 0),
             'items' => $items->isEmpty()
                 ? null
-                : $items->first()->product?->name.($items->count() > 1 ? ' +'.($items->count() - 1) : ''),
+                : $items->first()->productLabel().($items->count() > 1 ? ' +'.($items->count() - 1) : ''),
             'age' => $budget->created_at?->timezone($tz)->locale('pt_BR')->diffForHumans(short: true),
             'from_site' => $budget->user_id === null,
             'whatsapp' => (bool) $budget->notified_via_whatsapp,

@@ -137,6 +137,8 @@ class Budget extends Component
             'subtotal' => 0,
             'min_quantity' => 1,
             'unit' => '',
+            // Unidades como dia, hora e unidade só aceitam números inteiros
+            'decimal' => true,
         ];
     }
 
@@ -171,15 +173,17 @@ class Budget extends Component
                     $min = (float) ($product?->min_quantity ?? 1);
                     $this->items[$index]['min_quantity'] = $min;
                     $this->items[$index]['quantity'] = $min;
+                    $this->items[$index]['decimal'] = $product?->allowsFractions() ?? true;
                 }
             }
 
             if ($field === 'quantity') {
                 $min = (float) ($this->items[$index]['min_quantity'] ?? 1);
                 $qty = (float) ($this->items[$index]['quantity'] ?: 0);
-                if ($qty < $min) {
-                    $this->items[$index]['quantity'] = $min;
+                if (! ($this->items[$index]['decimal'] ?? true)) {
+                    $qty = ceil($qty);
                 }
+                $this->items[$index]['quantity'] = max($qty, $min);
             }
 
             // O preço e a unidade sempre vêm do banco, nunca do navegador
@@ -395,10 +399,15 @@ class Budget extends Component
                 'max:10000',
                 function (string $attribute, mixed $value, \Closure $fail) {
                     $index = explode('.', $attribute)[1];
-                    $min = (float) ($this->getCachedProduct($this->items[$index]['product_id'] ?? null)?->min_quantity ?? 1);
+                    $product = $this->getCachedProduct($this->items[$index]['product_id'] ?? null);
+                    $min = (float) ($product?->min_quantity ?? 1);
 
                     if ((float) $value < $min) {
-                        $fail('A quantidade mínima para este produto é '.BudgetCalculatorService::formatQuantity($min).'.');
+                        $fail('A quantidade mínima para este produto é '.BudgetCalculatorService::formatQuantityWithUnit($min, $product?->unit?->value).'.');
+                    }
+
+                    if ($product && ! $product->allowsFractions() && floor((float) $value) != (float) $value) {
+                        $fail('Para '.$product->name.', informe uma quantidade inteira (sem frações).');
                     }
                 },
             ],
@@ -598,6 +607,7 @@ class Budget extends Component
     {
         return Cache::remember(Product::CATALOG_CACHE_KEY, 86400, fn () => Product::where('is_active', true)
             ->whereHas('productOption', fn ($q) => $q->where('is_active', true))
+            ->orderBy('sort')
             ->orderBy('name')
             ->pluck('name', 'id')
             ->toArray());
@@ -611,6 +621,7 @@ class Budget extends Component
 
         return Cache::remember(ProductOption::catalogCacheKey($productId), 86400, fn () => ProductOption::where('product_id', $productId)
             ->where('is_active', true)
+            ->orderBy('sort')
             ->orderBy('name')
             ->pluck('name', 'id')
             ->toArray());

@@ -267,11 +267,11 @@
                 <tr>
                     <td class="text-center">{{ $item->product_id ?? '-' }}</td>
                     <td>
-                        {{ $item->product?->name ?? 'Produto' }}
-                        @if($item->productOption) ({{ $item->productOption->name }}) @endif
+                        {{ $item->productLabel() }}
+                        @if($item->optionLabel()) ({{ $item->optionLabel() }}) @endif
                         @if($item->location) - Local: {{ $item->location->name }} @endif
                     </td>
-                    <td class="text-center">{{ $item->productOption?->unit?->value ?? 'UN' }}</td>
+                    <td class="text-center">{{ $item->unitLabel() ?? 'UN' }}</td>
                     <td class="text-center">{{ \App\Services\BudgetCalculatorService::formatQuantity((float) $item->quantity) }}</td>
                     <td class="text-right">R$ {{ number_format((float)$item->price, 2, ',', '.') }}</td>
                     <td class="text-right">R$ {{ number_format((float) $item->quantity * (float) $item->price, 2, ',', '.') }}</td>

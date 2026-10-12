@@ -457,7 +457,7 @@ class BudgetResource extends Resource
                             ->schema([
                                 Select::make('product_id')
                                     ->label('Produto')
-                                    ->options(fn () => Product::orderBy('name')->pluck('name', 'id'))
+                                    ->options(fn (mixed $state) => self::productOptions($state))
                                     ->searchable()
                                     ->required()
                                     ->live()
@@ -465,15 +465,16 @@ class BudgetResource extends Resource
                                     ->afterStateUpdated(fn (Set $set) => $set('product_option_id', null)),
                                 Select::make('product_option_id')
                                     ->label('Opção / Traço')
-                                    ->options(fn (Get $get) => ProductOption::where('product_id', $get('product_id'))->orderBy('name')->pluck('name', 'id'))
+                                    ->options(fn (Get $get, mixed $state) => self::variationOptions($get('product_id'), $state))
                                     ->required()
                                     ->live()
                                     ->searchable()
                                     ->columnSpan(['default' => 2, 'md' => 3])
                                     ->afterStateUpdated(function (Set $set, Get $get, $state) {
                                         if ($state) {
-                                            $option = ProductOption::find($state);
-                                            $set('price', number_format($option?->price ?? 0, 2, ',', '.'));
+                                            $option = ProductOption::withTrashed()->find($state);
+                                            $set('price', number_format((float) ($option?->price ?? 0), 2, ',', '.'));
+                                            $set('unit_cost', $option?->cost);
                                         }
                                         self::calculateTotalInsideRepeater($get, $set);
                                     }),
@@ -484,7 +485,7 @@ class BudgetResource extends Resource
                                     ->default(1)
                                     ->live(debounce: 500)
                                     ->columnSpan(['default' => 1, 'md' => 2])
-                                    ->step(0.5)
+                                    ->step(fn (Get $get) => Product::withTrashed()->find($get('product_id'))?->allowsFractions() === false ? 1 : 0.5)
                                     ->minValue(0.5)
                                     ->suffix(fn (Get $get) => ProductOption::find($get('product_option_id'))?->unit?->value ?? '')
                                     ->formatStateUsing(fn ($state) => $state === null ? null : round(floatval($state), 2))
@@ -508,6 +509,8 @@ class BudgetResource extends Resource
                                     ->hintColor('warning')
                                     ->columnSpan(['default' => 1, 'md' => 2])
                                     ->afterStateUpdated(fn (Set $set, Get $get) => self::calculateTotalInsideRepeater($get, $set)),
+                                // Custo do momento da venda (o model grava ao salvar); usado na margem do resumo
+                                Hidden::make('unit_cost')->dehydrated(false),
                                 Placeholder::make('total_item')
                                     ->label('Total')
                                     ->columnSpan(['default' => 2, 'md' => 2])
@@ -583,6 +586,17 @@ class BudgetResource extends Resource
                 $money(TextInput::make('content.discount'))
                     ->label('Desconto')
                     ->prefix('− R$'),
+                Placeholder::make('summary_margin')
+                    ->label('Margem')
+                    ->inlineLabel()
+                    ->visible(fn (Get $get) => self::estimatedMargin($get) !== null)
+                    ->content(function (Get $get) {
+                        [$profit, $percent] = self::estimatedMargin($get);
+
+                        return new HtmlString('<span class="bq-money">R$ '.number_format($profit, 2, ',', '.').'</span> '
+                            .'<span class="bq-hint">('.number_format($percent, 1, ',', '.').'% sobre os itens)</span>');
+                    })
+                    ->hintIcon('heroicon-m-lock-closed', tooltip: 'Visível só no painel. Itens sem custo cadastrado ficam fora do cálculo.'),
                 Placeholder::make('summary_total')
                     ->hiddenLabel()
                     ->content(fn (Get $get) => new HtmlString(
@@ -757,6 +771,75 @@ class BudgetResource extends Resource
                         }
                     }),
             ]);
+    }
+
+    /**
+     * Produtos ativos, mais o já escolhido (mesmo inativo ou na lixeira) para não sumir de orçamentos antigos.
+     */
+    protected static function productOptions(mixed $selected): array
+    {
+        return Product::withTrashed()
+            ->where(fn (Builder $q) => $q->where(fn (Builder $q) => $q->where('is_active', true)->whereNull('deleted_at'))
+                ->when($selected, fn (Builder $q) => $q->orWhere('id', $selected)))
+            ->orderBy('sort')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (Product $product) => [
+                $product->id => $product->name.($product->trashed() ? ' (na lixeira)' : (! $product->is_active ? ' (inativo)' : '')),
+            ])
+            ->all();
+    }
+
+    /**
+     * Variações ativas do produto, mais a já escolhida (mesmo inativa ou arquivada).
+     */
+    protected static function variationOptions(mixed $productId, mixed $selected): array
+    {
+        if (blank($productId)) {
+            return [];
+        }
+
+        return ProductOption::withTrashed()
+            ->where('product_id', $productId)
+            ->where(fn (Builder $q) => $q->where(fn (Builder $q) => $q->where('is_active', true)->whereNull('deleted_at'))
+                ->when($selected, fn (Builder $q) => $q->orWhere('id', $selected)))
+            ->orderBy('sort')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (ProductOption $option) => [
+                $option->id => $option->name.' — R$ '.number_format((float) $option->price, 2, ',', '.')
+                    .($option->trashed() ? ' (arquivada)' : (! $option->is_active ? ' (inativa)' : '')),
+            ])
+            ->all();
+    }
+
+    /**
+     * Lucro bruto estimado dos itens que têm custo: [lucro, % sobre a venda desses itens].
+     */
+    protected static function estimatedMargin(Get $get): ?array
+    {
+        $revenue = 0.0;
+        $profit = 0.0;
+
+        foreach ($get('budgetItems') ?? [] as $item) {
+            if (! isset($item['unit_cost']) || $item['unit_cost'] === '' || $item['unit_cost'] === null) {
+                continue;
+            }
+
+            $quantity = (float) ($item['quantity'] ?? 0);
+            $price = self::parseMoney($item['price'] ?? 0);
+            $revenue += $quantity * $price;
+            $profit += $quantity * ($price - (float) $item['unit_cost']);
+        }
+
+        if ($revenue <= 0) {
+            return null;
+        }
+
+        // Desconto sai da margem
+        $profit -= self::parseMoney($get('content.discount') ?? 0);
+
+        return [$profit, $profit / $revenue * 100];
     }
 
     /**
@@ -1072,7 +1155,7 @@ class BudgetResource extends Resource
 
                 TextColumn::make('items_summary')
                     ->label('Itens')
-                    ->state(fn (Budget $record) => $record->budgetItems->first()?->product?->name ?? '—')
+                    ->state(fn (Budget $record) => $record->budgetItems->first()?->productLabel() ?? '—')
                     ->limit(22)
                     ->tooltip(fn (Budget $record) => $record->budgetItems->map(fn ($item) => $item->describe())->implode(' | ') ?: null)
                     ->description(function (Budget $record) {
@@ -1081,7 +1164,7 @@ class BudgetResource extends Resource
                             return null;
                         }
 
-                        $unit = $first->productOption?->unit?->value;
+                        $unit = $first->unitLabel();
                         $others = $record->budgetItems->count() - 1;
 
                         return BudgetCalculatorService::formatQuantityWithUnit((float) $first->quantity, $unit)
@@ -1321,7 +1404,7 @@ class BudgetResource extends Resource
                 ExcelColumn::make('state')->heading('UF')->getStateUsing($content('state')),
                 ExcelColumn::make('postcode')->heading('CEP')->getStateUsing($content('postcode')),
                 ExcelColumn::make('items')->heading('Itens')->getStateUsing(fn (Budget $record) => $record->budgetItems
-                    ->map(fn ($item) => $item->describe().' — '.BudgetCalculatorService::formatQuantity((float) $item->quantity).' '.($item->productOption?->unit?->value ?? '').' × R$ '.number_format((float) $item->price, 2, ',', '.'))
+                    ->map(fn ($item) => $item->describe().' — '.BudgetCalculatorService::formatQuantityWithUnit((float) $item->quantity, $item->unitLabel()).' × R$ '.number_format((float) $item->price, 2, ',', '.'))
                     ->implode("\n")),
                 ExcelColumn::make('delivery_date')->heading('Entrega desejada')->getStateUsing(fn (Budget $record) => ! empty($record->content['delivery_date']) ? Carbon::parse($record->content['delivery_date'])->format('d/m/Y') : 'A combinar'),
                 ExcelColumn::make('subtotal')->heading('Subtotal (R$)')->getStateUsing(fn (Budget $record) => self::parseMoney($record->content['subtotal'] ?? 0)),

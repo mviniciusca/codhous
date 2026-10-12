@@ -16,7 +16,18 @@ class BudgetItem extends Model
         'location_id',
         'quantity',
         'price',
+        'unit_cost',
         'subtotal',
+        'product_name',
+        'option_name',
+        'unit',
+    ];
+
+    protected $casts = [
+        'quantity' => 'decimal:2',
+        'price' => 'decimal:2',
+        'unit_cost' => 'decimal:2',
+        'subtotal' => 'decimal:2',
     ];
 
     /** Campos acompanhados no histórico do orçamento */
@@ -24,6 +35,26 @@ class BudgetItem extends Model
 
     protected static function booted(): void
     {
+        // Guarda nome, unidade e custo do momento da venda: renomear ou arquivar
+        // uma variação depois não altera orçamentos já feitos.
+        static::saving(function (BudgetItem $item) {
+            if ($item->isDirty('product_id') || blank($item->product_name)) {
+                $item->product_name = Product::withTrashed()->find($item->product_id)?->name;
+            }
+
+            if ($item->isDirty('product_option_id') || blank($item->option_name)) {
+                $option = ProductOption::withTrashed()->find($item->product_option_id);
+                $item->option_name = $option?->name;
+                $item->unit = $option?->unit?->value;
+
+                if ($item->isDirty('product_option_id') || $item->unit_cost === null) {
+                    $item->unit_cost = $option?->cost;
+                }
+            }
+
+            $item->subtotal = round((float) $item->quantity * (float) $item->price, 2);
+        });
+
         static::created(fn (BudgetItem $item) => $item->logChange('item_added'));
         static::updated(fn (BudgetItem $item) => $item->logChange('item_updated'));
         static::deleted(fn (BudgetItem $item) => $item->logChange('item_removed'));
@@ -34,10 +65,42 @@ class BudgetItem extends Model
      */
     public function describe(?int $productId = null, ?int $optionId = null): string
     {
+        // Sem ids explícitos, usa os nomes gravados na venda
+        if ($productId === null && $optionId === null && filled($this->product_name)) {
+            return $this->option_name ? "{$this->product_name} · {$this->option_name}" : $this->product_name;
+        }
+
         $product = Product::withTrashed()->find($productId ?? $this->product_id)?->name ?? 'Produto removido';
-        $option = ProductOption::find($optionId ?? $this->product_option_id)?->name;
+        $option = ProductOption::withTrashed()->find($optionId ?? $this->product_option_id)?->name;
 
         return $option ? "{$product} · {$option}" : $product;
+    }
+
+    public function productLabel(): string
+    {
+        return $this->product_name ?: ($this->product?->name ?? 'Produto removido');
+    }
+
+    public function optionLabel(): ?string
+    {
+        return $this->option_name ?: $this->productOption?->name;
+    }
+
+    public function unitLabel(): ?string
+    {
+        return $this->unit ?: $this->productOption?->unit?->value;
+    }
+
+    /**
+     * Lucro bruto do item (preço − custo) × quantidade. Null quando não há custo.
+     */
+    public function grossProfit(): ?float
+    {
+        if ($this->unit_cost === null) {
+            return null;
+        }
+
+        return round(((float) $this->price - (float) $this->unit_cost) * (float) $this->quantity, 2);
     }
 
     /**
@@ -100,12 +163,12 @@ class BudgetItem extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->withTrashed();
     }
 
     public function productOption(): BelongsTo
     {
-        return $this->belongsTo(ProductOption::class);
+        return $this->belongsTo(ProductOption::class)->withTrashed();
     }
 
     public function location(): BelongsTo

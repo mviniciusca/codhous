@@ -150,7 +150,7 @@
                                         <div class="md:col-span-2">
                                             <label class="mb-1.5 block text-xs font-bold text-foreground">Qtd. <span class="text-red-500">*</span></label>
                                             <div class="relative">
-                                                <input type="number" wire:model.blur="items.{{ $index }}.quantity" step="0.5" min="{{ $item['min_quantity'] ?? 1 }}" inputmode="decimal" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-bold shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" {{ empty($item['option_id']) ? 'disabled' : '' }} />
+                                                <input type="number" wire:model.blur="items.{{ $index }}.quantity" step="{{ ($item['decimal'] ?? true) ? '0.5' : '1' }}" min="{{ $item['min_quantity'] ?? 1 }}" inputmode="{{ ($item['decimal'] ?? true) ? 'decimal' : 'numeric' }}" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-bold shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" {{ empty($item['option_id']) ? 'disabled' : '' }} />
                                                 @if(!empty($item['unit']))
                                                     <span class="absolute inset-y-0 right-3 flex items-center text-xs font-medium text-muted-foreground pointer-events-none">{{ $item['unit'] }}</span>
                                                 @endif
