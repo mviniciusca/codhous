@@ -127,10 +127,14 @@
                             <span>{{ $alert->message }}</span>
                         </p>
                         @if($ctaUrl)
-                            <a href="{{ $ctaUrl }}" class="sa-btn sa-btn--light" @if($newTab) target="_blank" rel="noopener noreferrer" @endif>
+                            <a href="{{ $ctaUrl }}" @class(['sa-btn', 'sa-btn--light' => ! $inlineLink, 'sa-btn--ghost' => $inlineLink]) @if($newTab) target="_blank" rel="noopener noreferrer" @endif>
                                 {{ $alert->cta_label }}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                             </a>
+                        @endif
+                        {{-- Consentimento: aceitar é a ação principal (grava o cookie quando "Lembrar fechamento" está ligado) --}}
+                        @if($dismissible && $inlineLink)
+                            <button type="button" class="sa-btn sa-btn--light" @click="dismiss()" data-sa-dismiss>{{ $look['dismissAlone'] }}</button>
                         @endif
                         @if($dismissible)
                             <button type="button" class="sa-x" @click="dismiss()" aria-label="Fechar" data-sa-dismiss>

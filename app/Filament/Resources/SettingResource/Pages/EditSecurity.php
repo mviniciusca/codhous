@@ -47,11 +47,22 @@ class EditSecurity extends EditRecord
                     ->icon('heroicon-o-shield-exclamation')
                     ->description('Gerencie as configurações de privacidade e consentimento de cookies.')
                     ->schema([
-                        Toggle::make('settings.security.cookie_consent_enabled')
+                        // O aviso de cookies agora é um alerta (estilo Consentimento) em Alertas e notificações
+                        \Filament\Forms\Components\Placeholder::make('cookie_consent_alert')
                             ->label('Aviso de Cookies')
-                            ->helperText('Ativa o banner de consentimento de cookies (válido por 7 dias) no site.')
-                            ->default(true)
-                            ->inline(false),
+                            ->content(function (): \Illuminate\Support\HtmlString {
+                                $alert = \App\Models\Alert::where('style', \App\Models\Alert::STYLE_CONSENT)->orderBy('id')->first();
+                                $url = $alert
+                                    ? \App\Filament\Resources\AlertResource::getUrl('edit', ['record' => $alert])
+                                    : \App\Filament\Resources\AlertResource::getUrl('create');
+                                $status = $alert ? ($alert->status() === \App\Models\Alert::STATUS_ACTIVE ? 'ativo no site' : 'não está aparecendo no site') : 'ainda não criado';
+
+                                return new \Illuminate\Support\HtmlString(
+                                    'O banner de cookies agora é gerenciado em <strong>Alertas e notificações</strong> ('.e($status).'). '
+                                    .'<a href="'.e($url).'" class="font-semibold text-primary-600 underline dark:text-primary-400">'
+                                    .($alert ? 'Editar aviso de cookies' : 'Criar aviso de cookies').'</a>'
+                                );
+                            }),
                     ]),
 
                 Section::make('Cloudflare Turnstile (Anti-Spam)')

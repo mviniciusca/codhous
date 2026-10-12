@@ -263,6 +263,37 @@ class Alert extends Model
         return self::STATUS_ACTIVE;
     }
 
+    /** Nome interno do aviso de cookies padrão (seeder e migração de instalações antigas) */
+    public const COOKIE_CONSENT_NAME = 'Consentimento de cookies';
+
+    /**
+     * Aviso de cookies (LGPD) que antes era o componente fixo site-cookie-consent.
+     * Usa o mesmo cookie de antes, então quem já aceitou continua sem ver o aviso.
+     *
+     * @return array<string, mixed>
+     */
+    public static function cookieConsentDefaults(): array
+    {
+        return [
+            'name' => self::COOKIE_CONSENT_NAME,
+            'type' => self::TYPE_BANNER,
+            'style' => self::STYLE_CONSENT,
+            'position' => self::POSITION_BOTTOM,
+            'title' => 'Valorizamos sua privacidade',
+            'message' => 'Utilizamos cookies e tecnologias semelhantes para melhorar a sua experiência em nosso site, analisar o tráfego e personalizar o conteúdo. Ao continuar navegando, você concorda com a nossa política de privacidade.',
+            'is_active' => true,
+            'is_dismissible' => true,
+            'use_cookie' => true,
+            'cookie_key' => 'codhous_cookie_consent',
+            'cookie_duration_days' => 7,
+            'cta_label' => null,
+            'cta_url' => null,
+            'start_at' => null,
+            'end_at' => null,
+            'sort_order' => 0,
+        ];
+    }
+
     public function getCookieKey(): string
     {
         return $this->cookie_key ?: 'alert_dismissed_'.$this->id;

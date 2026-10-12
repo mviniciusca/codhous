@@ -44,6 +44,8 @@
     .sa-btn--dark { color: #fff; background: #1e293b; }
     .sa-btn--dark:hover { filter: none; background: #0f172a; }
     .sa-btn--light { color: rgb(var(--sa-banner)); background: #fff; }
+    .sa-btn--ghost { color: #fff; background: transparent; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .45); }
+    .sa-btn--ghost:hover { filter: none; background: rgb(255 255 255 / .12); }
 
     .sa a:focus-visible, .sa button:focus-visible { outline: 2px solid rgb(var(--sa-accent)); outline-offset: 2px; }
 
@@ -102,7 +104,10 @@
     .sa-banner .sa-icon svg { width: 18px; height: 18px; }
     .sa-banner-text { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; font-size: 14px; line-height: 1.4; }
     .sa-banner-text strong { flex: none; font-weight: 700; }
-    .sa-banner-text span { min-width: 0; color: rgb(255 255 255 / .88); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sa-banner-text span {
+        min-width: 0; color: rgb(255 255 255 / .88);
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
     .sa-banner-text.has-title span { padding-left: 12px; border-left: 1px solid rgb(255 255 255 / .35); }
     .sa-banner .sa-btn { flex: none; min-height: 34px; padding: 0 14px; font-size: 13px; }
     .sa-banner .sa-x { position: static; color: #fff; opacity: .8; }
@@ -122,7 +127,7 @@
         .sa-banner-in { flex-wrap: wrap; gap: 10px; padding: 10px 12px 12px 14px; }
         .sa-banner-text { flex: 1 1 calc(100% - 90px); flex-direction: column; align-items: flex-start; gap: 2px; }
         .sa-banner-text span, .sa-banner-text.has-title span { padding-left: 0; border-left: 0; white-space: normal; }
-        .sa-banner .sa-btn { order: 3; flex: 1 1 100%; }
+        .sa-banner .sa-btn { order: 3; flex: 1 1 0; }
     }
 
     @media (prefers-reduced-motion: reduce) {

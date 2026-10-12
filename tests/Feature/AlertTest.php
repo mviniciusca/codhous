@@ -9,6 +9,7 @@ use App\Models\Page;
 use App\Models\Setting;
 use App\Models\User;
 use App\Support\AlertAppearance;
+use Database\Seeders\AlertSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Blade;
 
@@ -371,4 +372,55 @@ test('perfil sem a área Website não acessa alertas nem a prévia', function ()
 
     livewire(ListAlerts::class)->assertForbidden();
     $this->get(route('alerts.preview'))->assertForbidden();
+});
+
+// ---------------------------------------------------------------- Aviso de cookies
+
+test('seeder cria o aviso de cookies ativo, sem duplicar ao rodar de novo', function () {
+    $this->seed(AlertSeeder::class);
+    $this->seed(AlertSeeder::class);
+
+    $consent = Alert::where('name', Alert::COOKIE_CONSENT_NAME)->sole();
+
+    expect($consent)
+        ->type->toBe(Alert::TYPE_BANNER)
+        ->style->toBe(Alert::STYLE_CONSENT)
+        ->position->toBe(Alert::POSITION_BOTTOM)
+        ->use_cookie->toBeTrue()
+        ->cookie_key->toBe('codhous_cookie_consent')
+        ->and($consent->status())->toBe(Alert::STATUS_ACTIVE);
+});
+
+test('banner de consentimento tem o botão Aceitar e o site não usa mais o componente antigo', function () {
+    Alert::create(Alert::cookieConsentDefaults());
+
+    $html = Blade::render('<x-site-alerts />');
+
+    expect($html)
+        ->toContain('Valorizamos sua privacidade')
+        ->toContain('Aceitar')
+        ->toContain('codhous_cookie_consent')
+        ->and(view()->exists('components.site-cookie-consent'))->toBeFalse()
+        ->and(file_get_contents(resource_path('views/components/layouts/app.blade.php')))->not->toContain('site-cookie-consent');
+});
+
+test('migração cria o aviso em instalações existentes respeitando a opção antiga', function () {
+    $migration = require database_path('migrations/2026_10_12_000001_move_cookie_consent_to_alerts.php');
+
+    Setting::query()->update(['settings' => ['security' => ['cookie_consent_enabled' => false]]]);
+    $migration->up();
+    $migration->up();
+
+    expect(Alert::where('style', Alert::STYLE_CONSENT)->get())
+        ->toHaveCount(1)
+        ->first()->is_active->toBeFalse();
+});
+
+test('migração não faz nada em instalação nova (o seeder cuida)', function () {
+    $migration = require database_path('migrations/2026_10_12_000001_move_cookie_consent_to_alerts.php');
+
+    Setting::query()->delete();
+    $migration->up();
+
+    expect(Alert::where('style', Alert::STYLE_CONSENT)->exists())->toBeFalse();
 });

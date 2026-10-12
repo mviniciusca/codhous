@@ -60,8 +60,8 @@
         @if($alertPreview !== null)
             @include('filament.alerts.preview-bridge', ['alerts' => $alertPreview])
         @elseif(! $sitePreview)
+            {{-- Inclui o aviso de cookies (alerta de estilo Consentimento) --}}
             <x-site-alerts />
-            <x-site-cookie-consent />
         @endif
     @endunless
 
