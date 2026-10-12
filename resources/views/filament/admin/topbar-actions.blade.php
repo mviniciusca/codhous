@@ -1,4 +1,4 @@
-{{-- Topbar: atalhos do Meu Workspace, tema (acesso rápido) e atalho para o site público --}}
+{{-- Topbar: atalhos do Meu Workspace, calculadora de volume, tema (acesso rápido) e atalho para o site público --}}
 @php $dueTasks = \App\Filament\Pages\Workspace::dueTaskCount(); @endphp
 <nav class="cx-topbar-shortcuts" aria-label="Meu Workspace">
     @foreach ([
@@ -20,6 +20,18 @@
         </a>
     @endforeach
 </nav>
+
+@if (\App\Livewire\VolumeCalculatorTool::canUse())
+    <button
+        type="button"
+        class="cx-topbar-icon"
+        aria-label="Calculadora de volume"
+        x-on:click="$dispatch('open-modal', { id: 'volume-calculator' })"
+        x-tooltip="{ content: 'Calculadora de volume', theme: $store.theme }"
+    >
+        <x-filament::icon icon="heroicon-m-cube" class="cx-icon-sm" aria-hidden="true" />
+    </button>
+@endif
 
 <x-filament::dropdown placement="bottom-end" teleport width="xs" class="cx-topbar-theme">
     <x-slot name="trigger">

@@ -6,6 +6,7 @@ use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\BudgetResource\Pages\CreateBudget;
 use App\Filament\Resources\BudgetResource\Pages\EditBudget;
+use App\Livewire\VolumeCalculatorTool;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -95,6 +96,10 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn () => auth()->check() ? view('filament.admin.profile-modal-host') : '',
+            )
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn () => VolumeCalculatorTool::canUse() ? view('filament.admin.volume-calculator-host') : '',
             )
             ->renderHook(
                 PanelsRenderHook::HEAD_END,

@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Enums\AccessArea;
 use App\Filament\Actions\QuickQuoteAction;
 use App\Filament\Resources\BudgetResource;
+use App\Livewire\VolumeCalculatorTool;
 use App\Services\DashboardOverview;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -85,6 +86,12 @@ class Dashboard extends BaseDashboard
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('volumeCalculator')
+                ->label('Calcular volume')
+                ->icon('heroicon-o-cube')
+                ->color('gray')
+                ->visible(fn () => VolumeCalculatorTool::canUse())
+                ->alpineClickHandler("\$dispatch('open-modal', { id: 'volume-calculator' })"),
             QuickQuoteAction::make()
                 ->visible(fn () => BudgetResource::canCreate()),
             Action::make('create')
