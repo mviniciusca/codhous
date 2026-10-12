@@ -1,5 +1,7 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\FilamentThemeServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 return [
@@ -69,6 +71,9 @@ return [
 
     'timezone' => env('APP_TIMEZONE', 'UTC'),
 
+    // Fuso usado só para exibir datas em documentos (PDF), sem alterar como as datas são gravadas
+    'display_timezone' => env('APP_DISPLAY_TIMEZONE', 'America/Sao_Paulo'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
@@ -122,7 +127,7 @@ return [
 
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
-        'store'  => env('APP_MAINTENANCE_STORE', 'database'),
+        'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
     'providers' => ServiceProvider::defaultProviders()->merge([
@@ -133,8 +138,8 @@ return [
         /*
          * Application Service Providers...
          */
-        App\Providers\AppServiceProvider::class,
-        App\Providers\FilamentThemeServiceProvider::class,
+        AppServiceProvider::class,
+        FilamentThemeServiceProvider::class,
     ])->toArray(),
 
 ];

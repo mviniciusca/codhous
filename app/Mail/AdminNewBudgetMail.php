@@ -22,7 +22,7 @@ class AdminNewBudgetMail extends Mailable
      */
     public function __construct(public Budget $budget)
     {
-        $this->company = (object) (Setting::get('company') ?? []);
+        $this->company = Setting::first()?->companySetting ?? (object) [];
     }
 
     /**

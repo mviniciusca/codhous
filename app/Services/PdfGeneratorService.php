@@ -12,10 +12,11 @@ class PdfGeneratorService
     protected function getOptions(): array
     {
         return [
-            'isRemoteEnabled' => true,
+            // Sem acesso remoto nem PHP embutido: o PDF contém dados digitados pelo cliente
+            'isRemoteEnabled' => false,
             'isHtml5ParserEnabled' => true,
             'defaultFont' => 'DejaVu Sans',
-            'isPhpEnabled' => true,
+            'isPhpEnabled' => false,
         ];
     }
 
@@ -65,7 +66,7 @@ class PdfGeneratorService
     {
         // Garantir que o diretório existe
         $directory = dirname($path);
-        if (!file_exists($directory)) {
+        if (! file_exists($directory)) {
             mkdir($directory, 0755, true);
         }
 

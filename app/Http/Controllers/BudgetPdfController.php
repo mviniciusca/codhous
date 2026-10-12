@@ -6,14 +6,13 @@ use App\Models\BudgetPdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class BudgetPdfController extends Controller
 {
     /**
      * Download a budget PDF using a token
      *
-     * @param Request $request
-     * @param string $token
      * @return BinaryFileResponse
      */
     public function download(Request $request, string $token)
@@ -38,8 +37,8 @@ class BudgetPdfController extends Controller
             // Check if the file exists
             if (! file_exists($filePath)) {
                 Log::error('PDF file not found', [
-                    'token'     => $token,
-                    'path'      => $filePath,
+                    'token' => $token,
+                    'path' => $filePath,
                     'budget_id' => $pdf->budget_id,
                 ]);
                 abort(404, 'Arquivo não encontrado. Por favor, entre em contato com o suporte.');
@@ -52,9 +51,9 @@ class BudgetPdfController extends Controller
             activity()
                 ->performedOn($budget)
                 ->withProperties([
-                    'token'          => $token,
+                    'token' => $token,
                     'download_count' => $pdf->download_count,
-                    'filename'       => $pdf->filename,
+                    'filename' => $pdf->filename,
                 ])
                 ->log('Downloaded PDF document for budget #'.$budget->code);
 
@@ -62,8 +61,8 @@ class BudgetPdfController extends Controller
             $pdf->incrementDownloadCount();
 
             Log::info('PDF download successful', [
-                'token'          => $token,
-                'budget_id'      => $pdf->budget_id,
+                'token' => $token,
+                'budget_id' => $pdf->budget_id,
                 'download_count' => $pdf->download_count,
             ]);
 
@@ -73,6 +72,9 @@ class BudgetPdfController extends Controller
                 'Orcamento_'.$budget->code.'.pdf',
                 ['Content-Type' => 'application/pdf']
             );
+        } catch (HttpExceptionInterface $e) {
+            // Mantém o 404 de link inválido/expirado em vez de convertê-lo em erro 500
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Error in PDF download', [
                 'token' => $token,

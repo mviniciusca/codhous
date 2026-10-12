@@ -102,6 +102,25 @@
 </head>
 
 <body>
+    @php
+        $company = $company ?? (object) [];
+        $issuedAt = now(config('app.display_timezone'));
+        $content = $state['content'] ?? [];
+        $items = $budget->budgetItems()->with(['product', 'productOption', 'location'])->get();
+
+        // Totais calculados a partir dos itens, para o documento nunca divergir da tabela de produtos
+        $subtotal = $items->sum(fn ($item) => (float) $item->quantity * (float) $item->price);
+        $shipping = (float) ($content['shipping'] ?? 0);
+        $tax = (float) ($content['tax'] ?? 0);
+        $discount = (float) ($content['discount'] ?? 0);
+        $total = $subtotal + $shipping + $tax - $discount;
+
+        $deliveryDate = !empty($content['delivery_date']) ? \Illuminate\Support\Carbon::parse($content['delivery_date'])->format('d/m/Y') : null;
+        $deliveryPeriod = \App\Livewire\Budget::DELIVERY_PERIODS[$content['delivery_period'] ?? ''] ?? null;
+        $needsPump = \App\Livewire\Budget::PUMP_OPTIONS[$content['needs_pump'] ?? ''] ?? null;
+        $notes = $content['notes'] ?? $content['observation'] ?? null;
+    @endphp
+
     <!-- Cabeçalho Principal -->
     <table>
         <tr>
@@ -113,24 +132,25 @@
                 @if($fullLogoPath && file_exists($fullLogoPath))
                     <img src="{{ $fullLogoPath }}" class="logo-img">
                 @else
-                    <div style="font-size: 14px; font-weight: bold;">{{ $company->trade_name ?? 'LOGO' }}</div>
+                    <div style="font-size: 14px; font-weight: bold;">{{ $company->trade_name ?? config('app.name') }}</div>
                 @endif
             </td>
             <td class="header-company">
                 <span class="label">Emitente</span>
-                <span class="value bold">{{ $company->legal_name ?? $company->trade_name }}</span>
+                <span class="value bold">{{ $company->legal_name ?? $company->trade_name ?? config('app.name') }}</span>
                 <span class="value">
-                    {{ data_get($company, 'address.street') }}, {{ data_get($company, 'address.number') }}<br>
-                    {{ data_get($company, 'address.neighborhood') }} - {{ data_get($company, 'address.city') }}/{{ data_get($company, 'address.state') }}<br>
-                    CEP: {{ data_get($company, 'address.postcode') }} - Tel: {{ $company->phone }}
+                    @if(data_get($company, 'address.street'))
+                        {{ data_get($company, 'address.street') }}, {{ data_get($company, 'address.number') ?: 'S/N' }}<br>
+                        {{ data_get($company, 'address.neighborhood') }} - {{ data_get($company, 'address.city') }}/{{ data_get($company, 'address.state') }}<br>
+                        CEP: {{ data_get($company, 'address.postcode') }} -
+                    @endif
+                    Tel: {{ $company->phone ?? '-' }}
                 </span>
             </td>
             <td class="header-danfe">
                 <span style="font-size: 12px; font-weight: bold;">ORÇAMENTO</span>
                 <br>
                 <span style="font-size: 10px;">Nº {{ $state['code'] ?? '0000' }}</span>
-                <br>
-                <span style="font-size: 8px;">FOLHA 1 / 1</span>
             </td>
         </tr>
         <tr>
@@ -139,7 +159,7 @@
                     <tr>
                         <td style="border: none; width: 50%;">
                             <span class="label">CNPJ / CPF</span>
-                            <span class="value">{{ $company->document }}</span>
+                            <span class="value">{{ $company->document ?? '-' }}</span>
                         </td>
                         <td style="border: none; border-left: 1px solid #000; width: 50%;">
                             <span class="label">Inscrição Estadual</span>
@@ -150,54 +170,54 @@
             </td>
             <td class="text-center" style="vertical-align: middle;">
                 <span class="label">Data de Emissão</span>
-                <span class="value">{{ date('d/m/Y', strtotime($state['created_at'] ?? now())) }}</span>
+                <span class="value">{{ $issuedAt->format('d/m/Y') }}</span>
             </td>
         </tr>
     </table>
 
     <!-- Dados do Cliente -->
-    <div class="section-title">Destinatário / Remetente</div>
+    <div class="section-title">Cliente / Local da Obra</div>
     <table>
         <tr>
             <td colspan="3" style="width: 70%;">
                 <span class="label">Nome / Razão Social</span>
-                <span class="value">{{ data_get($state['content'], 'customer_name', 'Consumidor Final') }}</span>
+                <span class="value">{{ data_get($content, 'customer_name') ?: 'Consumidor Final' }}</span>
             </td>
             <td style="width: 30%;">
-                <span class="label">CNPJ / CPF</span>
-                <span class="value">{{ data_get($state['content'], 'customer_document', '-') }}</span>
+                <span class="label">E-mail</span>
+                <span class="value">{{ data_get($content, 'customer_email') ?: '-' }}</span>
             </td>
         </tr>
         <tr>
             <td style="width: 50%;">
                 <span class="label">Endereço</span>
-                <span class="value">{{ data_get($state['content'], 'street', '-') }}, {{ data_get($state['content'], 'number', 'S/N') }}</span>
+                <span class="value">{{ data_get($content, 'street') ?: '-' }}, {{ data_get($content, 'number') ?: 'S/N' }}@if(!empty($content['complement'])) - {{ $content['complement'] }}@endif</span>
             </td>
             <td style="width: 25%;">
                 <span class="label">Bairro / Distrito</span>
-                <span class="value">{{ data_get($state['content'], 'neighborhood', '-') }}</span>
+                <span class="value">{{ data_get($content, 'neighborhood', '-') }}</span>
             </td>
             <td style="width: 15%;">
                 <span class="label">CEP</span>
-                <span class="value">{{ data_get($state['content'], 'postcode', '-') }}</span>
+                <span class="value">{{ data_get($content, 'postcode', '-') }}</span>
             </td>
             <td style="width: 10%;">
-                <span class="label">Data Saída</span>
-                <span class="value">{{ date('d/m/Y') }}</span>
+                <span class="label">Entrega</span>
+                <span class="value">{{ $deliveryDate ?? 'A combinar' }}</span>
             </td>
         </tr>
         <tr>
             <td style="width: 50%;">
                 <span class="label">Município</span>
-                <span class="value">{{ data_get($state['content'], 'city', '-') }}</span>
+                <span class="value">{{ data_get($content, 'city', '-') }}</span>
             </td>
             <td style="width: 10%;">
                 <span class="label">UF</span>
-                <span class="value text-center">{{ data_get($state['content'], 'state', '-') }}</span>
+                <span class="value text-center">{{ data_get($content, 'state', '-') }}</span>
             </td>
             <td colspan="2" style="width: 40%;">
                 <span class="label">Telefone / WhatsApp</span>
-                <span class="value">{{ data_get($state['content'], 'customer_phone', '-') }}</span>
+                <span class="value">{{ data_get($content, 'customer_phone', '-') }}</span>
             </td>
         </tr>
     </table>
@@ -208,23 +228,23 @@
         <tr>
             <td style="width: 18%;">
                 <span class="label">Subtotal Itens</span>
-                <span class="value text-right">R$ {{ number_format(floatval(data_get($state['content'], 'subtotal', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">R$ {{ number_format($subtotal, 2, ',', '.') }}</span>
             </td>
             <td style="width: 18%;">
                 <span class="label">Valor do Frete</span>
-                <span class="value text-right">R$ {{ number_format(floatval(data_get($state['content'], 'shipping', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">R$ {{ number_format($shipping, 2, ',', '.') }}</span>
             </td>
             <td style="width: 18%;">
                 <span class="label">Taxas / Outros</span>
-                <span class="value text-right">R$ {{ number_format(floatval(data_get($state['content'], 'tax', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">R$ {{ number_format($tax, 2, ',', '.') }}</span>
             </td>
             <td style="width: 18%;">
                 <span class="label">(-) Desconto</span>
-                <span class="value text-right">R$ {{ number_format(floatval(data_get($state['content'], 'discount', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right">R$ {{ number_format($discount, 2, ',', '.') }}</span>
             </td>
             <td style="width: 28%;" class="total-box">
                 <span class="label">Valor Total do Orçamento</span>
-                <span class="value text-right bold" style="font-size: 11px;">R$ {{ number_format(floatval(data_get($state['content'], 'total', 0)), 2, ',', '.') }}</span>
+                <span class="value text-right bold" style="font-size: 11px;">R$ {{ number_format($total, 2, ',', '.') }}</span>
             </td>
         </tr>
     </table>
@@ -243,9 +263,6 @@
             </tr>
         </thead>
         <tbody>
-            @php
-                $items = $budget->budgetItems()->with(['product', 'productOption', 'location'])->get();
-            @endphp
             @foreach($items as $item)
                 <tr>
                     <td class="text-center">{{ $item->product_id ?? '-' }}</td>
@@ -257,7 +274,7 @@
                     <td class="text-center">{{ $item->productOption?->unit?->value ?? 'UN' }}</td>
                     <td class="text-center">{{ \App\Services\BudgetCalculatorService::formatQuantity((float) $item->quantity) }}</td>
                     <td class="text-right">R$ {{ number_format((float)$item->price, 2, ',', '.') }}</td>
-                    <td class="text-right">R$ {{ number_format((float)$item->subtotal, 2, ',', '.') }}</td>
+                    <td class="text-right">R$ {{ number_format((float) $item->quantity * (float) $item->price, 2, ',', '.') }}</td>
                 </tr>
             @endforeach
             @for($i = count($items); $i < 10; $i++)
@@ -280,9 +297,15 @@
             <td style="width: 100%; height: 60px;">
                 <span class="label">Informações Complementares</span>
                 <span class="value" style="font-size: 7px;">
-                    {{ $company->budget_information }}
-                    <br><br>
-                    <strong>OBSERVAÇÕES:</strong> {{ data_get($state['content'], 'observation', 'Nenhuma') }}
+                    @if(!empty($company->budget_information))
+                        {{ $company->budget_information }}
+                        <br><br>
+                    @endif
+                    @if($deliveryDate || $deliveryPeriod || $needsPump)
+                        <strong>ENTREGA:</strong> {{ collect([$deliveryDate, $deliveryPeriod, $needsPump])->filter()->implode(' · ') }}
+                        <br>
+                    @endif
+                    <strong>OBSERVAÇÕES:</strong> {{ $notes ?: 'Nenhuma' }}
                 </span>
             </td>
         </tr>
@@ -290,7 +313,7 @@
 
     <div class="footer">
         Este documento é uma proposta comercial e não possui valor de nota fiscal eletrônica.<br>
-        Gerado em {{ date('d/m/Y H:i') }} &bull; {{ $company->trade_name }}
+        Gerado em {{ $issuedAt->format('d/m/Y H:i') }} &bull; {{ $company->trade_name ?? config('app.name') }}
     </div>
 </body>
 </html>
