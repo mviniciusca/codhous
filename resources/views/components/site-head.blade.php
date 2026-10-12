@@ -1,6 +1,8 @@
 @props([
     'title' => null,
     'description' => null,
+    'keywords' => null,
+    'ogImage' => null,
 ])
 
 @php
@@ -13,24 +15,35 @@
     $finalDescription = $description ?: $defaultDescription;
     
     $scripts = data_get($website, 'scripts', []);
-    $fontFamily = data_get($scripts, 'google_font_family', 'Inter');
+    $fontFamily = data_get($scripts, 'google_font_family', 'Jost');
     
     // Constrói a URL do Google Fonts dinamicamente
-    $fonts = ['Inter:wght@400;500;600;700'];
-    if ($fontFamily && $fontFamily !== 'Inter') {
+    $fonts = ['Jost:wght@400;500;600;700'];
+    if ($fontFamily && $fontFamily !== 'Jost') {
         $fonts[] = urlencode($fontFamily) . ':wght@400;500;600;700';
     }
     $googleFontsUrl = "https://fonts.googleapis.com/css2?family=" . implode('&family=', $fonts) . "&display=swap";
     
-    $headScripts = data_get($scripts, 'head_scripts');
+    // 'head' era a chave gravada pelo painel antes de alinhar com 'head_scripts'.
+    // Na prévia do painel, scripts de terceiros (Analytics, Pixel) não rodam.
+    $headScripts = \App\Models\Setting::isPreviewing() ? null : (data_get($scripts, 'head_scripts') ?: data_get($scripts, 'head'));
     $favicon = data_get($website, 'favicon');
 @endphp
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<meta name="theme-color" content="#e5b800">
+<meta name="theme-color" content="rgb({{ implode(', ', \App\Support\SiteTheme::parse(data_get($website, 'primary_color'))) }})">
 <meta name="description" content="{{ $finalDescription }}">
-<title>{{ $websiteName }} | {{ $websiteTitle }}</title>
+@if($keywords)
+    <meta name="keywords" content="{{ $keywords }}">
+@endif
+<title>{{ $title ? $title . ' | ' . $websiteName : $websiteName . ' | ' . $websiteTitle }}</title>
+
+<meta property="og:title" content="{{ $title ? $title . ' | ' . $websiteName : $websiteName . ' | ' . $websiteTitle }}">
+<meta property="og:description" content="{{ $finalDescription }}">
+@if($ogImage)
+    <meta property="og:image" content="{{ \Illuminate\Support\Facades\Storage::url($ogImage) }}">
+@endif
 
 @if($favicon)
     <link rel="icon" type="image/x-icon" href="{{ \Illuminate\Support\Facades\Storage::url($favicon) }}">

@@ -1,0 +1,625 @@
+{
+  "id": "oferta-produto",
+  "order": 3,
+  "name": "Oferta de produto",
+  "category": "Promoções",
+  "description": "Preço em destaque. Use o painel \"Dados\" para inserir produto e preço do catálogo.",
+  "tags": [
+    "promoção",
+    "preço",
+    "produto",
+    "oferta"
+  ],
+  "background": {
+    "role": "primary"
+  },
+  "caption": "🔥 Oferta da semana!\n\nChame no WhatsApp e garanta a sua: {{brand.whatsapp}}\n\n*Consulte condições.\n\n#oferta #promocao #construcao",
+  "elements": [
+    {
+      "id": "decor_1",
+      "type": "ellipse",
+      "name": "Decoração superior",
+      "x": 720,
+      "y": -220,
+      "width": 600,
+      "height": 600,
+      "angle": 0,
+      "opacity": 0.45,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "secondary"
+      },
+      "stroke": null,
+      "strokeWidth": 0
+    },
+    {
+      "id": "decor_2",
+      "type": "ellipse",
+      "name": "Decoração inferior",
+      "x": -160,
+      "y": 820,
+      "width": 420,
+      "height": 420,
+      "angle": 0,
+      "opacity": 0.35,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "accent"
+      },
+      "stroke": null,
+      "strokeWidth": 0
+    },
+    {
+      "id": "logo_bg",
+      "type": "rect",
+      "name": "Fundo da logo",
+      "x": 60,
+      "y": 60,
+      "width": 270,
+      "height": 100,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "fill": "#FFFFFF",
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 18
+    },
+    {
+      "id": "logo",
+      "type": "image",
+      "name": "Logo",
+      "x": 78,
+      "y": 72,
+      "width": 234,
+      "height": 76,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.logo",
+      "src": null,
+      "fit": "contain",
+      "radius": 0,
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": 0,
+      "placeholder": true
+    },
+    {
+      "id": "badge",
+      "type": "text",
+      "name": "Etiqueta",
+      "x": 60,
+      "y": 205,
+      "width": 600,
+      "height": 30,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "OFERTA DA SEMANA",
+      "fontFamily": "Inter",
+      "fontSize": 26,
+      "fontWeight": 800,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 300,
+      "fill": {
+        "role": "onPrimary"
+      }
+    },
+    {
+      "id": "title",
+      "type": "text",
+      "name": "Nome do produto",
+      "x": 60,
+      "y": 250,
+      "width": 960,
+      "height": 86,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Nome do produto",
+      "fontFamily": "Montserrat",
+      "fontSize": 82,
+      "fontWeight": 900,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onPrimary"
+      }
+    },
+    {
+      "id": "description",
+      "type": "text",
+      "name": "Descrição",
+      "x": 60,
+      "y": 345,
+      "width": 820,
+      "height": 42,
+      "angle": 0,
+      "opacity": 0.9,
+      "locked": false,
+      "hidden": false,
+      "text": "Descreva o produto ou a condição especial em uma frase.",
+      "fontFamily": "Inter",
+      "fontSize": 30,
+      "fontWeight": 500,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.25,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onPrimary"
+      }
+    },
+    {
+      "id": "price_bg",
+      "type": "rect",
+      "name": "Cartão de preço",
+      "x": 60,
+      "y": 455,
+      "width": 600,
+      "height": 300,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "background"
+      },
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 32
+    },
+    {
+      "id": "price_label",
+      "type": "text",
+      "name": "Rótulo do preço",
+      "x": 100,
+      "y": 488,
+      "width": 400,
+      "height": 36,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "a partir de",
+      "fontFamily": "Inter",
+      "fontSize": 28,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "muted"
+      }
+    },
+    {
+      "id": "price",
+      "type": "text",
+      "name": "Preço",
+      "x": 100,
+      "y": 535,
+      "width": 540,
+      "height": 92,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "R$ 000,00",
+      "fontFamily": "Montserrat",
+      "fontSize": 88,
+      "fontWeight": 900,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 0,
+      "fill": {
+        "role": "primary"
+      }
+    },
+    {
+      "id": "unit",
+      "type": "text",
+      "name": "Unidade",
+      "x": 100,
+      "y": 660,
+      "width": 400,
+      "height": 36,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "por m³",
+      "fontFamily": "Inter",
+      "fontSize": 28,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "muted"
+      }
+    },
+    {
+      "id": "photo",
+      "type": "image",
+      "name": "Foto do produto",
+      "x": 700,
+      "y": 435,
+      "width": 340,
+      "height": 340,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.photo",
+      "src": null,
+      "fit": "cover",
+      "radius": 170,
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": 0,
+      "placeholder": true
+    },
+    {
+      "id": "disclaimer",
+      "type": "text",
+      "name": "Observação",
+      "x": 60,
+      "y": 785,
+      "width": 760,
+      "height": 27,
+      "angle": 0,
+      "opacity": 0.8,
+      "locked": false,
+      "hidden": false,
+      "text": "Consulte condições. Valores sujeitos a alteração.",
+      "fontFamily": "Inter",
+      "fontSize": 20,
+      "fontWeight": 500,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onPrimary"
+      }
+    },
+    {
+      "id": "cta_bg",
+      "type": "rect",
+      "name": "Botão de contato",
+      "x": 60,
+      "y": 880,
+      "width": 960,
+      "height": 130,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "dark"
+      },
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 65
+    },
+    {
+      "id": "cta_icon",
+      "type": "icon",
+      "name": "Ícone do WhatsApp",
+      "x": 100,
+      "y": 915,
+      "width": 60,
+      "height": 60,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "MessageCircle",
+      "fill": "#25D366",
+      "strokeWidth": 2.4
+    },
+    {
+      "id": "cta_label",
+      "type": "text",
+      "name": "Chamada",
+      "x": 185,
+      "y": 905,
+      "width": 600,
+      "height": 34,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Chame no WhatsApp",
+      "fontFamily": "Inter",
+      "fontSize": 26,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onDark"
+      }
+    },
+    {
+      "id": "whatsapp",
+      "type": "text",
+      "name": "WhatsApp",
+      "x": 185,
+      "y": 940,
+      "width": 640,
+      "height": 50,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.whatsapp",
+      "text": "(00) 00000-0000",
+      "fontFamily": "Montserrat",
+      "fontSize": 46,
+      "fontWeight": 800,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onDark"
+      }
+    },
+    {
+      "id": "cta_arrow",
+      "type": "icon",
+      "name": "Seta",
+      "x": 930,
+      "y": 920,
+      "width": 52,
+      "height": 52,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "ArrowRight",
+      "fill": {
+        "role": "primary"
+      },
+      "strokeWidth": 2.6
+    }
+  ],
+  "layouts": {
+    "portrait": {
+      "decor_1": {
+        "x": 720,
+        "y": -220,
+        "width": 600,
+        "height": 600
+      },
+      "decor_2": {
+        "x": -160,
+        "y": 1090,
+        "width": 420,
+        "height": 420
+      },
+      "logo_bg": {
+        "x": 60,
+        "y": 60,
+        "width": 270,
+        "height": 100
+      },
+      "logo": {
+        "x": 78,
+        "y": 72,
+        "width": 234,
+        "height": 76
+      },
+      "badge": {
+        "x": 60,
+        "y": 205,
+        "width": 600,
+        "height": 30
+      },
+      "title": {
+        "x": 60,
+        "y": 250,
+        "width": 960,
+        "height": 86
+      },
+      "description": {
+        "x": 60,
+        "y": 345,
+        "width": 820,
+        "height": 42
+      },
+      "price_bg": {
+        "x": 60,
+        "y": 590,
+        "width": 600,
+        "height": 300
+      },
+      "price_label": {
+        "x": 100,
+        "y": 623,
+        "width": 400,
+        "height": 36
+      },
+      "price": {
+        "x": 100,
+        "y": 670,
+        "width": 540,
+        "height": 92
+      },
+      "unit": {
+        "x": 100,
+        "y": 795,
+        "width": 400,
+        "height": 36
+      },
+      "photo": {
+        "x": 700,
+        "y": 570,
+        "width": 340,
+        "height": 340
+      },
+      "disclaimer": {
+        "x": 60,
+        "y": 920,
+        "width": 760,
+        "height": 27
+      },
+      "cta_bg": {
+        "x": 60,
+        "y": 1150,
+        "width": 960,
+        "height": 130
+      },
+      "cta_icon": {
+        "x": 100,
+        "y": 1185,
+        "width": 60,
+        "height": 60
+      },
+      "cta_label": {
+        "x": 185,
+        "y": 1175,
+        "width": 600,
+        "height": 34
+      },
+      "whatsapp": {
+        "x": 185,
+        "y": 1210,
+        "width": 640,
+        "height": 50
+      },
+      "cta_arrow": {
+        "x": 930,
+        "y": 1190,
+        "width": 52,
+        "height": 52
+      }
+    },
+    "story": {
+      "decor_1": {
+        "x": 720,
+        "y": -220,
+        "width": 600,
+        "height": 600
+      },
+      "decor_2": {
+        "x": -160,
+        "y": 1410,
+        "width": 420,
+        "height": 420
+      },
+      "logo_bg": {
+        "x": 60,
+        "y": 260,
+        "width": 270,
+        "height": 100
+      },
+      "logo": {
+        "x": 78,
+        "y": 272,
+        "width": 234,
+        "height": 76
+      },
+      "badge": {
+        "x": 60,
+        "y": 405,
+        "width": 600,
+        "height": 30
+      },
+      "title": {
+        "x": 60,
+        "y": 450,
+        "width": 960,
+        "height": 86
+      },
+      "description": {
+        "x": 60,
+        "y": 545,
+        "width": 820,
+        "height": 42
+      },
+      "price_bg": {
+        "x": 60,
+        "y": 835,
+        "width": 600,
+        "height": 300
+      },
+      "price_label": {
+        "x": 100,
+        "y": 868,
+        "width": 400,
+        "height": 36
+      },
+      "price": {
+        "x": 100,
+        "y": 915,
+        "width": 540,
+        "height": 92
+      },
+      "unit": {
+        "x": 100,
+        "y": 1040,
+        "width": 400,
+        "height": 36
+      },
+      "photo": {
+        "x": 700,
+        "y": 815,
+        "width": 340,
+        "height": 340
+      },
+      "disclaimer": {
+        "x": 60,
+        "y": 1165,
+        "width": 760,
+        "height": 27
+      },
+      "cta_bg": {
+        "x": 60,
+        "y": 1440,
+        "width": 960,
+        "height": 130
+      },
+      "cta_icon": {
+        "x": 100,
+        "y": 1475,
+        "width": 60,
+        "height": 60
+      },
+      "cta_label": {
+        "x": 185,
+        "y": 1465,
+        "width": 600,
+        "height": 34
+      },
+      "whatsapp": {
+        "x": 185,
+        "y": 1500,
+        "width": 640,
+        "height": 50
+      },
+      "cta_arrow": {
+        "x": 930,
+        "y": 1480,
+        "width": 52,
+        "height": 52
+      }
+    }
+  }
+}

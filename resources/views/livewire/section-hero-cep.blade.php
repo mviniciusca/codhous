@@ -1,142 +1,156 @@
 @php
     $layout = $layout ?? 'default';
+    $alignment = $alignment ?? 'center';
     $isWhatsapp = $layout === 'whatsapp';
-    $slides = $slides ?? [];
-    if (empty($slides) && !empty($mainSlide)) {
-        $slides = [$mainSlide];
-    }
+    $alignments = [
+        'center' => 'object-center',
+        'top' => 'object-top',
+        'bottom' => 'object-bottom',
+        'left' => 'object-left',
+        'right' => 'object-right',
+    ];
+    $alignmentClass = $alignments[$mainSlide['image_alignment'] ?? 'center'] ?? 'object-center';
+    
+    $textAlignClass = $alignment === 'left' ? 'text-left lg:text-left' : ($alignment === 'right' ? 'text-right lg:text-right' : 'text-center lg:text-center');
+    $flexAlignClass = $alignment === 'left' ? 'items-start' : ($alignment === 'right' ? 'items-end' : 'items-center');
+    $marginClass = $alignment === 'left' ? 'mr-auto ml-0' : ($alignment === 'right' ? 'ml-auto mr-0' : 'mx-auto');
+    $justifyClass = $alignment === 'left' ? 'justify-start' : ($alignment === 'right' ? 'justify-end' : 'justify-center');
 @endphp
 
-<section class="relative flex min-h-[70vh] items-center overflow-hidden bg-zinc-950 pt-8">
-    
-    {{-- Swiper Background Slider --}}
-    <div class="absolute inset-0 z-0">
-        <div class="swiper hero-swiper h-full w-full"
-             x-data="{ 
-                initSwiper() {
-                    if (typeof Swiper !== 'undefined') {
-                        new Swiper($el, {
-                            loop: true,
-                            effect: 'fade',
-                            pagination: {
-                                el: '.swiper-pagination',
-                                clickable: true,
-                            },
-                            autoplay: {
-                                delay: 5000,
-                                disableOnInteraction: false,
-                            },
-                            speed: 1500,
-                        });
-                    }
-                } 
-             }"
-             x-init="setTimeout(() => initSwiper(), 200)">
-            <div class="swiper-wrapper">
-                @forelse($slides as $slide)
-                    <div class="swiper-slide relative">
-                        {{-- Imagem ou Vídeo de fundo --}}
-                        @if(!empty($slide['video']))
-                            <video autoplay muted loop playsinline class="h-full w-full object-cover">
-                                <source src="{{ str_starts_with($slide['video'], 'http') ? $slide['video'] : Storage::url($slide['video']) }}" type="video/mp4">
-                            </video>
-                        @elseif(!empty($slide['image']))
-                            <img src="{{ str_starts_with($slide['image'], 'http') ? $slide['image'] : Storage::url($slide['image']) }}" 
-                                 class="h-full w-full object-cover" 
-                                 alt="{{ $slide['title'] ?? '' }}">
-                        @else
-                            <div class="h-full w-full bg-zinc-900"></div>
-                        @endif
-                        
-                        {{-- Overlay Gradiente --}}
-                        <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent"></div>
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.querySelector('.hero-swiper')) {
+                new Swiper('.hero-swiper', {
+                    loop: true,
+                    effect: 'fade',
+                    fadeEffect: {
+                        crossFade: true
+                    },
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                });
+            }
+        });
+    </script>
+@endpush
+    @php
+        // Sobreposição clara pede texto escuro; nos demais casos o texto é claro sobre a mídia
+        $heroLight = ($overlayEnabled ?? true) && ($overlayTheme ?? 'dark') === 'light';
+        $isClean = $layout === 'clean';
+        $mediaUrl = fn ($path) => str_starts_with($path, 'http') ? $path : Storage::url($path);
+    @endphp
+    <section class="relative isolate flex min-h-[68vh] items-center overflow-hidden {{ $bgColor ?: 'bg-primary-950' }} {{ $heroLight ? 'text-scheme-light' : 'dark' }} {{ $spacing ?: 'py-14 md:py-20' }}">
+
+        {{-- Mídia de fundo --}}
+        <div class="absolute inset-0 -z-10">
+            @if($showSlideshow && !empty($slideshow))
+                <div class="swiper hero-swiper h-full w-full">
+                    <div class="swiper-wrapper">
+                        @foreach($slideshow as $slide)
+                            <div class="swiper-slide h-full w-full bg-primary-950">
+                                @if(!empty($slide['image']))
+                                    <img src="{{ $mediaUrl($slide['image']) }}" class="h-full w-full object-cover {{ $alignments[$slide['image_alignment'] ?? 'center'] ?? 'object-center' }}" alt="">
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
-                @empty
-                    <div class="swiper-slide bg-zinc-900"></div>
-                @endforelse
-            </div>
-            
-            {{-- Pontos de Navegação --}}
-            <div class="swiper-pagination !bottom-8 !left-auto !right-8 !w-auto"></div>
+                </div>
+            @elseif(!empty($mainSlide['video']))
+                <video autoplay muted loop playsinline class="h-full w-full object-cover {{ $alignmentClass }}">
+                    <source src="{{ $mediaUrl($mainSlide['video']) }}" type="video/mp4">
+                </video>
+            @elseif(!empty($mainSlide['image']))
+                <img src="{{ $mediaUrl($mainSlide['image']) }}" class="h-full w-full object-cover {{ $alignmentClass }}" alt="{{ $mainSlide['title'] ?? '' }}">
+            @else
+                {{-- Sem mídia: gradiente com os tons profundos da marca --}}
+                <div class="h-full w-full bg-gradient-to-br from-primary-900 via-primary-950 to-black"></div>
+                <div class="absolute -right-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-primary-500/30 blur-3xl"></div>
+                <div class="absolute inset-0 opacity-[0.06] [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:22px_22px]"></div>
+            @endif
+
+            @if($overlayEnabled ?? true)
+                @if($heroLight)
+                    <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-white/90 via-white/70 to-white/20"></div>
+                @else
+                    <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/55 to-black/10"></div>
+                    <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-primary-950/60 via-transparent to-transparent"></div>
+                @endif
+            @endif
         </div>
-    </div>
 
-    {{-- Grid decorativa por cima do slider --}}
-    <div class="pointer-events-none absolute inset-0 z-10 opacity-10">
-        <div class="absolute left-1/4 top-0 h-full w-px bg-white"></div>
-        <div class="absolute left-2/4 top-0 h-full w-px bg-white"></div>
-        <div class="absolute left-3/4 top-0 h-full w-px bg-white"></div>
-        <div class="absolute left-0 top-1/3 h-px w-full bg-white"></div>
-        <div class="absolute left-0 top-2/3 h-px w-full bg-white"></div>
-    </div>
+        <div class="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div @class([
+                'flex flex-col gap-10',
+                'items-center' => $isClean,
+                'lg:flex-row lg:items-center lg:justify-between lg:gap-16' => ! $isClean,
+            ])>
+                <div @class([
+                    'w-full flex-1',
+                    $textAlignClass,
+                    "flex max-w-4xl flex-col {$flexAlignClass} {$marginClass}" => $isClean,
+                    'max-w-2xl' => ! $isClean,
+                ]) data-reveal>
+                    @if(!empty($badge))
+                        <span class="kicker kicker-pill mb-6 backdrop-blur"><span class="kicker-dot"></span> {{ $badge }}</span>
+                    @endif
 
-    {{-- Conteúdo (z-20 para ficar na frente de tudo) --}}
-    <div class="relative z-20 mx-auto w-full max-w-7xl px-4 py-12 lg:px-8">
-        @if($isWhatsapp)
-            {{-- Layout WhatsApp: conteúdo centralizado + CEP abaixo --}}
-            <div class="flex flex-col items-center gap-10 text-center">
-                <div class="max-w-3xl">
-                    <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5">
-                        <span class="h-2 w-2 rounded-full bg-primary"></span>
-                        <span class="text-xs font-medium uppercase tracking-wider text-primary">{{ $badge }}</span>
-                    </div>
-                    <h1 class="font-mono text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl" style="text-wrap: balance;">
-                        {!! e(data_get($mainSlide, 'title', 'Concreto usinado na sua obra')) !!}
+                    <h1 class="font-mono text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl" style="text-wrap: balance;">
+                        {{ data_get($mainSlide, 'title') ?: 'Concreto usinado na sua obra' }}
                     </h1>
-                    <p class="mt-6 mx-auto max-w-2xl text-lg leading-relaxed text-zinc-300">
-                        {{ data_get($mainSlide, 'subtitle', '') }}
-                    </p>
-                    @if(!empty($stats))
-                        <div class="mt-10 flex flex-wrap items-center justify-center gap-6 lg:gap-10">
-                            @foreach($stats as $index => $stat)
-                                @if($index > 0)<div class="h-10 w-px bg-white/10"></div>@endif
-                                <div class="text-center">
-                                    <p class="font-mono text-3xl font-bold text-primary">{{ $stat['value'] ?? '' }}</p>
-                                    <p class="text-xs text-zinc-400">{{ $stat['label'] ?? '' }}</p>
-                                </div>
-                            @endforeach
+
+                    @if(filled(data_get($mainSlide, 'subtitle')))
+                        <p class="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground {{ $marginClass }}">
+                            {{ data_get($mainSlide, 'subtitle') }}
+                        </p>
+                    @endif
+
+                    @if($showActionButtons && (!empty($buttons['primary']['text']) || !empty($buttons['secondary']['text'])))
+                        <div class="mt-8 flex flex-wrap items-center gap-3 {{ $justifyClass }}">
+                            @if(!empty($buttons['primary']['text']))
+                                <x-ui.button :href="$buttons['primary']['url'] ?? '#'" size="lg" :icon="$buttons['primary']['icon'] ?: null" :trailing-icon="empty($buttons['primary']['icon']) ? 'arrow-right' : null" class="w-full sm:w-auto">
+                                    {{ $buttons['primary']['text'] }}
+                                </x-ui.button>
+                            @endif
+                            @if(!empty($buttons['secondary']['text']))
+                                <x-ui.button :href="$buttons['secondary']['url'] ?? '#'" variant="secondary" size="lg" :icon="$buttons['secondary']['icon'] ?: null" class="w-full backdrop-blur sm:w-auto">
+                                    {{ $buttons['secondary']['text'] }}
+                                </x-ui.button>
+                            @endif
                         </div>
                     @endif
-                </div>
-                {{-- CEP card (sempre visível) --}}
-                <div class="w-full max-w-md">
-                    @include('livewire.partials.hero-cep-card')
-                </div>
-            </div>
-        @else
-            {{-- Layout padrão: texto à esquerda + CEP à direita --}}
-            <div class="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:gap-16">
-                <div class="flex-1">
-                    <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5">
-                        <span class="h-2 w-2 rounded-full bg-primary"></span>
-                        <span class="text-xs font-medium uppercase tracking-wider text-primary">{{ $badge }}</span>
-                    </div>
-                    <h1 class="font-mono text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl" style="text-wrap: balance;">
-                        {!! str_replace('agilidade', '<span class="text-primary">agilidade</span>', e(data_get($mainSlide, 'title', 'Concreto usinado com agilidade e precisão no traço'))) !!}
-                    </h1>
-                    <p class="mt-6 max-w-xl text-lg leading-relaxed text-zinc-300">
-                        {{ data_get($mainSlide, 'subtitle', 'Entrega rápida, rastreamento em tempo real e suporte técnico especializado.') }}
-                    </p>
-                    @if(!empty($stats))
-                        <div class="mt-10 flex flex-wrap items-center gap-6 lg:gap-10">
+
+                    @if($showStats && !empty($stats))
+                        <dl class="mt-10 flex items-center gap-x-4 sm:flex-wrap sm:gap-x-8 sm:gap-y-4 {{ $justifyClass }}">
                             @foreach($stats as $index => $stat)
-                                @if($index > 0)<div class="h-10 w-px bg-white/10"></div>@endif
-                                <div>
-                                    <p class="font-mono text-3xl font-bold text-primary">{{ $stat['value'] ?? '' }}</p>
-                                    <p class="text-xs text-zinc-400">{{ $stat['label'] ?? '' }}</p>
+                                <div @class(['flex min-w-0 flex-col', 'border-l border-border pl-4 sm:pl-8' => $index > 0])>
+                                    <dt class="order-2 text-xs text-muted-foreground">{{ $stat['label'] ?? '' }}</dt>
+                                    <dd class="order-1 font-mono text-2xl font-bold text-primary-ink md:text-3xl" data-count>{{ $stat['value'] ?? '' }}</dd>
                                 </div>
                             @endforeach
-                        </div>
+                        </dl>
                     @endif
                 </div>
-                <div class="w-full max-w-md flex-shrink-0">
-                    @include('livewire.partials.hero-cep-card')
-                </div>
+
+                @if(! $isClean)
+                    <div class="mx-auto w-full max-w-md shrink-0 lg:mx-0" data-reveal style="--reveal-delay: 150ms">
+                        @if($isWhatsapp)
+                            @include('livewire.partials.hero-whatsapp-card', ['theme' => $heroLight ? 'corporate' : 'default'])
+                        @else
+                            @include('livewire.partials.hero-cep-card', ['theme' => $heroLight ? 'corporate' : 'default'])
+                        @endif
+                    </div>
+                @endif
             </div>
-        @endif
-    </div>
-</section>
+        </div>
+    </section>
 
 @script
 <script>

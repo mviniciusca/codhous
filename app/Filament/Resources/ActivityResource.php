@@ -6,6 +6,13 @@ use Z3d0X\FilamentLogger\Resources\ActivityResource as BaseActivityResource;
 
 class ActivityResource extends BaseActivityResource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Logs;
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return 'Configurações';

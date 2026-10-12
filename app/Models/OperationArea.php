@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\OperationAreaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OperationArea extends Model
 {
-    /** @use HasFactory<\Database\Factories\OperationAreaFactory> */
+    /** @use HasFactory<OperationAreaFactory> */
     use HasFactory;
 
     /**
@@ -61,7 +62,7 @@ class OperationArea extends Model
                 })->orWhere(function ($q2) use ($prefix5) {
                     $q2->whereNull('postcode_start')
                         ->whereNull('postcode_end')
-                        ->whereRaw('LEFT(postcode_prefix, 2) = ?', [substr($prefix5, 0, 2)]);
+                        ->whereRaw('SUBSTR(postcode_prefix, 1, 2) = ?', [substr($prefix5, 0, 2)]);
                 });
             })
             ->exists();
@@ -89,7 +90,7 @@ class OperationArea extends Model
                 })->orWhere(function ($q2) use ($prefix5) {
                     $q2->whereNull('postcode_start')
                         ->whereNull('postcode_end')
-                        ->whereRaw('LEFT(postcode_prefix, 2) = ?', [substr($prefix5, 0, 2)]);
+                        ->whereRaw('SUBSTR(postcode_prefix, 1, 2) = ?', [substr($prefix5, 0, 2)]);
                 });
             })
             ->first();

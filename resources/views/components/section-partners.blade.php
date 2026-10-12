@@ -1,80 +1,92 @@
+@props([
+    'data' => [],
+    'textColor' => null,
+    'bgColor' => null,
+    'layout' => 'slider',
+    'subtitle' => null,
+    'title' => null,
+    'description' => null,
+    'header' => [],
+    'items' => [],
+])
+
 @php
-    $brands = \App\Models\Brand::where('is_active', true)->orderBy('sort_order')->get();
-    
-    // Fallback caso não existam marcas no banco
+    $data = array_merge(array_filter(['background_color' => $bgColor, 'text_color' => $textColor]), (array) $data);
+
+    $brands = collect($items)->map(fn ($item) => (object) [
+        'name' => $item['name'] ?? '',
+        'logo' => $item['logo'] ?? null,
+        'icon' => $item['icon'] ?? 'building-2',
+    ]);
+
+    // Sem itens no bloco: módulo de Marcas e, por fim, demonstração
+    if ($brands->isEmpty()) {
+        $brands = \App\Models\Brand::where('is_active', true)->orderBy('sort_order')->get();
+    }
     if ($brands->isEmpty()) {
         $brands = collect([
-            (object)['name' => 'MRV Engenharia', 'logo' => null, 'icon' => 'building-2'],
-            (object)['name' => 'Construtora Tenda', 'logo' => null, 'icon' => 'hard-hat'],
-            (object)['name' => 'Cyrela Brazil', 'logo' => null, 'icon' => 'landmark'],
-            (object)['name' => 'Gafisa S.A.', 'logo' => null, 'icon' => 'factory'],
-            (object)['name' => 'Even Construtora', 'logo' => null, 'icon' => 'warehouse'],
-            (object)['name' => 'Direcional Eng.', 'logo' => null, 'icon' => 'hammer'],
-            (object)['name' => 'Cury Construtora', 'logo' => null, 'icon' => 'construction'],
-            (object)['name' => 'Plano & Plano', 'logo' => null, 'icon' => 'ruler'],
-        ]);
+            ['MRV Engenharia', 'building-2'], ['Construtora Tenda', 'hard-hat'], ['Cyrela Brazil', 'landmark'], ['Gafisa S.A.', 'factory'],
+            ['Even Construtora', 'warehouse'], ['Direcional Eng.', 'hammer'], ['Cury Construtora', 'construction'], ['Plano & Plano', 'ruler'],
+        ])->map(fn ($b) => (object) ['name' => $b[0], 'logo' => null, 'icon' => $b[1]]);
     }
+
+    $hasHeader = filled($title) || filled($subtitle) || filled($header['title'] ?? null);
+    // Velocidade constante independente da quantidade de logos
+    $duration = max(20, $brands->count() * 4);
 @endphp
 
-<section class="bg-white py-8 overflow-hidden">
-    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <p class="mb-8 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
-            Empresas que confiam no nosso concreto
-        </p>
-    </div>
-
-    <!-- Swiper Container - Full Width -->
-    <div class="swiper partners-swiper w-full">
-            <div class="swiper-wrapper flex items-center">
+@if(!\App\Models\ContentSection::isHidden('partners'))
+<x-ui.section :data="$data" spacing="sm" :container="$layout === 'grid' ? 'default' : 'none'">
+    @if($layout === 'grid')
+        @php $isRight = ($header['alignment'] ?? 'left') === 'right'; @endphp
+        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+            <div @class(['lg:order-last' => $isRight])>
+                <x-ui.section-header
+                    :header="$header ?? []"
+                    :fallback-title="$title"
+                    :fallback-subtitle="$subtitle"
+                    :fallback-description="$description"
+                    class="!mb-0"
+                />
+            </div>
+            <div class="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-border/70 bg-border/70 sm:grid-cols-3" data-reveal>
                 @foreach($brands as $brand)
-                    <div class="swiper-slide flex items-center justify-center px-6">
-                        <div class="flex items-center transition-all duration-300 hover:scale-110">
-                            @if(!empty($brand->logo))
-                                <div class="flex h-14 w-full items-center justify-center">
-                                    <img src="{{ Storage::url($brand->logo) }}" 
-                                         alt="{{ $brand->name }}" 
-                                         class="h-full max-w-[160px] object-contain">
-                                </div>
-                            @else
-                                <div class="flex h-14 w-14 items-center justify-center rounded bg-foreground/5">
-                                    <i data-lucide="{{ $brand->icon ?? 'building-2' }}" class="h-7 w-7 text-foreground/40"></i>
-                                </div>
-                            @endif
-                        </div>
+                    <div class="group flex h-24 items-center justify-center bg-card p-5" title="{{ $brand->name }}">
+                        @include('components.partials.brand-logo', ['brand' => $brand])
                     </div>
                 @endforeach
             </div>
         </div>
-    </div>
+    @else
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            @if($hasHeader)
+                <x-ui.section-header
+                    :header="$header ?? []"
+                    default-align="center"
+                    :fallback-title="$title"
+                    :fallback-subtitle="$subtitle"
+                    :fallback-description="$description"
+                    class="!mb-8"
+                />
+            @else
+                <p class="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    Empresas que confiam no nosso concreto
+                </p>
+            @endif
+        </div>
 
-    <script>
-        document.addEventListener('livewire:navigated', initPartnersSwiper);
-        document.addEventListener('DOMContentLoaded', initPartnersSwiper);
-
-        function initPartnersSwiper() {
-            if (typeof Swiper !== 'undefined') {
-                new Swiper('.partners-swiper', {
-                    slidesPerView: 3,
-                    spaceBetween: 30,
-                    loop: true,
-                    speed: 5000,
-                    autoplay: {
-                        delay: 0,
-                        disableOnInteraction: false,
-                    },
-                    breakpoints: {
-                        640: { slidesPerView: 5 },
-                        1024: { slidesPerView: 7 },
-                    },
-                });
-            }
-        }
-    </script>
-    
-    <style>
-        /* Efeito de movimento contínuo linear */
-        .partners-swiper .swiper-wrapper {
-            transition-timing-function: linear !important;
-        }
-    </style>
-</section>
+        {{-- Faixa contínua em CSS: pausa no hover, sem depender de JS --}}
+        <div class="marquee marquee-mask relative flex overflow-hidden" style="--marquee-duration: {{ $duration }}s">
+            @foreach([0, 1] as $copy)
+                <ul class="flex shrink-0 animate-marquee items-center gap-4 pr-4" @if($copy) aria-hidden="true" @endif>
+                    @foreach($brands as $brand)
+                        <li class="group flex h-20 w-40 shrink-0 items-center justify-center rounded-card border border-border/60 bg-card px-5 transition-colors hover:border-primary-500/30 md:w-48" title="{{ $brand->name }}">
+                            @include('components.partials.brand-logo', ['brand' => $brand])
+                        </li>
+                    @endforeach
+                </ul>
+            @endforeach
+        </div>
+    @endif
+</x-ui.section>
+@endif

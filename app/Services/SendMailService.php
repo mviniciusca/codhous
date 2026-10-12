@@ -10,17 +10,12 @@ use Illuminate\Support\Facades\Mail;
 
 class SendMailService
 {
-    private string $fromEmail;
-
     private bool $error = false;
 
     /**
      * Create a new class instance.
      */
-    public function __construct(public array $data)
-    {
-        $this->fromEmail = env('MAIL_FROM_ADDRESS');
-    }
+    public function __construct(public array $data) {}
 
     private function createMail()
     {
@@ -38,15 +33,22 @@ class SendMailService
 
     private function persistMail()
     {
+        // Envio falhou: não registra como enviada
+        if ($this->error) {
+            return $this;
+        }
+
         try {
+            // Guarda o destinatário, como os demais envios (orçamentos), para o histórico do contato
             MailModel::create([
                 'is_sent' => true,
-                'email'   => $this->fromEmail,
-                'name'    => $this->data['name'],
+                'email' => $this->data['email'],
+                'name' => $this->data['name'] ?? $this->data['email'],
+                'phone' => $this->data['phone'] ?? null,
                 'subject' => $this->data['subject'],
                 'message' => $this->data['message'],
             ]);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->error = true;
 
             return $this->validation(__('Error on sending: ').$e->getMessage());
@@ -75,9 +77,19 @@ class SendMailService
 
     private function save()
     {
-        $this->createMail()->persistMail()->validation();
+        $this->createMail()->persistMail();
+
+        // Erros já foram notificados no passo em que aconteceram
+        if (! $this->error) {
+            $this->validation();
+        }
 
         return $this;
+    }
+
+    public function failed(): bool
+    {
+        return $this->error;
     }
 
     public function send()

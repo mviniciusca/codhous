@@ -1,86 +1,67 @@
 @props([
+    'data' => [],
+    'textColor' => null,
+    'bgColor' => null,
     'title' => null,
     'subtitle' => null,
     'description' => null,
+    'header' => [],
     'items' => null,
 ])
 
 @php
+    $data = array_merge(array_filter(['background_color' => $bgColor, 'text_color' => $textColor]), (array) $data);
     $displayTitle = $title;
     $displaySubtitle = $subtitle;
     $displayDescription = $description;
     $displayItems = $items;
 
-    // Fallback Primário: Focado em CONCRETO USINADO
+    // Sem itens no bloco: tenta a seção global e, por fim, um conteúdo de demonstração
     if (empty($displayItems)) {
-        $displayTitle = $displayTitle ?? 'Nossos Pilares';
-        $displaySubtitle = $displaySubtitle ?? 'Por que nos escolher';
-        $displayDescription = $displayDescription ?? 'Conheça os pilares que sustentam nossa excelência no fornecimento de concreto e logística para obras de todos os portes.';
+        $section = \App\Models\ContentSection::getBySlug('differentials');
+        $displayItems = $section?->content['items'] ?? null;
+        $displayTitle ??= $section?->content['header']['title'] ?? null;
+        $displaySubtitle ??= $section?->content['header']['subtitle'] ?? null;
+        $displayDescription ??= $section?->content['header']['description'] ?? null;
+    }
+
+    if (empty($displayItems)) {
+        $displayTitle ??= 'Nossos Pilares';
+        $displaySubtitle ??= 'Por que nos escolher';
+        $displayDescription ??= 'Conheça os pilares que sustentam nossa excelência no fornecimento de concreto e logística para obras de todos os portes.';
         $displayItems = [
-            [
-                'title' => 'Tecnologia do Concreto',
-                'icon' => 'flask-conical',
-                'description' => 'Produzimos concreto com rigoroso controle tecnológico e FCK garantido, assegurando a máxima resistência para sua estrutura.'
-            ],
-            [
-                'title' => 'Logística de Precisão',
-                'icon' => 'truck',
-                'description' => 'Frota moderna e monitoramento em tempo real para garantir que o concreto chegue no canteiro no horário exato da concretagem.'
-            ],
-            [
-                'title' => 'Suporte Especialista',
-                'icon' => 'users',
-                'description' => 'Nossa equipe técnica acompanha sua obra desde o cálculo do volume até o bombeamento, oferecendo a melhor solução técnica.'
-            ],
+            ['title' => 'Tecnologia do Concreto', 'icon' => 'flask-conical', 'description' => 'Produzimos concreto com rigoroso controle tecnológico e FCK garantido, assegurando a máxima resistência para sua estrutura.'],
+            ['title' => 'Logística de Precisão', 'icon' => 'truck', 'description' => 'Frota moderna e monitoramento em tempo real para garantir que o concreto chegue no canteiro no horário exato da concretagem.'],
+            ['title' => 'Suporte Especialista', 'icon' => 'users', 'description' => 'Nossa equipe técnica acompanha sua obra desde o cálculo do volume até o bombeamento, oferecendo a melhor solução técnica.'],
         ];
     }
 
-    // Se mesmo assim estiver vazio (caso alguém tenha limpado o fallback), tenta buscar da seção global
-    if (empty($displayItems)) {
-        $section = \App\Models\ContentSection::getBySlug('differentials');
-        $displayTitle = $displayTitle ?? ($section?->content['header']['title'] ?? 'Nossos Pilares');
-        $displaySubtitle = $displaySubtitle ?? ($section?->content['header']['subtitle'] ?? 'Diferenciais');
-        $displayDescription = $displayDescription ?? ($section?->content['header']['description'] ?? null);
-        $displayItems = $section?->content['items'] ?? null;
-    }
-
-    // Garante que só mostramos 3 itens
     $displayItems = array_slice((array) $displayItems, 0, 3);
 @endphp
 
-<section class="bg-background py-16 lg:py-24">
-    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        @if(!empty($displayTitle) || !empty($displaySubtitle) || !empty($displayDescription))
-            <div class="mb-16 text-center">
-                @if(!empty($displaySubtitle))
-                    <span class="mb-4 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{{ $displaySubtitle }}</span>
-                @endif
-                <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                    {{ $displayTitle }}
-                </h2>
-                @if(!empty($displayDescription))
-                    <p class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                        {{ $displayDescription }}
-                    </p>
-                @endif
-            </div>
-        @endif
-        
-        <div class="grid gap-12 md:grid-cols-3">
-            @foreach($displayItems as $item)
-                <div class="group flex flex-col items-center text-center transition-all hover:-translate-y-1">
-                    {{-- Ícone Centralizado --}}
-                    <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
-                        <i data-lucide="{{ $item['icon'] ?? 'check-circle' }}" class="h-8 w-8"></i>
-                    </div>
+@if(!\App\Models\ContentSection::isHidden('differentials'))
+<x-ui.section :data="$data" background="bg-background">
+    <x-ui.section-header
+        :header="$header ?? []"
+        :fallback-title="$displayTitle"
+        :fallback-subtitle="$displaySubtitle"
+        :fallback-description="$displayDescription"
+    />
 
-                    {{-- Texto Centralizado --}}
-                    <h3 class="mb-3 font-mono text-xl font-bold text-foreground">{{ $item['title'] ?? '' }}</h3>
-                    <p class="max-w-xs text-muted-foreground leading-relaxed">
-                        {{ $item['description'] ?? '' }}
-                    </p>
+    {{-- Pilares lado a lado num único painel, separados por linhas finas --}}
+    <div class="surface-card grid gap-px overflow-hidden bg-border/70 md:grid-cols-3" data-reveal>
+        @foreach($displayItems as $index => $item)
+            <div class="group relative bg-card p-6 transition-colors duration-300 hover:bg-primary-500/[0.03] md:p-8" data-spotlight>
+                <div class="mb-6 flex items-center justify-between">
+                    <x-ui.icon-box size="lg" :icon="$item['icon'] ?? 'check-circle'" />
+                    <span class="font-mono text-sm font-medium text-muted-foreground/40 transition-colors group-hover:text-primary-ink">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
                 </div>
-            @endforeach
-        </div>
+                <h3 class="text-lg font-bold text-foreground">{{ $item['title'] ?? '' }}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{{ $item['description'] ?? '' }}</p>
+                {{-- Linha de destaque que cresce no hover --}}
+                <span class="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-primary-400 to-primary-600 transition-transform duration-500 ease-out-expo group-hover:scale-x-100"></span>
+            </div>
+        @endforeach
     </div>
-</section>
+</x-ui.section>
+@endif

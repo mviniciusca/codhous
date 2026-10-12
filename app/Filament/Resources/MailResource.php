@@ -2,50 +2,75 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Mail;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use App\Services\SendMailService;
-use Filament\Tables\Actions\Action;
-use Filament\Forms\Components\Hidden;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\Layout\Split;
-use Filament\Tables\Columns\Layout\Stack;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Forms\Components\RichEditor;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\TrashedFilter;
 use App\Filament\Resources\MailResource\Pages;
+use App\Models\Mail;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+/**
+ * Caixa de entrada: mensagens do formulário do site e e-mails enviados pelo painel.
+ * A tela é uma caixa de dois painéis (Pages\ListMails), sem tabela do Filament.
+ */
 class MailResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Comercial;
+    }
+
     protected static ?string $model = Mail::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
+
+    protected static ?string $activeNavigationIcon = 'heroicon-s-inbox';
+
+    protected static ?string $navigationGroup = 'Website';
+
+    protected static ?int $navigationSort = 1;
+
+    /** Pastas da caixa, na ordem das abas */
+    public const FOLDERS = [
+        'inbox' => ['label' => 'Entrada', 'icon' => 'heroicon-m-inbox'],
+        'unread' => ['label' => 'Não lidas', 'icon' => 'heroicon-m-envelope'],
+        'starred' => ['label' => 'Importantes', 'icon' => 'heroicon-m-star'],
+        'sent' => ['label' => 'Enviadas', 'icon' => 'heroicon-m-paper-airplane'],
+        'spam' => ['label' => 'Spam', 'icon' => 'heroicon-m-shield-exclamation'],
+        'trash' => ['label' => 'Lixeira', 'icon' => 'heroicon-m-trash'],
+    ];
 
     public static function getNavigationBadge(): ?string
     {
         return self::count();
     }
 
-    protected static ?string $navigationGroup = 'Website';
-    protected static ?int $navigationSort = 1;
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Mensagens não lidas';
+    }
 
+    /** Mensagens recebidas ainda não lidas (fora do spam e da lixeira) */
     public static function count(): ?string
     {
-        $count = Mail::query()
-            ->where('is_read', 0)
-            ->where('is_sent', 0)
-            ->where('is_spam', 0)
-            ->count();
+        $count = self::folderQuery('unread')->count();
 
         return $count > 0 ? (string) $count : null;
+    }
+
+    public static function folderQuery(string $folder): Builder
+    {
+        $query = Mail::query();
+
+        return match ($folder) {
+            'unread' => $query->where('is_sent', false)->where('is_spam', false)->where('is_read', false),
+            'starred' => $query->where('is_favorite', true)->where('is_spam', false),
+            'sent' => $query->where('is_sent', true),
+            'spam' => $query->where('is_spam', true),
+            'trash' => $query->onlyTrashed(),
+            default => $query->where('is_sent', false)->where('is_spam', false),
+        };
     }
 
     public static function getNavigationLabel(): string
@@ -63,213 +88,6 @@ class MailResource extends Resource
         return 'Caixa de Entrada';
     }
 
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->heading('Caixa de Entrada')
-            ->headerActions([
-                Action::make('compose_mail')
-                    ->label('Nova Mensagem')
-                    ->icon('heroicon-o-pencil')
-                    ->color('primary')
-                    ->modal(true)
-                    ->closeModalByClickingAway(false)
-                    ->form([
-                        Hidden::make('is_sent')
-                            ->default(true),
-                        TextInput::make('name')
-                            ->label('Remetente:')
-                            ->helperText('Seu nome ou nome da empresa que aparecerá no e-mail.')
-                            ->required()
-                            ->placeholder('Ex: Codhous Software')
-                            ->maxLength(255)
-                            ->default(env('MAIL_FROM_NAME') ?? 'Codhous Software'),
-                        TextInput::make('sending_mail')
-                            ->label('E-mail de Envio:')
-                            ->helperText('O endereço de e-mail configurado para disparos.')
-                            ->required()
-                            ->maxLength(255)
-                            ->disabled()
-                            ->default(env('MAIL_FROM_ADDRESS')),
-                        TextInput::make('email')
-                            ->label('Para:')
-                            ->helperText('Endereço de e-mail do destinatário.')
-                            ->email()
-                            ->maxLength(200)
-                            ->required()
-                            ->placeholder('email@exemplo.com'),
-                        TextInput::make('subject')
-                            ->label('Assunto:')
-                            ->helperText('O título/assunto que aparecerá na caixa do destinatário.')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Assunto do e-mail'),
-                        RichEditor::make('message')
-                            ->label('Mensagem:')
-                            ->helperText('Escreva o conteúdo da sua mensagem. Máximo de 5000 caracteres.')
-                            ->required()
-                            ->maxLength(5000),
-                    ])
-                    ->action(function (?array $data): void {
-                        $mail = new SendMailService($data);
-                        $mail->send();
-                    }),
-            ])
-            ->description('Gerencie as mensagens e e-mails recebidos através do site.')
-            ->columns([
-                Split::make([
-                    IconColumn::make('is_read')
-                        ->label('')
-                        ->boolean()
-                        ->trueIcon('')
-                        ->falseIcon('heroicon-s-circle-stack')
-                        ->falseColor('primary')
-                        ->tooltip('Não lida')
-                        ->grow(false),
-                    Tables\Columns\ToggleColumn::make('is_favorite')
-                        ->label('')
-                        ->onIcon('heroicon-s-star')
-                        ->offIcon('heroicon-o-star')
-                        ->onColor('warning')
-                        ->grow(false),
-                    TextColumn::make('name')
-                        ->weight('bold')
-                        ->searchable()
-                        ->formatStateUsing(fn($state) => self::normalizeText($state))
-                        ->grow(false)
-                        ->width('180px'),
-                    TextColumn::make('is_new_badge')
-                        ->state('')
-                        ->badge()
-                        ->label('')
-                        ->color('primary')
-                        ->formatStateUsing(fn() => 'Nova')
-                        ->visible(fn(?Mail $record) => $record && !$record->is_read)
-                        ->grow(false),
-                    Stack::make([
-                        TextColumn::make('subject_message')
-                            ->state(fn(Mail $record) => $record->subject . ' - ' . strip_tags($record->message))
-                            ->searchable(['subject', 'message'])
-                            ->limit(80)
-                            ->weight(fn(Mail $record) => !$record->is_read ? 'bold' : 'normal')
-                            ->html(),
-                    ])->grow(true),
-                    TextColumn::make('created_at')
-                        ->dateTime('d/m/y')
-                        ->color('gray')
-                        ->alignEnd()
-                        ->grow(false),
-                ])->extraAttributes([
-                    'class' => 'py-2',
-                ]),
-            ])
-            ->recordAction('view')
-            ->recordClasses(fn(Mail $record) => match ($record->is_read) {
-                0, false => ['bg-primary-50/50 dark:bg-primary-500/5 border-l-4 border-l-primary-500'],
-                default => ['opacity-70'],
-            })
-            ->paginated(25)
-            ->defaultSort('created_at', 'desc')
-            ->filters([
-                TernaryFilter::make('is_sent')
-                    ->label('Tipo de Mensagem')
-                    ->indicator('Mensagens')
-                    ->trueLabel('Enviadas')
-                    ->falseLabel('Recebidas')
-                    ->default(false),
-                TernaryFilter::make('is_favorite')
-                    ->label('Importante')
-                    ->indicator('Favoritos')
-                    ->trueLabel('Importantes')
-                    ->falseLabel('Normais'),
-                TernaryFilter::make('is_read')
-                    ->label('Status de Leitura')
-                    ->indicator('Leitura')
-                    ->trueLabel('Lidas')
-                    ->falseLabel('Não Lidas'),
-                TernaryFilter::make('is_spam')
-                    ->label('Filtro de Spam')
-                    ->indicator('Spam')
-                    ->trueLabel('Marcadas como Spam')
-                    ->falseLabel('Não é Spam')
-                    ->default(false),
-                TrashedFilter::make()
-                    ->indicator('Lixeira')
-                    ->label('Lixeira'),
-            ], FiltersLayout::BelowContent)
-            ->persistFiltersInSession()
-            ->actions([
-                ActionGroup::make([
-                    Tables\Actions\Action::make('reply')
-                        ->label('Responder')
-                        ->icon('heroicon-o-arrow-uturn-left')
-                        ->color('primary')
-                        ->modalHeading('Responder Mensagem')
-                        ->hidden(fn(Mail $record) => $record->is_sent)
-                        ->form([
-                            TextInput::make('email')
-                                ->label('Para:')
-                                ->helperText('Destinatário da resposta.')
-                                ->default(fn($record) => $record->email)
-                                ->readOnly(),
-                            TextInput::make('subject')
-                                ->label('Assunto:')
-                                ->helperText('Título da resposta.')
-                                ->default(fn($record) => "Re: " . $record->subject)
-                                ->required(),
-                            RichEditor::make('message')
-                                ->label('Mensagem:')
-                                ->helperText('Escreva sua resposta abaixo.')
-                                ->required(),
-                        ])
-                        ->action(function (Mail $record, array $data) {
-                            $data['name'] = env('MAIL_FROM_NAME') ?? 'Codhous Software';
-                            $service = new \App\Services\SendMailService($data);
-                            $service->send();
-                        }),
-                    Tables\Actions\Action::make('mark_as_read')
-                        ->label('Marcar como Lida')
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->hidden(fn(Mail $record) => $record->is_read)
-                        ->action(fn(Mail $record) => $record->update(['is_read' => true])),
-                    Tables\Actions\Action::make('mark_as_unread')
-                        ->label('Marcar como Não Lida')
-                        ->icon('heroicon-o-envelope')
-                        ->color('gray')
-                        ->visible(fn(Mail $record) => $record->is_read)
-                        ->action(fn(Mail $record) => $record->update(['is_read' => false])),
-                    Tables\Actions\DeleteAction::make()
-                        ->label('Mover para Lixeira'),
-                    Tables\Actions\ForceDeleteAction::make()
-                        ->label('Excluir Permanentemente'),
-                    Tables\Actions\RestoreAction::make()
-                        ->label('Restaurar Mensagem'),
-                ]),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('mark_as_read')
-                        ->label('Marcar como Lidas')
-                        ->icon('heroicon-o-check-circle')
-                        ->action(fn($records) => $records->each->update(['is_read' => true])),
-                    Tables\Actions\BulkAction::make('mark_as_unread')
-                        ->label('Marcar como Não Lidas')
-                        ->icon('heroicon-o-envelope')
-                        ->action(fn($records) => $records->each->update(['is_read' => false])),
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->label('Mover Selecionadas para Lixeira'),
-                ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -281,9 +99,10 @@ class MailResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'   => Pages\ListMails::route('/'),
-            'view'    => Pages\ViewMail::route('/{record}/view'),
-            'create'  => Pages\CreateMail::route('/create'),
+            'index' => Pages\ListMails::route('/'),
+            // Links antigos (notificação por e-mail) continuam funcionando: abrem a mensagem na caixa
+            'view' => Pages\ViewMail::route('/{record}/view'),
+            'create' => Pages\CreateMail::route('/create'),
         ];
     }
 

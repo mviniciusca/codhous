@@ -55,6 +55,17 @@ class BudgetFactory extends Factory
         // Gera o código usando o mesmo padrão do modelo
         $code = 'BD'.date('Ym').str_pad($this->faker->unique()->numberBetween(1, 99999), 5, '0', STR_PAD_LEFT);
 
+        $address = $this->faker->randomElement([
+            ['postcode' => '20040-002', 'city' => 'Rio de Janeiro', 'state' => 'RJ', 'neighborhood' => 'Centro', 'street' => 'Avenida Rio Branco'],
+            ['postcode' => '22041-001', 'city' => 'Rio de Janeiro', 'state' => 'RJ', 'neighborhood' => 'Copacabana', 'street' => 'Rua Barata Ribeiro'],
+            ['postcode' => '22793-081', 'city' => 'Rio de Janeiro', 'state' => 'RJ', 'neighborhood' => 'Barra da Tijuca', 'street' => 'Avenida das Américas'],
+            ['postcode' => '24220-008', 'city' => 'Niterói', 'state' => 'RJ', 'neighborhood' => 'Icaraí', 'street' => 'Praia de Icaraí'],
+            ['postcode' => '25010-007', 'city' => 'Duque de Caxias', 'state' => 'RJ', 'neighborhood' => 'Centro', 'street' => 'Avenida Presidente Kennedy'],
+            ['postcode' => '26210-210', 'city' => 'Nova Iguaçu', 'state' => 'RJ', 'neighborhood' => 'Centro', 'street' => 'Via Light'],
+            ['postcode' => '24440-420', 'city' => 'São Gonçalo', 'state' => 'RJ', 'neighborhood' => 'Centro', 'street' => 'Rua Doutor Nilo Peçanha'],
+            ['postcode' => '21040-361', 'city' => 'Rio de Janeiro', 'state' => 'RJ', 'neighborhood' => 'Bonsucesso', 'street' => 'Avenida Brasil'],
+        ]);
+
         return [
             'created_at' => $this->faker->dateTimeBetween(date('2024-01-01')),
             'code'       => $code,
@@ -70,15 +81,15 @@ class BudgetFactory extends Factory
                 'product'        => (string) $product_id,
                 'product_option' => (string) $product_option_id,
                 'location'       => (string) $this->faker->randomElement([1, 2, 3]),
-                'postcode'       => $this->faker->numerify('22###-000'),
+                'postcode'       => $address['postcode'],
                 'customer_name'  => $this->faker->name(),
                 'customer_email' => $this->faker->email(),
                 'customer_phone' => $this->faker->phoneNumber(),
-                'street'         => $this->faker->streetAddress(),
-                'number'         => (string) $this->faker->randomNumber(),
-                'city'           => $this->faker->city(),
-                'neighborhood'   => $this->faker->city(),
-                'state'          => $this->faker->countryCode(),
+                'street'         => $address['street'],
+                'number'         => (string) $this->faker->randomNumber(3),
+                'city'           => $address['city'],
+                'neighborhood'   => $address['neighborhood'],
+                'state'          => $address['state'],
                 'shipping'       => (string) $shipping,
                 'tax'            => (string) $tax,
                 'price'          => (string) $price,

@@ -20,11 +20,36 @@ class SectionHeroCep extends Component
     /** Texto do badge (ex: Qualidade Certificada) */
     public string $badge = 'Qualidade Certificada';
 
-    /** Layout: default (texto + CEP lado a lado) | whatsapp (destaque central + CEP abaixo) */
+    /** Layout: default (texto + CEP lado a lado) | whatsapp (destaque central + CEP abaixo) | clean */
     public string $layout = 'default';
+
+    public string $alignment = 'center';
+
+    /** Overlay Configs */
+    public bool $overlayEnabled = true;
+    public string $overlayTheme = 'dark';
+
+    /** Tema: default, corporate, creative */
+    public string $theme = 'default';
+    public ?string $bgColor = null;
+    public string $textColor = 'light';
+
+    /** Classes de padding vertical (App\Support\SectionStyle::spacing) */
+    public ?string $spacing = null;
 
     /** Estatísticas exibidas na hero (value + label) */
     public array $stats = [];
+
+    /** Botões de ação adicionais */
+    public array $buttons = [];
+
+    /** Controles de visibilidade */
+    public bool $showActionButtons = true;
+    public bool $showStats = true;
+    public bool $showSlideshow = false;
+
+    /** Slideshow items */
+    public array $slideshow = [];
 
     public function updatedCep($value)
     {
@@ -94,16 +119,20 @@ class SectionHeroCep extends Component
             'subtitle' => 'Entrega rápida, rastreamento em tempo real e suporte técnico especializado.',
         ];
         $stats = $this->stats ?: [
-            ['value' => '500+', 'label' => 'Obras atendidas'],
-            ['value' => '98%', 'label' => 'Pontualidade'],
-            ['value' => '15+', 'label' => 'Anos de experiência'],
+            ['value' => '2.500+', 'label' => 'Obras Entregues'],
+            ['value' => '150k+', 'label' => 'm³ de Concreto'],
+            ['value' => '15+', 'label' => 'Anos de Mercado'],
         ];
 
         return view('livewire.section-hero-cep', [
             'mainSlide' => $mainSlide,
             'badge' => $this->badge ?: 'Qualidade Certificada',
             'layout' => $this->layout ?: 'default',
+            'theme' => $this->theme ?: 'default',
             'stats' => $stats,
+            'buttons' => $this->buttons,
+            'showActionButtons' => $this->showActionButtons,
+            'showStats' => $this->showStats,
         ]);
     }
 }

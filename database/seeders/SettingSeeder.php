@@ -12,8 +12,8 @@ class SettingSeeder extends Seeder
      */
     public function run(): void
     {
-        // Garante que existe apenas um registro de configurações
-        Setting::query()->delete();
-        Setting::factory()->create();
+        // Garante que existe apenas um registro de configurações e o ID é sempre 1
+        Setting::truncate();
+        Setting::factory()->create(['id' => 1]);
     }
 }

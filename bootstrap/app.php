@@ -12,6 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(\App\Http\Middleware\CheckMaintenanceMode::class);
+        // Cancelamento de um clique dos clientes de e-mail (List-Unsubscribe-Post) não tem token CSRF
+        $middleware->validateCsrfTokens(except: ['newsletter/cancelar/*']);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
     })
     ->withExceptions(function (Exceptions $exceptions) {

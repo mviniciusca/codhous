@@ -10,22 +10,22 @@ class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
 
-    public function getTitle(): string 
+    public function getTitle(): string
     {
         return 'Produtos e Serviços';
     }
 
     public function getSubheading(): ?string
     {
-        return 'Gerencie seu catálogo completo de materiais, locação de equipamentos e serviços especializados.';
+        return 'Catálogo e tabela de preços usados no formulário do site e nos orçamentos.';
     }
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-                ->label('Novo Produto ou Serviço')
-                ->icon('heroicon-o-shopping-bag'),
+                ->label('Novo produto')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }

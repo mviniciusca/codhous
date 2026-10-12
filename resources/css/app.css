@@ -84,13 +84,225 @@
     }
 }
 
+/*
+ * ─── Tokens do tema do site ───────────────────────────────────────────────
+ * Todas as cores do Tailwind (bg-primary, text-foreground, border-border…)
+ * leem estas variáveis. Para criar um tema, redefina-as em
+ * [data-theme="nome"] (o <html> recebe o tema de settings.website.theme).
+ *
+ * --primary-color ("R G B") e --color-primary-foreground/-ink são escritos
+ * pelo layout a partir de App\Support\SiteTheme. Os tons 400–950 derivam
+ * da cor base; os efeitos usam tons diferentes (hover 600, pressionado 700,
+ * superfícies profundas 900/950, realce em fundo escuro 400).
+ */
+@layer base {
+    :root {
+        --primary-color: 249 115 22;
+
+        --color-primary-400: color-mix(in oklab, rgb(var(--primary-color)) 78%, white);
+        --color-primary-500: rgb(var(--primary-color));
+        --color-primary-600: color-mix(in oklab, rgb(var(--primary-color)) 86%, black);
+        --color-primary-700: color-mix(in oklab, rgb(var(--primary-color)) 70%, black);
+        --color-primary-800: color-mix(in oklab, rgb(var(--primary-color)) 56%, black);
+        --color-primary-900: color-mix(in oklab, rgb(var(--primary-color)) 44%, black);
+        --color-primary-950: color-mix(in oklab, rgb(var(--primary-color)) 26%, black);
+        --color-primary-foreground: oklch(1 0 0);
+        --color-primary-ink-base: var(--color-primary-600);
+        --color-primary-ink: var(--color-primary-ink-base);
+
+        --color-background: oklch(0.975 0.002 250);
+        --color-foreground: oklch(0.18 0.01 250);
+        --color-card: oklch(1 0 0);
+        --color-card-foreground: var(--color-foreground);
+        --color-muted: oklch(0.93 0.004 250);
+        --color-muted-foreground: oklch(0.47 0.01 250);
+        --color-border: oklch(0.89 0.005 250);
+
+        --radius-card: 1.25rem;
+        --radius-control: 0.75rem;
+    }
+
+    /*
+     * Esquemas de seção: redefinem os tokens dentro da seção, então
+     * text-foreground, bg-card, border-border etc. se adaptam sozinhos.
+     */
+    .text-scheme-dark,
+    .dark {
+        --color-foreground: oklch(0.985 0 0);
+        --color-card: oklch(1 0 0 / 0.06);
+        --color-card-foreground: oklch(0.985 0 0);
+        --color-muted: oklch(1 0 0 / 0.08);
+        --color-muted-foreground: oklch(0.985 0 0 / 0.72);
+        --color-border: oklch(1 0 0 / 0.14);
+        --color-primary-ink: var(--color-primary-400);
+        color: var(--color-foreground);
+    }
+
+    .scheme-primary {
+        --color-foreground: var(--color-primary-foreground);
+        --color-card: oklch(1 0 0);
+        --color-card-foreground: oklch(0.18 0.01 250);
+        --color-muted: color-mix(in oklab, var(--color-primary-foreground) 12%, transparent);
+        --color-muted-foreground: color-mix(in oklab, var(--color-primary-foreground) 80%, transparent);
+        --color-border: color-mix(in oklab, var(--color-primary-foreground) 22%, transparent);
+        --color-primary-ink: var(--color-primary-foreground);
+        color: var(--color-foreground);
+    }
+
+    /* Cartões claros dentro de seções escuras/primárias voltam aos tokens padrão */
+    .text-scheme-light {
+        --color-foreground: oklch(0.18 0.01 250);
+        --color-card: oklch(1 0 0);
+        --color-card-foreground: oklch(0.18 0.01 250);
+        --color-muted: oklch(0.93 0.004 250);
+        --color-muted-foreground: oklch(0.47 0.01 250);
+        --color-border: oklch(0.89 0.005 250);
+        --color-primary-ink: var(--color-primary-ink-base);
+        color: var(--color-foreground);
+    }
+
+    /* Títulos sem cor explícita seguem o esquema da seção */
+    :where(.text-scheme-dark, .scheme-primary, .text-scheme-light) :where(h1, h2, h3, h4) {
+        color: var(--color-foreground);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
 @layer components {
+
+    /*
+     * ─── Primitivas do site ───────────────────────────────────────────────
+     * Usadas pelos componentes x-ui.* e disponíveis para conteúdo vindo do
+     * banco (rich text, HTML customizado). Só dependem dos tokens do tema.
+     */
+
+    /* Botões: .btn + variante (+ tamanho opcional) */
+    .btn {
+        @apply relative inline-flex select-none items-center justify-center gap-2 max-w-full whitespace-normal rounded-control px-5 py-3 text-center text-sm font-semibold leading-tight sm:whitespace-nowrap sm:leading-none tracking-wide transition-all duration-200 ease-out-expo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+    }
+    .btn > svg, .btn > i { @apply h-4 w-4 shrink-0 transition-transform duration-200; }
+    .btn:hover > [data-icon-trailing] { @apply translate-x-0.5; }
+    .btn-sm { @apply gap-1.5 px-3.5 py-2 text-xs; }
+    .btn-lg { @apply px-7 py-4 text-base; }
+    .btn-lg > svg, .btn-lg > i { @apply h-5 w-5; }
+
+    .btn-primary {
+        @apply bg-primary-500 text-primary-foreground shadow-sm shadow-primary-700/20 hover:-translate-y-px hover:bg-primary-600 hover:shadow-md hover:shadow-primary-700/25 active:bg-primary-700;
+    }
+    .btn-secondary {
+        @apply border border-border bg-card text-foreground shadow-sm hover:-translate-y-px hover:border-primary-500/40 hover:text-primary-ink hover:shadow-md;
+    }
+    .btn-outline {
+        @apply border border-primary-500/50 text-primary-ink hover:border-primary-600 hover:bg-primary-500/10 active:bg-primary-500/15;
+    }
+    .btn-ghost {
+        @apply text-foreground hover:bg-muted active:bg-muted;
+    }
+    .btn-whatsapp {
+        @apply bg-[#25D366] text-white shadow-sm shadow-green-700/20 hover:-translate-y-px hover:bg-[#1ebe5b] hover:shadow-md;
+    }
+    /* Em fundo primário, o botão principal inverte para não sumir */
+    .scheme-primary .btn-primary {
+        @apply bg-primary-950 text-white shadow-primary-950/30 hover:bg-primary-900 active:bg-primary-800;
+    }
+
+    /* Link com seta que desliza no hover */
+    .link-arrow {
+        @apply inline-flex items-center gap-1.5 text-sm font-semibold text-primary-ink transition-colors hover:text-primary-700;
+    }
+    .link-arrow > svg, .link-arrow > i { @apply h-4 w-4 transition-transform duration-200; }
+    .link-arrow:hover > svg, .link-arrow:hover > i, .group:hover .link-arrow > svg { @apply translate-x-1; }
+    .text-scheme-dark .link-arrow:hover { @apply text-primary-400; }
+
+    /* Kicker (subtítulo curto acima do título) */
+    .kicker {
+        @apply inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-primary-ink;
+    }
+    .kicker-pill {
+        @apply rounded-full border border-primary-500/20 bg-primary-500/10 px-3 py-1;
+    }
+    .kicker-dot { @apply relative flex h-1.5 w-1.5; }
+    .kicker-dot::before { @apply absolute inset-0 animate-ping rounded-full bg-primary-500 opacity-60 content-['']; }
+    .kicker-dot::after { @apply relative h-1.5 w-1.5 rounded-full bg-primary-500 content-['']; }
+
+    /* Títulos de seção */
+    .section-title {
+        @apply font-mono text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem];
+        text-wrap: balance;
+    }
+    .section-lead {
+        @apply text-base leading-relaxed text-muted-foreground md:text-lg;
+        text-wrap: pretty;
+    }
+
+    /* Cartão base */
+    .surface-card {
+        @apply relative rounded-card border border-border/70 bg-card text-card-foreground shadow-[0_1px_2px_rgb(0_0_0/0.04)];
+    }
+    .surface-card-interactive {
+        @apply transition-all duration-300 ease-out-expo hover:-translate-y-1 hover:border-primary-500/30 hover:shadow-[0_18px_40px_-20px_rgb(0_0_0/0.25)];
+    }
+
+    /* Caixa de ícone: suave por padrão, sólida no hover do card (.group) */
+    .icon-box {
+        @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-500/10 text-primary-ink transition-all duration-300 ease-out-expo;
+    }
+    .icon-box > svg, .icon-box > i { @apply h-5 w-5; }
+    .group:hover .icon-box-react { @apply -rotate-6 scale-105 bg-primary-500 text-primary-foreground shadow-lg shadow-primary-600/25; }
+    .icon-box-sm { @apply h-8 w-8 rounded-lg; }
+    .icon-box-sm > svg, .icon-box-sm > i { @apply h-4 w-4; }
+    .icon-box-lg { @apply h-14 w-14 rounded-2xl; }
+    .icon-box-lg > svg, .icon-box-lg > i { @apply h-6 w-6; }
+
+    /* Brilho que segue o cursor (data-spotlight; posição atualizada em site.js) */
+    [data-spotlight] { @apply isolate overflow-hidden; }
+    [data-spotlight]::before {
+        @apply pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 content-[''];
+        background: radial-gradient(420px circle at var(--spot-x, 50%) var(--spot-y, 0%), color-mix(in oklab, var(--color-primary-500) 12%, transparent), transparent 65%);
+    }
+    [data-spotlight]:hover::before { @apply opacity-100; }
+
+    /* Navegação dos sliders */
+    .slider-btn {
+        @apply flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm transition-all duration-200 hover:border-primary-500/40 hover:bg-primary-500 hover:text-primary-foreground active:scale-95 disabled:opacity-30 disabled:hover:bg-card disabled:hover:text-foreground;
+    }
+    .slider-btn.swiper-button-disabled { @apply pointer-events-none opacity-30; }
+    .swiper-pagination-bullet { @apply !h-1.5 !w-1.5 !bg-foreground/30 !opacity-100 transition-all duration-300; }
+    .swiper-pagination-bullet-active { @apply !w-6 !rounded-full !bg-primary-500; }
+
+    /* Revelar ao rolar: só quando o JS ativa (html.reveal-on), nunca na prévia do painel */
+    .reveal-on [data-reveal] {
+        @apply translate-y-4 opacity-0 transition-all duration-700 ease-out-expo;
+        transition-delay: var(--reveal-delay, 0ms);
+    }
+    .reveal-on [data-reveal].is-visible { @apply translate-y-0 opacity-100; }
+
+    /* Linha do tempo: o trilho se preenche quando a seção aparece */
+    .timeline-progress { transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s; }
+    .reveal-on .timeline:not(.is-visible) .timeline-progress { transform: scaleX(0); }
+
+    [x-cloak] { display: none !important; }
+
+    /* Faixa contínua (logos de parceiros) */
+    .marquee-mask {
+        mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    }
+    .marquee:hover .animate-marquee { animation-play-state: paused; }
+
 
     /* Estilizando inputs e botões do Filament */
     .fi-input,
     .fi-select,
     .fi-textarea {
-        @apply rounded-md border border-input bg-background shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
+        @apply rounded-md border border-input bg-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
     }
 
     .fi-btn {
@@ -106,7 +318,7 @@
     }
 
     .fi-btn-outline {
-        @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+        @apply border border-input bg-white hover:bg-accent hover:text-accent-foreground;
     }
 
     .fi-card {
@@ -124,8 +336,11 @@
     textarea,
     select,
     input[type="text"],
-    input[type="password"] {
-        @apply bg-background dark:bg-secondary;
+    input[type="password"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"] {
+        @apply bg-white dark:bg-secondary;
     }
 
     form button {
@@ -136,8 +351,19 @@
     .dark .fi-input,
     .dark .fi-select,
     .dark .fi-textarea {
-        @apply bg-background border-border;
+        @apply bg-secondary border-border;
     }
+
+    /* Fix Filament dynamic custom colors missing in frontend Tailwind */
+    .bg-custom-600 { @apply bg-primary !important; }
+    .bg-custom-500 { @apply bg-primary !important; }
+    .text-custom-600 { @apply text-primary !important; }
+    .ring-custom-600 { @apply ring-primary !important; }
+    .bg-custom-50 { @apply bg-primary/10 !important; }
+    .hover\:bg-custom-500:hover { @apply bg-primary/90 !important; }
+    .hover\:bg-custom-600:hover { @apply bg-primary/90 !important; }
+    .dark .dark\:bg-custom-500 { @apply bg-primary !important; }
+    .dark .dark\:hover\:bg-custom-400:hover { @apply bg-primary/90 !important; }
 
     /* Personalizações adicionais para tons de azul */
     .fi-sidebar {
@@ -179,4 +405,13 @@
     #orcamento .fi-input-wrp {
         @apply focus-within:ring-primary;
     }
+}
+
+/* 
+ * Alias rápido para a cor primária solicitado pelo usuário 
+ * Fica fora das @layers para não ser expurgado pelo Tailwind
+ * quando usado apenas no banco de dados.
+ */
+.tp {
+    @apply text-primary font-bold !important;
 }

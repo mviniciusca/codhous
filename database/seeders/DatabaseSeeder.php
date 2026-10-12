@@ -33,6 +33,11 @@ class DatabaseSeeder extends Seeder
 
         // 2. Criar obras de exemplo para o portfólio
         $this->seedShowcases();
+        $this->call(PagesTableSeeder::class);
+        $this->call(ContentSectionsTableSeeder::class);
+
+        // 3. Alertas do site (inclui o aviso de cookies)
+        $this->call(AlertSeeder::class);
     }
 
     protected function seedShowcases()

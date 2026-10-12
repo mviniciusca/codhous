@@ -2,348 +2,628 @@
 
 namespace App\Livewire;
 
+use App\Mail\AdminNewBudgetMail;
+use App\Mail\CustomerBudgetReceivedMail;
 use App\Models\Budget as BudgetModel;
-use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductOption;
 use App\Models\User;
-use App\Notifications\NewBudget;
+use App\Rules\CepInOperationAreaRule;
 use App\Services\BudgetCalculatorService;
 use App\Services\OperationAreaService;
 use App\Services\PostcodeFinderService;
-use App\Rules\CepInOperationAreaRule;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use App\Services\TurnstileService;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\Rule;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
-class Budget extends Component implements HasForms
+class Budget extends Component
 {
-    use InteractsWithForms;
+    use WithFileUploads;
 
-    public ?array $data = [];
+    /** Máximo de envios por IP dentro da janela abaixo */
+    protected const SUBMIT_MAX_ATTEMPTS = 5;
+
+    protected const SUBMIT_DECAY_SECONDS = 600;
+
+    public const DELIVERY_PERIODS = [
+        'manha' => 'Manhã',
+        'tarde' => 'Tarde',
+        'flexivel' => 'Flexível',
+    ];
+
+    public const PUMP_OPTIONS = [
+        'sim' => 'Sim, preciso de bomba',
+        'nao' => 'Não, descarga direta',
+        'nao_sei' => 'Não sei, preciso de orientação',
+    ];
+
+    public ?string $bgColor = '';
+
+    public ?string $title = null;
+
+    public ?string $subtitle = null;
+
+    public ?string $description = null;
+
+    public bool $headerVisible = true;
+
+    public string $headerAlignment = 'left';
 
     public bool $isSubmitted = false;
 
-    public function mount(): void
+    public ?string $turnstileToken = null;
+
+    // Wizard
+    public int $currentStep = 1;
+
+    // Repeater
+    public array $items = [];
+
+    // Form Data
+    public string $location_id = '';
+
+    public $photos = [];
+
+    public string $customer_name = '';
+
+    public string $customer_phone = '';
+
+    public string $customer_email = '';
+
+    public string $postcode = '';
+
+    public string $street = '';
+
+    public string $number = '';
+
+    public string $complement = '';
+
+    public string $neighborhood = '';
+
+    public string $city = '';
+
+    public string $state = '';
+
+    // Entrega
+    public string $delivery_date = '';
+
+    public string $delivery_period = '';
+
+    public string $needs_pump = '';
+
+    public string $notes = '';
+
+    // Derived (calculados no servidor, não podem ser alterados pelo navegador)
+    #[Locked]
+    public float $shipping = 0;
+
+    #[Locked]
+    public float $subtotal = 0;
+
+    #[Locked]
+    public float $total = 0;
+
+    #[Locked]
+    public float $totalQuantity = 0;
+
+    #[Locked]
+    public string $code = '';
+
+    // Caches da requisição atual (não são persistidos entre requisições)
+    protected array $productsCache = [];
+
+    protected array $productOptionsCache = [];
+
+    public function mount()
     {
-        $this->form->fill();
+        $this->addItem();
     }
 
-    public function form(Form $form): Form
+    public function addItem()
     {
-        return $form
-            ->schema([
-                Hidden::make('code')->default(fn () => BudgetModel::generateUniqueCode()),
-                Hidden::make('content.price'),
-                Hidden::make('content.subtotal'),
-                Hidden::make('content.total'),
-                Hidden::make('content.quantity'),
-                Hidden::make('content.shipping')->default(0),
-
-                Grid::make(12)
-                    ->schema([
-                        // Coluna da Esquerda (Formulário)
-                        Group::make([
-                            Section::make('1. Local de Entrega')
-                                ->description('Onde o material deve ser entregue?')
-                                ->icon('heroicon-o-map-pin')
-                                ->extraAttributes(['class' => '!shadow-none'])
-                                ->schema([
-                                    TextInput::make('content.postcode')
-                                        ->label('CEP')
-                                        ->placeholder('00000-000')
-                                        ->mask('99999-999')
-                                        ->required()
-                                        ->validationAttribute('CEP')
-                                        ->live(debounce: 500)
-                                        ->extraInputAttributes(['class' => '!bg-white shadow-sm'])
-                                        ->rules($this->getPostcodeRules())
-                                        ->afterStateUpdated(function ($state, Set $set, $livewire) {
-                                            // Limpa campos para evitar dados residuais de CEPs anteriores
-                                            $set('content.street', null);
-                                            $set('content.neighborhood', null);
-                                            $set('content.city', null);
-                                            $set('content.state', null);
-                                            $set('content.shipping', 0);
-
-                                            if (strlen($state ?? '') === 9) {
-                                                try {
-                                                    $livewire->validateOnly('data.content.postcode');
-                                                    $postcode = new \App\Services\PostcodeFinderService($state, $set);
-                                                    $postcode->find();
-                                                    $livewire->applyShippingFromCep($state, $set);
-                                                } catch (\Illuminate\Validation\ValidationException $e) {
-                                                    // Se falhar a validação (ex: fora da área), os campos permanecem limpos
-                                                    throw $e;
-                                                }
-                                            }
-                                        }),
-                                    
-                                    Grid::make(3)
-                                        ->schema([
-                                            TextInput::make('content.street')
-                                                ->label('Rua/Av')
-                                                ->columnSpan(2)
-                                                ->disabled()
-                                                ->dehydrated()
-                                                ->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
-                                            TextInput::make('content.number')
-                                                ->label('Nº')
-                                                ->required()
-                                                ->validationAttribute('Número')
-                                                ->live(onBlur: true)
-                                                ->placeholder('Nº ou KM da obra')
-                                                ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
-                                        ])
-                                        ->visible(fn (Get $get) => filled($get('content.street'))),
-
-                                    Grid::make(12)
-                                        ->schema([
-                                            TextInput::make('content.neighborhood')->label('Bairro')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
-                                            TextInput::make('content.city')->label('Cidade')->columnSpan(5)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200']),
-                                            TextInput::make('content.state')->label('UF')->columnSpan(2)->disabled()->dehydrated()->extraInputAttributes(['class' => '!bg-zinc-100/80 !opacity-90 !cursor-not-allowed border-zinc-200 text-center']),
-                                        ])
-                                        ->visible(fn (Get $get) => filled($get('content.street'))),
-                                ])->collapsible(),
-
-                            Section::make('2. Seus Dados')
-                                ->description('Como podemos entrar em contato?')
-                                ->icon('heroicon-o-user')
-                                ->extraAttributes(['class' => 'shadow-none'])
-                                ->visible(fn (Get $get) => filled($get('content.street')))
-                                ->disabled(fn (Get $get) => ! \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode')))
-                                ->schema([
-                                    TextInput::make('content.customer_name')
-                                        ->label('Nome Completo')
-                                        ->required()
-                                        ->validationAttribute('Nome Completo')
-                                        ->live(onBlur: true)
-                                        ->placeholder('Nome do responsável pela obra')
-                                        ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
-                                    Grid::make(2)->schema([
-                                        TextInput::make('content.customer_phone')
-                                            ->label('WhatsApp')
-                                            ->tel()
-                                            ->mask('(99)99999-9999')
-                                            ->required()
-                                            ->validationAttribute('WhatsApp')
-                                            ->live(onBlur: true)
-                                            ->placeholder('(00) 00000-0000 - WhatsApp para retorno')
-                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
-                                        TextInput::make('content.customer_email')
-                                            ->label('E-mail')
-                                            ->email()
-                                            ->required()
-                                            ->validationAttribute('E-mail')
-                                            ->live(onBlur: true)
-                                            ->placeholder('E-mail para envio da proposta')
-                                            ->extraInputAttributes(['class' => '!bg-white shadow-sm']),
-                                    ]),
-                                ])->collapsible(),
-
-                            Section::make('3. Itens do Pedido')
-                                ->description('Quais produtos ou serviços você precisa?')
-                                ->icon('heroicon-o-shopping-bag')
-                                ->extraAttributes(['class' => 'shadow-none'])
-                                ->visible(fn (Get $get) => filled($get('content.street')))
-                                ->disabled(fn (Get $get) => ! \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode')))
-                                ->schema([
-                                    Repeater::make('content.products')
-                                        ->label('')
-                                        ->live()
-                                        ->itemLabel(fn (array $state): ?string => $this->getItemLabel($state))
-                                        ->schema([
-                                            Grid::make(2)->schema([
-                                                Select::make('product')
-                                                    ->label('Produto')
-                                                    ->options(Product::all()->pluck('name', 'id'))
-                                                    ->required()
-                                                    ->validationAttribute('Produto')
-                                                    ->live()
-                                                    ->afterStateUpdated(fn (Set $set) => $set('product_option', null)),
-                                                Select::make('product_option')
-                                                    ->label('Opção / Traço')
-                                                    ->options(fn (Get $get) => $this->getProductOptions($get))
-                                                    ->required(fn (Get $get) => $this->getProductOptions($get)->isNotEmpty())
-                                                    ->validationAttribute('Opção / Traço')
-                                                    ->hidden(fn (Get $get) => $this->getProductOptions($get)->isEmpty())
-                                                    ->live()
-                                                    ->afterStateUpdated(fn (Get $get, Set $set, $state) => $this->updatePrice($get, $set, $state)),
-                                            ]),
-                                            Grid::make(2)->schema([
-                                                Select::make('location')
-                                                    ->label('Local da Obra')
-                                                    ->options(Location::all()->pluck('name', 'id'))
-                                                    ->required()
-                                                    ->validationAttribute('Local da Obra')
-                                                    ->live(),
-                                                TextInput::make('quantity')
-                                                    ->label('Quantidade')
-                                                    ->numeric()
-                                                    ->required()
-                                                    ->default(1)
-                                                    ->validationAttribute('Quantidade')
-                                                    ->step(1)
-                                                    ->suffix(fn (Get $get) => $this->getUnitSuffix($get))
-                                                    ->live(debounce: 500)
-                                                    ->placeholder('Ex: 5')
-                                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                                        $set('quantity', ceil(floatval($state ?? 1)));
-                                                        $this->calculateItemSubtotal($get, $set);
-                                                        $this->calculateTotal($get, $set);
-                                                    }),
-                                                Hidden::make('price'),
-                                            ]),
-                                        ])
-                                        ->addActionLabel('Adicionar Item')
-                                        ->cloneable()
-                                        ->collapsible(),
-                                ])->collapsible(),
-                        ])->columnSpan(8),
-
-                        // Coluna da Direita (Resumo / Checkout Sidebar)
-                        Group::make([
-                            Section::make('Resumo do Orçamento')
-                                ->description('Confira os itens selecionados para sua obra.')
-                                ->icon('heroicon-o-shopping-cart')
-                                ->extraAttributes(['class' => 'shadow-none'])
-                                ->schema([
-                                    Placeholder::make('summary')
-                                        ->label('')
-                                        ->content(fn (Get $get) => view('livewire.budget-checkout-summary', [
-                                            'data' => ['content' => $get('content')],
-                                            'canSubmit' => \App\Services\OperationAreaService::isCepInOperationArea((string) $get('content.postcode'))
-                                        ])),
-                                ])
-                                ->extraAttributes(['class' => 'sticky top-24'])
-                        ])->columnSpan(4),
-                    ]),
-            ])
-            ->statePath('data');
+        $this->items[] = [
+            'id' => uniqid(),
+            'product_id' => '',
+            'option_id' => '',
+            'quantity' => 1,
+            'price' => 0,
+            'subtotal' => 0,
+            'min_quantity' => 1,
+            'unit' => '',
+            // Unidades como dia, hora e unidade só aceitam números inteiros
+            'decimal' => true,
+        ];
     }
 
-    protected function getItemLabel(array $state): string
+    public function removeItem($index)
     {
-        if (empty($state['product'])) return 'Novo Item';
-        $productName = Product::find($state['product'])?->name;
-        $optionName = $state['product_option'] ? ' · ' . ProductOption::find($state['product_option'])?->name : '';
-        $qty = $state['quantity'] ? ' (' . number_format(floatval($state['quantity']), 0, '', '') . ')' : '';
-        return $productName . $optionName . $qty;
+        unset($this->items[$index]);
+        $this->items = array_values($this->items);
+        if (empty($this->items)) {
+            $this->addItem();
+        }
+        $this->recalculateAll();
     }
 
-    protected function getPostcodeRules(): array
+    public function updatedItems($value, $name)
     {
-        return ['required', 'string', 'size:9', new CepInOperationAreaRule];
+        $parts = explode('.', $name);
+        if (count($parts) === 2) {
+            $index = $parts[0];
+            $field = $parts[1];
+
+            if (! isset($this->items[$index])) {
+                return;
+            }
+
+            if ($field === 'product_id') {
+                $this->items[$index]['option_id'] = '';
+                $this->items[$index]['unit'] = '';
+
+                $productId = $this->items[$index]['product_id'];
+                if ($productId) {
+                    $product = $this->getCachedProduct($productId);
+                    $min = (float) ($product?->min_quantity ?? 1);
+                    $this->items[$index]['min_quantity'] = $min;
+                    $this->items[$index]['quantity'] = $min;
+                    $this->items[$index]['decimal'] = $product?->allowsFractions() ?? true;
+                }
+            }
+
+            if ($field === 'quantity') {
+                $min = (float) ($this->items[$index]['min_quantity'] ?? 1);
+                $qty = (float) ($this->items[$index]['quantity'] ?: 0);
+                if (! ($this->items[$index]['decimal'] ?? true)) {
+                    $qty = ceil($qty);
+                }
+                $this->items[$index]['quantity'] = max($qty, $min);
+            }
+
+            // O preço e a unidade sempre vêm do banco, nunca do navegador
+            $option = $this->getCachedProductOption($this->items[$index]['option_id'] ?? null);
+            $this->items[$index]['price'] = (float) ($option?->price ?? 0);
+            $this->items[$index]['unit'] = $option?->unit?->value ?? '';
+
+            $qty = (float) ($this->items[$index]['quantity'] ?? 0);
+            $this->items[$index]['subtotal'] = BudgetCalculatorService::calculateItemSubtotal($qty, $this->items[$index]['price']);
+
+            $this->recalculateAll();
+        }
     }
 
-    public function create(): void
+    public function updatedPostcode($value)
     {
-        $this->form->validate();
-        $state = $this->form->getState();
+        $this->street = '';
+        $this->neighborhood = '';
+        $this->city = '';
+        $this->state = '';
+        $this->shipping = 0;
 
-        // Garantir que os totais estejam corretos antes de salvar e enviar e-mail
-        $products = $state['content']['products'] ?? [];
-        $shipping = (float) ($state['content']['shipping'] ?? 0);
-        $result = BudgetCalculatorService::calculateTotal($products, $shipping, 0, 0);
-        
-        $state['content']['quantity'] = $result['quantity'];
-        $state['content']['price'] = $result['price'];
-        $state['content']['subtotal'] = $result['subtotal'];
-        $state['content']['total'] = $result['total'];
-        
-        // Extract products for pivot table sync
-        $products = $state['content']['products'] ?? [];
-        
-        $budget = BudgetModel::create($state);
-        
-        // Save items to the pivot table (snapshot)
-        foreach ($products as $req) {
-            $budget->budgetItems()->create([
-                'product_id' => $req['product'] ?? null,
-                'product_option_id' => $req['product_option'] ?? null,
-                'location_id' => $req['location'] ?? null,
-                'quantity' => $req['quantity'] ?? 1,
-                'price' => $req['price'] ?? 0,
-                'subtotal' => $req['subtotal'] ?? 0,
-            ]);
+        $cep = preg_replace('/\D/', '', $value);
+        if (strlen($cep) === 8) {
+            $postcodeService = new PostcodeFinderService($value, function ($key, $val) {
+                $k = str_replace('content.', '', $key);
+                if (in_array($k, ['street', 'neighborhood', 'city', 'state'], true)) {
+                    $this->$k = $val ?? '';
+                }
+            });
+            $postcodeService->find();
+
+            $this->shipping = $this->shippingForPostcode($value);
+            $this->recalculateAll();
+        }
+    }
+
+    public function recalculateAll()
+    {
+        $result = BudgetCalculatorService::calculateTotal($this->formattedProducts(), $this->shipping, 0, 0);
+        $this->totalQuantity = $result['quantity'];
+        $this->subtotal = (float) $result['subtotal'];
+        $this->total = (float) $result['total'];
+    }
+
+    public function setStep($step)
+    {
+        // Não permite pular etapas sem validar as anteriores
+        if ($step >= 2) {
+            $this->validate($this->itemRules(), $this->itemMessages());
         }
 
-        \Illuminate\Support\Facades\Mail::to(User::first()?->email ?? config('mail.from.address'))
-            ->send(new \App\Mail\AdminNewBudgetMail($budget));
-        
+        if ($step >= 3) {
+            $this->validate($this->contactRules(), $this->contactMessages());
+        }
+
+        $this->currentStep = $step;
+    }
+
+    public function submit(TurnstileService $turnstile)
+    {
+        $rateKey = 'budget-submit:'.request()->ip();
+        if (RateLimiter::tooManyAttempts($rateKey, self::SUBMIT_MAX_ATTEMPTS)) {
+            $minutes = (int) ceil(RateLimiter::availableIn($rateKey) / 60);
+            $this->addError('submit', "Muitas solicitações enviadas. Tente novamente em {$minutes} minuto(s).");
+
+            return;
+        }
+
+        // Revalida tudo: o método pode ser chamado diretamente, sem passar pelas etapas
+        $this->validate(
+            array_merge($this->itemRules(), $this->contactRules()),
+            array_merge($this->itemMessages(), $this->contactMessages())
+        );
+
+        if ($turnstile->isEnabled() && ! $turnstile->verify($this->turnstileToken, request()->ip())) {
+            $this->turnstileToken = null;
+            $this->addError('turnstileToken', 'A verificação anti-spam falhou. Atualize a página.');
+            $this->dispatch('budget-turnstile-reset');
+
+            return;
+        }
+
+        RateLimiter::hit($rateKey, self::SUBMIT_DECAY_SECONDS);
+
+        // Recalcula preços e frete a partir do banco antes de gravar
+        $this->refreshPricesFromDatabase();
+        $this->shipping = $this->shippingForPostcode($this->postcode);
+        $this->recalculateAll();
+
+        $content = [
+            'products' => $this->formattedProducts(),
+            'customer_name' => trim($this->customer_name),
+            'customer_phone' => self::formatPhone($this->customer_phone),
+            'customer_email' => trim($this->customer_email),
+            'postcode' => $this->postcode,
+            'street' => $this->street,
+            'number' => trim($this->number),
+            'complement' => trim($this->complement),
+            'neighborhood' => $this->neighborhood,
+            'city' => $this->city,
+            'state' => $this->state,
+            'delivery_date' => $this->delivery_date ?: null,
+            'delivery_period' => $this->delivery_period ?: null,
+            'needs_pump' => $this->needs_pump ?: null,
+            'notes' => trim($this->notes),
+            'shipping' => $this->shipping,
+            'tax' => 0,
+            'discount' => 0,
+            'quantity' => $this->totalQuantity,
+            'price' => $this->items[0]['price'] ?? 0,
+            'subtotal' => $this->subtotal,
+            'total' => $this->total,
+        ];
+
+        $photoPaths = [];
+        foreach ($this->photos as $photo) {
+            $photoPaths[] = $photo->store('budget-documents', 'public');
+        }
+        if ($photoPaths) {
+            $content['photos'] = $photoPaths;
+        }
+
+        $budget = $this->createBudget($content);
+
+        $this->sendNotifications($budget);
+
+        $this->code = $budget->code;
         $this->isSubmitted = true;
     }
 
-    public function resetForm(): void
+    public function resetForm()
     {
-        $this->form->fill();
         $this->isSubmitted = false;
+        $this->currentStep = 1;
+        $this->items = [];
+        $this->addItem();
+        $this->customer_name = '';
+        $this->customer_phone = '';
+        $this->customer_email = '';
+        $this->postcode = '';
+        $this->street = '';
+        $this->number = '';
+        $this->complement = '';
+        $this->neighborhood = '';
+        $this->city = '';
+        $this->state = '';
+        $this->delivery_date = '';
+        $this->delivery_period = '';
+        $this->needs_pump = '';
+        $this->notes = '';
+        $this->shipping = 0;
+        $this->photos = [];
+        $this->turnstileToken = null;
+        $this->recalculateAll();
+        $this->code = '';
     }
 
-    public function render()
+    public function render(TurnstileService $turnstile)
     {
-        return view('livewire.budget');
+        return view('livewire.budget', [
+            'turnstileEnabled' => $turnstile->isEnabled(),
+            'turnstileSiteKey' => $turnstile->getSiteKey(),
+            'allProducts' => $this->getAllProductsPlucked(),
+            'deliveryPeriods' => self::DELIVERY_PERIODS,
+            'pumpOptions' => self::PUMP_OPTIONS,
+        ]);
     }
 
-    private function getProductOptions(Get $get): Collection
+    /**
+     * Formata o telefone no padrão (99) 99999-9999 ou (99) 9999-9999.
+     */
+    public static function formatPhone(string $phone): string
     {
-        return ProductOption::where('product_id', '=', $get('product'))->get()->pluck('name', 'id');
+        $digits = preg_replace('/\D/', '', $phone);
+
+        return match (strlen($digits)) {
+            11 => sprintf('(%s) %s-%s', substr($digits, 0, 2), substr($digits, 2, 5), substr($digits, 7)),
+            10 => sprintf('(%s) %s-%s', substr($digits, 0, 2), substr($digits, 2, 4), substr($digits, 6)),
+            default => trim($phone),
+        };
     }
 
-    private function calculateTotal(Get|\Closure $get, Set $set): void
+    protected function itemRules(): array
     {
-        $products = $get('content.products') ?? [];
-        $shipping = (float) ($get('content.shipping') ?? 0);
-        $result = BudgetCalculatorService::calculateTotal($products, $shipping, 0, 0);
-        $set('content.quantity', $result['quantity']);
-        $set('content.price', $result['price']);
-        $set('content.subtotal', $result['subtotal']);
-        $set('content.total', $result['total']);
+        return [
+            'items' => 'required|array|min:1|max:20',
+            'items.*.product_id' => [
+                'required',
+                Rule::exists('products', 'id')->where('is_active', true)->whereNull('deleted_at'),
+            ],
+            'items.*.option_id' => [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    $index = explode('.', $attribute)[1];
+                    $productId = $this->items[$index]['product_id'] ?? null;
+
+                    $belongsToProduct = ProductOption::query()
+                        ->whereKey($value)
+                        ->where('product_id', $productId)
+                        ->where('is_active', true)
+                        ->exists();
+
+                    if (! $belongsToProduct) {
+                        $fail('Selecione uma opção válida para este produto.');
+                    }
+                },
+            ],
+            'items.*.quantity' => [
+                'required',
+                'numeric',
+                'min:0.5',
+                'max:10000',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    $index = explode('.', $attribute)[1];
+                    $product = $this->getCachedProduct($this->items[$index]['product_id'] ?? null);
+                    $min = (float) ($product?->min_quantity ?? 1);
+
+                    if ((float) $value < $min) {
+                        $fail('A quantidade mínima para este produto é '.BudgetCalculatorService::formatQuantityWithUnit($min, $product?->unit?->value).'.');
+                    }
+
+                    if ($product && ! $product->allowsFractions() && floor((float) $value) != (float) $value) {
+                        $fail('Para '.$product->name.', informe uma quantidade inteira (sem frações).');
+                    }
+                },
+            ],
+            'photos' => 'array|max:4',
+            'photos.*' => 'image|max:4096',
+        ];
     }
 
-    public function applyShippingFromCep(?string $postcode, Set $set): void
+    protected function itemMessages(): array
     {
-        if (empty($postcode) || strlen(preg_replace('/\D/', '', $postcode)) < 8) return;
-        $result = OperationAreaService::resultForCep($postcode);
-        $fee = $result['shipping_fee'] ?? 0;
-        $set('content.shipping', (string) $fee);
-        $get = fn (string $key) => data_get($this->data, $key);
-        $this->calculateTotal($get, $set);
+        return [
+            'items.*.product_id.required' => 'Selecione o produto.',
+            'items.*.product_id.exists' => 'Este produto não está mais disponível.',
+            'items.*.option_id.required' => 'Selecione uma opção.',
+            'items.*.quantity.required' => 'Informe a quantidade.',
+            'items.*.quantity.numeric' => 'A quantidade deve ser um número.',
+            'items.*.quantity.min' => 'A quantidade mínima é 0,5.',
+            'items.*.quantity.max' => 'Quantidade muito alta. Fale com a nossa equipe.',
+            'photos.max' => 'Você pode enviar no máximo 4 fotos.',
+            'photos.*.image' => 'Os arquivos devem ser imagens.',
+            'photos.*.max' => 'Cada foto deve ter no máximo 4MB.',
+        ];
     }
 
-    private function updatePrice(Get $get, Set $set, $productId): void
+    protected function contactRules(): array
     {
-        $price = $productId ? (ProductOption::find($productId)?->price ?? 0) : 0;
-        $set('quantity', null);
-        $set('price', $price);
-        $this->calculateItemSubtotal($get, $set);
-        $this->calculateTotal($get, $set);
+        return [
+            'customer_name' => 'required|string|min:2|max:255',
+            'customer_phone' => [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    $digits = strlen(preg_replace('/\D/', '', (string) $value));
+                    if ($digits < 10 || $digits > 11) {
+                        $fail('Informe um telefone válido com DDD.');
+                    }
+                },
+            ],
+            'customer_email' => 'required|email|max:255',
+            'postcode' => ['required', 'string', 'size:9', new CepInOperationAreaRule],
+            'number' => 'required|string|max:20',
+            'complement' => 'nullable|string|max:255',
+            'delivery_date' => 'nullable|date|after_or_equal:today',
+            'delivery_period' => ['nullable', Rule::in(array_keys(self::DELIVERY_PERIODS))],
+            'needs_pump' => ['nullable', Rule::in(array_keys(self::PUMP_OPTIONS))],
+            'notes' => 'nullable|string|max:1000',
+        ];
     }
 
-    private function getUnitSuffix(Get $get): string
+    protected function contactMessages(): array
     {
-        return ProductOption::find($get('product_option'))?->unit?->value ?? '';
+        return [
+            'customer_name.required' => 'Informe seu nome.',
+            'customer_phone.required' => 'Informe seu WhatsApp.',
+            'customer_email.required' => 'Informe seu e-mail.',
+            'customer_email.email' => 'Informe um e-mail válido.',
+            'postcode.required' => 'Informe o CEP da obra.',
+            'postcode.size' => 'Informe o CEP completo (00000-000).',
+            'number.required' => 'Informe o número (ou S/N).',
+            'delivery_date.after_or_equal' => 'A data de entrega não pode estar no passado.',
+            'notes.max' => 'As observações devem ter no máximo 1000 caracteres.',
+        ];
     }
 
-    private function calculateItemSubtotal(Get $get, Set $set): void
+    /**
+     * Busca o preço e a unidade de cada item diretamente no banco (sem cache).
+     */
+    protected function refreshPricesFromDatabase(): void
     {
-        $quantity = floatval($get('quantity') ?? 0);
-        $price = floatval($get('price') ?? 0);
-        $set('subtotal', BudgetCalculatorService::calculateItemSubtotal($quantity, $price));
+        $options = ProductOption::whereIn('id', collect($this->items)->pluck('option_id')->filter())
+            ->get()
+            ->keyBy('id');
+
+        foreach ($this->items as $index => $item) {
+            $option = $options->get($item['option_id']);
+            $price = (float) ($option?->price ?? 0);
+            $quantity = (float) $item['quantity'];
+
+            $this->items[$index]['quantity'] = $quantity;
+            $this->items[$index]['price'] = $price;
+            $this->items[$index]['unit'] = $option?->unit?->value ?? '';
+            $this->items[$index]['subtotal'] = BudgetCalculatorService::calculateItemSubtotal($quantity, $price);
+        }
+    }
+
+    protected function formattedProducts(): array
+    {
+        return collect($this->items)->map(fn ($i) => [
+            'product' => $i['product_id'],
+            'product_option' => $i['option_id'],
+            'quantity' => $i['quantity'],
+            'price' => $i['price'],
+            'subtotal' => $i['subtotal'],
+        ])->toArray();
+    }
+
+    protected function shippingForPostcode(string $postcode): float
+    {
+        return (float) (OperationAreaService::resultForCep($postcode)['shipping_fee'] ?? 0);
+    }
+
+    /**
+     * Cria o orçamento, os itens e os anexos numa transação.
+     * Se dois pedidos chegarem ao mesmo tempo com o mesmo código, gera outro e tenta de novo.
+     */
+    protected function createBudget(array $content): BudgetModel
+    {
+        $attempts = 0;
+
+        while (true) {
+            try {
+                return DB::transaction(function () use ($content) {
+                    $budget = BudgetModel::create([
+                        'user_id' => null,
+                        'content' => $content,
+                    ]);
+
+                    foreach ($this->items as $item) {
+                        $budget->budgetItems()->create([
+                            'product_id' => $item['product_id'],
+                            'product_option_id' => $item['option_id'],
+                            'location_id' => null,
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price'],
+                            'subtotal' => $item['subtotal'],
+                        ]);
+                    }
+
+                    foreach ($content['photos'] ?? [] as $index => $photoPath) {
+                        $fullPath = storage_path('app/public/'.$photoPath);
+                        if (file_exists($fullPath)) {
+                            $budget->documents()->create([
+                                'title' => 'Foto do Local (Anexo '.($index + 1).')',
+                                'description' => 'Foto recebida via formulário.',
+                                'file_path' => $photoPath,
+                                'file_name' => basename($photoPath),
+                                'file_size' => filesize($fullPath),
+                                'file_type' => mime_content_type($fullPath),
+                            ]);
+                        }
+                    }
+
+                    return $budget;
+                });
+            } catch (UniqueConstraintViolationException $e) {
+                if (++$attempts >= 3) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    /**
+     * Falhas de e-mail não podem impedir o pedido: ele já está salvo.
+     */
+    protected function sendNotifications(BudgetModel $budget): void
+    {
+        try {
+            Mail::to(User::first()?->email ?? config('mail.from.address'))
+                ->send(new AdminNewBudgetMail($budget));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        try {
+            Mail::to($budget->content['customer_email'])
+                ->send(new CustomerBudgetReceivedMail($budget));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    protected function getCachedProduct($id)
+    {
+        if (! $id) {
+            return null;
+        }
+        if (! array_key_exists($id, $this->productsCache)) {
+            $this->productsCache[$id] = Cache::remember(Product::cacheKey($id), 86400, fn () => Product::find($id));
+        }
+
+        return $this->productsCache[$id];
+    }
+
+    protected function getCachedProductOption($id)
+    {
+        if (! $id) {
+            return null;
+        }
+        if (! array_key_exists($id, $this->productOptionsCache)) {
+            $this->productOptionsCache[$id] = Cache::remember(ProductOption::cacheKey($id), 86400, fn () => ProductOption::find($id));
+        }
+
+        return $this->productOptionsCache[$id];
+    }
+
+    protected function getAllProductsPlucked()
+    {
+        return Cache::remember(Product::CATALOG_CACHE_KEY, 86400, fn () => Product::where('is_active', true)
+            ->whereHas('productOption', fn ($q) => $q->where('is_active', true))
+            ->orderBy('sort')
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->toArray());
+    }
+
+    public function getOptionsForProduct($productId)
+    {
+        if (! $productId) {
+            return [];
+        }
+
+        return Cache::remember(ProductOption::catalogCacheKey($productId), 86400, fn () => ProductOption::where('product_id', $productId)
+            ->where('is_active', true)
+            ->orderBy('sort')
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->toArray());
     }
 }

@@ -62,9 +62,31 @@
                                                     <span style="font-size: 16px; font-weight: 600; color: #1e293b;">{{ $customerPhone }}</span>
                                                 </td>
                                             </tr>
+                                            @php
+                                                $content = $budget->content ?? [];
+                                                $deliveryDate = !empty($content['delivery_date']) ? \Illuminate\Support\Carbon::parse($content['delivery_date'])->format('d/m/Y') : null;
+                                                $deliveryPeriod = \App\Livewire\Budget::DELIVERY_PERIODS[$content['delivery_period'] ?? ''] ?? null;
+                                                $needsPump = \App\Livewire\Budget::PUMP_OPTIONS[$content['needs_pump'] ?? ''] ?? null;
+                                            @endphp
+                                            @if ($deliveryDate || $deliveryPeriod || $needsPump)
+                                                <tr>
+                                                    <td style="padding: 20px 0; border-bottom: 1px solid #e2e8f0;">
+                                                        <span style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Entrega</span>
+                                                        <span style="font-size: 16px; font-weight: 600; color: #1e293b;">{{ collect([$deliveryDate, $deliveryPeriod, $needsPump])->filter()->implode(' · ') }}</span>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                            @if (!empty($content['notes']))
+                                                <tr>
+                                                    <td style="padding: 20px 0; border-bottom: 1px solid #e2e8f0;">
+                                                        <span style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Observações do cliente</span>
+                                                        <span style="font-size: 14px; color: #1e293b;">{{ $content['notes'] }}</span>
+                                                    </td>
+                                                </tr>
+                                            @endif
                                             <tr>
                                                 <td style="padding: 20px 0;">
-                                                    <span style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Valor Estimado <small style="font-weight: 400; text-transform: none; color: #cbd5e1;">(Sem frete e outras despesas)</small></span>
+                                                    <span style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Valor Estimado <small style="font-weight: 400; text-transform: none; color: #cbd5e1;">(Itens + frete, sem taxas ou descontos)</small></span>
                                                     <span style="font-size: 24px; font-weight: 800; color: #0284c7;">R$ {{ number_format($totalValue, 2, ',', '.') }}</span>
                                                 </td>
                                             </tr>

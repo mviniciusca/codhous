@@ -10,6 +10,7 @@
     ];
 @endphp
 
+@if(!\App\Models\ContentSection::isHidden('hero'))
 <section class="relative flex min-h-[90vh] items-center overflow-hidden bg-foreground pt-16">
     <div class="pointer-events-none absolute inset-0 opacity-5">
         <div class="absolute left-1/4 top-0 h-full w-px bg-background"></div>
@@ -73,3 +74,4 @@
         </div>
     </div>
 </section>
+@endif

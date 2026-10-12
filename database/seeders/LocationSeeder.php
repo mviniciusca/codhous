@@ -16,18 +16,16 @@ class LocationSeeder extends Seeder
         Location::query()->delete();
 
         $locations = [
-            'Laje (Térreo)',
-            'Laje (Superior)',
-            'Vigas e Pilares',
-            'Piso Industrial',
-            'Piso de Garagem / Estacionamento',
-            'Fundação / Sapata / Bloco',
-            'Calçada / Acesso',
-            'Escada',
-            'Capa de Laje (Treliçada)',
-            'Enchimento de Piso',
-            'Muro de Arrimo',
+            'Baldrame',
+            'Calçada',
+            'Estaca Hélice',
+            'Fundação',
+            'Guia/Sarjeta',
+            'Laje',
+            'Piso',
+            'Piscina',
             'Radier',
+            'Outros',
         ];
 
         foreach ($locations as $location) {

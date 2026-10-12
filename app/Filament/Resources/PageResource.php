@@ -11,9 +11,19 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use App\Filament\Resources\PageResource\Pages;
+use App\Filament\Resources\PageResource\PageTemplates;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PageResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Website;
+    }
+
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
@@ -41,67 +51,195 @@ class PageResource extends Resource
     {
         return $form
             ->schema([
+                // As abas ficam no cabeçalho do editor (resources/views/filament/page-builder/editor.blade.php);
+                // os painéis só são escondidos via Alpine para que tudo continue sendo salvo.
                 Forms\Components\Group::make()
+                    ->extraAttributes(['x-show' => "tab === 'content'"])
+                    ->columnSpanFull()
                     ->schema([
-                        Forms\Components\Section::make(__('Conteúdo da Página'))
-                            ->schema([
-                                Forms\Components\Builder::make('content')
-                                    ->label(__('Blocos de Conteúdo'))
-                                        ->blocks([
-                                            self::getPageHeaderBlock(),
-                                            self::getHeroBlock(),
-                                            self::getCalculatorBlock(),
-                                            self::getBudgetFormBlock(),
-                                            self::getPartnersBlock(),
-                                            self::getServicesBlock(),
-                                            self::getTimelineBlock(),
-                                            self::getShowcaseBlock(),
-                                            self::getFaqBlock(),
-                                            self::getTestimonialsBlock(),
-                                            self::getCoverageBlock(),
-                                            self::getContactFormBlock(),
-                                            self::getContactBannerBlock(),
-                                            self::getMapBlock(),
-                                            self::getDifferentialsBlock(),
-                                            self::getCtaBlock(),
-                                            self::getRichTextBlock(),
-                                            self::getModuleReferenceBlock(),
-                                        ])
-                                    ->collapsible()
-                                    ->collapsed(),
-                            ]),
-                    ])->columnSpan(['lg' => 2]),
+                        Forms\Components\Builder::make('content')
+                            ->label('')
+                            ->addActionLabel(__('Adicionar Novo Bloco'))
+                            ->blocks([
+                                self::getPageHeaderBlock(),
+                                self::getServicesBlock(),
+                                self::getDifferentialsBlock(),
+                                self::getShowcaseBlock(),
+                                self::getEquipmentShowcaseBlock(),
+                                self::getPartnersBlock(),
+                                self::getTimelineBlock(),
+                                self::getFaqBlock(),
+                                self::getTestimonialsBlock(),
+                                self::getCoverageBlock(),
+                                self::getCtaBlock(),
+                                self::getContactBannerBlock(),
+                                self::getMapBlock(),
+                                self::getRichTextBlock(),
+                                self::getPaymentOfferBlock(),
+                                self::getModuleReferenceBlock(),
+                                self::getStatsBlock(),
+                                self::getImageWithTextBlock(),
+                                self::getDataTableBlock(),
+                                self::getFeaturedTestimonialBlock(),
+                                self::getCardsBlock(),
+                            ])
+                            ->collapsible()
+                            ->collapsed()
+                            ->cloneable()
+                            ->blockPickerColumns(2)
+                            ->blockNumbers(false)
+                            ->blockPreviews()
+                            ->registerActions([self::getLoadTemplateAction()])
+                            // Layout estilo WordPress: Blocos | Live Preview | Estrutura
+                            ->view('filament.forms.components.page-builder')
+                            // Adiciona o bloco direto (com valores padrão) e abre o painel de edição.
+                            // O `blockPreviews()` injeta o schema do bloco como form da ação de adicionar,
+                            // o que valida campos obrigatórios antes de inserir (e falha em silêncio com o
+                            // modal oculto). Removemos o form: a validação acontece no painel de edição/salvar.
+                            ->addAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action
+                                ->form(null)
+                                ->modalHidden()
+                                ->after(function (\Filament\Forms\Components\Builder $component, $livewire): void {
+                                    $uuid = array_key_last($component->getState() ?? []);
+
+                                    if (filled($uuid)) {
+                                        $livewire->dispatch('page-builder-block-added', uuid: (string) $uuid);
+                                    }
+                                }))
+                            // Painel lateral de edição: mantém o live preview visível enquanto edita
+                            ->editAction(fn (\Filament\Forms\Components\Actions\Action $action) => $action
+                                ->slideOver()
+                                ->modalWidth(\Filament\Support\Enums\MaxWidth::TwoExtraLarge)
+                                ->modalHeading(function (array $arguments, \Filament\Forms\Components\Builder $component): string {
+                                    $type = $component->getState()[$arguments['item'] ?? '']['type'] ?? null;
+                                    $label = $type ? $component->getBlock($type)?->getLabel() : null;
+
+                                    return 'Editar: ' . ($label ?? 'Bloco');
+                                })
+                                ->modalDescription('As alterações aparecem no preview em tempo real. Clique em "Aplicar" para confirmar.')
+                                ->modalSubmitActionLabel('Aplicar')
+                                ->closeModalByClickingAway(false)
+                                ->extraModalWindowAttributes(['class' => 'pb-inspector'])),
+                    ]),
 
                 Forms\Components\Group::make()
-                    ->schema([
-                        Forms\Components\Section::make(__('Configurações'))
-                            ->schema([
-                                Forms\Components\TextInput::make('title')
-                                    ->label(__('Título da Página'))
-                                    ->required()
-                                    ->lazy()
-                                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                                Forms\Components\TextInput::make('slug')
-                                    ->label(__('Slug'))
-                                    ->required()
-                                    ->unique(ignoreRecord: true),
+                    ->extraAttributes(['x-show' => "tab === 'settings'", 'x-cloak' => true, 'class' => 'pe-settings'])
+                    ->columnSpanFull()
+                    ->schema(self::getSettingsSchema()),
+            ]);
+    }
 
-                                Forms\Components\Toggle::make('is_visible')
-                                    ->label(__('Página Visível'))
-                                    ->default(true),
-                                Forms\Components\TextInput::make('sort_order')
-                                    ->label(__('Ordem'))
-                                    ->numeric()
-                                    ->default(0),
-                            ]),
-                        
-                        Forms\Components\Section::make(__('SEO'))
-                            ->schema([
-                                Forms\Components\Textarea::make('meta.description')
-                                    ->label(__('Meta Descrição')),
-                            ])->collapsed(),
-                    ])->columnSpan(['lg' => 1]),
-            ])->columns(3);
+    protected static function getSettingsSchema(): array
+    {
+        $host = preg_replace('#^https?://#', '', url('/')) . '/';
+
+        return [
+            Forms\Components\Grid::make(['default' => 1, 'lg' => 3])->schema([
+                Forms\Components\Group::make()->columnSpan(['lg' => 2])->schema([
+                    Forms\Components\Section::make(__('Página'))
+                        ->description(__('Nome e endereço da página no site.'))
+                        ->icon('heroicon-o-document-text')
+                        ->schema([
+                            Forms\Components\TextInput::make('title')
+                                ->label(__('Nome da página'))
+                                ->helperText(__('Usado no menu, no topo da página e na aba do navegador.'))
+                                ->placeholder(__('Ex.: Sobre a empresa'))
+                                ->required()
+                                ->maxLength(120)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function (Set $set, Forms\Get $get, ?string $old, ?string $state, string $operation): void {
+                                    // Só sugere o endereço em páginas novas e enquanto ele não foi editado à mão
+                                    if ($operation === 'create' && (blank($get('slug')) || $get('slug') === Str::slug((string) $old))) {
+                                        $set('slug', Str::slug((string) $state));
+                                    }
+                                }),
+                            Forms\Components\TextInput::make('slug')
+                                ->label(__('Endereço'))
+                                ->prefix($host)
+                                ->placeholder(fn (?Page $record) => $record?->isHomepage() ? __('página inicial') : 'sobre-a-empresa')
+                                ->formatStateUsing(fn (?string $state, ?Page $record) => $record?->isHomepage() ? null : $state)
+                                ->disabled(fn (?Page $record) => (bool) $record?->isHomepage())
+                                ->required(fn (?Page $record) => ! $record?->isHomepage())
+                                ->regex('/^[a-z0-9]+(?:[-\/][a-z0-9]+)*$/')
+                                ->validationMessages([
+                                    'regex' => __('Use apenas letras minúsculas, números e hífens (ex.: sobre-a-empresa).'),
+                                    'unique' => __('Já existe uma página com este endereço.'),
+                                ])
+                                ->unique(ignoreRecord: true, modifyRuleUsing: fn (\Illuminate\Validation\Rules\Unique $rule) => $rule->withoutTrashed())
+                                ->helperText(fn (?Page $record, string $operation) => match (true) {
+                                    (bool) $record?->isHomepage() => __('Esta é a página inicial do site, por isso o endereço é fixo.'),
+                                    $operation === 'create' => __('Gerado a partir do nome. Use letras minúsculas, números e hífens.'),
+                                    default => __('Atenção: mudar o endereço quebra links que já foram compartilhados.'),
+                                }),
+                        ]),
+
+                    Forms\Components\Section::make(__('Visibilidade'))
+                        ->description(__('Quem vê a página e onde ela aparece. Vale a partir da próxima publicação.'))
+                        ->icon('heroicon-o-eye')
+                        ->columns(['default' => 1, 'md' => 2])
+                        ->schema([
+                            Forms\Components\Toggle::make('is_visible')
+                                ->label(__('Visível para os visitantes'))
+                                ->helperText(__('Desligada, a página fica acessível só pelo painel.'))
+                                ->onIcon('heroicon-m-eye')
+                                ->offIcon('heroicon-m-eye-slash')
+                                ->default(true),
+                            Forms\Components\Toggle::make('is_active_in_menu')
+                                ->label(__('Mostrar no menu do site'))
+                                ->helperText(__('Adiciona um link no menu do topo com o nome da página.'))
+                                ->onIcon('heroicon-m-bars-3')
+                                ->default(true),
+                        ]),
+
+                    Forms\Components\Section::make(__('Aparência no Google e nas redes sociais'))
+                        ->description(__('Como a página aparece nas buscas e quando alguém compartilha o link.'))
+                        ->icon('heroicon-o-magnifying-glass')
+                        ->schema([
+                            Forms\Components\TextInput::make('meta.title')
+                                ->label(__('Título na busca'))
+                                ->placeholder(fn (Forms\Get $get) => $get('title'))
+                                ->helperText(__('Opcional. Em branco, usa o nome da página. Ideal: até 60 caracteres.'))
+                                ->maxLength(120),
+                            Forms\Components\Textarea::make('meta.description')
+                                ->label(__('Descrição na busca'))
+                                ->placeholder(__('Ex.: Concreto usinado com entrega no horário para obras de todos os portes. Peça seu orçamento online.'))
+                                ->helperText(__('Resuma em uma ou duas frases o que o visitante encontra aqui. Ideal: 120 a 160 caracteres.'))
+                                ->rows(3)
+                                ->autosize()
+                                ->maxLength(320),
+                            Forms\Components\FileUpload::make('meta.og_image')
+                                ->label(__('Imagem ao compartilhar'))
+                                ->helperText(__('Aparece no WhatsApp, Facebook e LinkedIn. Tamanho ideal: 1200 × 630 px.'))
+                                ->image()
+                                ->imageEditor()
+                                ->directory('seo'),
+                        ]),
+
+                    Forms\Components\Section::make(__('Avançado'))
+                        ->icon('heroicon-o-cog-6-tooth')
+                        ->collapsible()
+                        ->collapsed()
+                        ->columns(['default' => 1, 'md' => 2])
+                        ->schema([
+                            Forms\Components\TextInput::make('sort_order')
+                                ->label(__('Posição no menu'))
+                                ->helperText(__('Número menor aparece antes. Também dá para arrastar na lista de páginas.'))
+                                ->numeric()
+                                ->default(0),
+                            Forms\Components\TextInput::make('meta.keywords')
+                                ->label(__('Palavras-chave'))
+                                ->helperText(__('Opcional, separadas por vírgula. O Google não usa mais este campo.')),
+                        ]),
+                ]),
+
+                Forms\Components\View::make('filament.page-builder.seo-preview')
+                    ->columnSpan(['lg' => 1])
+                    ->viewData([
+                        'siteName' => (string) (\App\Models\Setting::get('website.name') ?: config('app.name')),
+                        'host' => rtrim($host, '/'),
+                    ]),
+            ]),
+        ];
     }
 
     public static function table(Table $table): Table
@@ -119,9 +257,22 @@ class PageResource extends Resource
                     ->badge()
                     ->color('gray'),
 
-                Tables\Columns\IconColumn::make('is_visible')
-                    ->label(__('Visível'))
-                    ->boolean()
+                Tables\Columns\TextColumn::make('is_visible')
+                    ->label(__('Situação'))
+                    ->badge()
+                    ->formatStateUsing(fn (Page $record): string => match (true) {
+                        ! $record->published_at => __('Rascunho'),
+                        ! $record->is_visible => __('Oculta'),
+                        default => __('Publicada'),
+                    })
+                    ->color(fn (Page $record): string => match (true) {
+                        ! $record->published_at => 'warning',
+                        ! $record->is_visible => 'gray',
+                        default => 'success',
+                    })
+                    ->description(fn (Page $record): ?string => $record->published_at && $record->hasDraft()
+                        ? __('Alterações não publicadas')
+                        : null)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('Ordem'))
@@ -130,15 +281,19 @@ class PageResource extends Resource
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
             ->filters([
-                //
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -152,292 +307,779 @@ class PageResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
+    /**
+     * Ação "Templates" do Page Builder. Registrada no próprio Builder para poder ser
+     * disparada de dentro do layout customizado (cabeçalho da Estrutura e estado vazio).
+     */
+    protected static function getLoadTemplateAction(): Forms\Components\Actions\Action
+    {
+        return Forms\Components\Actions\Action::make('loadTemplate')
+            ->label(__('Templates'))
+            ->icon('heroicon-m-sparkles')
+            ->modalIcon('heroicon-o-sparkles')
+            ->modalHeading(__('Biblioteca de templates'))
+            ->modalDescription(__('Escolha uma estrutura pronta. Os textos são sugestões: edite cada bloco depois de aplicar.'))
+            ->modalWidth(\Filament\Support\Enums\MaxWidth::SixExtraLarge)
+            ->modalSubmitActionLabel(__('Aplicar template'))
+            ->form(fn (Forms\Components\Builder $component): array => [
+                Forms\Components\ViewField::make('template')
+                    ->hiddenLabel()
+                    ->required()
+                    ->validationMessages(['required' => __('Selecione um template.')])
+                    ->view('filament.forms.components.page-template-picker')
+                    ->viewData([
+                        'templates' => PageTemplates::summaries($component),
+                        'categories' => PageTemplates::CATEGORIES,
+                    ]),
+                Forms\Components\ToggleButtons::make('behavior')
+                    ->label(__('O que fazer com os blocos atuais?'))
+                    ->options([
+                        'append' => __('Adicionar ao final'),
+                        'replace' => __('Substituir tudo'),
+                    ])
+                    ->icons([
+                        'append' => 'heroicon-m-plus',
+                        'replace' => 'heroicon-m-arrow-path',
+                    ])
+                    ->colors([
+                        'append' => 'primary',
+                        'replace' => 'danger',
+                    ])
+                    ->default('append')
+                    ->inline()
+                    ->required()
+                    ->visible(filled($component->getState())),
+            ])
+            ->action(function (array $data, Forms\Components\Builder $component): void {
+                $template = PageTemplates::find($data['template'] ?? null);
+
+                if (! $template) {
+                    return;
+                }
+
+                ['blocks' => $blocks, 'skipped' => $skipped] = PageTemplates::resolve($template);
+
+                $items = ($data['behavior'] ?? 'replace') === 'replace' ? [] : ($component->getState() ?? []);
+
+                foreach ($blocks as $block) {
+                    $uuid = $component->generateUuid();
+                    $items[$uuid] = ['type' => $block['type'], 'data' => []];
+                    $component->state($items);
+
+                    // Preenche os valores padrão do bloco e aplica o conteúdo do template por cima,
+                    // passando pelos hooks de hidratação (ex.: Repeater gera as chaves dos itens).
+                    $container = $component->getChildComponentContainer($uuid);
+                    $container->fill();
+                    $container->fill(array_merge($container->getRawState(), $block['data']));
+
+                    $items = $component->getState();
+                }
+
+                $component->state($items);
+                $component->callAfterStateUpdated();
+
+                $body = trans_choice('{1} :count bloco adicionado.|[2,*] :count blocos adicionados.', count($blocks), ['count' => count($blocks)]);
+
+                if ($skipped) {
+                    $body .= ' ' . __('Ignorados por falta de seção global ativa: :list. Cadastre-as em "Seções do site".', ['list' => implode(', ', $skipped)]);
+                }
+
+                \Filament\Notifications\Notification::make()
+                    ->title(__('Template ":name" aplicado', ['name' => $template['label']]))
+                    ->body($body)
+                    ->status($skipped ? 'warning' : 'success')
+                    ->send();
+            });
+    }
+
     // Block Definitions
 
-    protected static function getHeroBlock(): Forms\Components\Builder\Block
+    protected static function getBlockTabs(array $contentSchema, array $styleSchema = [], array $advancedSchema = []): array
     {
-        return Forms\Components\Builder\Block::make('hero')
-            ->label(__('Hero (Destaque Principal)'))
-            ->icon('heroicon-o-presentation-chart-line')
-            ->schema([
-                Forms\Components\Select::make('layout')
-                    ->options([
-                        'default' => 'Padrão (Texto + CEP)',
-                        'whatsapp' => 'WhatsApp (Texto Central)',
-                    ])->default('default'),
-                Forms\Components\TextInput::make('badge')->label('Texto do Badge'),
-                Forms\Components\Repeater::make('slides')
-                    ->schema([
-                        Forms\Components\TextInput::make('title')->required(),
-                        Forms\Components\Textarea::make('subtitle'),
-                        Forms\Components\FileUpload::make('image')->image()->directory('hero'),
-                    ])->minItems(1),
-                Forms\Components\Repeater::make('stats')
-                    ->schema([
-                        Forms\Components\TextInput::make('value')->required(),
-                        Forms\Components\TextInput::make('label')->required(),
-                    ])->columns(2),
-            ]);
+        return [
+            \Filament\Forms\Components\Tabs::make('Tabs')
+                ->tabs([
+                    \Filament\Forms\Components\Tabs\Tab::make('Conteúdo')
+                        ->icon('heroicon-o-document-text')
+                        ->schema($contentSchema),
+                    \Filament\Forms\Components\Tabs\Tab::make('Estilo')
+                        ->icon('heroicon-o-paint-brush')
+                        ->schema(array_merge([
+                            \Filament\Forms\Components\ToggleButtons::make('background_color')
+                                ->label(__('Cor de Fundo da Seção'))
+                                ->helperText(__('Escolha a cor predominante no fundo deste bloco.'))
+                                ->options([
+                                    'bg-white' => 'Branco',
+                                    'bg-background' => 'Padrão',
+                                    'bg-muted/30' => 'Cinza Claro',
+                                    'bg-primary' => 'Primária',
+                                    'bg-foreground' => 'Escuro',
+                                ])
+                                ->icons([
+                                    'bg-white' => 'heroicon-o-sun',
+                                    'bg-background' => 'heroicon-o-stop',
+                                    'bg-muted/30' => 'heroicon-o-stop',
+                                    'bg-primary' => 'heroicon-o-star',
+                                    'bg-foreground' => 'heroicon-o-moon',
+                                ])
+                                ->default('bg-white')
+                                ->inline(),
+                            \Filament\Forms\Components\ToggleButtons::make('text_color')
+                                ->label(__('Esquema de Cores (Texto)'))
+                                ->helperText(__('Define se os textos devem ser escuros ou brancos para contrastar com o fundo.'))
+                                ->options([
+                                    'light' => 'Claro (Texto Escuro)',
+                                    'dark' => 'Escuro (Texto Branco)',
+                                ])
+                                ->icons([
+                                    'light' => 'heroicon-o-sun',
+                                    'dark' => 'heroicon-o-moon',
+                                ])
+                                ->default('light')
+                                ->inline(),
+                            ...static::getSpacingFields(),
+                        ], $styleSchema)),
+                    \Filament\Forms\Components\Tabs\Tab::make('Avançado')
+                        ->icon('heroicon-o-cog-8-tooth')
+                        ->schema(array_merge([
+                            \Filament\Forms\Components\TextInput::make('custom_id')
+                                ->label(__('ID da Seção (HTML)'))
+                                ->prefixIcon('heroicon-o-hashtag')
+                                ->helperText(__('Útil para links âncora no menu. Ex: "sobre-nos"')),
+                            \Filament\Forms\Components\TextInput::make('custom_css_classes')
+                                ->label(__('Classes CSS Extras'))
+                                ->prefixIcon('heroicon-o-code-bracket')
+                                ->helperText(__('Classes do Tailwind para desenvolvedores fazerem ajustes finos. Ex: "pb-0 pt-32"')),
+                        ], $advancedSchema)),
+                ])
+                ->contained(false)
+        ];
+    }
+
+    /**
+     * Espaçamento vertical da seção (escala em App\Support\SectionStyle).
+     * Vazio = padrão do bloco.
+     */
+    public static function getSpacingFields(string $prefix = ''): array
+    {
+        $field = fn (string $name, string $label, string $help) => \Filament\Forms\Components\ToggleButtons::make($prefix.$name)
+            ->label($label)
+            ->helperText($help)
+            ->options(\App\Support\SectionStyle::SPACING_LABELS)
+            ->inline()
+            ->grouped();
+
+        return [
+            \Filament\Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
+                ->schema([
+                    $field('spacing_top', __('Espaço acima'), __('Sem seleção, usa o padrão do bloco.')),
+                    $field('spacing_bottom', __('Espaço abaixo'), __('Use 0 para colar em uma seção de mesmo fundo.')),
+                ]),
+        ];
     }
 
     protected static function getPartnersBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('partners')
+            ->preview('filament.block-previews.partners')
             ->label(__('Parceiros'))
             ->icon('heroicon-o-building-office')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de parceiros.')),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto sobre a parceria.')),
                 Forms\Components\Repeater::make('items')
+                    ->label(__('Parceiros'))
+                    ->helperText(__('Cadastre as logomarcas ou nomes dos parceiros.'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')->required(),
-                        Forms\Components\TextInput::make('icon')->label('Ícone (Lucide)'),
+                        Forms\Components\TextInput::make('name')->label(__('Nome'))->helperText(__('Nome da empresa parceira.'))->required(),
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone (Lucide)'))->helperText(__('Nome do ícone Lucide, se houver.')),
                     ])->columns(2),
-            ]);
+            ]));
     }
 
     protected static function getServicesBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('services')
+            ->preview('filament.block-previews.services')
             ->label(__('Serviços'))
             ->icon('heroicon-o-wrench-screwdriver')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da área de serviços.')),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Descrição geral sobre os serviços oferecidos.')),
                 Forms\Components\Repeater::make('items')
+                    ->label(__('Serviços'))
+                    ->helperText(__('Cadastre os serviços que deseja exibir.'))
                     ->schema([
-                        Forms\Components\TextInput::make('title')->required(),
-                        Forms\Components\Textarea::make('description'),
-                        Forms\Components\TextInput::make('icon'),
-                        Forms\Components\TagsInput::make('bullets'),
-                        Forms\Components\TextInput::make('cta_label'),
-                        Forms\Components\TextInput::make('cta_url'),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Nome do serviço.'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Detalhes sobre o serviço.')),
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone'))->helperText(__('Nome do ícone representativo.')),
+                        Forms\Components\TagsInput::make('bullets')->label(__('Tópicos'))->helperText(__('Pressione Enter para adicionar tópicos (tags).')),
+                        Forms\Components\TextInput::make('cta_label')->label(__('Rótulo do Botão (CTA)'))->helperText(__('Texto do botão de ação do serviço.')),
+                        Forms\Components\TextInput::make('cta_url')->label(__('URL do Botão (CTA)'))->helperText(__('Link para a página do serviço.')),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getTimelineBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('timeline')
+            ->preview('filament.block-previews.timeline')
             ->label(__('Linha do Tempo (Etapas)'))
             ->icon('heroicon-o-clock')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título para a linha do tempo.')),
                 Forms\Components\Repeater::make('steps')
+                    ->label(__('Etapas'))
+                    ->helperText(__('Cadastre cada passo da linha do tempo.'))
                     ->schema([
-                        Forms\Components\TextInput::make('step_label')->required(),
-                        Forms\Components\TextInput::make('title')->required(),
-                        Forms\Components\Textarea::make('description'),
-                        Forms\Components\TextInput::make('icon'),
+                        Forms\Components\TextInput::make('step_label')->label(__('Rótulo da Etapa'))->helperText(__('Ex: Passo 1, Ano 2023.'))->required(),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da etapa.'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Explicação da etapa.')),
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone'))->helperText(__('Ícone representativo da etapa.')),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getShowcaseBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('showcase')
-            ->label(__('Galeria de Obras (Showcase)'))
+            ->preview('filament.block-previews.showcase')
+            ->label(__('Galeria de Projetos / Portfólio'))
             ->icon('heroicon-o-camera')
-            ->schema([
-                Forms\Components\TextInput::make('badge')->label('Texto do Badge (Laranja)')->placeholder('NOSSAS OBRAS'),
-                Forms\Components\TextInput::make('title')->label('Título')->required(),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
-                Forms\Components\TextInput::make('limit')->numeric()->default(4)->label('Limite de itens'),
-            ]);
+            ->schema(self::getBlockTabs([
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Ex: NOSSAS OBRAS'))->placeholder('NOSSAS OBRAS'),
+                    Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da galeria.'))->required(),
+                    Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo da galeria.'))->columnSpanFull(),
+                    Forms\Components\TextInput::make('limit')->numeric()->default(4)->label(__('Limite de itens'))->helperText(__('Quantidade máxima de obras a serem exibidas.')),
+                ])
+            ]));
+    }
+
+    protected static function getEquipmentShowcaseBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('equipment_showcase')
+            ->preview('filament.block-previews.equipment_showcase')
+            ->label(__('Catálogo de Itens / Showcase'))
+            ->icon('heroicon-o-truck')
+            ->schema(self::getBlockTabs([
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Ex: EQUIPAMENTOS'))->placeholder('EQUIPAMENTOS'),
+                    Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título principal da vitrine de equipamentos.'))->required(),
+                    Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Breve texto explicativo.'))->columnSpanFull(),
+                ])
+            ]));
     }
 
     protected static function getFaqBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('faq')
+            ->preview('filament.block-previews.faq')
             ->label(__('FAQ (Perguntas Frequentes)'))
             ->icon('heroicon-o-question-mark-circle')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de perguntas frequentes.')),
                 Forms\Components\Repeater::make('items')
+                    ->label(__('Perguntas'))
+                    ->helperText(__('Cadastre as perguntas e respostas.'))
                     ->schema([
-                        Forms\Components\TextInput::make('question')->required(),
-                        Forms\Components\Textarea::make('answer')->required(),
+                        Forms\Components\TextInput::make('question')->label(__('Pergunta'))->helperText(__('A dúvida frequente.'))->required(),
+                        Forms\Components\Textarea::make('answer')->label(__('Resposta'))->helperText(__('A resposta para a dúvida.'))->required(),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getTestimonialsBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('testimonials')
+            ->preview('filament.block-previews.testimonials')
             ->label(__('Depoimentos'))
             ->icon('heroicon-o-chat-bubble-bottom-center-text')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de depoimentos.')),
                 Forms\Components\Repeater::make('items')
+                    ->label(__('Depoimentos'))
+                    ->helperText(__('Adicione os relatos de clientes.'))
                     ->schema([
-                        Forms\Components\Textarea::make('quote')->required(),
-                        Forms\Components\TextInput::make('author_name')->required(),
-                        Forms\Components\TextInput::make('author_role'),
-                        Forms\Components\TextInput::make('stars')->numeric()->default(5),
+                        Forms\Components\Textarea::make('quote')->label(__('Citação'))->helperText(__('O texto do depoimento.'))->required(),
+                        Forms\Components\TextInput::make('author_name')->label(__('Nome do Autor'))->helperText(__('Nome de quem fez o depoimento.'))->required(),
+                        Forms\Components\TextInput::make('author_role')->label(__('Cargo / Empresa'))->helperText(__('Cargo ou empresa do autor.')),
+                        Forms\Components\TextInput::make('stars')->label(__('Estrelas'))->helperText(__('Quantidade de estrelas (ex: 5).'))->numeric()->default(5),
                     ]),
-            ]);
+            ]));
     }
 
     protected static function getCoverageBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('coverage')
+            ->preview('filament.block-previews.coverage')
             ->label(__('Área de Atendimento'))
             ->icon('heroicon-o-map-pin')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título da seção de área de cobertura.')),
                 Forms\Components\Select::make('cities')
-                    ->label('Cidades Atendidas')
+                    ->label(__('Cidades Atendidas'))
                     ->multiple()
                     ->options(\App\Models\OperationArea::query()->where('is_active', true)->pluck('city', 'city'))
-                    ->helperText('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.'),
-            ]);
+                    ->helperText(__('Selecione as cidades que deseja destacar. Os dados vêm do módulo de Áreas de Operação.')),
+            ]));
     }
 
     protected static function getCtaBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('cta')
-            ->label(__('Chamada para Ação (CTA)'))
+            ->preview('filament.block-previews.cta')
+            ->label(__('CTA de Atendimento'))
             ->icon('heroicon-o-megaphone')
             ->schema([
-                Forms\Components\TextInput::make('title'),
-                Forms\Components\Textarea::make('subtitle'),
-                Forms\Components\TextInput::make('button_label'),
-                Forms\Components\TextInput::make('button_url'),
+                Forms\Components\FileUpload::make('image')
+                    ->label(__('Imagem do Atendente'))
+                    ->helperText(__('PNG com fundo transparente. A imagem ficará um pouco para fora do topo do card.'))
+                    ->image()
+                    ->directory('blocks')
+                    ->columnSpanFull(),
+                Forms\Components\Grid::make(3)->schema([
+                    Forms\Components\TextInput::make('image_size')
+                        ->label(__('Tamanho da Imagem (%)'))
+                        ->helperText(__('100 = cabe dentro; >100 sobressai pelo topo.'))
+                        ->numeric()->minValue(100)->maxValue(220)->default(155),
+                    Forms\Components\TextInput::make('image_offset_x')
+                        ->label(__('Posição Horizontal (px)'))
+                        ->helperText(__('Negativo = esquerda, positivo = direita.'))
+                        ->numeric()->minValue(-200)->maxValue(200)->default(0),
+                    Forms\Components\TextInput::make('image_offset_y')
+                        ->label(__('Ajuste da Base (px)'))
+                        ->helperText(__('0 = encostado na base. Negativo desce, positivo sobe.'))
+                        ->numeric()->minValue(-100)->maxValue(100)->default(0),
+                ]),
+                Forms\Components\Toggle::make('show_features')
+                    ->label(__('Mostrar lista de diferenciais'))
+                    ->helperText(__('Atendimento rápido, orçamento sem compromisso e canal preferido.'))
+                    ->default(true),
             ]);
     }
 
     protected static function getDifferentialsBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('differentials')
-            ->label(__('Diferenciais (Pilar / Missão / Visão)'))
+            ->preview('filament.block-previews.differentials')
+            ->label(__('Diferenciais / Recursos'))
             ->icon('heroicon-o-shield-check')
-            ->schema([
-                Forms\Components\TextInput::make('subtitle')->label('Subtítulo'),
-                Forms\Components\TextInput::make('title')->label('Título Principal'),
-                Forms\Components\Textarea::make('description')->label('Descrição / Texto de Apoio'),
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('subtitle')->label(__('Subtítulo'))->helperText(__('Texto pequeno acima do título.')),
+                Forms\Components\TextInput::make('title')->label(__('Título Principal'))->helperText(__('Título de destaque da seção.')),
+                Forms\Components\Textarea::make('description')->label(__('Descrição / Texto de Apoio'))->helperText(__('Explicação geral dos diferenciais.')),
                 Forms\Components\Repeater::make('items')
-                    ->label('Itens (Recomendado: 3)')
+                    ->label(__('Itens (Recomendado: 3)'))
+                    ->helperText(__('Adicione os pilares ou diferenciais.'))
                     ->schema([
-                        Forms\Components\TextInput::make('title')->label('Título')->required(),
-                        Forms\Components\Textarea::make('description')->label('Descrição')->required(),
-                        Forms\Components\TextInput::make('icon')->label('Ícone (Lucide)')->default('check-circle'),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Nome do diferencial.'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Explicação do diferencial.'))->required(),
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone (Lucide)'))->helperText(__('Ícone representativo.'))->default('check-circle'),
                     ])->columns(2),
-            ]);
+            ]));
     }
 
     protected static function getPageHeaderBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('page_header')
+            ->preview('filament.block-previews.page_header')
             ->label(__('Cabeçalho da Página'))
             ->icon('heroicon-o-document-text')
-            ->schema([
-                Forms\Components\TextInput::make('badge')->label('Texto de Apoio (Laranja)')->placeholder('NOSSOS SERVIÇOS'),
-                Forms\Components\TextInput::make('title')->label('Título Principal')->required(),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
-                Forms\Components\Toggle::make('show_breadcrumbs')->label('Mostrar Breadcrumbs')->default(true),
-                Forms\Components\FileUpload::make('background_image')->image()->directory('headers')->label('Imagem de Fundo (Opcional)'),
-            ]);
+            ->schema(self::getBlockTabs([
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->helperText(__('Texto acima do título principal.'))->placeholder('NOSSOS SERVIÇOS'),
+                    Forms\Components\TextInput::make('title')->label(__('Título Principal'))->helperText(__('Título grande da página.'))->required(),
+                    Forms\Components\Textarea::make('description')->label(__('Descrição'))->helperText(__('Subtítulo ou texto descritivo do cabeçalho.'))->columnSpanFull(),
+                    Forms\Components\Toggle::make('show_breadcrumbs')->label(__('Mostrar Breadcrumbs'))->helperText(__('Exibe o caminho de navegação (ex: Home > Serviços).'))->onIcon('heroicon-m-check')->default(true)->columnSpanFull(),
+                    Forms\Components\FileUpload::make('background_image')->image()->directory('headers')->label(__('Imagem de Fundo (Opcional)'))->helperText(__('Imagem de fundo para o cabeçalho.'))->columnSpanFull(),
+                ])
+            ]));
     }
 
-    protected static function getContactFormBlock(): Forms\Components\Builder\Block
+
+    protected static function getStatsBlock(): Forms\Components\Builder\Block
     {
-        return Forms\Components\Builder\Block::make('contact_form')
-            ->label(__('Formulário de Contato'))
-            ->icon('heroicon-o-envelope')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título')->default('Entre em Contato'),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
-                Forms\Components\TextInput::make('email_to')->label('Enviar para (e-mail)')->placeholder('contato@empresa.com'),
-            ]);
+        return Forms\Components\Builder\Block::make('stats')
+            ->preview('filament.block-previews.stats')
+            ->label(__('Estatísticas'))
+            ->icon('heroicon-o-chart-bar-square')
+            ->schema(self::getBlockTabs([
+                Forms\Components\Repeater::make('items')
+                    ->label(__('Itens (Estatísticas)'))
+                    ->helperText(__('Adicione os números e textos explicativos (ex: 13.800+ Colaboradores). Recomendado até 4 itens.'))
+                    ->schema([
+                        Forms\Components\TextInput::make('value')
+                            ->label(__('Valor (Número)'))
+                            ->placeholder('Ex: 13.800+')
+                            ->required(),
+                        Forms\Components\TextInput::make('label')
+                            ->label(__('Rótulo (Texto)'))
+                            ->placeholder('Ex: Colaboradores')
+                            ->required(),
+                        Forms\Components\TextInput::make('icon')
+                            ->label(__('Ícone (Lucide)'))
+                            ->default('users')
+                            ->helperText('Busque em lucide.dev/icons'),
+                    ])
+                    ->columns(3)
+                    ->cloneable()
+                    ->collapsible()
+                    ->maxItems(4)
+                    ->defaultItems(4),
+            ], [
+                Forms\Components\Toggle::make('overlap')
+                    ->label(__('Sobrepor à seção anterior'))
+                    ->helperText(__('O cartão sobe sobre o fim do bloco de cima (ideal logo após o banner principal).'))
+                    ->default(true),
+            ]));
+    }
+
+    protected static function getIconSelection(string $name, string $label, string $default = 'arrow-right'): array
+    {
+        return [
+            Forms\Components\Group::make()->schema([
+                Forms\Components\ToggleButtons::make("{$name}_select")
+                    ->label($label)
+                    ->helperText(__('Escolha um ícone rápido ou selecione "Outro".'))
+                    ->options([
+                        'arrow-right' => 'Seta',
+                        'play' => 'Play',
+                        'check-circle' => 'Check',
+                        'star' => 'Estrela',
+                        'zap' => 'Raio',
+                        'other' => 'Outro',
+                    ])
+                    ->icons([
+                        'arrow-right' => 'heroicon-o-arrow-right',
+                        'play' => 'heroicon-o-play',
+                        'check-circle' => 'heroicon-o-check-circle',
+                        'star' => 'heroicon-o-star',
+                        'zap' => 'heroicon-o-bolt',
+                        'other' => 'heroicon-o-ellipsis-horizontal-circle',
+                    ])
+                    ->inline()
+                    ->live()
+                    ->default(in_array($default, ['arrow-right', 'play', 'check-circle', 'star', 'zap']) ? $default : 'other'),
+                Forms\Components\TextInput::make("{$name}_custom")
+                    ->label(__('Nome do Ícone Lucide'))
+                    ->helperText(__('Digite o nome (ex: shield). Veja lucide.dev/icons'))
+                    ->prefixIcon('heroicon-o-magnifying-glass')
+                    ->visible(fn (\Filament\Forms\Get $get) => $get("{$name}_select") === 'other')
+                    ->required(fn (\Filament\Forms\Get $get) => $get("{$name}_select") === 'other')
+                    ->default(!in_array($default, ['arrow-right', 'play', 'check-circle', 'star', 'zap']) ? $default : ''),
+            ])->columnSpanFull()
+        ];
+    }
+
+    protected static function getImageWithTextBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('image_with_text')
+            ->preview('filament.block-previews.image_with_text')
+            ->label(__('Seção de Imagem + Texto'))
+            ->icon('heroicon-o-photo')
+            ->schema(self::getBlockTabs([
+                Forms\Components\Grid::make(1)->schema([
+                    Forms\Components\Section::make('Conteúdo Principal')->schema([
+                        Forms\Components\Grid::make(3)->schema([
+                            // Coluna de Texto (Ocupa 2)
+                            Forms\Components\Group::make()->schema([
+                                ...self::getIconSelection('badge_icon', 'Ícone do Badge', 'zap'),
+                                Forms\Components\TextInput::make('badge')
+                                    ->label(__('Badge (Ex: Sobre Nós)'))
+                                    ->helperText(__('Pequeno texto de destaque acima do título.'))
+                                    ->prefixIcon('heroicon-o-tag')
+                                    ->placeholder('SOBRE NÓS'),
+                                
+                                Forms\Components\TextInput::make('title')
+                                    ->label(__('Título Principal'))
+                                    ->helperText(__('O título grande da seção.'))
+                                    ->prefixIcon('heroicon-o-h1')
+                                    ->required(),
+                                    
+                                Forms\Components\Textarea::make('description')
+                                    ->label(__('Descrição / Texto de Apoio'))
+                                    ->helperText(__('O texto principal descrevendo os detalhes.'))
+                                    ->rows(4),
+                            ])->columnSpan(2),
+
+                            // Coluna da Imagem (Ocupa 1)
+                            Forms\Components\Group::make()->schema([
+                                Forms\Components\FileUpload::make('image')
+                                    ->label(__('Imagem Principal'))
+                                    ->image()
+                                    ->directory('blocks')
+                                    ->required(),
+                                Forms\Components\ToggleButtons::make('image_position')
+                                    ->label(__('Posição da Imagem'))
+                                    ->options([
+                                        'left' => 'Esquerda', 
+                                        'right' => 'Direita'
+                                    ])
+                                    ->icons([
+                                        'left' => 'heroicon-o-bars-3-bottom-left',
+                                        'right' => 'heroicon-o-bars-3-bottom-right',
+                                    ])
+                                    ->default('right')
+                                    ->inline(),
+                                Forms\Components\ToggleButtons::make('image_vertical_alignment')
+                                    ->label(__('Alinhamento Vertical'))
+                                    ->options([
+                                        'start' => 'Topo',
+                                        'center' => 'Meio',
+                                        'end' => 'Base'
+                                    ])
+                                    ->icons([
+                                        'start' => 'heroicon-o-bars-arrow-up',
+                                        'center' => 'heroicon-o-bars-2',
+                                        'end' => 'heroicon-o-bars-arrow-down',
+                                    ])
+                                    ->default('center')
+                                    ->inline(),
+                            ])->columnSpan(1),
+                        ]),
+                    ])->collapsible(),
+
+                    Forms\Components\Section::make('Botão Primário')->schema([
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('button_text')
+                                ->label(__('Texto do Botão'))
+                                ->helperText(__('Ex: Começar Agora'))
+                                ->prefixIcon('heroicon-o-cursor-arrow-rays'),
+                            Forms\Components\TextInput::make('button_url')
+                                ->label(__('URL do Botão'))
+                                ->helperText(__('Link para onde o botão leva.'))
+                                ->prefixIcon('heroicon-o-link'),
+                        ]),
+                        ...self::getIconSelection('button_icon', 'Ícone do Botão Primário', 'arrow-right'),
+                    ])->collapsible()->collapsed(),
+
+                    Forms\Components\Section::make('Botão Secundário')->schema([
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('secondary_button_text')
+                                ->label(__('Texto do Botão'))
+                                ->helperText(__('Ex: Ver Demonstração'))
+                                ->prefixIcon('heroicon-o-cursor-arrow-rays'),
+                            Forms\Components\TextInput::make('secondary_button_url')
+                                ->label(__('URL do Botão'))
+                                ->helperText(__('Link para onde o botão leva.'))
+                                ->prefixIcon('heroicon-o-link'),
+                        ]),
+                        ...self::getIconSelection('secondary_button_icon', 'Ícone do Botão Secundário', 'play'),
+                    ])->collapsible()->collapsed(),
+
+                    Forms\Components\Section::make('Mini Cards (Rodapé)')->schema([
+                        Forms\Components\Repeater::make('mini_stats')
+                            ->label(__('Mini Cards de Estatísticas/Features'))
+                            ->helperText(__('Adicione pequenos itens de destaque abaixo dos botões.'))
+                            ->schema([
+                                ...self::getIconSelection('icon', 'Ícone do Card', 'check-circle'),
+                                Forms\Components\TextInput::make('title')
+                                    ->label(__('Título'))
+                                    ->helperText(__('Ex: Mais Produtividade'))
+                                    ->prefixIcon('heroicon-o-h3')
+                                    ->required(),
+                                Forms\Components\TextInput::make('subtitle')
+                                    ->label(__('Subtítulo'))
+                                    ->helperText(__('Ex: Descrição curta do card.'))
+                                    ->prefixIcon('heroicon-o-bars-3-bottom-left'),
+                            ])->collapsible()->cloneable(),
+                    ])->collapsible()->collapsed(),
+
+                    // A aba de imagem foi movida para o Conteúdo Principal
+                ]),
+            ]));
+    }
+
+    protected static function getDataTableBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('data_table')
+            ->preview('filament.block-previews.data_table')
+            ->label(__('Tabela / Dados'))
+            ->icon('heroicon-o-table-cells')
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('title')->label(__('Título da Tabela')),
+                Forms\Components\TextInput::make('badge')->label(__('Badge superior')),
+                Forms\Components\Repeater::make('rows')
+                    ->label(__('Linhas de Dados'))
+                    ->schema([
+                        Forms\Components\TextInput::make('col1')->label(__('Projeto (Coluna 1)'))->required(),
+                        Forms\Components\TextInput::make('col2')->label(__('Local (Coluna 2)'))->required(),
+                        Forms\Components\Select::make('col3')->label(__('Status (Coluna 3)'))
+                            ->options([
+                                'success' => 'Concluído',
+                                'warning' => 'Em andamento',
+                                'danger' => 'Atrasado',
+                                'info' => 'Planejamento',
+                            ])->default('success'),
+                        Forms\Components\TextInput::make('col4')->label(__('Prazo (Coluna 4)'))->required(),
+                    ])
+                    ->columns(4)
+                    ->cloneable()
+                    ->collapsible(),
+            ]));
+    }
+
+    protected static function getCardsBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('cards')
+            ->preview('filament.block-previews.cards')
+            ->label(__('Cards de Conteúdo'))
+            ->icon('heroicon-o-square-3-stack-3d')
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('badge')->label(__('Badge / Subtítulo'))->helperText(__('Ex: NOSSOS PILARES')),
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Ex: O que nos move')),
+                Forms\Components\Textarea::make('description')->label(__('Descrição'))->rows(3),
+                Forms\Components\ToggleButtons::make('columns')
+                    ->label(__('Colunas'))
+                    ->options([
+                        '2' => '2 Colunas',
+                        '3' => '3 Colunas',
+                        '4' => '4 Colunas',
+                    ])
+                    ->inline()
+                    ->default('3'),
+                Forms\Components\Repeater::make('items')
+                    ->label(__('Cards'))
+                    ->schema([
+                        Forms\Components\TextInput::make('icon')->label(__('Ícone (Lucide)'))->default('check-circle'),
+                        Forms\Components\TextInput::make('title')->label(__('Título'))->required(),
+                        Forms\Components\Textarea::make('description')->label(__('Descrição'))->rows(3)->required(),
+                    ])->columns(2)->defaultItems(3)->cloneable()->collapsible(),
+            ]));
+    }
+
+    protected static function getFeaturedTestimonialBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('featured_testimonial')
+            ->preview('filament.block-previews.featured_testimonial')
+            ->label(__('Depoimento em Destaque'))
+            ->icon('heroicon-o-chat-bubble-bottom-center-text')
+            ->schema(self::getBlockTabs([
+                Forms\Components\Textarea::make('quote')->label(__('Depoimento (Citação)'))->required()->rows(3),
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('author')->label(__('Nome do Autor'))->required(),
+                    Forms\Components\TextInput::make('role')->label(__('Cargo / Empresa')),
+                    Forms\Components\FileUpload::make('author_image')->label(__('Foto do Autor'))->image()->avatar()->directory('testimonials'),
+                    Forms\Components\FileUpload::make('background_image')->label(__('Imagem de Fundo (Opcional)'))->image()->directory('blocks'),
+                ]),
+            ]));
     }
 
     protected static function getMapBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('map')
-            ->label(__('Mapa (Google Maps)'))
+            ->preview('filament.block-previews.map')
+            ->label(__('Mapa (Localização)'))
             ->icon('heroicon-o-map')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título'),
+            ->schema(self::getBlockTabs([
+                Forms\Components\TextInput::make('title')->label(__('Título'))->helperText(__('Título do mapa.')),
                 Forms\Components\Textarea::make('iframe_code')
-                    ->label('Código de Incorporação (iframe)')
-                    ->helperText('Cole aqui o <iframe> gerado pelo Google Maps'),
-            ]);
+                    ->label(__('Código de Incorporação (iframe)'))
+                    ->helperText(__('Cole aqui o <iframe> gerado pelo Google Maps.')),
+            ]));
     }
 
     protected static function getRichTextBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('rich_text')
+            ->preview('filament.block-previews.rich_text')
             ->label(__('Texto Livre (Editor)'))
             ->icon('heroicon-o-document-text')
-            ->schema([
-                Forms\Components\RichEditor::make('content')->required(),
-            ]);
+            ->schema(self::getBlockTabs([
+                Forms\Components\RichEditor::make('content')->label(__('Conteúdo'))->helperText(__('Digite o conteúdo livremente usando o editor.'))->required(),
+            ]));
     }
 
-    protected static function getCalculatorBlock(): Forms\Components\Builder\Block
-    {
-        return Forms\Components\Builder\Block::make('calculator')
-            ->label(__('Calculadora de Concreto'))
-            ->icon('heroicon-o-calculator')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título')->default('Calculadora de Volume'),
-            ]);
-    }
-
-    protected static function getBudgetFormBlock(): Forms\Components\Builder\Block
-    {
-        return Forms\Components\Builder\Block::make('budget_form')
-            ->label(__('Formulário de Orçamento (Wizard)'))
-            ->icon('heroicon-o-document-text')
-            ->schema([
-                Forms\Components\TextInput::make('title')->label('Título')->default('Solicitar Orçamento'),
-                Forms\Components\Textarea::make('description')->label('Descrição'),
-            ]);
-    }
     protected static function getContactBannerBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('contact_banner')
-            ->label(__('Banner de Atendimento (Call Actions)'))
+            ->preview('filament.block-previews.contact_banner')
+            ->label(__('Banner de Atendimento / Contato'))
             ->icon('heroicon-o-chat-bubble-left-right')
-            ->schema([
+            ->schema(self::getBlockTabs([
                 Forms\Components\TextInput::make('badge')
-                    ->label('Badge (Texto Superior)')
+                    ->label(__('Badge (Texto Superior)'))
+                    ->helperText(__('Pequeno texto de destaque.'))
                     ->default('ATENDIMENTO'),
                 Forms\Components\TextInput::make('title')
-                    ->label('Título')
+                    ->label(__('Título'))
+                    ->helperText(__('Título do banner de contato.'))
                     ->default('Fale conosco')
                     ->required(),
                 Forms\Components\Textarea::make('description')
-                    ->label('Descrição')
+                    ->label(__('Descrição'))
+                    ->helperText(__('Texto explicativo do banner.'))
                     ->default('Dúvidas, orçamento ou suporte: estamos prontos para atender você por telefone, WhatsApp ou e-mail.')
                     ->rows(2),
                 Forms\Components\Grid::make(3)
                     ->schema([
                         Forms\Components\Toggle::make('whatsapp_enabled')
-                            ->label('Botão WhatsApp')
+                            ->label(__('Botão WhatsApp'))
+                            ->helperText(__('Exibir botão do WhatsApp.'))
+                            ->onIcon('heroicon-m-check')
                             ->default(true),
                         Forms\Components\Toggle::make('call_enabled')
-                            ->label('Botão Ligar')
+                            ->label(__('Botão Ligar'))
+                            ->helperText(__('Exibir botão de ligação.'))
+                            ->onIcon('heroicon-m-check')
                             ->default(true),
                         Forms\Components\Toggle::make('email_enabled')
-                            ->label('Botão E-mail')
+                            ->label(__('Botão E-mail'))
+                            ->helperText(__('Exibir botão de envio de e-mail.'))
+                            ->onIcon('heroicon-m-check')
                             ->default(true),
                     ]),
-            ]);
+            ]));
+    }
+
+    protected static function getPaymentOfferBlock(): Forms\Components\Builder\Block
+    {
+        return Forms\Components\Builder\Block::make('payment_offer')
+            ->preview('filament.block-previews.payment_offer')
+            ->label(__('Tabela de Preços / Planos'))
+            ->icon('heroicon-o-credit-card')
+            ->schema(self::getBlockTabs([
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('badge')->label(__('Pré-título'))->default('APROVEITE ESSA MEGA OPORTUNIDADE'),
+                    Forms\Components\TextInput::make('title')->label(__('Título'))->default('Parcelamento em até 12x sem juros')->required(),
+                    Forms\Components\Textarea::make('subtitle')->label(__('Subtítulo'))->default('ou com desconto no pagamento à vista em dinheiro ou com o pix.')->columnSpanFull(),
+                    Forms\Components\TextInput::make('button_label')->label(__('Texto do Botão'))->default('Fazer orçamento grátis'),
+                    Forms\Components\TextInput::make('button_url')->label(__('URL do Botão (Deixe vazio p/ usar o WhatsApp)'))->helperText('Se vazio, enviará para o WhatsApp padrão.'),
+                    Forms\Components\FileUpload::make('background_image')->image()->directory('offers')->label(__('Imagem de Fundo (Opcional)'))->columnSpanFull(),
+                    Forms\Components\FileUpload::make('payment_methods_image')->image()->directory('offers')->label(__('Banner dos Meios de Pagamento (Cartões)'))->helperText('Recomendado imagem com fundo transparente (PNG/SVG) com as bandeiras dos cartões.')->columnSpanFull(),
+                ])
+            ]));
     }
 
     protected static function getModuleReferenceBlock(): Forms\Components\Builder\Block
     {
         return Forms\Components\Builder\Block::make('module_reference')
-            ->label(__('Módulo Global (Seção Pronta)'))
+            ->preview('filament.block-previews.module_reference')
+            ->label(function (?array $state): string {
+                if ($state === null) {
+                    return __('Módulo Global (Seção Pronta)');
+                }
+                $sectionName = \App\Models\ContentSection::find($state['content_section_id'] ?? null)?->name;
+                return $sectionName ? __('Seção pronta - ') . $sectionName : __('Módulo Global (Seção Pronta)');
+            })
             ->icon('heroicon-o-squares-plus')
-            ->schema([
-                Forms\Components\Select::make('content_section_id')
+            ->schema(self::getBlockTabs([
+                Forms\Components\ToggleButtons::make('content_section_id')
                     ->label(__('Seção de Conteúdo'))
                     ->options(\App\Models\ContentSection::query()->pluck('name', 'id'))
                     ->required()
-                    ->searchable()
+                    ->inline()
+                    ->live()
                     ->helperText(__('Selecione uma seção criada no módulo "Seções do site" para reutilizá-la aqui.')),
-            ]);
+            ]));
     }
 }

@@ -1,9 +1,20 @@
-<x-layouts.app :title="$meta['title']" :description="$meta['description']">
+<x-layouts.app 
+    :title="$meta['title']" 
+    :description="$meta['description']"
+    :keywords="$meta['keywords'] ?? null"
+    :ogImage="$meta['og_image'] ?? null"
+    :builder-preview="$builderPreview ?? false"
+    :site-preview="$sitePreview ?? false"
+    :alert-preview="$alertPreview ?? null"
+>
     @php
         $content = $page->content ?? [];
         $firstBlock = $content[0] ?? null;
         $hasHeader = collect($content)->contains('type', 'page_header');
         $isHome = $page->slug === '/' || $page->slug === '';
+        
+        $websiteSettings = \App\Models\Setting::get('website', []);
+        $pageTheme = data_get($websiteSettings, 'theme', 'default');
 
         // Dados base para o cabeçalho automático
         $autoHeader = [
@@ -35,7 +46,65 @@
         />
     @endif
 
+
+
+    @php
+        // Modo Live Preview do Page Builder (painel administrativo)
+        $builderPreview = $builderPreview ?? false;
+        $blockKeys = $blockKeys ?? [];
+        $blockLabels = $blockLabels ?? [];
+    @endphp
+
     @foreach($content as $block)
-        <x-render-block :type="$block['type']" :data="$block['data']" :page="$page" />
+        @if($builderPreview)
+            @php $pbUuid = $blockKeys[$loop->index] ?? ''; @endphp
+            <div class="pb-block" data-pb-block="{{ $pbUuid }}" data-pb-label="{{ $blockLabels[$pbUuid] ?? $block['type'] }}">
+                @php
+                    try {
+                        $pbHtml = \Illuminate\Support\Facades\Blade::render(
+                            '<x-render-block :type="$type" :data="$data" :page="$page" :theme="$theme" :hide-header="$hideHeader" />',
+                            [
+                                'type' => $block['type'],
+                                'data' => $block['data'] ?? [],
+                                'page' => $page,
+                                'theme' => $pageTheme,
+                                'hideHeader' => (!$isHome && !$hasHeader && $loop->first),
+                            ],
+                        );
+                        $pbError = null;
+                    } catch (\Throwable $e) {
+                        $pbHtml = '';
+                        $pbError = $e->getMessage();
+                    }
+                @endphp
+                @if($pbError)
+                    <div class="pb-block-error">
+                        <strong>Não foi possível renderizar "{{ $blockLabels[$pbUuid] ?? $block['type'] }}"</strong>
+                        <span>Complete os campos do bloco. ({{ \Illuminate\Support\Str::limit($pbError, 160) }})</span>
+                    </div>
+                @else
+                    {!! $pbHtml !!}
+                @endif
+            </div>
+        @else
+            <x-render-block 
+                :type="$block['type']" 
+                :data="$block['data']" 
+                :page="$page" 
+                :theme="$pageTheme" 
+                :hide-header="(!$isHome && !$hasHeader && $loop->first)"
+            />
+        @endif
     @endforeach
+
+    @if($builderPreview)
+        @if(empty($content))
+            <div class="pb-empty">
+                <div class="pb-empty-icon">+</div>
+                <h2>Sua página está vazia</h2>
+                <p>Adicione blocos pela coluna da esquerda para começar a construir.</p>
+            </div>
+        @endif
+        @include('filament.page-builder.preview-bridge')
+    @endif
 </x-layouts.app>

@@ -28,12 +28,14 @@
         ];
     }
 @endphp
+@if(!\App\Models\ContentSection::isHidden('hero'))
 <livewire:section-hero-cep
     :main-slide="$mainSlide"
     :badge="$heroBadge"
     :layout="$heroLayout"
     :stats="$heroStats"
 />
+@endif
 <x-section-partners />
 <x-section-services />
 <x-section-timeline />
@@ -42,5 +44,5 @@
 <x-section-differentials />
 <x-section-faq />
 <x-section-testimonials />
-<x-section-coverage />
+<livewire:section-coverage />
 <x-section-cta-contact />

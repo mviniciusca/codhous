@@ -21,6 +21,13 @@ use Illuminate\Support\Facades\Http;
 
 class OperationAreaResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Catalogo;
+    }
+
     protected static ?string $model = OperationArea::class;
 
     protected static ?string $navigationGroup = 'Orçamentos';
@@ -134,9 +141,11 @@ class OperationAreaResource extends Resource
                         TextInput::make('shipping_fee')
                             ->label('Taxa de Entrega')
                             ->helperText('Valor fixo cobrado para entregas nesta região.')
-                            ->numeric()
                             ->prefix('R$')
                             ->required()
+                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+                            ->stripCharacters('.')
+                            ->dehydrateStateUsing(fn ($state) => is_numeric($state) ? (float) $state : (float) str_replace(',', '.', str_replace('.', '', (string) $state)))
                             ->step(0.01),
                     ]),
             ]);

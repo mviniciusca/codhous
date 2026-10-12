@@ -18,14 +18,25 @@ enum ProductUnit: string implements HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::M3 => 'M³',
-            self::KG => 'Kg',
-            self::M2 => 'M²',
+            self::M3 => 'Metro cúbico (m³)',
+            self::KG => 'Quilo (kg)',
+            self::M2 => 'Metro quadrado (m²)',
             self::UNIT => 'Unidade',
-            self::DAY => 'Dia',
+            self::DAY => 'Diária',
             self::HOUR => 'Hora',
             self::WEEK => 'Semana',
             self::MONTH => 'Mês',
+        };
+    }
+
+    /**
+     * Abreviação usada ao lado de quantidades e preços (ex: "R$ 415,00/m³").
+     */
+    public function short(): string
+    {
+        return match ($this) {
+            self::MONTH => 'mês',
+            default => $this->value,
         };
     }
 

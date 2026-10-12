@@ -6,14 +6,16 @@ use App\Models\Scopes\UserBudgetScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Budget extends Model
 {
     use HasFactory;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $guarded = [];
 
@@ -21,6 +23,7 @@ class Budget extends Model
     {
         return [
             'content' => 'array',
+            'status_changed_at' => 'datetime',
         ];
     }
 
@@ -31,15 +34,18 @@ class Budget extends Model
     {
         static::addGlobalScope(new UserBudgetScope);
 
-        // Automatically set user_id and code when creating
+        // Automatically set user_id and code when creating.
+        // Passar 'user_id' => null explicitamente (pedidos do site) evita atribuir ao usuário logado.
         static::creating(function ($budget) {
-            if (! $budget->user_id && \Illuminate\Support\Facades\Auth::check()) {
-                $budget->user_id = \Illuminate\Support\Facades\Auth::id();
+            if (! array_key_exists('user_id', $budget->getAttributes()) && Auth::check()) {
+                $budget->user_id = Auth::id();
             }
 
             if (! $budget->code) {
                 $budget->code = self::generateUniqueCode();
             }
+
+            $budget->status_changed_at ??= now();
         });
 
         static::updating(function ($budget) {
@@ -70,6 +76,34 @@ class Budget extends Model
                 }
             }
         });
+
+        // Registrado depois da regra acima, para também cobrir a troca automática de etapa
+        static::updating(function ($budget) {
+            if ($budget->isDirty('status')) {
+                $budget->status_changed_at = now();
+            }
+        });
+    }
+
+    /** Dias sem mudar de etapa para um orçamento em negociação ser considerado parado */
+    public const STALE_AFTER_DAYS = 3;
+
+    public function isOpen(): bool
+    {
+        return in_array($this->status, ['pending', 'on going'], true);
+    }
+
+    /**
+     * Dias inteiros na etapa atual.
+     */
+    public function daysInStage(): int
+    {
+        return (int) ($this->status_changed_at ?? $this->updated_at ?? now())->diffInDays(now());
+    }
+
+    public function isStale(): bool
+    {
+        return $this->status === 'on going' && $this->daysInStage() >= self::STALE_AFTER_DAYS;
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -91,7 +125,7 @@ class Budget extends Model
 
     public function activities()
     {
-        return $this->morphMany(\Spatie\Activitylog\Models\Activity::class, 'subject');
+        return $this->morphMany(Activity::class, 'subject');
     }
 
     public function products()
@@ -123,8 +157,6 @@ class Budget extends Model
 
     /**
      * Generate a unique budget code
-     *
-     * @return string
      */
     public static function generateUniqueCode(): string
     {

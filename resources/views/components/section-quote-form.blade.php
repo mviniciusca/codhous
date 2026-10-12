@@ -1,3 +1,5 @@
+@props([
+    'textColor' => 'light','bgColor' => null])
 @php
     $company = \App\Models\Setting::get('company', []);
     $companyPhone = data_get($company, 'phone', '');
@@ -6,7 +8,7 @@
         ? '55' . $companyPhoneDigits
         : $companyPhoneDigits;
 @endphp
-<section id="orcamento" class="bg-background py-20 lg:py-28">
+<section id="orcamento" class="{{ $bgColor ?? 'bg-background' }} py-20 lg:py-28 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
     <div class="mx-auto max-w-7xl px-4 lg:px-8">
         <div class="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
             <div class="grid lg:grid-cols-[minmax(0,20rem)_1fr]">

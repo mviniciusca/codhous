@@ -10,22 +10,8 @@ class AlertSeeder extends Seeder
     public function run(): void
     {
         $alerts = [
-            [
-                'name' => 'Consentimento de cookies',
-                'type' => Alert::TYPE_BANNER,
-                'style' => Alert::STYLE_CONSENT,
-                'title' => 'Este site usa cookies',
-                'message' => 'Utilizamos cookies para melhorar sua experiência e analisar o tráfego. Ao continuar navegando, você concorda com nossa política de privacidade.',
-                'position' => Alert::POSITION_BOTTOM,
-                'is_active' => true,
-                'is_dismissible' => true,
-                'use_cookie' => true,
-                'cookie_key' => 'cookie_consent_accepted',
-                'cookie_duration_days' => 365,
-                'cta_label' => 'Política de privacidade',
-                'cta_url' => '/politica-de-privacidade',
-                'sort_order' => 0,
-            ],
+            // Aviso de cookies (LGPD): banner no rodapé, gerenciado em Alertas e notificações
+            Alert::cookieConsentDefaults(),
             [
                 'name' => 'Banner informativo (exemplo)',
                 'type' => Alert::TYPE_BANNER,

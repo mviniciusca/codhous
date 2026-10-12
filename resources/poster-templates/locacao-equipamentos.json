@@ -1,0 +1,561 @@
+{
+  "id": "locacao-equipamentos",
+  "order": 4,
+  "name": "Locação de equipamentos",
+  "category": "Locação de equipamentos",
+  "description": "Foto do equipamento recortada, lista de vantagens e contato.",
+  "tags": [
+    "locação",
+    "equipamentos",
+    "aluguel"
+  ],
+  "background": {
+    "role": "surface"
+  },
+  "caption": "Precisa de equipamento para a obra? 🚜\n\n✔️ Manutenção em dia\n✔️ Entrega e retirada\n✔️ Diárias, semanais e mensais\n\nReserve: {{brand.whatsapp}}\n\n#locacaodeequipamentos #obra #construcao",
+  "elements": [
+    {
+      "id": "decor",
+      "type": "ellipse",
+      "name": "Círculo decorativo",
+      "x": 430,
+      "y": 150,
+      "width": 700,
+      "height": 700,
+      "angle": 0,
+      "opacity": 0.12,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "primary"
+      },
+      "stroke": null,
+      "strokeWidth": 0
+    },
+    {
+      "id": "logo",
+      "type": "image",
+      "name": "Logo",
+      "x": 60,
+      "y": 60,
+      "width": 270,
+      "height": 92,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.logo",
+      "src": null,
+      "fit": "contain",
+      "radius": 0,
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": 0,
+      "placeholder": true
+    },
+    {
+      "id": "tag",
+      "type": "text",
+      "name": "Etiqueta",
+      "x": 60,
+      "y": 205,
+      "width": 400,
+      "height": 28,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "LOCAÇÃO",
+      "fontFamily": "Inter",
+      "fontSize": 24,
+      "fontWeight": 800,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 300,
+      "fill": {
+        "role": "primary"
+      }
+    },
+    {
+      "id": "title",
+      "type": "text",
+      "name": "Título",
+      "x": 60,
+      "y": 245,
+      "width": 500,
+      "height": 134,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Equipamentos\npara sua obra",
+      "fontFamily": "Montserrat",
+      "fontSize": 62,
+      "fontWeight": 900,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.05,
+      "charSpacing": 0,
+      "fill": {
+        "role": "text"
+      }
+    },
+    {
+      "id": "photo",
+      "type": "image",
+      "name": "Foto do equipamento",
+      "x": 580,
+      "y": 300,
+      "width": 460,
+      "height": 460,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.photo",
+      "src": null,
+      "fit": "contain",
+      "radius": 0,
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": 0,
+      "placeholder": true
+    },
+    {
+      "id": "item_1_icon",
+      "type": "icon",
+      "name": "Item 1 · ícone",
+      "x": 60,
+      "y": 470,
+      "width": 38,
+      "height": 38,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "CircleCheck",
+      "fill": {
+        "role": "primary"
+      },
+      "strokeWidth": 2.4
+    },
+    {
+      "id": "item_1",
+      "type": "text",
+      "name": "Item 1",
+      "x": 112,
+      "y": 474,
+      "width": 420,
+      "height": 34,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Manutenção em dia",
+      "fontFamily": "Inter",
+      "fontSize": 26,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "text"
+      }
+    },
+    {
+      "id": "item_2_icon",
+      "type": "icon",
+      "name": "Item 2 · ícone",
+      "x": 60,
+      "y": 534,
+      "width": 38,
+      "height": 38,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "CircleCheck",
+      "fill": {
+        "role": "primary"
+      },
+      "strokeWidth": 2.4
+    },
+    {
+      "id": "item_2",
+      "type": "text",
+      "name": "Item 2",
+      "x": 112,
+      "y": 538,
+      "width": 420,
+      "height": 34,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Entrega e retirada",
+      "fontFamily": "Inter",
+      "fontSize": 26,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "text"
+      }
+    },
+    {
+      "id": "item_3_icon",
+      "type": "icon",
+      "name": "Item 3 · ícone",
+      "x": 60,
+      "y": 598,
+      "width": 38,
+      "height": 38,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "CircleCheck",
+      "fill": {
+        "role": "primary"
+      },
+      "strokeWidth": 2.4
+    },
+    {
+      "id": "item_3",
+      "type": "text",
+      "name": "Item 3",
+      "x": 112,
+      "y": 602,
+      "width": 420,
+      "height": 34,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Diárias, semanais e mensais",
+      "fontFamily": "Inter",
+      "fontSize": 26,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "text"
+      }
+    },
+    {
+      "id": "cta_bg",
+      "type": "rect",
+      "name": "Barra de contato",
+      "x": 60,
+      "y": 880,
+      "width": 960,
+      "height": 130,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "fill": {
+        "role": "primary"
+      },
+      "stroke": null,
+      "strokeWidth": 0,
+      "radius": 24
+    },
+    {
+      "id": "cta_icon",
+      "type": "icon",
+      "name": "Ícone do WhatsApp",
+      "x": 100,
+      "y": 917,
+      "width": 56,
+      "height": 56,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "icon": "MessageCircle",
+      "fill": {
+        "role": "onPrimary"
+      },
+      "strokeWidth": 2.2
+    },
+    {
+      "id": "cta_label",
+      "type": "text",
+      "name": "Chamada",
+      "x": 180,
+      "y": 905,
+      "width": 420,
+      "height": 34,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "text": "Reserve agora",
+      "fontFamily": "Inter",
+      "fontSize": 26,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onPrimary"
+      }
+    },
+    {
+      "id": "whatsapp",
+      "type": "text",
+      "name": "WhatsApp",
+      "x": 180,
+      "y": 940,
+      "width": 480,
+      "height": 50,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.whatsapp",
+      "text": "(00) 00000-0000",
+      "fontFamily": "Montserrat",
+      "fontSize": 46,
+      "fontWeight": 800,
+      "fontStyle": "normal",
+      "textAlign": "left",
+      "lineHeight": 1.0,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onPrimary"
+      }
+    },
+    {
+      "id": "instagram",
+      "type": "text",
+      "name": "Instagram",
+      "x": 640,
+      "y": 935,
+      "width": 340,
+      "height": 36,
+      "angle": 0,
+      "opacity": 1,
+      "locked": false,
+      "hidden": false,
+      "bind": "brand.instagram",
+      "text": "@suaempresa",
+      "fontFamily": "Inter",
+      "fontSize": 28,
+      "fontWeight": 600,
+      "fontStyle": "normal",
+      "textAlign": "right",
+      "lineHeight": 1.15,
+      "charSpacing": 0,
+      "fill": {
+        "role": "onPrimary"
+      }
+    }
+  ],
+  "layouts": {
+    "portrait": {
+      "decor": {
+        "x": 430,
+        "y": 285,
+        "width": 700,
+        "height": 700
+      },
+      "logo": {
+        "x": 60,
+        "y": 60,
+        "width": 270,
+        "height": 92
+      },
+      "tag": {
+        "x": 60,
+        "y": 205,
+        "width": 400,
+        "height": 28
+      },
+      "title": {
+        "x": 60,
+        "y": 245,
+        "width": 500,
+        "height": 134
+      },
+      "photo": {
+        "x": 580,
+        "y": 380,
+        "width": 460,
+        "height": 560
+      },
+      "item_1_icon": {
+        "x": 60,
+        "y": 605,
+        "width": 38,
+        "height": 38
+      },
+      "item_1": {
+        "x": 112,
+        "y": 609,
+        "width": 420,
+        "height": 34
+      },
+      "item_2_icon": {
+        "x": 60,
+        "y": 669,
+        "width": 38,
+        "height": 38
+      },
+      "item_2": {
+        "x": 112,
+        "y": 673,
+        "width": 420,
+        "height": 34
+      },
+      "item_3_icon": {
+        "x": 60,
+        "y": 733,
+        "width": 38,
+        "height": 38
+      },
+      "item_3": {
+        "x": 112,
+        "y": 737,
+        "width": 420,
+        "height": 34
+      },
+      "cta_bg": {
+        "x": 60,
+        "y": 1150,
+        "width": 960,
+        "height": 130
+      },
+      "cta_icon": {
+        "x": 100,
+        "y": 1187,
+        "width": 56,
+        "height": 56
+      },
+      "cta_label": {
+        "x": 180,
+        "y": 1175,
+        "width": 420,
+        "height": 34
+      },
+      "whatsapp": {
+        "x": 180,
+        "y": 1210,
+        "width": 480,
+        "height": 50
+      },
+      "instagram": {
+        "x": 640,
+        "y": 1205,
+        "width": 340,
+        "height": 36
+      }
+    },
+    "story": {
+      "decor": {
+        "x": 90,
+        "y": 480,
+        "width": 900,
+        "height": 900
+      },
+      "logo": {
+        "x": 60,
+        "y": 260,
+        "width": 270,
+        "height": 92
+      },
+      "tag": {
+        "x": 60,
+        "y": 405,
+        "width": 400,
+        "height": 28
+      },
+      "title": {
+        "x": 60,
+        "y": 445,
+        "width": 500,
+        "height": 134
+      },
+      "photo": {
+        "x": 140,
+        "y": 600,
+        "width": 800,
+        "height": 520
+      },
+      "item_1_icon": {
+        "x": 60,
+        "y": 1160,
+        "width": 38,
+        "height": 38
+      },
+      "item_1": {
+        "x": 112,
+        "y": 1164,
+        "width": 900,
+        "height": 34
+      },
+      "item_2_icon": {
+        "x": 60,
+        "y": 1224,
+        "width": 38,
+        "height": 38
+      },
+      "item_2": {
+        "x": 112,
+        "y": 1228,
+        "width": 900,
+        "height": 34
+      },
+      "item_3_icon": {
+        "x": 60,
+        "y": 1288,
+        "width": 38,
+        "height": 38
+      },
+      "item_3": {
+        "x": 112,
+        "y": 1292,
+        "width": 900,
+        "height": 34
+      },
+      "cta_bg": {
+        "x": 60,
+        "y": 1440,
+        "width": 960,
+        "height": 130
+      },
+      "cta_icon": {
+        "x": 100,
+        "y": 1477,
+        "width": 56,
+        "height": 56
+      },
+      "cta_label": {
+        "x": 180,
+        "y": 1465,
+        "width": 420,
+        "height": 34
+      },
+      "whatsapp": {
+        "x": 180,
+        "y": 1500,
+        "width": 480,
+        "height": 50
+      },
+      "instagram": {
+        "x": 640,
+        "y": 1495,
+        "width": 340,
+        "height": 36
+      }
+    }
+  }
+}

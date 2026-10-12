@@ -6,6 +6,7 @@ use App\Models\Scopes\UserMailScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Mail extends Model
 {
@@ -13,6 +14,16 @@ class Mail extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+
+    protected function casts(): array
+    {
+        return [
+            'is_sent' => 'boolean',
+            'is_read' => 'boolean',
+            'is_favorite' => 'boolean',
+            'is_spam' => 'boolean',
+        ];
+    }
 
     /**
      * The "booted" method of the model.
@@ -23,8 +34,8 @@ class Mail extends Model
 
         // Automatically set user_id when creating
         static::creating(function ($mail) {
-            if (! $mail->user_id && \Illuminate\Support\Facades\Auth::check()) {
-                $mail->user_id = \Illuminate\Support\Facades\Auth::id();
+            if (! $mail->user_id && Auth::check()) {
+                $mail->user_id = Auth::id();
             }
         });
     }
