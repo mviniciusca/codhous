@@ -163,6 +163,65 @@
     .dark .fi-sidebar-item-active > .fi-sidebar-item-button { background: rgba(var(--primary-500), .1); }
     .dark .fi-sidebar-item-active .fi-sidebar-item-label { color: rgb(var(--primary-300)); }
     .fi-sidebar-group-label { letter-spacing: .04em; text-transform: uppercase; font-size: 11px; }
+
+    /*
+        Cabeçalho de página compacto (todas as páginas): uma linha com trilha › título,
+        subtítulo como dica no "?" e ações à direita. Markup em vendor/filament-panels/components/header.
+        As margens negativas compensam o py-8 / gap-y-8 da página do Filament.
+    */
+    .cx-pagebar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px 12px;
+        min-height: 36px;
+        margin: -20px 0 -18px;
+    }
+    .cx-pagebar-start { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; }
+    .cx-pagebar-crumb {
+        flex: none;
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        color: rgb(var(--gray-500));
+        transition: color .15s ease;
+    }
+    a.cx-pagebar-crumb:hover { color: rgb(var(--gray-950)); }
+    .dark .cx-pagebar-crumb { color: rgb(var(--gray-400)); }
+    .dark a.cx-pagebar-crumb:hover { color: #fff; }
+    .cx-pagebar-sep { width: 16px; height: 16px; flex: none; color: rgb(var(--gray-400)); }
+    .dark .cx-pagebar-sep { color: rgb(var(--gray-600)); }
+    .cx-pagebar-title {
+        min-width: 0;
+        overflow: hidden;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.3;
+        letter-spacing: -.01em;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        color: rgb(var(--gray-950));
+    }
+    .dark .cx-pagebar-title { color: #fff; }
+    .cx-pagebar-hint {
+        display: grid;
+        place-items: center;
+        flex: none;
+        border-radius: 999px;
+        color: rgb(var(--gray-400));
+        cursor: help;
+        transition: color .15s ease;
+    }
+    .cx-pagebar-hint:hover, .cx-pagebar-hint:focus-visible { color: rgb(var(--primary-500)); outline: none; }
+    .cx-pagebar-hint svg { width: 16px; height: 16px; }
+    .cx-pagebar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: none; }
+    .cx-pagebar-actions:empty { display: none; }
+    /* Celular: só o título; a trilha volta a aparecer a partir de 640px */
+    @media (max-width: 639px) {
+        .cx-pagebar { margin-top: -12px; }
+        .cx-pagebar-crumb, .cx-pagebar-sep { display: none; }
+    }
 </style>
 
 @include('filament.admin.ui')

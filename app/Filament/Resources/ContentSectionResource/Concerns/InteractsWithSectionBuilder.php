@@ -7,7 +7,6 @@ use App\Http\Controllers\ContentSectionPreviewController;
 use App\Models\ContentSection;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Renderless;
 
@@ -92,19 +91,6 @@ trait InteractsWithSectionBuilder
     protected function getFormActions(): array
     {
         return [];
-    }
-
-    /**
-     * Cabeçalho compacto (uma linha) para sobrar mais altura para o construtor.
-     */
-    public function getHeader(): ?View
-    {
-        return view('filament.section-builder.page-header', [
-            'breadcrumbs' => $this->getBreadcrumbs(),
-            'heading' => $this->getHeading(),
-            'subheading' => $this->getSubheading(),
-            'actions' => $this->getCachedHeaderActions(),
-        ]);
     }
 
     public function getMaxContentWidth(): MaxWidth|string|null

@@ -22,7 +22,7 @@ CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 
 - **The UI language is Brazilian Portuguese** (`APP_LOCALE=pt_BR`). Labels, helper texts, comments and test names are mostly in Portuguese and often wrapped in `__()`. Keep new UI strings in Portuguese.
 - Commits use Conventional Commits (`feat:`, `refactor:`, `style:`, `chore:`, `fix:`), written in English.
 - Work happens on feature branches. PRs target `main`.
-- Admin "builder" screens (component library + live preview + step inspector, compact one-line page header) follow `docs/PADRAO_UI_BUILDER.md`. Public-site blocks follow `docs/estilo-minimalista-design.md`.
+- Admin "builder" screens (component library + live preview + step inspector) follow `docs/PADRAO_UI_BUILDER.md`. Every admin page gets the compact one-line header (breadcrumb › title, subheading as a `?` tooltip, actions on the right) from the overridden `resources/views/vendor/filament-panels/components/header/index.blade.php`; set heading/subheading/actions through Filament methods, never build a header inside the view. Public-site blocks follow `docs/estilo-minimalista-design.md`.
 
 ## Architecture
 
@@ -49,7 +49,7 @@ CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 
 - `filament-peek` (`PreviewAction`) is also registered, as a separate "Preview Interno".
 
 ### Filament overrides
-- `resources/views/vendor/filament-forms/` contains **published, customized** Filament form views (builder, block-picker, wizard, …), and they are committed. Filament upgrades may require re-syncing them.
+- `resources/views/vendor/filament-forms/` contains **published, customized** Filament form views (builder, block-picker, wizard, …), and `resources/views/vendor/filament-panels/` overrides panel components (page header, user menu). They are committed. Filament upgrades may require re-syncing them.
 - The panel is configured in `app/Providers/Filament/AdminPanelProvider.php`. Resources, pages, widgets and clusters are auto-discovered. Navigation groups: Orçamentos, Website, Empresa, Configurações. The Shield plugin is installed but commented out.
 
 ### Budgets (orçamentos)

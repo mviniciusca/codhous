@@ -2,7 +2,7 @@
 
 Regras de design e implementação das telas de "construção" do painel admin: biblioteca de componentes, prévia ao vivo e inspetor. A referência implementada é a criação e edição de seções (`/admin/content-sections/create`).
 
-Este guia vale para o **painel Filament**. Para os blocos do **site público** (Tailwind, cards, tipografia), siga o [estilo-minimalista-design.md](estilo-minimalista-design.md).
+Este guia vale para o **painel Filament**. A barra de título (seção 2.1) vale para **todas** as páginas do painel. Para os blocos do **site público** (Tailwind, cards, tipografia), siga o [estilo-minimalista-design.md](estilo-minimalista-design.md).
 
 > Leitura obrigatória para quem (pessoa ou LLM) for criar ou alterar uma tela nesse formato. Se uma regra precisar mudar, atualize este documento junto com o código.
 
@@ -34,33 +34,28 @@ Não use para cadastros simples (cliente, produto) nem para listagens. Nesses ca
 
 Cada coluna é um painel com rolagem própria. **A página em si não rola no desktop**: o construtor ocupa a altura da tela.
 
-### 2.1 Barra de título (cabeçalho compacto)
+### 2.1 Barra de título (cabeçalho compacto) — vale para todo o painel
 
-O cabeçalho padrão do Filament (trilha, título grande e subtítulo em três linhas) **não é usado** nessas telas. No lugar dele vai uma linha única:
+**Todas as páginas e subpáginas do painel** usam este cabeçalho, não só o construtor. O cabeçalho padrão do Filament (trilha, título grande e subtítulo em três linhas) foi substituído por uma linha única:
 
 - **Esquerda:** trilha com os níveis anteriores clicáveis, separador `›` e o título da página (18px, peso 700).
-  - O último nível da trilha ("Criar", "Editar") **não aparece**, porque repete o título.
-- **Subtítulo:** vira a dica de um ícone `?` (`heroicon-m-question-mark-circle`) ao lado do título. Nunca vira uma linha de texto.
-- **Direita:** as ações de cabeçalho da página (ex.: **Excluir** na edição), em tamanho `sm`.
+  - O último nível da trilha ("Criar", "Editar", "Lista") **não aparece**, porque é a própria página.
+  - Também saem os níveis que **apontam para a página atual** (ex.: o link "Alertas" na própria listagem de alertas) ou que **repetem o título**.
+  - Resultado: listagens mostram só o título; subpáginas mostram `Alertas › Criar Alerta`, `Orçamentos › Quadro de orçamentos`.
+- **Subtítulo:** vira a dica de um ícone `?` (`heroicon-m-question-mark-circle`) ao lado do título, com o texto também disponível para leitores de tela. Nunca vira uma linha de texto.
+- **Direita:** as ações de cabeçalho da página (`getHeaderActions()`), mais os render hooks `PAGE_HEADER_ACTIONS_BEFORE/AFTER`.
 - **Altura e espaçamento:** mínimo de 36px. As margens negativas (`margin: -20px 0 -18px`) compensam o `py-8 gap-y-8` da página do Filament.
+- **Celular (< 640px):** a trilha some, ficam o título e o `?`; as ações quebram para a linha de baixo.
 
-**Como aplicar:** sobrescreva `getHeader()` na página e devolva a view `filament.section-builder.page-header` (ver `InteractsWithSectionBuilder::getHeader()`):
+**Como funciona:** o componente do Filament é sobrescrito em `resources/views/vendor/filament-panels/components/header/index.blade.php`, e os estilos (`.cx-pagebar-*`) ficam em `filament/admin/theme.blade.php`. Toda página que usa `<x-filament-panels::page>` recebe o cabeçalho automaticamente; **não é preciso fazer nada** em páginas novas.
 
-```php
-public function getHeader(): ?View
-{
-    return view('filament.section-builder.page-header', [
-        'breadcrumbs' => $this->getBreadcrumbs(),
-        'heading' => $this->getHeading(),
-        'subheading' => $this->getSubheading(),
-        'actions' => $this->getCachedHeaderActions(),
-    ]);
-}
-```
+Regras para páginas novas:
+- Defina título, subtítulo e ações pelos métodos do Filament (`getHeading()`, `getSubheading()`, `getHeaderActions()`). Não monte cabeçalho próprio dentro da view.
+- Escreva o subtítulo como uma frase de ajuda, porque ele aparece como dica.
+- Exceção: telas de edição em tela cheia com barra própria (ex.: editor de páginas, `filament.page-builder.editor`) devolvem `''` em `getHeading()` para ocultar este cabeçalho.
+- Ao atualizar o Filament, compare o componente sobrescrito com o original (`vendor/filament/filament/resources/views/components/header/index.blade.php`).
 
-A página também deve usar `getMaxContentWidth(): MaxWidth::Full`.
-
-> Se outras telas (fora do construtor) passarem a usar essa barra, mova a view para `filament/admin/` e mantenha o nome das classes `sb-pagebar-*`.
+As telas de construtor também usam `getMaxContentWidth(): MaxWidth::Full`.
 
 ### 2.2 Colunas e responsividade
 
@@ -301,7 +296,7 @@ O inspetor é estreito (368–440px). Os formulários precisam ser pensados para
 
 ## 8. Checklist para uma nova tela no padrão
 
-- [ ] Página com `getHeader()` compacto, `MaxWidth::Full` e `getFormActions(): []`.
+- [ ] Página com `MaxWidth::Full` e `getFormActions(): []` (o cabeçalho compacto já vem do painel).
 - [ ] Layout com três filhos: seletor (biblioteca), `View` do canvas e `Wizard` com a view do inspetor.
 - [ ] Metadados dos tipos no modelo (`*Catalog()`), com uma miniatura skeleton própria por tipo.
 - [ ] Endpoint de prévia com token, checagem de área e de usuário, cabeçalhos de segurança e renderização antes do layout.
@@ -316,7 +311,7 @@ O inspetor é estreito (368–440px). Os formulários precisam ser pensados para
 | Parte | Arquivo |
 |---|---|
 | Layout | `app/Filament/Forms/Components/SectionBuilder.php`, `resources/views/filament/section-builder/layout.blade.php`, `styles.blade.php` |
-| Barra de título | `resources/views/filament/section-builder/page-header.blade.php` |
+| Barra de título (global) | `resources/views/vendor/filament-panels/components/header/index.blade.php`, estilos em `resources/views/filament/admin/theme.blade.php`, teste em `tests/Feature/PageHeaderTest.php` |
 | Biblioteca | `app/Filament/Forms/Components/SectionTypePicker.php`, `resources/views/filament/forms/components/section-type-picker.blade.php` (+ `/styles`, `/previews/*`) |
 | Prévia | `resources/views/filament/section-builder/canvas.blade.php`, `script.blade.php`, `app/Http/Controllers/ContentSectionPreviewController.php`, `resources/views/section-preview.blade.php` |
 | Inspetor | `resources/views/filament/section-builder/wizard.blade.php`, `component-summary.blade.php` |
