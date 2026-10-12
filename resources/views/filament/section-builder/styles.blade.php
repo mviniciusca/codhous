@@ -35,7 +35,7 @@
         .sb {
             grid-template-columns: 272px minmax(0, 1fr) 368px;
             grid-template-areas: "library canvas inspector";
-            height: max(620px, calc(100dvh - 13.5rem));
+            height: max(620px, calc(100dvh - 10.25rem));
         }
         .sb-col--library, .sb-col--canvas, .sb-col--inspector { height: auto; max-height: none; min-height: 0; }
         .sb-col--inspector { display: flex; flex-direction: column; }
