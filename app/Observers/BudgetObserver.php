@@ -55,11 +55,11 @@ class BudgetObserver
 
             foreach ($priceChanges as $field => $values) {
                 $fieldLabel = match ($field) {
-                    'price'    => 'Preço',
-                    'tax'      => 'Taxa',
+                    'price' => 'Preço',
+                    'tax' => 'Taxa',
                     'discount' => 'Desconto',
-                    'total'    => 'Total',
-                    default    => ucfirst($field),
+                    'total' => 'Total',
+                    default => ucfirst($field),
                 };
 
                 $oldFormatted = $values['old'] ? 'R$ '.number_format((float) $values['old'], 2, ',', '.') : 'N/A';
@@ -84,14 +84,5 @@ class BudgetObserver
         }
     }
 
-    /**
-     * Handle the Budget "creating" event.
-     */
-    public function creating(Budget $budget): void
-    {
-        // Ensure user_id is set
-        if (! $budget->user_id && Auth::check()) {
-            $budget->user_id = Auth::id();
-        }
-    }
+    // O user_id é definido em Budget::booted() (creating), que respeita 'user_id' => null dos pedidos do site.
 }

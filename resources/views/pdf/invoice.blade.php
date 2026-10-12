@@ -255,7 +255,7 @@
                         @if($item->location) - Local: {{ $item->location->name }} @endif
                     </td>
                     <td class="text-center">{{ $item->productOption?->unit?->value ?? 'UN' }}</td>
-                    <td class="text-center">{{ number_format(ceil($item->quantity), 0, ',', '.') }}</td>
+                    <td class="text-center">{{ \App\Services\BudgetCalculatorService::formatQuantity((float) $item->quantity) }}</td>
                     <td class="text-right">R$ {{ number_format((float)$item->price, 2, ',', '.') }}</td>
                     <td class="text-right">R$ {{ number_format((float)$item->subtotal, 2, ',', '.') }}</td>
                 </tr>

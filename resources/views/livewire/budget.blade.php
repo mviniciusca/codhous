@@ -19,6 +19,13 @@
             <p class="mt-4 text-lg text-muted-foreground leading-relaxed">
                 Nossa equipe recebeu sua solicitação. Em até 24 horas entraremos em contato via WhatsApp ou E-mail para enviar sua proposta personalizada.
             </p>
+            @if($code)
+                <div class="mt-6 inline-flex flex-col items-center rounded-2xl border border-border/60 bg-muted/30 px-6 py-3">
+                    <span class="text-xs font-medium text-muted-foreground">Código do seu pedido</span>
+                    <strong class="font-mono text-xl font-bold text-foreground">#{{ $code }}</strong>
+                </div>
+                <p class="mt-3 text-xs text-muted-foreground">Enviamos uma confirmação para <strong>{{ $customer_email }}</strong>.</p>
+            @endif
             <div class="mt-10">
                 <button wire:click="resetForm" class="rounded-xl px-8 py-4 text-sm font-bold tracking-widest text-white transition-all hover:-translate-y-1 hover:shadow-lg {{ $accentBg }}">
                     Fazer outro pedido
@@ -143,7 +150,7 @@
                                         <div class="md:col-span-2">
                                             <label class="mb-1.5 block text-xs font-bold text-foreground">Qtd. <span class="text-red-500">*</span></label>
                                             <div class="relative">
-                                                <input type="number" wire:model.blur="items.{{ $index }}.quantity" step="1" min="{{ $item['min_quantity'] ?? 1 }}" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-bold shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" {{ empty($item['option_id']) ? 'disabled' : '' }} />
+                                                <input type="number" wire:model.blur="items.{{ $index }}.quantity" step="0.5" min="{{ $item['min_quantity'] ?? 1 }}" inputmode="decimal" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-bold shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" {{ empty($item['option_id']) ? 'disabled' : '' }} />
                                                 @if(!empty($item['unit']))
                                                     <span class="absolute inset-y-0 right-3 flex items-center text-xs font-medium text-muted-foreground pointer-events-none">{{ $item['unit'] }}</span>
                                                 @endif
@@ -206,7 +213,7 @@
                             
                             <div>
                                 <label class="mb-1.5 block text-xs font-bold text-foreground">WhatsApp <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="customer_phone" placeholder="(00) 00000-0000" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" x-mask="(99) 99999-9999" />
+                                <input type="text" wire:model="customer_phone" placeholder="(00) 00000-0000" inputmode="tel" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" x-mask:dynamic="$input.replace(/\D/g, '').length > 10 ? '(99) 99999-9999' : '(99) 9999-99999'" />
                                 @error('customer_phone') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                             
@@ -238,7 +245,7 @@
                             
                             <div class="md:col-span-2">
                                 <label class="mb-1.5 block text-xs font-bold text-foreground">Nº <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="number" placeholder="Nº ou KM" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                                <input type="text" wire:model="number" placeholder="Nº, KM ou S/N" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                                 @error('number') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
@@ -256,6 +263,55 @@
                                     <input type="text" wire:model="state" disabled class="w-full rounded-xl border border-transparent bg-muted/40 px-4 py-3 text-sm font-medium text-muted-foreground shadow-inner text-center" />
                                 </div>
                             @endif
+
+                            <div class="md:col-span-12">
+                                <label class="mb-1.5 block text-xs font-bold text-foreground">Complemento / Ponto de referência</label>
+                                <input type="text" wire:model="complement" placeholder="Ex: Lote 5, Quadra B, próximo ao mercado" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                                @error('complement') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <hr class="border-border/50 my-8" />
+
+                        <div class="mb-6">
+                            <h4 class="font-bold text-foreground">Entrega</h4>
+                            <p class="text-xs text-muted-foreground mt-1">Opcional, mas ajuda a programar o caminhão para o dia certo.</p>
+                        </div>
+
+                        <div class="grid gap-6 md:grid-cols-12">
+                            <div class="md:col-span-4">
+                                <label class="mb-1.5 block text-xs font-bold text-foreground">Data desejada</label>
+                                <input type="date" wire:model="delivery_date" min="{{ now()->toDateString() }}" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                                @error('delivery_date') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="md:col-span-3">
+                                <label class="mb-1.5 block text-xs font-bold text-foreground">Período</label>
+                                <select wire:model="delivery_period" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                    <option value="">Selecione...</option>
+                                    @foreach($deliveryPeriods as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('delivery_period') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="md:col-span-5">
+                                <label class="mb-1.5 block text-xs font-bold text-foreground">Precisa de bomba?</label>
+                                <select wire:model="needs_pump" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                    <option value="">Selecione...</option>
+                                    @foreach($pumpOptions as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('needs_pump') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="md:col-span-12">
+                                <label class="mb-1.5 block text-xs font-bold text-foreground">Observações</label>
+                                <textarea wire:model="notes" rows="3" maxlength="1000" placeholder="Tipo de obra (laje, piso, fundação…), acesso para o caminhão, restrições de horário…" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+                                @error('notes') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
                     @elseif ($currentStep === 3)
@@ -277,10 +333,47 @@
                             
                             <h4 class="font-bold text-foreground mt-6 mb-4 border-b border-border/50 pb-2">Local da Obra</h4>
                             <div class="text-sm text-foreground">
-                                {{ $street }}, {{ $number }} - {{ $neighborhood }}<br>
+                                {{ $street }}, {{ $number }}@if($complement) ({{ $complement }})@endif - {{ $neighborhood }}<br>
                                 {{ $city }} - {{ $state }}, CEP: {{ $postcode }}
                             </div>
+
+                            @if($delivery_date || $delivery_period || $needs_pump || $notes)
+                                <h4 class="font-bold text-foreground mt-6 mb-4 border-b border-border/50 pb-2">Entrega</h4>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    @if($delivery_date)
+                                        <div><span class="text-muted-foreground block text-xs">Data desejada:</span> <strong class="text-foreground">{{ \Illuminate\Support\Carbon::parse($delivery_date)->format('d/m/Y') }}</strong></div>
+                                    @endif
+                                    @if($delivery_period)
+                                        <div><span class="text-muted-foreground block text-xs">Período:</span> <strong class="text-foreground">{{ $deliveryPeriods[$delivery_period] ?? '' }}</strong></div>
+                                    @endif
+                                    @if($needs_pump)
+                                        <div class="col-span-2"><span class="text-muted-foreground block text-xs">Bomba:</span> <strong class="text-foreground">{{ $pumpOptions[$needs_pump] ?? '' }}</strong></div>
+                                    @endif
+                                    @if($notes)
+                                        <div class="col-span-2"><span class="text-muted-foreground block text-xs">Observações:</span> <span class="text-foreground whitespace-pre-line">{{ $notes }}</span></div>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
+
+                        @if($turnstileEnabled)
+                            {{-- Renderização explícita: a etapa 3 é inserida pelo Livewire depois do carregamento da página --}}
+                            <div class="mt-6 flex justify-center" wire:ignore
+                                x-data="{ widgetId: null }"
+                                x-init="
+                                    const renderWidget = () => {
+                                        if (! window.turnstile) { return setTimeout(renderWidget, 200); }
+                                        widgetId = window.turnstile.render($el, {
+                                            sitekey: @js($turnstileSiteKey),
+                                            callback: (token) => { $wire.turnstileToken = token },
+                                            'expired-callback': () => { $wire.turnstileToken = null },
+                                        });
+                                    };
+                                    renderWidget();
+                                "
+                                x-on:budget-turnstile-reset.window="widgetId !== null && window.turnstile?.reset(widgetId)"
+                            ></div>
+                        @endif
                     @endif
 
                 </div>
@@ -301,18 +394,18 @@
                             <i data-lucide="arrow-right" class="h-4 w-4"></i>
                         </button>
                     @else
-                        <button type="button" wire:click="submit" class="flex items-center gap-2 rounded-xl px-10 py-4 text-sm font-bold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg {{ $accentBg }}">
-                            Enviar Solicitação Grátis
+                        <button type="button" wire:click="submit" wire:loading.attr="disabled" wire:target="submit" class="flex items-center gap-2 rounded-xl px-10 py-4 text-sm font-bold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-wait disabled:opacity-70 {{ $accentBg }}">
+                            <span wire:loading.remove wire:target="submit">Enviar Solicitação Grátis</span>
+                            <span wire:loading wire:target="submit">Enviando...</span>
                             <i data-lucide="check-circle" class="h-4 w-4"></i>
                         </button>
                     @endif
                 </div>
 
-                @if($turnstileEnabled)
-                    <div class="mt-2 text-center">
-                        @error('turnstileToken') <span class="text-xs text-red-500 font-bold">{{ $message }}</span> @enderror
-                    </div>
-                @endif
+                <div class="mt-2 text-center">
+                    @error('turnstileToken') <span class="text-xs text-red-500 font-bold">{{ $message }}</span> @enderror
+                    @error('submit') <span class="text-xs text-red-500 font-bold">{{ $message }}</span> @enderror
+                </div>
             </div>
 
             <!-- Direita: Sidebar Resumo -->
@@ -343,7 +436,7 @@
                                             <strong class="block text-sm font-bold text-foreground leading-tight">{{ $allProducts[$item['product_id']] ?? 'Produto' }}</strong>
                                             <span class="block text-xs text-muted-foreground mt-0.5">{{ $this->getOptionsForProduct($item['product_id'])[$item['option_id']] ?? '' }}</span>
                                             <div class="mt-2 flex items-baseline gap-1">
-                                                <span class="text-lg font-extrabold text-primary">{{ $item['quantity'] }}</span>
+                                                <span class="text-lg font-extrabold text-primary">{{ \App\Services\BudgetCalculatorService::formatQuantity((float) $item['quantity']) }}</span>
                                                 <span class="text-xs font-medium text-primary/80">{{ $item['unit'] }}</span>
                                             </div>
                                         </div>
@@ -367,7 +460,7 @@
                         <div class="mt-5 rounded-xl border border-orange-200 bg-orange-50 p-4 text-xs leading-relaxed text-orange-800">
                             <div class="flex items-start gap-2">
                                 <i data-lucide="info" class="h-4 w-4 shrink-0 mt-0.5 text-orange-500"></i>
-                                <p>Os valores exatos e o custo de entrega serão calculados pela nossa equipe técnica e enviados no seu e-mail ou whatsapp em até 48 horas.</p>
+                                <p>Os valores exatos e o custo de entrega serão calculados pela nossa equipe técnica e enviados no seu e-mail ou WhatsApp em até 24 horas.</p>
                             </div>
                         </div>
                     @endif
@@ -410,11 +503,6 @@
     @push('scripts')
         @if($turnstileEnabled)
             <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-            <script>
-                function onTurnstileSuccess(token) {
-                    @this.set('turnstileToken', token);
-                }
-            </script>
         @endif
     @endpush
 

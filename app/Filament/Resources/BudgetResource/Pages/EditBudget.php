@@ -10,7 +10,7 @@ class EditBudget extends EditRecord
 {
     protected static string $resource = BudgetResource::class;
 
-    public function getTitle(): string 
+    public function getTitle(): string
     {
         return 'Detalhes do Orçamento';
     }
@@ -23,18 +23,25 @@ class EditBudget extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $fieldsToFormat = ['tax', 'discount', 'subtotal', 'shipping', 'total'];
-        
+
         if (isset($data['content']) && is_array($data['content'])) {
+            // Pedidos do site (e antigos) não têm taxa/desconto; sem isso o formulário não salva
+            foreach (['tax', 'discount', 'shipping'] as $field) {
+                if (! isset($data['content'][$field]) || $data['content'][$field] === '') {
+                    $data['content'][$field] = 0;
+                }
+            }
+
             foreach ($fieldsToFormat as $field) {
                 if (isset($data['content'][$field])) {
                     $val = $data['content'][$field];
-                    if (is_numeric($val) && !str_contains((string)$val, ',')) {
+                    if (is_numeric($val) && ! str_contains((string) $val, ',')) {
                         $data['content'][$field] = number_format(floatval($val), 2, ',', '.');
                     }
                 }
             }
         }
-        
+
         return $data;
     }
 

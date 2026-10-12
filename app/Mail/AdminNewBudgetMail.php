@@ -6,6 +6,7 @@ use App\Models\Budget;
 use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -21,7 +22,7 @@ class AdminNewBudgetMail extends Mailable
      */
     public function __construct(public Budget $budget)
     {
-        $this->company = Setting::first()?->companySetting;
+        $this->company = (object) (Setting::get('company') ?? []);
     }
 
     /**
@@ -30,7 +31,7 @@ class AdminNewBudgetMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "🔔 Novo Orçamento Recebido: #{$this->budget->code} - " . data_get($this->budget->content, 'customer_name', 'Cliente'),
+            subject: "🔔 Novo Orçamento Recebido: #{$this->budget->code} - ".data_get($this->budget->content, 'customer_name', 'Cliente'),
         );
     }
 
@@ -55,7 +56,7 @@ class AdminNewBudgetMail extends Mailable
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {

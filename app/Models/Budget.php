@@ -6,14 +6,16 @@ use App\Models\Scopes\UserBudgetScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Budget extends Model
 {
     use HasFactory;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $guarded = [];
 
@@ -31,10 +33,11 @@ class Budget extends Model
     {
         static::addGlobalScope(new UserBudgetScope);
 
-        // Automatically set user_id and code when creating
+        // Automatically set user_id and code when creating.
+        // Passar 'user_id' => null explicitamente (pedidos do site) evita atribuir ao usuário logado.
         static::creating(function ($budget) {
-            if (! $budget->user_id && \Illuminate\Support\Facades\Auth::check()) {
-                $budget->user_id = \Illuminate\Support\Facades\Auth::id();
+            if (! array_key_exists('user_id', $budget->getAttributes()) && Auth::check()) {
+                $budget->user_id = Auth::id();
             }
 
             if (! $budget->code) {
@@ -91,7 +94,7 @@ class Budget extends Model
 
     public function activities()
     {
-        return $this->morphMany(\Spatie\Activitylog\Models\Activity::class, 'subject');
+        return $this->morphMany(Activity::class, 'subject');
     }
 
     public function products()
@@ -123,8 +126,6 @@ class Budget extends Model
 
     /**
      * Generate a unique budget code
-     *
-     * @return string
      */
     public static function generateUniqueCode(): string
     {
