@@ -1,4 +1,26 @@
-{{-- Topbar: tema (acesso rápido) e atalho para o site público --}}
+{{-- Topbar: atalhos do Meu Workspace, tema (acesso rápido) e atalho para o site público --}}
+@php $dueTasks = \App\Filament\Pages\Workspace::dueTaskCount(); @endphp
+<nav class="cx-topbar-shortcuts" aria-label="Meu Workspace">
+    @foreach ([
+        'tarefas' => ['heroicon-m-check-circle', 'Minhas tarefas'],
+        'agenda' => ['heroicon-m-calendar-days', 'Agenda'],
+        'notas' => ['heroicon-m-document-text', 'Notas rápidas'],
+    ] as $tab => [$icon, $label])
+        @php $tooltip = $tab === 'tarefas' && $dueTasks ? $label.' · '.$dueTasks.($dueTasks === 1 ? ' vence hoje ou está atrasada' : ' vencem hoje ou estão atrasadas') : $label; @endphp
+        <a
+            href="{{ \App\Filament\Pages\Workspace::getUrl($tab === 'tarefas' ? [] : ['aba' => $tab]) }}"
+            class="cx-topbar-icon"
+            aria-label="{{ $tooltip }}"
+            x-tooltip="{ content: @js($tooltip), theme: $store.theme }"
+        >
+            <x-filament::icon :icon="$icon" class="cx-icon-sm" aria-hidden="true" />
+            @if ($tab === 'tarefas' && $dueTasks)
+                <span class="cx-topbar-count" aria-hidden="true">{{ $dueTasks > 9 ? '9+' : $dueTasks }}</span>
+            @endif
+        </a>
+    @endforeach
+</nav>
+
 <x-filament::dropdown placement="bottom-end" teleport width="xs" class="cx-topbar-theme">
     <x-slot name="trigger">
         <button

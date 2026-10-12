@@ -86,6 +86,38 @@
     .dark .cx-topbar-icon { color: rgb(var(--gray-400)); }
     .dark .cx-topbar-icon:hover { color: #fff; background: rgba(255, 255, 255, .06); }
 
+    /* Atalhos do Meu Workspace (tarefas, agenda, notas) */
+    .cx-topbar-shortcuts {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding-right: 8px;
+        margin-right: 4px;
+        border-right: 1px solid rgba(var(--gray-950), .08);
+    }
+    .dark .cx-topbar-shortcuts { border-right-color: rgba(255, 255, 255, .08); }
+    .cx-topbar-shortcuts .cx-topbar-icon { position: relative; }
+    .cx-topbar-count {
+        position: absolute;
+        top: 1px;
+        right: -2px;
+        min-width: 15px;
+        height: 15px;
+        padding: 0 4px;
+        border-radius: 999px;
+        font-size: 9.5px;
+        font-weight: 700;
+        line-height: 15px;
+        text-align: center;
+        color: #fff;
+        background: rgb(var(--primary-600));
+        box-shadow: 0 0 0 2px #fff;
+    }
+    .dark .cx-topbar-count { box-shadow: 0 0 0 2px rgb(var(--gray-950)); }
+    @media (max-width: 639px) {
+        .cx-topbar-shortcuts { display: none; }
+    }
+
     /* Menu do usuário */
     .cx-um-trigger {
         display: flex;

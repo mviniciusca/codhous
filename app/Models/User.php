@@ -141,4 +141,22 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->morphMany(Activity::class, 'causer')
             ->orderBy('created_at', 'desc');
     }
+
+    /**
+     * Meu Workspace: tarefas, compromissos e notas pessoais.
+     */
+    public function workspaceTasks()
+    {
+        return $this->hasMany(WorkspaceTask::class);
+    }
+
+    public function workspaceEvents()
+    {
+        return $this->hasMany(WorkspaceEvent::class);
+    }
+
+    public function workspaceNotes()
+    {
+        return $this->hasMany(WorkspaceNote::class);
+    }
 }
