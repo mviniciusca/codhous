@@ -70,7 +70,6 @@ CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 
 
 - **`routes/web.php` overrides `/admin/login` with a dev auto-login** that logs in `User::first()`, marked "TODO: Remove". Never ship it to production. Don't rely on it in tests either.
 - `AppServiceProvider::boot()` queries `settings` whenever the table exists, so a broken settings row affects every request.
-- The `*.php`/`*.py` scripts in the repo root (`modify_*.php`, `patch_*.py`, `refactor_wizard*.py`, `generate_*.php`, `check_brackets.py`, `update_resource.patch`) are one-off codemods that were used to rewrite Blade/Filament files. They are not part of the app. Don't run them unless asked, because they overwrite files in `resources/views/vendor/...` and in the resources.
-- `.bak` files exist in `app/Livewire` and `resources/views/livewire`. Ignore them.
-- Test coverage is thin (`tests/Feature`: Budget, Navigation, User).
+- Keep the repo root Laravel-standard: no one-off codemod scripts, patches or `.bak` files (git history is the backup). A reusable maintenance task becomes an Artisan command in `app/Console/Commands`.
+- `storage/` is tracked only through its per-folder `.gitignore` stubs, as in the Laravel skeleton. Never ignore `/storage` wholesale, because a fresh clone would come without the folders Laravel needs.
 - `docs/` has product and design notes (roadmap, permissions, user guide), mostly in Portuguese.
