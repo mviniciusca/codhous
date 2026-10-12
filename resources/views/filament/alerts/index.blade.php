@@ -193,8 +193,8 @@
                                     <span class="al-thumb-line" style="--w: 40%"></span>
                                     <span class="al-thumb-line is-thin" style="--w: 70%"></span>
                                 </span>
-                                <span class="al-mini al-mini--{{ $alert->style }}" aria-hidden="true">
-                                    <x-filament::icon :icon="$style['icon']" class="al-mini-icon" />
+                                <span class="al-mini" style="{{ \App\Support\AlertAppearance::cssVariables($alert->style) }}" aria-hidden="true">
+                                    <span class="al-mini-icon">{!! \App\Support\AlertAppearance::icon($alert->style) !!}</span>
                                     <span class="al-mini-text">
                                         @if ($alert->title)
                                             <span class="al-mini-title">{{ $alert->title }}</span>

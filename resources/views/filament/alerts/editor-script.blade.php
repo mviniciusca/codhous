@@ -162,6 +162,10 @@
                     // Links internos do site abrem a outra página dentro da prévia
                     this.ready = false;
                     this.frameSrc = config.src + '?pagina=' + encodeURIComponent(data.path);
+                } else if (data.type === 'alert-cta') {
+                    this.showHint(`Botão de demonstração. No site, “${data.label || 'o botão'}” abre ${data.href}.`);
+                } else if (data.type === 'alert-dismissed') {
+                    this.showHint('Alerta fechado, como o visitante faria. Use “Mostrar de novo” para vê-lo outra vez.');
                 } else if (data.type === 'blocked') {
                     this.showHint(data.form ? 'Formulários não são enviados na prévia.' : 'Links externos não abrem na prévia.');
                 }
@@ -170,7 +174,7 @@
             showHint(text) {
                 this.hint = text;
                 clearTimeout(this._hintTimer);
-                this._hintTimer = setTimeout(() => (this.hint = ''), 2600);
+                this._hintTimer = setTimeout(() => (this.hint = ''), 4000);
             },
         };
     };

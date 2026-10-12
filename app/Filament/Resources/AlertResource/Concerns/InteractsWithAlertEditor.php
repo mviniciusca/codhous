@@ -4,6 +4,7 @@ namespace App\Filament\Resources\AlertResource\Concerns;
 
 use App\Filament\Resources\AlertResource;
 use App\Models\Alert;
+use App\Support\AlertAppearance;
 use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Blade;
@@ -33,14 +34,18 @@ trait InteractsWithAlertEditor
         // Só valores simples: o estado vem do navegador e vai direto para a view do site
         $text = fn (string $key): ?string => isset($data[$key]) && is_scalar($data[$key]) ? (string) $data[$key] : null;
 
+        $style = array_key_exists((string) $text('style'), Alert::styleCatalog()) ? $text('style') : Alert::STYLE_INFO;
+        // Campos vazios mostram o conteúdo demonstrativo do estilo
+        $demo = AlertAppearance::for($style);
+
         $alert = new Alert;
         $alert->forceFill([
             'name' => $text('name'),
             'type' => array_key_exists((string) $text('type'), Alert::typeCatalog()) ? $text('type') : Alert::TYPE_MODAL,
-            'style' => array_key_exists((string) $text('style'), Alert::styleCatalog()) ? $text('style') : Alert::STYLE_INFO,
+            'style' => $style,
             'position' => $text('position'),
-            'title' => $text('title'),
-            'message' => filled($text('message')) ? $text('message') : 'Escreva a mensagem principal para vê-la aqui.',
+            'title' => filled($text('title')) ? $text('title') : $demo['demoTitle'],
+            'message' => filled($text('message')) ? $text('message') : $demo['demoMessage'],
             'cta_label' => $text('cta_label'),
             'cta_url' => $text('cta_url'),
             'is_dismissible' => (bool) ($data['is_dismissible'] ?? true),

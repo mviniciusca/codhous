@@ -114,6 +114,8 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => self::GRAPHITE,
                 'info' => Color::Sky,
                 'primary' => self::ELECTRIC_BLUE,
+                // Estilo "Promoção" dos alertas
+                'purple' => Color::Violet,
                 'success' => Color::Emerald,
                 'warning' => Color::Amber,
             ])

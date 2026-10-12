@@ -122,10 +122,10 @@ class Alert extends Model
     {
         return [
             self::STYLE_INFO => ['label' => 'Informativo', 'icon' => 'heroicon-o-information-circle', 'color' => 'info'],
-            self::STYLE_PROMO => ['label' => 'Promoção', 'icon' => 'heroicon-o-sparkles', 'color' => 'primary'],
-            self::STYLE_ANNOUNCEMENT => ['label' => 'Aviso', 'icon' => 'heroicon-o-megaphone', 'color' => 'gray'],
+            self::STYLE_PROMO => ['label' => 'Promoção', 'icon' => 'heroicon-o-gift', 'color' => 'purple'],
+            self::STYLE_ANNOUNCEMENT => ['label' => 'Aviso', 'icon' => 'heroicon-o-megaphone', 'color' => 'warning'],
             self::STYLE_CONSENT => ['label' => 'Consentimento', 'icon' => 'heroicon-o-shield-check', 'color' => 'gray'],
-            self::STYLE_WARNING => ['label' => 'Atenção', 'icon' => 'heroicon-o-exclamation-triangle', 'color' => 'warning'],
+            self::STYLE_WARNING => ['label' => 'Atenção', 'icon' => 'heroicon-o-exclamation-triangle', 'color' => 'danger'],
             self::STYLE_SUCCESS => ['label' => 'Sucesso', 'icon' => 'heroicon-o-check-circle', 'color' => 'success'],
         ];
     }

@@ -8,6 +8,7 @@ use App\Models\Alert;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Models\User;
+use App\Support\AlertAppearance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Blade;
 
@@ -96,10 +97,38 @@ test('site renderiza cada tipo de alerta com conteúdo escapado e link seguro', 
         ->not->toContain('<script>alert(1)')
         ->not->toContain('javascript:')
         ->toContain('href="/contato"')
-        ->toContain('fixed inset-0 flex items-center justify-center')
-        ->toContain('absolute bottom-0 left-0 right-0')
-        ->toContain('absolute bottom-6 left-6')
+        ->toContain('sa sa--modal sa--center')
+        ->toContain('sa sa--banner sa--bottom')
+        ->toContain('sa sa--toast sa--bottom-left')
         ->toContain('alertWidget');
+});
+
+test('cada estilo usa a própria paleta e ícone nos três formatos', function (string $style) {
+    foreach ([Alert::TYPE_MODAL, Alert::TYPE_TOAST, Alert::TYPE_BANNER] as $type) {
+        $html = Blade::render('<x-site-alerts :alerts="$alerts" />', [
+            'alerts' => collect([Alert::make(validAlertData(['type' => $type, 'style' => $style, 'position' => null]))]),
+        ]);
+
+        expect($html)
+            ->toContain('--sa-accent: '.AlertAppearance::for($style)['accent'].';')
+            ->toContain('data-alert-style="'.$style.'"')
+            ->toContain('.sa-modal');
+    }
+})->with(array_keys(AlertAppearance::styles()));
+
+test('modal: botão principal e fechar com rótulo do estilo; consentimento usa link no texto e "Aceitar"', function () {
+    $render = fn (array $data) => Blade::render('<x-site-alerts :alerts="$alerts" />', ['alerts' => collect([Alert::make(validAlertData(['type' => Alert::TYPE_MODAL, ...$data]))])]);
+
+    expect($render(['style' => Alert::STYLE_PROMO, 'cta_label' => 'Ver ofertas', 'cta_url' => '/ofertas']))
+        ->toContain('sa-btn sa-btn--primary')->toContain('Ver ofertas')->toContain('Agora não');
+
+    expect($render(['style' => Alert::STYLE_SUCCESS]))->toContain('Ok, entendi');
+
+    expect($render(['style' => Alert::STYLE_CONSENT, 'cta_label' => 'Política de privacidade', 'cta_url' => '/privacidade']))
+        ->toContain('class="sa-inline-link"')->toContain('Aceitar');
+
+    expect($render(['style' => Alert::STYLE_INFO, 'is_dismissible' => false]))
+        ->not->toContain('data-sa-dismiss');
 });
 
 test('site mostra só alertas ativos dentro do período', function () {
@@ -258,6 +287,15 @@ test('lembrar fechamento só aparece quando o alerta pode ser fechado', function
         ->assertFormFieldIsVisible('cookie_duration_days');
 });
 
+test('prévia usa conteúdo demonstrativo do estilo quando título e mensagem estão vazios', function () {
+    $html = livewire(CreateAlert::class)
+        ->fillForm(['style' => Alert::STYLE_PROMO, 'title' => null, 'message' => null])
+        ->call('renderAlertPreview')
+        ->effects['returns'][0];
+
+    expect($html)->toContain('Black Friday Codhous')->toContain('Até 40% de desconto');
+});
+
 test('prévia renderiza o estado não salvo com o componente do site, escapado', function () {
     $html = livewire(CreateAlert::class)
         ->fillForm(validAlertData(['title' => '<img src=x onerror=alert(1)>', 'cta_label' => 'Ver', 'cta_url' => 'javascript:alert(1)']))
@@ -267,7 +305,7 @@ test('prévia renderiza o estado não salvo com o componente do site, escapado',
     expect($html)
         ->toContain('&lt;img src=x onerror=alert(1)&gt;')
         ->not->toContain('javascript:')
-        ->toContain('absolute top-6 right-6');
+        ->toContain('sa sa--toast sa--top-right');
 });
 
 test('editar alerta publicado mantém publicado ao salvar e despublica pela ação', function () {

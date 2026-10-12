@@ -242,7 +242,11 @@
     .al-thumb.is-bottom-left .al-mini { bottom: 8px; left: 8px; }
     .al-thumb.is-bottom-right .al-mini { bottom: 8px; right: 8px; }
 
-    .al-mini-icon { width: 14px; height: 14px; flex: none; margin-top: 1px; color: var(--mini-accent, rgb(var(--info-500))); }
+    .al-mini-icon {
+        display: grid; place-items: center; flex: none; width: 18px; height: 18px; border-radius: 999px;
+        color: #fff; background: rgb(var(--sa-accent));
+    }
+    .al-mini-icon svg { width: 11px; height: 11px; }
     .al-mini-text { display: grid; gap: 2px; min-width: 0; flex: 1; }
     .al-mini-title { font-size: 11px; font-weight: 600; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .al-mini-msg {
@@ -250,18 +254,19 @@
         display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
     .al-thumb.is-top .al-mini-msg, .al-thumb.is-bottom .al-mini-msg { -webkit-line-clamp: 1; }
-    .al-mini-cta { font-size: 9.5px; font-weight: 600; color: var(--mini-accent, rgb(var(--primary-600))); }
+    .al-mini-cta { font-size: 9.5px; font-weight: 600; }
     .al-mini-close { width: 11px; height: 11px; flex: none; opacity: .55; }
 
-    /* Estilos: os mesmos papéis de cor do site */
-    .al-mini--promo { --mini-accent: #fff; color: #fff; background: linear-gradient(90deg, rgb(var(--primary-600)), rgb(var(--primary-500))); box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .5); }
-    .al-mini--announcement { --mini-accent: rgb(var(--primary-500)); box-shadow: 0 0 0 1px rgba(var(--primary-500), .45), 0 8px 18px -10px rgba(0, 0, 0, .45); }
-    .al-mini--consent { --mini-accent: #fff; color: #fff; background: rgb(var(--gray-900)); }
-    .dark .al-mini--consent { --mini-accent: rgb(var(--gray-900)); color: rgb(var(--gray-900)); background: rgb(var(--gray-100)); }
-    .al-mini--warning { --mini-accent: rgb(var(--warning-500)); color: rgb(var(--warning-700)); background: rgb(var(--warning-50)); box-shadow: 0 0 0 1px rgba(var(--warning-500), .35), 0 8px 18px -10px rgba(0, 0, 0, .4); }
-    .dark .al-mini--warning { color: rgb(var(--warning-300)); background: rgb(var(--gray-900)); }
-    .al-mini--success { --mini-accent: rgb(var(--success-500)); color: rgb(var(--success-700)); background: rgb(var(--success-50)); box-shadow: 0 0 0 1px rgba(var(--success-500), .35), 0 8px 18px -10px rgba(0, 0, 0, .4); }
-    .dark .al-mini--success { color: rgb(var(--success-300)); background: rgb(var(--gray-900)); }
+    /* Miniaturas com as mesmas cores do site (variáveis --sa-* de App\Support\AlertAppearance) */
+    .al-thumb.is-modal .al-mini { color: rgb(var(--sa-ink)); background: rgb(var(--sa-soft)); box-shadow: 0 0 0 1px rgb(var(--sa-accent) / .35), 0 8px 18px -8px rgb(var(--sa-accent) / .55); }
+    .al-thumb.is-modal .al-mini-cta { color: rgb(var(--sa-button)); }
+    .al-thumb.is-modal .al-mini-icon { width: 22px; height: 22px; }
+    .al-thumb.is-modal .al-mini-icon svg { width: 13px; height: 13px; }
+    .al-thumb.is-toast .al-mini { color: #f8fafc; background: rgb(15 23 42); box-shadow: 0 0 0 1px rgb(var(--sa-accent) / .65), 0 8px 18px -8px rgb(var(--sa-accent) / .6); }
+    .al-thumb.is-toast .al-mini-msg { color: #cbd5e1; opacity: 1; }
+    .al-thumb.is-toast .al-mini-cta { color: color-mix(in srgb, rgb(var(--sa-accent)) 55%, #fff); }
+    .al-thumb.is-banner .al-mini { color: #fff; background: rgb(var(--sa-banner)); box-shadow: 0 6px 14px -8px rgb(0 0 0 / .5); }
+    .al-thumb.is-banner .al-mini-icon { background: rgb(255 255 255 / .2); }
 
     /* Lista: uma linha por alerta */
     .al-grid--list .al-card {

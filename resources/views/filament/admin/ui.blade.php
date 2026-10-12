@@ -36,12 +36,14 @@
     .cx-tone-warning { --tone: var(--warning-500); --tone-fg: rgb(var(--warning-700)); }
     .cx-tone-danger  { --tone: var(--danger-500);  --tone-fg: rgb(var(--danger-600)); }
     .cx-tone-info    { --tone: var(--info-500);    --tone-fg: rgb(var(--info-600)); }
+    .cx-tone-purple  { --tone: var(--purple-500);  --tone-fg: rgb(var(--purple-600)); }
     .dark .cx-tone-gray    { --tone-fg: rgb(var(--gray-300)); }
     .dark .cx-tone-primary { --tone-fg: rgb(var(--primary-300)); }
     .dark .cx-tone-success { --tone-fg: rgb(var(--success-400)); }
     .dark .cx-tone-warning { --tone-fg: rgb(var(--warning-400)); }
     .dark .cx-tone-danger  { --tone-fg: rgb(var(--danger-400)); }
     .dark .cx-tone-info    { --tone-fg: rgb(var(--info-400)); }
+    .dark .cx-tone-purple  { --tone-fg: rgb(var(--purple-300)); }
 
     .cx-icon    { width: 20px; height: 20px; flex: none; }
     .cx-icon-sm { width: 16px; height: 16px; flex: none; }

@@ -1,7 +1,10 @@
 {{--
-    Alertas do site (modal, toast e banner). Sem props, mostra os alertas ativos.
-    A prévia do painel passa :alerts com o alerta ainda não salvo e :preview="true"
-    (sempre visível, sem cookie e sem animação a cada atualização).
+    Alertas do site em três formatos (modal, toast e banner) e seis estilos.
+    A aparência de cada estilo (cores, ícone, rótulos) vem de App\Support\AlertAppearance;
+    o CSS (prefixo sa-) fica em site-alerts/styles.
+
+    Sem props, mostra os alertas ativos. A prévia do painel passa :alerts com o alerta ainda
+    não salvo e :preview="true" (sempre visível, sem cookie e sem animação a cada atualização).
 --}}
 @props([
     'alerts' => null,
@@ -9,127 +12,134 @@
 ])
 @php
     use App\Models\Alert;
+    use App\Support\AlertAppearance;
+
     $alerts ??= Alert::getActiveForFrontend();
 @endphp
 @if($alerts->isNotEmpty())
-<div id="site-alerts" class="fixed inset-0 pointer-events-none z-[100]" aria-live="polite">
+<x-site-alerts.styles />
+<div id="site-alerts" class="sa-root" aria-live="polite">
     @foreach($alerts as $alert)
         @php
-            $cookieKey = $alert->getCookieKey();
-            $cookieDays = $alert->getCookieDurationDays();
-
-            $isModal = $alert->type === Alert::TYPE_MODAL;
-
+            $look = AlertAppearance::for($alert->style);
+            $type = in_array($alert->type, [Alert::TYPE_MODAL, Alert::TYPE_TOAST, Alert::TYPE_BANNER], true) ? $alert->type : Alert::TYPE_BANNER;
             // Posição compatível com o tipo (modal no centro, banner em cima/embaixo, toast nos cantos)
             $position = $alert->resolvedPosition();
-            $isFullWidth = in_array($position, ['top', 'bottom']);
-
             $ctaUrl = $alert->hasCta() ? $alert->safeCtaUrl() : null;
+            $newTab = $ctaUrl && $alert->ctaOpensInNewTab();
+            $dismissible = (bool) $alert->is_dismissible;
+            // Consentimento: o link (ex.: política de privacidade) vai no texto e o botão principal é "Aceitar"
+            $inlineLink = $alert->style === Alert::STYLE_CONSENT;
+            $titleId = 'sa-title-'.($alert->id ?: 'preview').'-'.$loop->index;
 
-            // Design premium colors and glassmorphism
-            $styleClasses = match($alert->style) {
-                'promo' => 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground border-primary/20',
-                'announcement' => 'bg-card/90 backdrop-blur-md text-card-foreground border-primary/30',
-                'consent' => 'bg-foreground/95 backdrop-blur-md text-background border-border',
-                'warning' => 'bg-amber-500/10 backdrop-blur-md text-amber-600 border-amber-500/20 dark:text-amber-400',
-                'success' => 'bg-emerald-500/10 backdrop-blur-md text-emerald-600 border-emerald-500/20 dark:text-emerald-400',
-                default => 'bg-background/95 backdrop-blur-xl text-foreground border-border/50',
+            $slideFrom = match (true) {
+                $type === Alert::TYPE_MODAL => 'scale-95',
+                str_contains($position, 'right') => 'translate-x-8',
+                str_contains($position, 'left') => '-translate-x-8',
+                str_contains($position, 'top') => '-translate-y-4',
+                default => 'translate-y-4',
             };
-
-            $wrapperClass = match($position) {
-                'top' => 'absolute top-0 left-0 right-0 border-b ' . $styleClasses,
-                'bottom' => 'absolute bottom-0 left-0 right-0 border-t shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] ' . $styleClasses,
-                'top-left' => 'absolute top-6 left-6',
-                'top-right' => 'absolute top-6 right-6',
-                'bottom-left' => 'absolute bottom-6 left-6',
-                'bottom-right' => 'absolute bottom-6 right-6',
-                'center' => 'fixed inset-0 flex items-center justify-center p-4 z-[110]',
-                default => 'absolute top-0 left-0 right-0 border-b ' . $styleClasses,
-            };
-
-            $cardClass = match($position) {
-                'top-left', 'bottom-left', 'top-right', 'bottom-right' => 'w-full max-w-sm rounded-xl border shadow-2xl shadow-black/10 ring-1 ring-black/5',
-                'center' => 'w-full max-w-lg rounded-2xl border shadow-2xl shadow-black/20 ring-1 ring-black/5 transform transition-all',
-                default => 'w-full',
-            };
-
-            $linkClasses = match($alert->style) {
-                'promo' => 'mt-3 inline-flex items-center text-sm font-semibold text-primary-foreground hover:text-white transition-all hover:translate-x-1',
-                'consent' => 'mt-3 inline-flex items-center text-sm font-semibold text-background hover:opacity-80 transition-all hover:translate-x-1',
-                default => 'mt-3 inline-flex items-center text-sm font-semibold text-primary hover:text-primary/80 transition-all hover:translate-x-1',
-            };
-
-            $icon = match($alert->style) {
-                'success' => '<svg class="h-5 w-5 mt-0.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-                'warning' => '<svg class="h-5 w-5 mt-0.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>',
-                'promo' => '<svg class="h-5 w-5 mt-0.5 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>',
-                default => '<svg class="h-5 w-5 mt-0.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-            };
-
-            $slideFrom = $isModal ? 'scale-95' : (str_contains($position, 'right') ? 'translate-x-8' : (str_contains($position, 'left') ? '-translate-x-8' : (str_contains($position, 'top') ? '-translate-y-4' : 'translate-y-4')));
-            $slideTo = $isModal ? 'scale-100' : 'translate-x-0 translate-y-0';
+            $slideTo = $type === Alert::TYPE_MODAL ? 'scale-100' : 'translate-x-0 translate-y-0';
         @endphp
         <div
             x-data="alertWidget({
-                cookieKey: @js($cookieKey),
+                cookieKey: @js($alert->getCookieKey()),
                 useCookie: @js($preview ? false : $alert->use_cookie),
-                cookieDays: @js($cookieDays),
-                dismissible: @js($alert->is_dismissible),
+                cookieDays: @js($alert->getCookieDurationDays()),
+                dismissible: @js($dismissible),
             })"
             x-show="visible"
             @unless($preview)
-                x-transition:enter="transition ease-out duration-400"
+                x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 {{ $slideFrom }}"
                 x-transition:enter-end="opacity-100 {{ $slideTo }}"
-                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 {{ $slideTo }}"
                 x-transition:leave-end="opacity-0 {{ $slideFrom }}"
             @endunless
-            class="pointer-events-auto {{ $wrapperClass }} {{ $isModal ? 'bg-black/60 backdrop-blur-sm' : '' }} {{ !$isFullWidth ? 'p-2 sm:p-4' : '' }}"
-            @if($isModal) role="dialog" aria-modal="true" @if($alert->title) aria-label="{{ $alert->title }}" @endif @endif
-            style="display: none;"
+            class="sa sa--{{ $type }} sa--{{ $position }}"
+            style="{{ AlertAppearance::cssVariables($alert->style) }} display: none;"
+            data-alert-style="{{ $alert->style }}"
         >
-            @if($isModal)
-            <div class="absolute inset-0" @click="if (dismissible) dismiss()" aria-hidden="true"></div>
-            @endif
-            @if($isFullWidth)
-            <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 lg:px-8">
-            @else
-            <div
-                class="relative {{ $cardClass }} {{ $styleClasses }} p-5 sm:p-6 {{ $isModal ? 'z-10' : '' }}"
-                @if($isModal) @click.stop @endif
-            >
-            @endif
-                <div class="flex min-w-0 flex-1 items-start gap-4 {{ $isFullWidth ? 'items-center' : '' }}">
-                    @if(!$isFullWidth)
-                        <div class="shrink-0 rounded-full p-1">
-                            {!! $icon !!}
-                        </div>
-                    @endif
-                    <div class="min-w-0 flex-1">
+            @if($type === Alert::TYPE_MODAL)
+                <div class="sa-overlay" @click="if (dismissible) dismiss()" aria-hidden="true"></div>
+                <div class="sa-modal" role="dialog" aria-modal="true" @if($alert->title) aria-labelledby="{{ $titleId }}" @else aria-label="Aviso" @endif>
+                    <span class="sa-icon">{!! AlertAppearance::icon($alert->style) !!}</span>
+                    <div class="sa-body">
                         @if($alert->title)
-                            <p class="font-sans text-base font-semibold tracking-tight {{ $isFullWidth ? 'text-base' : 'mb-1' }}">{{ $alert->title }}</p>
+                            <p class="sa-title" id="{{ $titleId }}">{{ $alert->title }}</p>
                         @endif
-                        <p class="whitespace-pre-line text-sm leading-relaxed {{ $alert->title ? 'mt-1' : '' }} {{ in_array($alert->style, ['promo', 'consent']) ? 'opacity-90' : 'opacity-80' }}">{{ $alert->message }}</p>
-                        @if($ctaUrl)
-                            <a href="{{ $ctaUrl }}" @if($alert->ctaOpensInNewTab()) target="_blank" rel="noopener noreferrer" @endif class="{{ $linkClasses }}">
-                                {{ $alert->cta_label }}
-                                <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                            </a>
+                        <p class="sa-msg">{{ $alert->message }}</p>
+                        @if($ctaUrl && $inlineLink)
+                            <a href="{{ $ctaUrl }}" class="sa-inline-link" @if($newTab) target="_blank" rel="noopener noreferrer" @endif>{{ $alert->cta_label }}</a>
+                        @endif
+
+                        @if(($ctaUrl && ! $inlineLink) || $dismissible)
+                            <div class="sa-actions">
+                                @if($ctaUrl && ! $inlineLink)
+                                    <a href="{{ $ctaUrl }}" class="sa-btn sa-btn--primary" @if($newTab) target="_blank" rel="noopener noreferrer" @endif>{{ $alert->cta_label }}</a>
+                                @endif
+                                @if($dismissible)
+                                    @php $alone = ! $ctaUrl || $inlineLink; @endphp
+                                    <button type="button" @class(['sa-btn', 'sa-btn--primary' => $alone, 'sa-btn--dark' => ! $alone]) @click="dismiss()" data-sa-dismiss>
+                                        {{ $alone ? $look['dismissAlone'] : $look['dismiss'] }}
+                                    </button>
+                                @endif
+                            </div>
                         @endif
                     </div>
-                    @if($alert->is_dismissible)
-                        <button
-                            type="button"
-                            @click="dismiss()"
-                            class="shrink-0 rounded-full p-2 opacity-60 transition-all hover:bg-black/5 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary dark:hover:bg-white/10"
-                            aria-label="Fechar"
-                        >
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    @if($dismissible)
+                        <button type="button" class="sa-x" @click="dismiss()" aria-label="Fechar" data-sa-dismiss>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
                         </button>
                     @endif
                 </div>
-            </div>
+            @elseif($type === Alert::TYPE_TOAST)
+                <div class="sa-toast" role="status">
+                    <span class="sa-icon">{!! AlertAppearance::icon($alert->style) !!}</span>
+                    <div class="sa-body">
+                        @if($alert->title)
+                            <p class="sa-title">{{ $alert->title }}</p>
+                        @endif
+                        <p class="sa-msg">{{ $alert->message }}</p>
+                        @if($ctaUrl)
+                            <a href="{{ $ctaUrl }}" class="sa-toast-link" @if($newTab) target="_blank" rel="noopener noreferrer" @endif>
+                                {{ $alert->cta_label }}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                            </a>
+                        @endif
+                    </div>
+                    @if($dismissible)
+                        <button type="button" class="sa-x" @click="dismiss()" aria-label="Fechar" data-sa-dismiss>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                        </button>
+                    @endif
+                    <span class="sa-line" aria-hidden="true"></span>
+                </div>
+            @else
+                <div class="sa-banner" role="region" aria-label="{{ $alert->title ?: 'Aviso' }}">
+                    <div class="sa-banner-in">
+                        <span class="sa-icon">{!! AlertAppearance::icon($alert->style) !!}</span>
+                        <p @class(['sa-banner-text', 'has-title' => filled($alert->title)])>
+                            @if($alert->title)
+                                <strong>{{ $alert->title }}</strong>
+                            @endif
+                            <span>{{ $alert->message }}</span>
+                        </p>
+                        @if($ctaUrl)
+                            <a href="{{ $ctaUrl }}" class="sa-btn sa-btn--light" @if($newTab) target="_blank" rel="noopener noreferrer" @endif>
+                                {{ $alert->cta_label }}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                            </a>
+                        @endif
+                        @if($dismissible)
+                            <button type="button" class="sa-x" @click="dismiss()" aria-label="Fechar" data-sa-dismiss>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </div>
     @endforeach
 </div>
