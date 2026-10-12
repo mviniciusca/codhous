@@ -22,6 +22,7 @@ CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 
 - **The UI language is Brazilian Portuguese** (`APP_LOCALE=pt_BR`). Labels, helper texts, comments and test names are mostly in Portuguese and often wrapped in `__()`. Keep new UI strings in Portuguese.
 - Commits use Conventional Commits (`feat:`, `refactor:`, `style:`, `chore:`, `fix:`), written in English.
 - Work happens on feature branches. PRs target `main`.
+- Admin "builder" screens (component library + live preview + step inspector, compact one-line page header) follow `docs/PADRAO_UI_BUILDER.md`. Public-site blocks follow `docs/estilo-minimalista-design.md`.
 
 ## Architecture
 
