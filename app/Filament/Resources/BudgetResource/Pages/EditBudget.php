@@ -13,6 +13,9 @@ class EditBudget extends EditRecord
 {
     protected static string $resource = BudgetResource::class;
 
+    /** Quantas entradas do histórico estão visíveis */
+    public int $timelineLimit = 15;
+
     public function getTitle(): string
     {
         return 'Orçamento '.$this->record->code;
@@ -37,10 +40,6 @@ class EditBudget extends EditRecord
         }
 
         $this->record->update(['status' => $status]);
-
-        activity()
-            ->performedOn($this->record)
-            ->log('Alterou a etapa para '.BudgetResource::STATUSES[$status]);
 
         Notification::make()
             ->title('Etapa: '.BudgetResource::STATUSES[$status])
@@ -71,6 +70,11 @@ class EditBudget extends EditRecord
         }
 
         return $data;
+    }
+
+    public function loadMoreTimeline(): void
+    {
+        $this->timelineLimit += 15;
     }
 
     protected function getHeaderActions(): array

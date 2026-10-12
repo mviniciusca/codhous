@@ -55,7 +55,7 @@ class BudgetPdfController extends Controller
                     'download_count' => $pdf->download_count,
                     'filename' => $pdf->filename,
                 ])
-                ->log('Downloaded PDF document for budget #'.$budget->code);
+                ->log('Cliente baixou o PDF do orçamento #'.$budget->code);
 
             // Increment download counter
             $pdf->incrementDownloadCount();

@@ -10,7 +10,7 @@ class ListBudgets extends ListRecords
 {
     protected static string $resource = BudgetResource::class;
 
-    public function getTitle(): string 
+    public function getTitle(): string
     {
         return 'Orçamentos Recebidos';
     }
@@ -23,6 +23,11 @@ class ListBudgets extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('board')
+                ->label('Quadro')
+                ->icon('heroicon-o-view-columns')
+                ->color('gray')
+                ->url(BudgetResource::getUrl('board')),
             Actions\CreateAction::make()
                 ->label('Novo Orçamento')
                 ->icon('heroicon-o-plus'),

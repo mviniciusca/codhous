@@ -213,7 +213,7 @@
                             
                             <div>
                                 <label class="mb-1.5 block text-xs font-bold text-foreground">WhatsApp <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="customer_phone" placeholder="(00) 00000-0000" inputmode="tel" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" x-mask:dynamic="$input.replace(/\D/g, '').length > 10 ? '(99) 99999-9999' : '(99) 9999-99999'" />
+                                <input type="text" wire:model="customer_phone" placeholder="(00) 00000-0000" inputmode="tel" class="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" x-mask:dynamic="$input.replace(/\D/g, '').length === 0 ? '' : ($input.replace(/\D/g, '').length > 10 ? '(99) 99999-9999' : '(99) 9999-99999')" />
                                 @error('customer_phone') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                             

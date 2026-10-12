@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\FakeDataEnum;
 use App\Filament\Resources\BudgetResource\Pages;
-use App\Filament\Resources\BudgetResource\RelationManagers\BudgetHistoryRelationManager;
 use App\Filament\Resources\BudgetResource\RelationManagers\DocumentsRelationManager;
 use App\Mail\BudgetCustomMessageMail;
 use App\Models\Budget;
@@ -15,6 +14,7 @@ use App\Models\Product;
 use App\Models\ProductOption;
 use App\Models\Setting;
 use App\Services\AddressFinderService;
+use App\Services\BudgetTimeline;
 use App\Services\FakeBudgetDataService;
 use App\Services\PdfGeneratorService;
 use App\Services\SendBudgetMailService;
@@ -122,6 +122,7 @@ class BudgetResource extends Resource
                         self::siteSection(),
                         self::deliverySection(),
                         self::itemsSection(),
+                        self::activitySection(),
                     ]),
 
                 // Coluna lateral: valores e ações, sempre visível
@@ -188,7 +189,7 @@ class BudgetResource extends Resource
                     ->live(onBlur: true)
                     ->tel()
                     ->mask(RawJs::make(<<<'JS'
-                        $input.replace(/\D/g, '').length > 10 ? '(99) 99999-9999' : '(99) 9999-99999'
+                        $input.replace(/\D/g, '').length === 0 ? '' : ($input.replace(/\D/g, '').length > 10 ? '(99) 99999-9999' : '(99) 9999-99999')
                     JS))
                     ->rule(fn () => function (string $attribute, $value, \Closure $fail) {
                         $digits = strlen(preg_replace('/\D/', '', (string) $value));
@@ -493,6 +494,33 @@ class BudgetResource extends Resource
             ]);
     }
 
+    protected static function activitySection(): Section
+    {
+        return Section::make('Histórico')
+            ->icon('heroicon-o-clock')
+            ->compact()
+            ->collapsible()
+            ->description(function (Budget $record) {
+                $total = (new BudgetTimeline($record))->total();
+
+                return $total === 1 ? '1 registro' : "{$total} registros";
+            })
+            ->visible(fn ($livewire) => $livewire instanceof Pages\EditBudget)
+            ->schema([
+                Placeholder::make('activity_timeline')
+                    ->hiddenLabel()
+                    ->content(function (Budget $record, $livewire) {
+                        $timeline = new BudgetTimeline($record);
+                        $limit = $livewire->timelineLimit ?? 15;
+
+                        return view('filament.budget.activity-timeline', [
+                            'groups' => $timeline->grouped($limit),
+                            'hasMore' => $timeline->total() > $limit,
+                        ]);
+                    }),
+            ]);
+    }
+
     protected static function summarySection(): Section
     {
         $money = fn (TextInput $input) => $input
@@ -502,7 +530,7 @@ class BudgetResource extends Resource
             ->stripCharacters('.')
             ->dehydrateStateUsing(fn ($state) => self::parseMoney($state))
             ->required()
-            ->default(0)
+            ->default('0,00')
             ->afterStateUpdated(fn (Get $get, Set $set) => self::calculateTotalFromRepeater($get, $set));
 
         return Section::make('Resumo')
@@ -861,7 +889,6 @@ class BudgetResource extends Resource
     public static function getRelations(): array
     {
         return [
-            BudgetHistoryRelationManager::class,
             DocumentsRelationManager::class,
         ];
     }
@@ -1200,6 +1227,7 @@ class BudgetResource extends Resource
             'create' => Pages\CreateBudget::route('/create'),
             'edit' => Pages\EditBudget::route('/{record}/edit'),
             'bin' => Pages\BudgetBin::route('/bin'),
+            'board' => Pages\BudgetBoard::route('/quadro'),
         ];
     }
 }
