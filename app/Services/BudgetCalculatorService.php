@@ -91,6 +91,33 @@ class BudgetCalculatorService
     }
 
     /**
+     * Quantidade com unidade, no plural quando for o caso (ex: "2,5 m³", "1 dia", "3 dias", "2 meses")
+     */
+    public static function formatQuantityWithUnit(float $quantity, ?string $unit): string
+    {
+        $formatted = self::formatQuantity($quantity);
+
+        if (blank($unit)) {
+            return $formatted;
+        }
+
+        $plural = [
+            'dia' => 'dias',
+            'hora' => 'horas',
+            'semana' => 'semanas',
+            'mes' => 'meses',
+            'unidade' => 'unidades',
+        ];
+
+        $label = $unit === 'mes' ? 'mês' : $unit;
+        if ($quantity > 1 && isset($plural[$unit])) {
+            $label = $plural[$unit];
+        }
+
+        return $formatted.' '.$label;
+    }
+
+    /**
      * Calcula o total a partir de valores individuais
      */
     public static function calculateTotalFromValues(float $subtotal, float $shipping = 0, float $tax = 0, float $discount = 0): string

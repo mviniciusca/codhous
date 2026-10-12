@@ -221,7 +221,7 @@ class BudgetTimeline
     {
         $item = $properties['item'] ?? 'Item';
         $unit = $properties['unit'] ?? '';
-        $summary = BudgetCalculatorService::formatQuantity((float) ($properties['quantity'] ?? 0)).($unit ? ' '.$unit : '')
+        $summary = BudgetCalculatorService::formatQuantityWithUnit((float) ($properties['quantity'] ?? 0), $unit)
             .' × '.$this->money($properties['price'] ?? 0);
 
         if ($event === 'item_added') {

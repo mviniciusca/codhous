@@ -55,7 +55,7 @@
                                         <span style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 12px;">Itens solicitados</span>
                                         @foreach ($budget->budgetItems as $item)
                                             <p style="margin: 0 0 8px; font-size: 15px; color: #1e293b;">
-                                                <strong>{{ \App\Services\BudgetCalculatorService::formatQuantity((float) $item->quantity) }} {{ $item->productOption?->unit?->value }}</strong>
+                                                <strong>{{ \App\Services\BudgetCalculatorService::formatQuantityWithUnit((float) $item->quantity, $item->productOption?->unit?->value) }}</strong>
                                                 &mdash; {{ $item->product?->name }}
                                                 @if ($item->productOption)
                                                     <span style="color: #64748b;">({{ $item->productOption->name }})</span>

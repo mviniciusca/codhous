@@ -25,8 +25,7 @@ class BudgetBoard extends Page
     /** Cartões exibidos por coluna */
     protected const PER_COLUMN = 50;
 
-    /** Dias sem movimentação para destacar um orçamento em negociação */
-    public const STALE_AFTER_DAYS = 3;
+    public const STALE_AFTER_DAYS = Budget::STALE_AFTER_DAYS;
 
     #[Url(as: 'busca')]
     public string $search = '';
@@ -92,7 +91,7 @@ class BudgetBoard extends Page
                     ->sum(fn ($content) => BudgetResource::parseMoney(data_get($content, 'total', 0))),
                 'cards' => (clone $query)
                     ->with('budgetItems.product')
-                    ->latest($status === 'pending' ? 'created_at' : 'updated_at')
+                    ->latest($status === 'pending' ? 'created_at' : 'status_changed_at')
                     ->limit(self::PER_COLUMN)
                     ->get()
                     ->map(fn (Budget $budget) => $this->card($budget)),
@@ -143,8 +142,7 @@ class BudgetBoard extends Page
             'email' => (bool) $budget->notified_via_email,
             'delivery' => $deliveryDate?->format('d/m'),
             'delivery_soon' => $daysToDelivery !== null && $daysToDelivery <= 3 && $budget->status !== 'ignored',
-            'stale' => $budget->status === 'on going'
-                && $budget->updated_at?->lt(now()->subDays(self::STALE_AFTER_DAYS)),
+            'stale' => $budget->isStale(),
         ];
     }
 }

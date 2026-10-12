@@ -23,6 +23,7 @@ class Budget extends Model
     {
         return [
             'content' => 'array',
+            'status_changed_at' => 'datetime',
         ];
     }
 
@@ -43,6 +44,8 @@ class Budget extends Model
             if (! $budget->code) {
                 $budget->code = self::generateUniqueCode();
             }
+
+            $budget->status_changed_at ??= now();
         });
 
         static::updating(function ($budget) {
@@ -73,6 +76,34 @@ class Budget extends Model
                 }
             }
         });
+
+        // Registrado depois da regra acima, para também cobrir a troca automática de etapa
+        static::updating(function ($budget) {
+            if ($budget->isDirty('status')) {
+                $budget->status_changed_at = now();
+            }
+        });
+    }
+
+    /** Dias sem mudar de etapa para um orçamento em negociação ser considerado parado */
+    public const STALE_AFTER_DAYS = 3;
+
+    public function isOpen(): bool
+    {
+        return in_array($this->status, ['pending', 'on going'], true);
+    }
+
+    /**
+     * Dias inteiros na etapa atual.
+     */
+    public function daysInStage(): int
+    {
+        return (int) ($this->status_changed_at ?? $this->updated_at ?? now())->diffInDays(now());
+    }
+
+    public function isStale(): bool
+    {
+        return $this->status === 'on going' && $this->daysInStage() >= self::STALE_AFTER_DAYS;
     }
 
     public function getActivitylogOptions(): LogOptions

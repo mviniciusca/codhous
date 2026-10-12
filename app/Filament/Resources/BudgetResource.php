@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\FakeDataEnum;
 use App\Filament\Resources\BudgetResource\Pages;
 use App\Filament\Resources\BudgetResource\RelationManagers\DocumentsRelationManager;
+use App\Filament\Resources\BudgetResource\Widgets;
 use App\Mail\BudgetCustomMessageMail;
 use App\Models\Budget;
 use App\Models\BudgetPdf;
@@ -14,6 +15,7 @@ use App\Models\Product;
 use App\Models\ProductOption;
 use App\Models\Setting;
 use App\Services\AddressFinderService;
+use App\Services\BudgetCalculatorService;
 use App\Services\BudgetTimeline;
 use App\Services\FakeBudgetDataService;
 use App\Services\PdfGeneratorService;
@@ -38,12 +40,12 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -51,8 +53,13 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class BudgetResource extends Resource
 {
@@ -88,11 +95,32 @@ class BudgetResource extends Resource
         ];
     }
 
+    /** O badge do menu mostra os pedidos que ainda esperam resposta */
     public static function getNavigationBadge(): ?string
     {
-        $count = static::getModel()::count();
+        $count = static::getModel()::query()
+            ->where('is_active', true)
+            ->where('status', 'pending')
+            ->count();
 
-        return $count != 0 ? $count : null;
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Novos pedidos aguardando resposta';
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            Widgets\BudgetStatsOverview::class,
+        ];
     }
 
     public const STATUSES = [
@@ -616,22 +644,7 @@ class BudgetResource extends Resource
                                 return;
                             }
 
-                            try {
-                                (new SendBudgetMailService($record->refresh(), $record->content['customer_email'] ?? ''))->dispatch();
-
-                                $record->withoutEvents(fn () => $record->update(['notified_via_email' => true]));
-                                self::markProposalSent($record);
-
-                                activity()
-                                    ->performedOn($record)
-                                    ->log('Enviou orçamento por e-mail para '.($record->content['customer_email'] ?? 'cliente'));
-                            } catch (\Exception $e) {
-                                Notification::make()
-                                    ->title('Erro ao enviar e-mail')
-                                    ->body($e->getMessage())
-                                    ->danger()
-                                    ->send();
-                            }
+                            self::sendProposalEmail($record->refresh());
                         }),
                 ])->fullWidth(),
 
@@ -837,7 +850,7 @@ class BudgetResource extends Resource
     protected static function markProposalSent(Budget $record): void
     {
         if ($record->status === 'pending') {
-            $record->withoutEvents(fn () => $record->update(['status' => 'on going']));
+            $record->withoutEvents(fn () => $record->update(['status' => 'on going', 'status_changed_at' => now()]));
         }
     }
 
@@ -994,222 +1007,449 @@ class BudgetResource extends Resource
         }
     }
 
+    /** Cores das etapas, iguais às do quadro e da barra de etapas */
+    public const STATUS_COLORS = [
+        'pending' => 'warning',
+        'on going' => 'primary',
+        'done' => 'success',
+        'ignored' => 'gray',
+    ];
+
+    public const STATUS_ICONS = [
+        'pending' => 'heroicon-m-inbox-arrow-down',
+        'on going' => 'heroicon-m-chat-bubble-left-right',
+        'done' => 'heroicon-m-check-circle',
+        'ignored' => 'heroicon-m-archive-box',
+    ];
+
     public static function table(Table $table): Table
     {
+        $tz = config('app.display_timezone');
+
         return $table
-            ->recordAction(null)
-            ->recordUrl(fn (Budget $record): ?string => $record->trashed() ? null : BudgetResource::getUrl('edit', ['record' => $record]))
-            ->recordClasses(fn (Budget $record) => match (true) {
-                $record->trashed() => 'opacity-40 dark:opacity-40 hover:opacity-70 dark:hover:opacity-70 [&_*]:line-through',
-                $record->status === 'ignored' => 'opacity-40 dark:opacity-40 hover:opacity-90 dark:hover:opacity-90',
-                $record->status === 'done' => 'opacity-70 dark:opacity-70 hover:opacity-100 dark:hover:opacity-100',
-                default => null,
-            })
+            ->modifyQueryUsing(fn (Builder $query) => $query
+                ->withoutTrashed()
+                ->with(['budgetItems.product', 'budgetItems.productOption', 'user'])
+                ->withSum('pdfs as pdf_views', 'download_count'))
+            ->recordUrl(fn (Budget $record): string => self::getUrl('edit', ['record' => $record]))
+            ->recordClasses(fn (Budget $record) => $record->status === 'ignored' ? 'opacity-60' : null)
+            ->searchPlaceholder('Código, cliente, telefone, e-mail ou cidade')
+            ->defaultSort('created_at', 'desc')
+            ->paginated([25, 50, 100])
+            ->defaultPaginationPageOption(25)
+            ->poll('60s')
+            ->striped()
+            ->emptyStateIcon('heroicon-o-inbox')
+            ->emptyStateHeading('Nenhum orçamento por aqui')
+            ->emptyStateDescription('Os pedidos feitos pelo site aparecem nesta lista automaticamente.')
             ->columns([
                 TextColumn::make('code')
+                    ->label('Pedido')
+                    ->weight(FontWeight::SemiBold)
+                    ->color('primary')
                     ->searchable()
-                    ->label('Código')
-                    ->toggleable()
-                    ->icon(fn (Budget $record) => $record->trashed() ? 'heroicon-o-trash' : null)
-                    ->iconColor('danger'),
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->sortable()
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'Pendente',
-                        'on going' => 'Em Andamento',
-                        'done' => 'Concluído',
-                        'ignored' => 'Arquivado',
-                        default => $state,
-                    })
-                    ->icon(fn (Budget $record, string $state): string => $record->trashed() ? 'heroicon-o-trash' : match ($state) {
-                        'pending' => 'heroicon-o-clock',
-                        'on going' => 'heroicon-o-arrow-path',
-                        'done' => 'heroicon-o-check-circle',
-                        'ignored' => 'heroicon-o-x-circle',
-                        default => 'heroicon-o-question-mark-circle',
-                    })
-                    ->color(fn (Budget $record, string $state): string => $record->trashed() ? 'gray' : match ($state) {
-                        'pending' => 'primary',
-                        'on going' => 'warning',
-                        'done' => 'success',
-                        'ignored' => 'danger',
-                        default => 'gray',
-                    }),
-                TextColumn::make('content.customer_name')
-                    ->sortable()
-                    ->searchable()
-                    ->label('Cliente'),
-                TextColumn::make('content.customer_phone')
-                    ->label('WhatsApp')
-                    ->icon('heroicon-m-phone')
+                    ->sortable(['created_at'])
                     ->copyable()
-                    ->copyMessage('Telefone copiado!')
-                    ->searchable(),
-                TextColumn::make('content.total')
+                    ->copyMessage('Código copiado')
+                    ->description(fn (Budget $record) => $record->created_at?->locale('pt_BR')->diffForHumans().' · '.($record->user_id ? 'Painel' : 'Site'))
+                    ->tooltip(fn (Budget $record) => 'Recebido em '.$record->created_at?->timezone($tz)->format('d/m/Y H:i').($record->user_id ? ' · criado por '.($record->user?->name ?? 'equipe') : ' pelo site')),
+
+                TextColumn::make('customer')
+                    ->label('Cliente')
+                    ->state(fn (Budget $record) => $record->content['customer_name'] ?? '—')
+                    ->weight(FontWeight::Medium)
+                    ->description(fn (Budget $record) => collect([
+                        filled($record->content['customer_phone'] ?? null) ? \App\Livewire\Budget::formatPhone($record->content['customer_phone']) : null,
+                        $record->content['city'] ?? null,
+                    ])->filter()->implode(' · '))
+                    ->searchable(query: fn (Builder $query, string $search) => $query->where(fn (Builder $q) => $q
+                        ->where('content->customer_name', 'like', "%{$search}%")
+                        ->orWhere('content->customer_email', 'like', "%{$search}%")
+                        ->orWhere('content->customer_phone', 'like', "%{$search}%")
+                        ->orWhere('content->city', 'like', "%{$search}%")
+                        ->orWhere('content->neighborhood', 'like', "%{$search}%")))
+                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderBy('content->customer_name', $direction)),
+
+                TextColumn::make('items_summary')
+                    ->label('Itens')
+                    ->state(fn (Budget $record) => $record->budgetItems->first()?->product?->name ?? '—')
+                    ->limit(22)
+                    ->tooltip(fn (Budget $record) => $record->budgetItems->map(fn ($item) => $item->describe())->implode(' | ') ?: null)
+                    ->description(function (Budget $record) {
+                        $first = $record->budgetItems->first();
+                        if (! $first) {
+                            return null;
+                        }
+
+                        $unit = $first->productOption?->unit?->value;
+                        $others = $record->budgetItems->count() - 1;
+
+                        return BudgetCalculatorService::formatQuantityWithUnit((float) $first->quantity, $unit)
+                            .($others > 0 ? ' · +'.$others.' '.($others === 1 ? 'item' : 'itens') : '');
+                    })
+                    ->toggleable(),
+
+                TextColumn::make('delivery')
+                    ->label('Entrega')
+                    ->state(fn (Budget $record) => ! empty($record->content['delivery_date'])
+                        ? Carbon::parse($record->content['delivery_date'])->format('d/m/Y')
+                        : null)
+                    ->placeholder('A combinar')
+                    ->badge()
+                    ->color(fn (Budget $record) => self::deliveryColor($record))
+                    ->icon(fn (Budget $record) => self::deliveryColor($record) === 'danger' ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-truck')
+                    ->description(fn (Budget $record) => \App\Livewire\Budget::DELIVERY_PERIODS[$record->content['delivery_period'] ?? ''] ?? null)
+                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderBy('content->delivery_date', $direction))
+                    ->toggleable(),
+
+                TextColumn::make('status')
+                    ->label('Etapa')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state) => self::STATUSES[$state] ?? $state)
+                    ->color(fn (string $state) => self::STATUS_COLORS[$state] ?? 'gray')
+                    ->icon(fn (string $state) => self::STATUS_ICONS[$state] ?? null)
+                    ->description(fn (Budget $record) => self::stageNote($record))
+                    ->sortable(['status', 'status_changed_at']),
+
+                TextColumn::make('proposal')
+                    ->label('Proposta')
+                    ->state(fn (Budget $record) => match (true) {
+                        $record->notified_via_whatsapp && $record->notified_via_email => 'WhatsApp e e-mail',
+                        (bool) $record->notified_via_whatsapp => 'WhatsApp',
+                        (bool) $record->notified_via_email => 'E-mail',
+                        default => 'Não enviada',
+                    })
+                    ->badge()
+                    ->color(fn (Budget $record) => $record->notified_via_whatsapp || $record->notified_via_email ? 'success' : 'gray')
+                    ->icon(fn (Budget $record) => $record->notified_via_whatsapp || $record->notified_via_email ? 'heroicon-m-paper-airplane' : 'heroicon-m-minus-circle')
+                    ->description(fn (Budget $record) => ($views = (int) $record->pdf_views) > 0 ? "PDF aberto {$views}×" : null)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('total')
                     ->label('Total')
-                    ->formatStateUsing(fn ($state) => 'R$ '.number_format(floatval($state), 2, '.', ','))
+                    ->state(fn (Budget $record) => self::parseMoney($record->content['total'] ?? 0))
+                    ->money('BRL', locale: 'pt_BR')
+                    ->weight(FontWeight::SemiBold)
                     ->alignEnd()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime('d/m/y H:i')
-                    ->sortable()
-                    ->label('Data'),
+                    ->sortable(query: fn (Builder $query, string $direction) => $query
+                        ->orderByRaw("CAST(json_extract(content, '$.total') AS DECIMAL(14,2)) ".($direction === 'asc' ? 'asc' : 'desc'))),
+
                 IconColumn::make('is_active')
                     ->label('Ativo')
-                    ->alignCenter()
                     ->boolean()
+                    ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('id', 'desc')
             ->filters([
-                Tables\Filters\TrashedFilter::make()
-                    ->label('Lixeira')
-                    ->placeholder('Sem excluídos')
-                    ->trueLabel('Apenas excluídos')
-                    ->falseLabel('Com excluídos')
-                    ->native(false),
-                TernaryFilter::make('is_active')
-                    ->placeholder('Padrão')
-                    ->default(true)
-                    ->label('Exibição')
-                    ->trueLabel('Ativos')
-                    ->falseLabel('Inativos'),
-                SelectFilter::make('status')
-                    ->placeholder('Todos os Status')
-                    ->label('Status')
+                SelectFilter::make('origin')
+                    ->label('Origem')
+                    ->placeholder('Todas')
+                    ->options(['site' => 'Site', 'panel' => 'Painel'])
+                    ->query(fn (Builder $query, array $data) => match ($data['value'] ?? null) {
+                        'site' => $query->whereNull('user_id'),
+                        'panel' => $query->whereNotNull('user_id'),
+                        default => $query,
+                    }),
+
+                SelectFilter::make('delivery')
+                    ->label('Entrega')
+                    ->placeholder('Qualquer data')
                     ->options([
-                        'pending' => 'Pendente',
-                        'on going' => 'Em Andamento',
-                        'done' => 'Concluído',
-                        'ignored' => 'Arquivado',
+                        'late' => 'Atrasada (em aberto)',
+                        'week' => 'Próximos 7 dias',
+                        'scheduled' => 'Com data definida',
+                        'none' => 'A combinar',
                     ])
-                    ->searchable(),
-            ], FiltersLayout::AboveContent)
+                    ->query(function (Builder $query, array $data) use ($tz) {
+                        $today = now($tz)->toDateString();
+
+                        return match ($data['value'] ?? null) {
+                            'late' => $query->whereIn('status', ['pending', 'on going'])
+                                ->whereNotNull('content->delivery_date')
+                                ->where('content->delivery_date', '<', $today),
+                            'week' => $query->whereBetween('content->delivery_date', [$today, now($tz)->addDays(7)->toDateString()]),
+                            'scheduled' => $query->whereNotNull('content->delivery_date'),
+                            'none' => $query->whereNull('content->delivery_date'),
+                            default => $query,
+                        };
+                    }),
+
+                SelectFilter::make('proposal')
+                    ->label('Proposta')
+                    ->placeholder('Todas')
+                    ->options(['sent' => 'Enviada', 'not_sent' => 'Não enviada'])
+                    ->query(fn (Builder $query, array $data) => match ($data['value'] ?? null) {
+                        'sent' => $query->where(fn (Builder $q) => $q->where('notified_via_whatsapp', true)->orWhere('notified_via_email', true)),
+                        'not_sent' => $query->where('notified_via_whatsapp', false)->where('notified_via_email', false),
+                        default => $query,
+                    }),
+
+                Tables\Filters\Filter::make('created_at')
+                    ->label('Período')
+                    ->form([
+                        DatePicker::make('from')->label('Recebido de')->native(false)->displayFormat('d/m/Y'),
+                        DatePicker::make('until')->label('Até')->native(false)->displayFormat('d/m/Y'),
+                    ])
+                    ->columns(2)
+                    ->query(fn (Builder $query, array $data) => $query
+                        ->when($data['from'] ?? null, fn (Builder $q, $date) => $q->where('created_at', '>=', Carbon::parse($date, $tz)->startOfDay()->utc()))
+                        ->when($data['until'] ?? null, fn (Builder $q, $date) => $q->where('created_at', '<=', Carbon::parse($date, $tz)->endOfDay()->utc())))
+                    ->indicateUsing(fn (array $data) => array_values(array_filter([
+                        ($data['from'] ?? null) ? 'Desde '.Carbon::parse($data['from'])->format('d/m/Y') : null,
+                        ($data['until'] ?? null) ? 'Até '.Carbon::parse($data['until'])->format('d/m/Y') : null,
+                    ]))),
+
+                TernaryFilter::make('is_active')
+                    ->label('Exibição')
+                    ->placeholder('Todos')
+                    ->trueLabel('Somente ativos')
+                    ->falseLabel('Somente inativos')
+                    ->default(true),
+            ])
+            ->filtersFormColumns(2)
+            ->filtersTriggerAction(fn (Tables\Actions\Action $action) => $action->label('Filtros')->button()->color('gray'))
             ->actions([
+                Tables\Actions\Action::make('whatsapp')
+                    ->label('WhatsApp')
+                    ->hiddenLabel()
+                    ->tooltip('Conversar no WhatsApp')
+                    ->icon('heroicon-m-chat-bubble-left-right')
+                    ->color('success')
+                    ->iconButton()
+                    ->visible(fn (Budget $record) => strlen(preg_replace('/\D/', '', $record->content['customer_phone'] ?? '')) >= 10)
+                    ->url(fn (Budget $record) => (new WhatsappService)->generateUrl(
+                        $record->content['customer_phone'],
+                        'Olá, '.Str::before(trim($record->content['customer_name'] ?? ''), ' ').'! Aqui é da '.(Setting::get('company.trade_name') ?: config('app.name')).", sobre o seu orçamento {$record->code}."
+                    ), shouldOpenInNewTab: true),
+
                 ActionGroup::make([
-                    Tables\Actions\Action::make('copy_link')
-                        ->label('Copiar Link do PDF')
-                        ->icon('heroicon-o-clipboard-document')
-                        ->color('success')
-                        ->visible(fn (Budget $record) => ! $record->trashed() && ! empty($record->content['share_link']))
-                        ->action(function (Budget $record) {
-                            Notification::make()
-                                ->title('Link copiado para a área de transferência!')
-                                ->success()
-                                ->send();
-                        }),
-                    Tables\Actions\Action::make('generate_link')
-                        ->label('Gerar Link do PDF')
-                        ->icon('heroicon-o-link')
-                        ->color('primary')
-                        ->visible(fn (Budget $record) => ! $record->trashed() && empty($record->content['share_link']))
-                        ->action(function (Budget $record) {
-                            $pdfModel = self::generatePdfModel($record);
+                    ActionGroup::make([
+                        Tables\Actions\EditAction::make()
+                            ->label('Abrir orçamento')
+                            ->icon('heroicon-m-arrow-top-right-on-square'),
+                        Tables\Actions\Action::make('download_pdf')
+                            ->label('Baixar PDF')
+                            ->icon('heroicon-m-document-arrow-down')
+                            ->action(fn (Budget $record) => self::streamPdf($record)),
+                        Tables\Actions\Action::make('copy_link')
+                            ->label('Copiar link do PDF')
+                            ->icon('heroicon-m-link')
+                            ->visible(fn (Budget $record) => filled($record->content['share_link'] ?? null))
+                            ->action(function (Budget $record, $livewire) {
+                                $livewire->js('navigator.clipboard.writeText('.json_encode($record->content['share_link']).')');
+                                Notification::make()->title('Link copiado')->success()->send();
+                            }),
+                        Tables\Actions\Action::make('send_email')
+                            ->label('Enviar proposta por e-mail')
+                            ->icon('heroicon-m-envelope')
+                            ->requiresConfirmation()
+                            ->modalHeading(fn (Budget $record) => 'Enviar '.$record->code.' por e-mail?')
+                            ->modalDescription(fn (Budget $record) => 'O PDF com os valores atuais será enviado para '.($record->content['customer_email'] ?? 'o cliente').'.')
+                            ->modalSubmitActionLabel('Enviar')
+                            ->visible(fn (Budget $record) => filled($record->content['customer_email'] ?? null))
+                            ->action(fn (Budget $record) => self::sendProposalEmail($record)),
+                    ])->dropdown(false),
 
-                            if ($pdfModel) {
-                                $url = $pdfModel->getDownloadUrl();
-                                $content = $record->content;
-                                $content['share_link'] = $url;
-                                $record->update([
-                                    'content' => $content,
-                                    'pdf_document' => $pdfModel->path,
-                                ]);
+                    ActionGroup::make(
+                        collect(self::STATUSES)->map(fn (string $label, string $status) => Tables\Actions\Action::make('move_'.Str::slug($status, '_'))
+                            ->label('Mover para '.$label)
+                            ->icon(self::STATUS_ICONS[$status])
+                            ->color(self::STATUS_COLORS[$status])
+                            ->visible(fn (Budget $record) => $record->status !== $status)
+                            ->action(fn (Budget $record) => self::moveTo($record, $status)))
+                            ->values()
+                            ->all()
+                    )->dropdown(false),
 
-                                Notification::make()
-                                    ->title('Link do PDF gerado com sucesso')
-                                    ->success()
-                                    ->send();
-                            }
-                        }),
-                    Tables\Actions\Action::make('download_pdf')
-                        ->label('Baixar PDF')
-                        ->icon('heroicon-o-document-arrow-down')
-                        ->color('warning')
-                        ->visible(fn (Budget $record) => ! $record->trashed())
-                        ->action(function (Budget $record) {
-                            $pdfModel = self::generatePdfModel($record);
-
-                            if ($pdfModel && $pdfModel->fileExists()) {
-                                return response()->download(
-                                    $pdfModel->getFullPath(),
-                                    'Orcamento_'.$record->code.'.pdf'
-                                );
-                            }
-                        }),
-                    Tables\Actions\Action::make('send_email')
-                        ->label('Enviar por E-mail')
-                        ->icon('heroicon-o-envelope')
-                        ->color('primary')
-                        ->visible(fn (Budget $record) => ! $record->trashed())
-                        ->action(function (Budget $record) {
-                            try {
-                                $mailService = new SendBudgetMailService(
-                                    $record,
-                                    $record->content['customer_email'] ?? ''
-                                );
-                                $mailService->dispatch();
-                            } catch (\Exception $e) {
-                                Notification::make()
-                                    ->title('Erro ao enviar e-mail')
-                                    ->body($e->getMessage())
-                                    ->danger()
-                                    ->send();
-                            }
-                        }),
-                    Tables\Actions\Action::make('share_whatsapp')
-                        ->label('Compartilhar WhatsApp')
-                        ->icon('heroicon-o-phone')
-                        ->color('success')
-                        ->visible(fn (Budget $record) => ! $record->trashed())
-                        ->action(function (Budget $record) {
-                            if (empty($record->content['share_link'] ?? null)) {
-                                $pdfModel = self::generatePdfModel($record);
-                                if ($pdfModel) {
-                                    $url = $pdfModel->getDownloadUrl();
-                                    $content = $record->content;
-                                    $content['share_link'] = $url;
-                                    $record->update([
-                                        'content' => $content,
-                                        'pdf_document' => $pdfModel->path,
-                                    ]);
-                                }
-                            }
-
-                            $whatsappService = new WhatsappService;
-                            $message = 'Olá! Segue o link do seu orçamento: '.($record->content['share_link'] ?? '');
-                            $url = $whatsappService->generateUrl(
-                                $record->content['customer_phone'] ?? '',
-                                $message
-                            );
-
-                            return redirect()->away($url);
-                        }),
-                    Tables\Actions\EditAction::make('edit')
-                        ->label('Editar')
-                        ->visible(fn (Budget $record) => ! $record->trashed()),
                     Tables\Actions\DeleteAction::make()
-                        ->label('Excluir')
-                        ->visible(fn (Budget $record) => ! $record->trashed()),
-                    Tables\Actions\ForceDeleteAction::make()
-                        ->label('Excluir Permanente')
-                        ->visible(fn (Budget $record) => $record->trashed()),
-                    Tables\Actions\RestoreAction::make()
-                        ->label('Restaurar')
-                        ->visible(fn (Budget $record) => $record->trashed()),
-                ]),
+                        ->label('Mover para a lixeira')
+                        ->modalHeading(fn (Budget $record) => 'Mover '.$record->code.' para a lixeira?'),
+                ])
+                    ->tooltip('Mais ações')
+                    ->color('gray'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->label('Excluir Selecionados'),
-                    Tables\Actions\ForceDeleteBulkAction::make()
-                        ->label('Excluir Permanente Selecionados'),
-                    Tables\Actions\RestoreBulkAction::make()
-                        ->label('Restaurar Selecionados'),
-                ]),
+                Tables\Actions\BulkAction::make('move_status')
+                    ->label('Mover para etapa')
+                    ->icon('heroicon-m-arrows-right-left')
+                    ->form([
+                        Select::make('status')
+                            ->label('Nova etapa')
+                            ->options(self::STATUSES)
+                            ->required(),
+                    ])
+                    ->action(function (Collection $records, array $data) {
+                        $records->each(fn (Budget $record) => self::moveTo($record, $data['status'], notify: false));
+
+                        Notification::make()
+                            ->title($records->count().' '.($records->count() === 1 ? 'orçamento movido' : 'orçamentos movidos').' para '.self::STATUSES[$data['status']])
+                            ->success()
+                            ->send();
+                    })
+                    ->deselectRecordsAfterCompletion(),
+                ExportBulkAction::make()
+                    ->label('Exportar para Excel')
+                    ->exports([self::excelExport()]),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->label('Mover para a lixeira'),
             ]);
+    }
+
+    /**
+     * Planilha com os dados comerciais do orçamento (lista e ações em massa).
+     */
+    public static function excelExport(): ExcelExport
+    {
+        $content = fn (string $key) => fn (Budget $record) => $record->content[$key] ?? null;
+
+        return ExcelExport::make('orcamentos')
+            ->withFilename(fn () => 'orcamentos-'.now(config('app.display_timezone'))->format('Y-m-d-His'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with('budgetItems.product', 'budgetItems.productOption'))
+            ->withColumns([
+                ExcelColumn::make('code')->heading('Pedido'),
+                ExcelColumn::make('status')->heading('Etapa')->formatStateUsing(fn ($state) => self::STATUSES[$state] ?? $state),
+                ExcelColumn::make('created_at')->heading('Recebido em')->formatStateUsing(fn ($state) => $state?->timezone(config('app.display_timezone'))->format('d/m/Y H:i')),
+                ExcelColumn::make('origin')->heading('Origem')->getStateUsing(fn (Budget $record) => $record->user_id ? 'Painel' : 'Site'),
+                ExcelColumn::make('customer_name')->heading('Cliente')->getStateUsing($content('customer_name')),
+                ExcelColumn::make('customer_phone')->heading('Telefone')->getStateUsing($content('customer_phone')),
+                ExcelColumn::make('customer_email')->heading('E-mail')->getStateUsing($content('customer_email')),
+                ExcelColumn::make('address')->heading('Endereço')->getStateUsing(fn (Budget $record) => collect([
+                    $record->content['street'] ?? null, $record->content['number'] ?? null, $record->content['complement'] ?? null,
+                ])->filter()->implode(', ')),
+                ExcelColumn::make('neighborhood')->heading('Bairro')->getStateUsing($content('neighborhood')),
+                ExcelColumn::make('city')->heading('Cidade')->getStateUsing($content('city')),
+                ExcelColumn::make('state')->heading('UF')->getStateUsing($content('state')),
+                ExcelColumn::make('postcode')->heading('CEP')->getStateUsing($content('postcode')),
+                ExcelColumn::make('items')->heading('Itens')->getStateUsing(fn (Budget $record) => $record->budgetItems
+                    ->map(fn ($item) => $item->describe().' — '.BudgetCalculatorService::formatQuantity((float) $item->quantity).' '.($item->productOption?->unit?->value ?? '').' × R$ '.number_format((float) $item->price, 2, ',', '.'))
+                    ->implode("\n")),
+                ExcelColumn::make('delivery_date')->heading('Entrega desejada')->getStateUsing(fn (Budget $record) => ! empty($record->content['delivery_date']) ? Carbon::parse($record->content['delivery_date'])->format('d/m/Y') : 'A combinar'),
+                ExcelColumn::make('subtotal')->heading('Subtotal (R$)')->getStateUsing(fn (Budget $record) => self::parseMoney($record->content['subtotal'] ?? 0)),
+                ExcelColumn::make('shipping')->heading('Frete (R$)')->getStateUsing(fn (Budget $record) => self::parseMoney($record->content['shipping'] ?? 0)),
+                ExcelColumn::make('tax')->heading('Taxas (R$)')->getStateUsing(fn (Budget $record) => self::parseMoney($record->content['tax'] ?? 0)),
+                ExcelColumn::make('discount')->heading('Desconto (R$)')->getStateUsing(fn (Budget $record) => self::parseMoney($record->content['discount'] ?? 0)),
+                ExcelColumn::make('total')->heading('Total (R$)')->getStateUsing(fn (Budget $record) => self::parseMoney($record->content['total'] ?? 0)),
+            ]);
+    }
+
+    /**
+     * Texto curto sob a etapa: há quanto tempo o pedido está parado ali.
+     */
+    public static function stageNote(Budget $record): ?string
+    {
+        $days = $record->daysInStage();
+
+        return match ($record->status) {
+            'pending' => self::waitingNote($record),
+            'on going' => $record->isStale() ? 'Sem retorno há '.$days.' dias' : self::proposalNote($record),
+            'done' => 'Em '.$record->status_changed_at?->timezone(config('app.display_timezone'))->format('d/m/Y'),
+            default => null,
+        };
+    }
+
+    /**
+     * Ex: "Enviada por WhatsApp · PDF aberto 2×"
+     */
+    protected static function proposalNote(Budget $record): ?string
+    {
+        $channels = collect([
+            $record->notified_via_whatsapp ? 'WhatsApp' : null,
+            $record->notified_via_email ? 'e-mail' : null,
+        ])->filter();
+        $views = (int) ($record->pdf_views ?? 0);
+
+        return collect([
+            $channels->isNotEmpty() ? 'Enviada por '.$channels->implode(' e ') : null,
+            $views > 0 ? "PDF aberto {$views}×" : null,
+        ])->filter()->implode(' · ') ?: null;
+    }
+
+    /**
+     * Pedido novo: conta desde o recebimento, que é quanto o cliente está esperando.
+     */
+    protected static function waitingNote(Budget $record): string
+    {
+        $days = (int) $record->created_at?->diffInDays(now());
+
+        return match (true) {
+            $days === 0 => 'Recebido hoje',
+            $days === 1 => 'Aguarda há 1 dia',
+            default => "Aguarda há {$days} dias",
+        };
+    }
+
+    protected static function deliveryColor(Budget $record): string
+    {
+        if (empty($record->content['delivery_date'])) {
+            return 'gray';
+        }
+
+        if (! $record->isOpen()) {
+            return 'gray';
+        }
+
+        $days = (int) now(config('app.display_timezone'))->startOfDay()
+            ->diffInDays(Carbon::parse($record->content['delivery_date'], config('app.display_timezone'))->startOfDay(), false);
+
+        return match (true) {
+            $days < 0 => 'danger',
+            $days <= 3 => 'warning',
+            default => 'info',
+        };
+    }
+
+    public static function moveTo(Budget $record, string $status, bool $notify = true): void
+    {
+        if (! array_key_exists($status, self::STATUSES) || $record->status === $status) {
+            return;
+        }
+
+        $record->update(['status' => $status]);
+
+        if ($notify) {
+            Notification::make()
+                ->title($record->code.' → '.self::STATUSES[$status])
+                ->success()
+                ->send();
+        }
+    }
+
+    /**
+     * Gera o PDF com os valores atuais e devolve como download, sem criar link público.
+     */
+    public static function streamPdf(Budget $record)
+    {
+        $settings = Setting::first();
+        $output = (new PdfGeneratorService)->outputFromView('pdf.invoice', [
+            'state' => $record->toArray(),
+            'budget' => $record,
+            'company' => $settings?->companySetting,
+            'layout' => $settings?->layoutSetting,
+        ]);
+
+        return response()->streamDownload(fn () => print ($output), 'Orcamento_'.$record->code.'.pdf', [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
+    public static function sendProposalEmail(Budget $record): void
+    {
+        try {
+            (new SendBudgetMailService($record, $record->content['customer_email'] ?? ''))->dispatch();
+
+            $record->withoutEvents(fn () => $record->update(['notified_via_email' => true]));
+            self::markProposalSent($record);
+
+            activity()
+                ->performedOn($record)
+                ->log('Enviou orçamento por e-mail para '.($record->content['customer_email'] ?? 'cliente'));
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Erro ao enviar e-mail')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
     }
 
     public static function getEloquentQuery(): Builder

@@ -3,8 +3,6 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 use App\Filament\Resources\BudgetResource;
-use App\Models\Setting;
-use App\Services\PdfGeneratorService;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -88,18 +86,7 @@ class EditBudget extends EditRecord
                 ->action(function () {
                     $this->save(shouldRedirect: false, shouldSendSavedNotification: false);
 
-                    $budget = $this->record->refresh();
-                    $settings = Setting::first();
-                    $output = (new PdfGeneratorService)->outputFromView('pdf.invoice', [
-                        'state' => $budget->toArray(),
-                        'budget' => $budget,
-                        'company' => $settings?->companySetting,
-                        'layout' => $settings?->layoutSetting,
-                    ]);
-
-                    return response()->streamDownload(fn () => print ($output), 'Orcamento_'.$budget->code.'.pdf', [
-                        'Content-Type' => 'application/pdf',
-                    ]);
+                    return BudgetResource::streamPdf($this->record->refresh());
                 }),
             Actions\Action::make('save')
                 ->label('Salvar')
