@@ -34,6 +34,9 @@ class SectionHeroCep extends Component
     public ?string $bgColor = null;
     public string $textColor = 'light';
 
+    /** Classes de padding vertical (App\Support\SectionStyle::spacing) */
+    public ?string $spacing = null;
+
     /** Estatísticas exibidas na hero (value + label) */
     public array $stats = [];
 

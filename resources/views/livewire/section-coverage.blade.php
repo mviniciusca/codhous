@@ -27,75 +27,67 @@
     $overlayColor = $overlayType === 'light' ? '255, 255, 255' : '0, 0, 0';
 @endphp
 @php
-    $bgClass = empty($bgMedia) ? 'bg-muted/50' : 'bg-zinc-950 text-white';
-    $textForeground = empty($bgMedia) ? 'text-foreground' : 'text-white';
-    $textMuted = empty($bgMedia) ? 'text-muted-foreground' : 'text-zinc-300';
-    $cardBg = empty($bgMedia) ? 'bg-card border-border' : 'bg-zinc-900/40 backdrop-blur-md border-white/10 text-white';
+    $hasMedia = !empty($bgMedia);
+    // Com mídia de fundo a seção fica escura; sem mídia segue o fundo/esquema do bloco
+    $scheme = $hasMedia ? 'dark' : \App\Support\SectionStyle::scheme(['background_color' => $bgColor, 'text_color' => $textColor]);
+    $sectionBg = $hasMedia ? 'bg-black' : ($bgColor ?: 'bg-muted/40');
+    if ($hasMedia) {
+        $isVideo = \Illuminate\Support\Str::endsWith($bgMedia, ['.mp4', '.webm', '.mov', '.quicktime']);
+        $mediaUrl = str_starts_with($bgMedia, 'http') ? $bgMedia : \Illuminate\Support\Facades\Storage::url($bgMedia);
+    }
+    $cityList = collect($cities)->map(fn ($c) => is_array($c) ? ($c['label'] ?? '') : $c)->filter()->values();
 @endphp
 @if(!\App\Models\ContentSection::isHidden('coverage'))
-<section id="onde-atuamos" class="relative border-b border-border {{ $bgClass }} py-20 lg:py-28 overflow-hidden">
-    @php
-        $isVideo = false;
-        if ($bgMedia) {
-            $isVideo = \Illuminate\Support\Str::endsWith($bgMedia, ['.mp4', '.webm', '.mov', '.quicktime']);
-            $mediaUrl = str_starts_with($bgMedia, 'http') ? $bgMedia : \Illuminate\Support\Facades\Storage::url($bgMedia);
-        }
-    @endphp
-
-    @if(!empty($bgMedia))
-        <div class="absolute inset-0 z-0 pointer-events-none" style="clip-path: inset(0);">
+<section id="onde-atuamos" class="relative isolate overflow-hidden {{ $sectionBg }} {{ \App\Support\SectionStyle::schemeClass($scheme) }} {{ $spacing ?: 'py-14 md:py-20' }}">
+    @if($hasMedia)
+        {{-- Mídia fixa (efeito parallax) recortada pela seção --}}
+        <div class="pointer-events-none absolute inset-0 -z-10" style="clip-path: inset(0);">
             @if($isVideo)
-                <video autoplay loop muted playsinline class="fixed inset-0 h-[100vh] w-[100vw] object-cover">
-                    <source src="{{ $mediaUrl }}" type="video/mp4">
-                </video>
+                <video autoplay loop muted playsinline class="fixed inset-0 h-screen w-screen object-cover"><source src="{{ $mediaUrl }}" type="video/mp4"></video>
             @else
-                <img src="{{ $mediaUrl }}" alt="Background" class="fixed inset-0 h-[100vh] w-[100vw] object-cover">
+                <img src="{{ $mediaUrl }}" alt="" class="fixed inset-0 h-screen w-screen object-cover">
             @endif
-            @if($overlayEnabled)
-                <div class="absolute inset-0 pointer-events-none" style="background-color: rgba({{ $overlayColor }}, {{ $overlayOpacity }});"></div>
-            @endif
+            <div class="absolute inset-0" style="background-color: rgba({{ $overlayEnabled ? $overlayColor : '0, 0, 0' }}, {{ $overlayEnabled ? $overlayOpacity : 0.6 }});"></div>
         </div>
     @endif
 
-    <div class="relative z-10 mx-auto max-w-7xl px-4 lg:px-8">
-        <x-ui.section-header 
-            :header="$header ?? []"
-            :fallback-title="$title ?? 'Onde atendemos'"
-            :fallback-subtitle="$subtitle ?? null"
-            :fallback-description="$description ?? null"
-            :text-color="$textColor"
-        />
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid gap-10 lg:grid-cols-12 lg:gap-14">
+            <div class="lg:col-span-7">
+                <x-ui.section-header
+                    :header="$header ?? []"
+                    :fallback-title="$title ?? 'Onde atendemos'"
+                    :fallback-subtitle="$subtitle ?? null"
+                    :fallback-description="$description ?? null"
+                    align="left"
+                    class="!mb-8"
+                />
 
-        <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-16">
-            <div class="flex-1">
-                <div class="rounded-xl border {{ $cardBg }} p-6 lg:p-8 shadow-sm">
-                    <h3 class="mb-8 font-mono text-xl font-bold {{ $textForeground }}">Principais cidades e regiões</h3>
-                    <ul class="grid gap-5 text-sm {{ $textMuted }} sm:grid-cols-2">
-                        @foreach($cities as $city)
-                            <li class="flex items-center gap-3 transition-colors hover:text-primary">
-                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                                    <span class="h-2 w-2 rounded-full bg-primary"></span>
-                                </span>
-                                {{ is_array($city) ? ($city['label'] ?? '') : $city }}
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
+                @if($cityList->isNotEmpty())
+                    <div class="surface-card p-5 md:p-6" data-reveal>
+                        <div class="mb-4 flex items-center justify-between gap-4">
+                            <h3 class="text-sm font-semibold text-foreground">Principais cidades e regiões</h3>
+                            <span class="rounded-full bg-primary-500/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-primary-ink">{{ $cityList->count() }}</span>
+                        </div>
+                        <ul class="flex flex-wrap gap-2">
+                            @foreach($cityList as $city)
+                                <li class="inline-flex cursor-default items-center gap-1.5 rounded-full border border-border/70 px-3 py-1.5 text-sm text-foreground/80 transition-colors hover:border-primary-500/40 hover:bg-primary-500/10 hover:text-primary-ink">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-primary-500"></span>
+                                    {{ $city }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-                <div class="mt-8 grid gap-6 sm:grid-cols-2">
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     @foreach($sidebar as $index => $card)
-                        @php
-                            $icons = ['map-pin', 'truck'];
-                            $icon = $card['icon'] ?? ($icons[$index] ?? 'map-pin');
-                        @endphp
-                        <div class="flex items-start gap-4 rounded-xl border {{ $cardBg }} p-6 shadow-sm">
-                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                                <i data-lucide="{{ $icon }}" class="h-6 w-6 text-primary"></i>
-                            </div>
+                        <div class="surface-card group flex items-start gap-4 p-5" data-reveal style="--reveal-delay: {{ ($index + 1) * 80 }}ms">
+                            <x-ui.icon-box :icon="$card['icon'] ?? (['map-pin', 'truck'][$index] ?? 'map-pin')" />
                             <div>
-                                <p class="font-mono text-base font-bold {{ $textForeground }}">{{ $card['title'] ?? '' }}</p>
+                                <p class="font-semibold text-foreground">{{ $card['title'] ?? '' }}</p>
                                 @if(!empty($card['description']))
-                                    <p class="mt-1 text-sm {{ $textMuted }} leading-relaxed">{{ $card['description'] }}</p>
+                                    <p class="mt-1 text-sm leading-relaxed text-muted-foreground">{{ $card['description'] }}</p>
                                 @endif
                             </div>
                         </div>
@@ -103,9 +95,9 @@
                 </div>
             </div>
 
-            <div class="flex-shrink-0 lg:w-[420px]">
-                <div class="sticky top-24">
-                    @include('livewire.partials.hero-cep-card', ['theme' => 'corporate'])
+            <div class="lg:col-span-5">
+                <div class="lg:sticky lg:top-28" data-reveal style="--reveal-delay: 150ms">
+                    @include('livewire.partials.hero-cep-card', ['theme' => $scheme === 'light' ? 'corporate' : 'default'])
                 </div>
             </div>
         </div>

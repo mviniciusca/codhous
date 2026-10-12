@@ -9,26 +9,25 @@
         $whatsappNumber = '5511999999999';
     }
 
+    // corporate = cartão claro sobre fundo claro; padrão = vidro sobre a mídia do hero
     $isLight = isset($theme) && $theme === 'corporate';
-    $cardBg = $isLight ? 'bg-zinc-50 border-zinc-200 shadow-sm' : 'border-background/10 bg-background/5 backdrop-blur-sm';
-    $titleColor = $isLight ? 'text-zinc-900' : 'text-background';
-    $subtitleColor = $isLight ? 'text-zinc-500' : 'text-background/50';
-    $bottomTextColor = $isLight ? 'text-zinc-400' : 'text-background/40';
+    $cardClass = $isLight
+        ? 'surface-card text-scheme-light shadow-[0_20px_50px_-30px_rgb(0_0_0/0.35)]'
+        : 'dark rounded-card border border-white/15 bg-white/[0.07] shadow-2xl backdrop-blur-xl';
+    $waText = rawurlencode("Olá! Verifiquei que vocês atendem minha região ({$cep}). Preciso de concreto usinado para minha obra.");
 @endphp
-<div class="rounded-xl border p-8 {{ $cardBg }}">
-    <div class="mb-6 flex items-center gap-3">
-        <div wire:ignore class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <i data-lucide="map-pin" class="h-5 w-5 text-primary"></i>
-        </div>
+<div class="{{ $cardClass }} p-6 md:p-7">
+    <div class="mb-5 flex items-center gap-3">
+        <span wire:ignore class="icon-box"><i data-lucide="map-pin"></i></span>
         <div>
-            <h3 class="font-mono text-lg font-bold {{ $titleColor }}">Atendemos sua região?</h3>
-            <p class="text-xs {{ $subtitleColor }}">Digite o CEP da obra para verificar</p>
+            <h3 class="font-mono text-lg font-bold text-foreground">Atendemos sua região?</h3>
+            <p class="text-xs text-muted-foreground">Digite o CEP da obra para verificar</p>
         </div>
     </div>
 
     @if(!$success)
         <div id="hero-cep-form">
-            <div class="flex gap-3">
+            <div class="flex gap-2 rounded-control border border-border bg-card p-1.5 transition-shadow focus-within:border-primary-500/60 focus-within:ring-4 focus-within:ring-primary-500/15">
                 <x-ui.input
                     wire:model.live.debounce.300ms="cep"
                     wire:keydown.enter="lookupCep"
@@ -37,61 +36,45 @@
                     inputmode="numeric"
                     maxlength="9"
                     placeholder="00000-000"
-                    class="flex-1 text-lg font-mono bg-white text-zinc-900"
+                    aria-label="CEP da obra"
+                    class="flex-1 !border-0 !bg-transparent font-mono text-lg !text-foreground !shadow-none placeholder:text-muted-foreground/60 focus:!ring-0"
                 />
-                <button
-                    wire:click="lookupCep"
-                    id="hero-cep-btn"
-                    class="hero-cep-search-btn flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3.5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                >
-                    <span wire:loading.remove wire:target="lookupCep" class="hero-cep-icon-search">
-                        <i data-lucide="search" class="h-5 w-5"></i>
-                    </span>
-                    <span wire:loading wire:target="lookupCep" class="hero-cep-icon-loading">
-                        <i data-lucide="loader-2" class="h-5 w-5 animate-spin"></i>
-                    </span>
+                <button wire:click="lookupCep" id="hero-cep-btn" type="button" class="btn btn-primary !mt-0 px-4" aria-label="Verificar CEP">
+                    <span wire:loading.remove wire:target="lookupCep"><i data-lucide="search" class="h-5 w-5"></i></span>
+                    <span wire:loading wire:target="lookupCep"><i data-lucide="loader-2" class="h-5 w-5 animate-spin"></i></span>
                 </button>
             </div>
             @if($error)
-                <p class="mt-2 text-xs text-red-500">{{ $error }}</p>
+                <p class="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-500"><i data-lucide="circle-alert" class="h-3.5 w-3.5"></i>{{ $error }}</p>
             @endif
         </div>
     @endif
 
     @if($success)
         <div id="hero-cep-success">
-            <div class="rounded-lg border border-primary/30 bg-primary/10 p-4">
-                <div class="flex items-center gap-2 mb-2">
-                    <span wire:ignore class="flex items-center justify-center"><i data-lucide="check-circle" class="h-5 w-5 text-primary"></i></span>
-                    <span class="font-semibold text-primary text-sm">Atendemos sua região!</span>
+            <div class="rounded-control border border-emerald-500/30 bg-emerald-500/10 p-4">
+                <div class="mb-1 flex items-center gap-2">
+                    <span wire:ignore class="flex"><i data-lucide="circle-check" class="h-5 w-5 text-emerald-500"></i></span>
+                    <span class="text-sm font-semibold text-foreground">Atendemos sua região!</span>
                 </div>
-                <p class="text-sm {{ $titleColor }} opacity-80">{{ $addressText }}</p>
+                <p class="text-sm text-muted-foreground">{{ $addressText }}</p>
             </div>
-            <div class="mt-4 flex flex-col gap-3">
-                <a id="hero-whatsapp-link" href="https://wa.me/{{ $whatsappNumber }}?text=Ol%C3%A1!%20Verifiquei%20que%20voc%C3%AAs%20atendem%20minha%20regi%C3%A3o%20({{ $cep }}).%20Preciso%20de%20concreto%20usinado%20para%20minha%20obra." target="_blank" rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center gap-2 rounded-md bg-[#25D366] px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[#1fb855]">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                    Falar pelo WhatsApp
+            <div class="mt-4 grid gap-2">
+                <a id="hero-whatsapp-link" href="https://wa.me/{{ $whatsappNumber }}?text={{ $waText }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp w-full">
+                    <i data-lucide="message-circle"></i> Falar pelo WhatsApp
                 </a>
-                <a href="#orcamento" class="inline-flex items-center justify-center gap-2 rounded-md border border-primary/30 px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10">
-                    Solicitar Orçamento Online
-                    <span wire:ignore class="flex items-center justify-center"><i data-lucide="arrow-right" class="h-4 w-4"></i></span>
+                <a href="#orcamento" class="btn btn-outline w-full">
+                    Solicitar orçamento online <span wire:ignore class="flex"><i data-lucide="arrow-right" class="h-4 w-4"></i></span>
                 </a>
             </div>
-            <button wire:click="resetCepForm" class="mt-3 w-full text-center text-xs {{ $bottomTextColor }} transition-colors hover:opacity-100">
+            <button wire:click="resetCepForm" type="button" class="!mt-3 w-full text-center text-xs text-muted-foreground transition-colors hover:text-foreground">
                 Consultar outro CEP
             </button>
         </div>
     @endif
 
-    <div class="mt-6 flex items-center gap-4 border-t border-zinc-200/20 pt-5">
-        <div class="flex items-center gap-1.5 text-xs {{ $bottomTextColor }}">
-            <span wire:ignore class="flex items-center justify-center"><i data-lucide="shield-check" class="h-3.5 w-3.5 text-primary/60"></i></span>
-            Consulta gratuita
-        </div>
-        <div class="flex items-center gap-1.5 text-xs {{ $bottomTextColor }}">
-            <span wire:ignore class="flex items-center justify-center"><i data-lucide="clock" class="h-3.5 w-3.5 text-primary/60"></i></span>
-            Resposta em minutos
-        </div>
+    <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border/60 pt-4 text-xs text-muted-foreground">
+        <span class="flex items-center gap-1.5"><span wire:ignore class="flex"><i data-lucide="shield-check" class="h-3.5 w-3.5 text-primary-ink"></i></span> Consulta gratuita</span>
+        <span class="flex items-center gap-1.5"><span wire:ignore class="flex"><i data-lucide="clock" class="h-3.5 w-3.5 text-primary-ink"></i></span> Resposta em minutos</span>
     </div>
 </div>

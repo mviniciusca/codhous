@@ -1,35 +1,32 @@
 @props(['title', 'subtitle', 'image', 'primaryButtonLabel', 'primaryButtonUrl', 'secondaryButtonLabel', 'secondaryButtonUrl'])
 
-<section class="relative flex min-h-[60vh] items-center justify-center overflow-hidden bg-zinc-950 pt-20 pb-20">
-    @if($image)
-        <div class="absolute inset-0 z-0">
-            <img src="{{ str_starts_with($image, 'http') ? $image : \Illuminate\Support\Facades\Storage::url($image) }}" class="h-full w-full object-cover opacity-40" alt="{{ $title }}">
-            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
-        </div>
-    @endif
+@php
+    $imageUrl = function_exists('resolveFilamentImagePath') ? resolveFilamentImagePath($image) : null;
+@endphp
 
-    <div class="relative z-10 mx-auto w-full max-w-4xl px-4 text-center text-white lg:px-8">
-        <h1 class="font-mono text-4xl font-extrabold leading-tight tracking-tighter md:text-6xl lg:text-7xl" style="text-wrap: balance;">
-            {{ $title }}
-        </h1>
-        
+<section class="dark relative isolate flex min-h-[60vh] items-center overflow-hidden bg-primary-950 py-20 text-white">
+    @if($imageUrl)
+        <img src="{{ $imageUrl }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover opacity-40">
+    @endif
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/60 to-primary-950/40"></div>
+    <div class="absolute left-1/2 top-0 -z-10 h-96 w-[48rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-500/30 blur-3xl"></div>
+
+    <div class="mx-auto w-full max-w-4xl px-4 text-center sm:px-6 lg:px-8" data-reveal>
+        <h1 class="font-mono text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl" style="text-wrap: balance;">{{ $title }}</h1>
+
         @if($subtitle)
-            <p class="mt-6 mx-auto max-w-2xl text-lg text-zinc-300 md:text-xl leading-relaxed">
-                {{ $subtitle }}
-            </p>
+            <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/70 md:text-xl">{{ $subtitle }}</p>
         @endif
 
-        <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            @if($primaryButtonLabel)
-                <a href="{{ $primaryButtonUrl ?? '#' }}" class="w-full sm:w-auto rounded-md bg-primary px-8 py-3.5 font-mono text-sm font-bold tracking-widest text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105 shadow-xl">
-                    {{ $primaryButtonLabel }}
-                </a>
-            @endif
-            @if($secondaryButtonLabel)
-                <a href="{{ $secondaryButtonUrl ?? '#' }}" class="w-full sm:w-auto rounded-md border-2 border-white/20 bg-white/5 px-8 py-3 font-mono text-sm font-bold tracking-widest text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/40">
-                    {{ $secondaryButtonLabel }}
-                </a>
-            @endif
-        </div>
+        @if($primaryButtonLabel || $secondaryButtonLabel)
+            <div class="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                @if($primaryButtonLabel)
+                    <x-ui.button :href="$primaryButtonUrl ?? '#'" size="lg" trailing-icon="arrow-right" class="w-full sm:w-auto">{{ $primaryButtonLabel }}</x-ui.button>
+                @endif
+                @if($secondaryButtonLabel)
+                    <x-ui.button :href="$secondaryButtonUrl ?? '#'" variant="secondary" size="lg" class="w-full backdrop-blur sm:w-auto">{{ $secondaryButtonLabel }}</x-ui.button>
+                @endif
+            </div>
+        @endif
     </div>
 </section>

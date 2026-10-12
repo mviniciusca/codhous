@@ -32,7 +32,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<meta name="theme-color" content="#e5b800">
+<meta name="theme-color" content="rgb({{ implode(', ', \App\Support\SiteTheme::parse(data_get($website, 'primary_color'))) }})">
 <meta name="description" content="{{ $finalDescription }}">
 @if($keywords)
     <meta name="keywords" content="{{ $keywords }}">

@@ -41,128 +41,114 @@
         });
     </script>
 @endpush
-    {{-- DEFAULT HERO (Original Layout + Layout Whatsapp toggle) --}}
-    <section class="relative flex min-h-[70vh] items-center overflow-hidden {{ $bgColor ?? 'bg-zinc-950' }} pt-8 {{ ($textColor ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }}">
-        
-        {{-- Background Image --}}
-        <div class="absolute inset-0 z-0">
-            <div class="h-full w-full relative">
-                {{-- Background Media --}}
-                @if($showSlideshow && !empty($slideshow))
-                    <div class="swiper hero-swiper h-full w-full">
-                        <div class="swiper-wrapper">
-                            @foreach($slideshow as $slide)
-                                @php
-                                    $slideAlignments = [
-                                        'center' => 'object-center',
-                                        'top' => 'object-top',
-                                        'bottom' => 'object-bottom',
-                                        'left' => 'object-left',
-                                        'right' => 'object-right',
-                                    ];
-                                    $slideAlignmentClass = $slideAlignments[$slide['image_alignment'] ?? 'center'] ?? 'object-center';
-                                @endphp
-                                <div class="swiper-slide h-full w-full bg-zinc-900">
-                                    @if(!empty($slide['image']))
-                                        <img src="{{ str_starts_with($slide['image'], 'http') ? $slide['image'] : Storage::url($slide['image']) }}" 
-                                             class="h-full w-full object-cover {{ $slideAlignmentClass }}" 
-                                             alt="">
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
+    @php
+        // Sobreposição clara pede texto escuro; nos demais casos o texto é claro sobre a mídia
+        $heroLight = ($overlayEnabled ?? true) && ($overlayTheme ?? 'dark') === 'light';
+        $isClean = $layout === 'clean';
+        $mediaUrl = fn ($path) => str_starts_with($path, 'http') ? $path : Storage::url($path);
+    @endphp
+    <section class="relative isolate flex min-h-[68vh] items-center overflow-hidden {{ $bgColor ?: 'bg-primary-950' }} {{ $heroLight ? 'text-scheme-light' : 'dark' }} {{ $spacing ?: 'py-14 md:py-20' }}">
+
+        {{-- Mídia de fundo --}}
+        <div class="absolute inset-0 -z-10">
+            @if($showSlideshow && !empty($slideshow))
+                <div class="swiper hero-swiper h-full w-full">
+                    <div class="swiper-wrapper">
+                        @foreach($slideshow as $slide)
+                            <div class="swiper-slide h-full w-full bg-primary-950">
+                                @if(!empty($slide['image']))
+                                    <img src="{{ $mediaUrl($slide['image']) }}" class="h-full w-full object-cover {{ $alignments[$slide['image_alignment'] ?? 'center'] ?? 'object-center' }}" alt="">
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
+                </div>
+            @elseif(!empty($mainSlide['video']))
+                <video autoplay muted loop playsinline class="h-full w-full object-cover {{ $alignmentClass }}">
+                    <source src="{{ $mediaUrl($mainSlide['video']) }}" type="video/mp4">
+                </video>
+            @elseif(!empty($mainSlide['image']))
+                <img src="{{ $mediaUrl($mainSlide['image']) }}" class="h-full w-full object-cover {{ $alignmentClass }}" alt="{{ $mainSlide['title'] ?? '' }}">
+            @else
+                {{-- Sem mídia: gradiente com os tons profundos da marca --}}
+                <div class="h-full w-full bg-gradient-to-br from-primary-900 via-primary-950 to-black"></div>
+                <div class="absolute -right-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-primary-500/30 blur-3xl"></div>
+                <div class="absolute inset-0 opacity-[0.06] [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:22px_22px]"></div>
+            @endif
+
+            @if($overlayEnabled ?? true)
+                @if($heroLight)
+                    <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-white/90 via-white/70 to-white/20"></div>
                 @else
-                    {{-- Imagem ou Vídeo de fundo único --}}
-                    @if(!empty($mainSlide['video']))
-                        <video autoplay muted loop playsinline class="h-full w-full object-cover {{ $alignmentClass }}">
-                            <source src="{{ str_starts_with($mainSlide['video'], 'http') ? $mainSlide['video'] : Storage::url($mainSlide['video']) }}" type="video/mp4">
-                        </video>
-                    @elseif(!empty($mainSlide['image']))
-                        <img src="{{ str_starts_with($mainSlide['image'], 'http') ? $mainSlide['image'] : Storage::url($mainSlide['image']) }}" 
-                             class="h-full w-full object-cover {{ $alignmentClass }}" 
-                             alt="{{ $mainSlide['title'] ?? '' }}">
-                    @else
-                        <div class="h-full w-full bg-zinc-900"></div>
-                    @endif
+                    <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/55 to-black/10"></div>
+                    <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-primary-950/60 via-transparent to-transparent"></div>
                 @endif
-                
-                {{-- Overlay Gradiente --}}
-                @if($overlayEnabled ?? true)
-                    @if(($overlayTheme ?? 'dark') === 'light')
-                        <div class="absolute inset-0 bg-white/20 z-10 pointer-events-none"></div>
-                        <div class="absolute inset-0 bg-gradient-to-r from-white/80 via-white/50 to-transparent z-10 pointer-events-none"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent z-10 pointer-events-none"></div>
-                    @else
-                        <div class="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-                        <div class="absolute inset-0 bg-gradient-to-r from-zinc-950/80 via-zinc-950/50 to-transparent z-10 pointer-events-none"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/30 to-transparent z-10 pointer-events-none"></div>
-                    @endif
-                @endif
-            </div>
+            @endif
         </div>
 
+        <div class="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div @class([
+                'flex flex-col gap-10',
+                'items-center' => $isClean,
+                'lg:flex-row lg:items-center lg:justify-between lg:gap-16' => ! $isClean,
+            ])>
+                <div @class([
+                    'w-full flex-1',
+                    $textAlignClass,
+                    "flex max-w-4xl flex-col {$flexAlignClass} {$marginClass}" => $isClean,
+                    'max-w-2xl' => ! $isClean,
+                ]) data-reveal>
+                    @if(!empty($badge))
+                        <span class="kicker kicker-pill mb-6 backdrop-blur"><span class="kicker-dot"></span> {{ $badge }}</span>
+                    @endif
 
+                    <h1 class="font-mono text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl" style="text-wrap: balance;">
+                        {{ data_get($mainSlide, 'title') ?: 'Concreto usinado na sua obra' }}
+                    </h1>
 
-        {{-- Conteúdo (z-20 para ficar na frente de tudo) --}}
-        <div class="relative z-20 mx-auto w-full max-w-7xl px-4 py-12 lg:px-8">
-                {{-- Layout padrão unificado: texto à esquerda + Card (CEP/WhatsApp) à direita --}}
-                <div class="flex flex-col items-center gap-10 {{ $layout === 'clean' ? 'justify-center w-full' : 'lg:flex-row lg:items-center lg:gap-16' }}">
-                    <div class="flex-1 w-full {{ $textAlignClass }} {{ $layout === 'clean' ? "flex flex-col $flexAlignClass max-w-4xl $marginClass" : '' }}">
-                        @if(!empty($badge))
-                            <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5">
-                                <span class="h-2 w-2 rounded-full bg-primary"></span>
-                                <span class="text-xs font-medium uppercase tracking-wider text-primary">{{ $badge }}</span>
-                            </div>
-                        @endif
-                        <h1 class="font-mono text-4xl font-bold leading-tight tracking-tight {{ ($textColor ?? 'light') === 'dark' ? 'text-zinc-900' : 'text-white' }} md:text-5xl lg:text-6xl" style="text-wrap: balance;">
-                            {!! e(data_get($mainSlide, 'title', 'Concreto usinado na sua obra')) !!}
-                        </h1>
-                        <p class="mt-6 {{ $layout === 'clean' ? '' : 'lg:mx-0' }} max-w-xl text-lg leading-relaxed {{ ($textColor ?? 'light') === 'dark' ? 'text-zinc-700' : 'text-zinc-300' }} {{ $marginClass }}">
-                            {{ data_get($mainSlide, 'subtitle', '') }}
+                    @if(filled(data_get($mainSlide, 'subtitle')))
+                        <p class="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground {{ $marginClass }}">
+                            {{ data_get($mainSlide, 'subtitle') }}
                         </p>
-                        @if($showActionButtons && (!empty($buttons['primary']['text']) || !empty($buttons['secondary']['text'])))
-                            <div class="mt-8 flex flex-wrap items-center {{ $layout === 'clean' ? $justifyClass : 'justify-center lg:justify-start' }} gap-4">
-                                @if(!empty($buttons['primary']['text']))
-                                    <a href="{{ $buttons['primary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl">
-                                        @if(!empty($buttons['primary']['icon']))
-                                            <i data-lucide="{{ $buttons['primary']['icon'] }}" class="h-5 w-5"></i>
-                                        @endif
-                                        {{ $buttons['primary']['text'] }}
-                                    </a>
-                                @endif
-                                @if(!empty($buttons['secondary']['text']))
-                                    <a href="{{ $buttons['secondary']['url'] ?? '#' }}" class="inline-flex items-center gap-2 rounded-xl border-2 border-primary bg-transparent px-6 py-3 font-bold text-primary transition-all hover:-translate-y-0.5 hover:bg-primary/5">
-                                        @if(!empty($buttons['secondary']['icon']))
-                                            <i data-lucide="{{ $buttons['secondary']['icon'] }}" class="h-5 w-5"></i>
-                                        @endif
-                                        {{ $buttons['secondary']['text'] }}
-                                    </a>
-                                @endif
-                            </div>
-                        @endif
-                        @if($showStats && !empty($stats))
-                            <div class="mt-10 flex flex-wrap items-center {{ $layout === 'clean' ? $justifyClass : 'justify-center lg:justify-start' }} gap-6 lg:gap-10">
-                                @foreach($stats as $index => $stat)
-                                    @if($index > 0)<div class="h-10 w-px {{ ($textColor ?? 'light') === 'dark' ? 'bg-zinc-300' : 'bg-white/10' }}"></div>@endif
-                                    <div>
-                                        <p class="font-mono text-3xl font-bold text-primary">{{ $stat['value'] ?? '' }}</p>
-                                        <p class="text-xs {{ ($textColor ?? 'light') === 'dark' ? 'text-zinc-500' : 'text-zinc-400' }}">{{ $stat['label'] ?? '' }}</p>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-                    @if($layout !== 'clean')
-                    <div class="w-full max-w-md flex-shrink-0 mx-auto lg:mx-0">
-                        @if($isWhatsapp)
-                            @include('livewire.partials.hero-whatsapp-card')
-                        @else
-                            @include('livewire.partials.hero-cep-card')
-                        @endif
-                    </div>
+                    @endif
+
+                    @if($showActionButtons && (!empty($buttons['primary']['text']) || !empty($buttons['secondary']['text'])))
+                        <div class="mt-8 flex flex-wrap items-center gap-3 {{ $justifyClass }}">
+                            @if(!empty($buttons['primary']['text']))
+                                <x-ui.button :href="$buttons['primary']['url'] ?? '#'" size="lg" :icon="$buttons['primary']['icon'] ?: null" :trailing-icon="empty($buttons['primary']['icon']) ? 'arrow-right' : null" class="w-full sm:w-auto">
+                                    {{ $buttons['primary']['text'] }}
+                                </x-ui.button>
+                            @endif
+                            @if(!empty($buttons['secondary']['text']))
+                                <x-ui.button :href="$buttons['secondary']['url'] ?? '#'" variant="secondary" size="lg" :icon="$buttons['secondary']['icon'] ?: null" class="w-full backdrop-blur sm:w-auto">
+                                    {{ $buttons['secondary']['text'] }}
+                                </x-ui.button>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if($showStats && !empty($stats))
+                        <dl class="mt-10 flex items-center gap-x-4 sm:flex-wrap sm:gap-x-8 sm:gap-y-4 {{ $justifyClass }}">
+                            @foreach($stats as $index => $stat)
+                                <div @class(['flex min-w-0 flex-col', 'border-l border-border pl-4 sm:pl-8' => $index > 0])>
+                                    <dt class="order-2 text-xs text-muted-foreground">{{ $stat['label'] ?? '' }}</dt>
+                                    <dd class="order-1 font-mono text-2xl font-bold text-primary-ink md:text-3xl" data-count>{{ $stat['value'] ?? '' }}</dd>
+                                </div>
+                            @endforeach
+                        </dl>
                     @endif
                 </div>
+
+                @if(! $isClean)
+                    <div class="mx-auto w-full max-w-md shrink-0 lg:mx-0" data-reveal style="--reveal-delay: 150ms">
+                        @if($isWhatsapp)
+                            @include('livewire.partials.hero-whatsapp-card', ['theme' => $heroLight ? 'corporate' : 'default'])
+                        @else
+                            @include('livewire.partials.hero-cep-card', ['theme' => $heroLight ? 'corporate' : 'default'])
+                        @endif
+                    </div>
+                @endif
+            </div>
         </div>
     </section>
 

@@ -4,6 +4,20 @@
 --}}
 <script>
     (() => {
+        // Mesma regra de App\Support\SiteTheme: texto sobre a cor e tom "ink" pelo contraste
+        const applyPrimary = (value) => {
+            const luminance = value.split(' ').map(Number)
+                .map((c) => (c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+                .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0);
+            const ink = Object.entries({ 500: 1, 600: 0.86, 700: 0.7, 800: 0.56 })
+                .find(([, mix]) => 1.05 / (luminance * mix ** 3 + 0.05) >= 4)?.[0] ?? 900;
+            const root = document.documentElement.style;
+
+            root.setProperty('--primary-color', value);
+            root.setProperty('--color-primary-foreground', luminance > 0.42 ? 'oklch(0.2 0.02 60)' : 'oklch(1 0 0)');
+            root.setProperty('--color-primary-ink-base', `var(--color-primary-${ink})`);
+        };
+
         const send = (type, data = {}) => window.parent?.postMessage({ source: 'codhous-preview', type, ...data }, window.location.origin);
 
         // Links: páginas do site abrem dentro da prévia; o resto não sai do iframe
@@ -36,9 +50,7 @@
             if (event.origin !== window.location.origin || event.data?.source !== 'codhous-panel') return;
 
             if (event.data.type === 'color' && /^\d{1,3} \d{1,3} \d{1,3}$/.test(event.data.value)) {
-                ['--primary-color', '--primary-400', '--primary-500', '--primary-600'].forEach((name) => {
-                    document.documentElement.style.setProperty(name, event.data.value);
-                });
+                applyPrimary(event.data.value);
             }
         });
 

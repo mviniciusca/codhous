@@ -1,47 +1,71 @@
+{{--
+    Cabeçalho de seção: kicker + título + descrição, com slot opcional de ações.
+
+    Respeita header.visible e header.alignment do bloco. Com alinhamento à
+    esquerda, as ações (ex.: "Ver todos") ficam na mesma linha do título em
+    telas largas, aproveitando o espaço lateral.
+--}}
 @props([
     'header' => [],
     'fallbackTitle' => null,
     'fallbackSubtitle' => null,
     'fallbackDescription' => null,
-    'textColor' => 'light',
-    'badgeBorderClass' => 'border-primary/20 bg-primary/10',
-    'badgeBgClass' => 'bg-primary',
-    'badgeTextClass' => 'text-primary'
+    // Força um alinhamento (left, center, right); sem valor usa header.alignment
+    'align' => null,
+    'defaultAlign' => 'left',
+    'as' => 'h2',
+    // Mantidos por compatibilidade; o esquema de cor agora vem da seção
+    'textColor' => null,
+    'badgeBorderClass' => null,
+    'badgeBgClass' => null,
+    'badgeTextClass' => null,
 ])
 @php
+    $header = (array) $header;
     $isVisible = $header['visible'] ?? true;
-    $alignment = $header['alignment'] ?? 'left';
-    $title = $header['title'] ?? $fallbackTitle;
-    $subtitle = $header['subtitle'] ?? $fallbackSubtitle;
-    $description = $header['description'] ?? $fallbackDescription;
+    $alignment = $align ?: ($header['alignment'] ?? $defaultAlign);
+    $title = filled($header['title'] ?? null) ? $header['title'] : $fallbackTitle;
+    $subtitle = filled($header['subtitle'] ?? null) ? $header['subtitle'] : $fallbackSubtitle;
+    $description = filled($header['description'] ?? null) ? $header['description'] : $fallbackDescription;
+    $hasActions = isset($actions) && $actions->isNotEmpty();
 
-    $alignClass = $alignment === 'left' ? 'text-left mr-auto items-start' : ($alignment === 'right' ? 'text-right ml-auto items-end' : 'text-center mx-auto items-center');
-    $isDark = $textColor === 'dark';
+    $textAlign = match ($alignment) {
+        'center' => 'items-center text-center mx-auto',
+        'right' => 'items-end text-right ml-auto',
+        default => 'items-start text-left',
+    };
 @endphp
 
-@if($isVisible && (!empty($title) || !empty($subtitle)))
-<div class="mb-12 flex flex-col max-w-3xl {{ $alignClass }}">
-    @if(!empty($subtitle))
-        @php
-            $currentBadgeBorder = $isDark ? 'border-white/10 bg-black/40' : $badgeBorderClass;
-            $currentBadgeText = $isDark ? 'text-primary' : $badgeTextClass;
-        @endphp
-        <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $currentBadgeBorder }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
-            <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
-            <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $currentBadgeText }}">{!! $subtitle !!}</span>
+@if($isVisible && (filled($title) || filled($subtitle)))
+    <div {{ $attributes->class([
+        'mb-10 md:mb-12',
+        'flex flex-col gap-6 md:flex-row md:items-end md:justify-between' => $hasActions && $alignment === 'left',
+    ]) }}>
+        <div class="flex max-w-2xl flex-col {{ $textAlign }}" data-reveal>
+            @if(filled($subtitle))
+                <span class="kicker kicker-pill mb-4">
+                    <span class="kicker-dot"></span>
+                    {!! $subtitle !!}
+                </span>
+            @endif
+
+            @if(filled($title))
+                <{{ $as }} class="section-title">{!! $title !!}</{{ $as }}>
+            @endif
+
+            @if(filled($description))
+                <p class="section-lead mt-4">{!! $description !!}</p>
+            @endif
         </div>
-    @endif
-    
-    @if(!empty($title))
-        <h2 class="font-mono text-3xl font-extrabold tracking-tight md:text-4xl drop-shadow-sm mb-4 {{ $isDark ? 'text-white' : 'text-foreground' }}" style="text-wrap: balance;">
-            {!! $title !!}
-        </h2>
-    @endif
-    
-    @if(!empty($description))
-        <p class="text-base md:text-lg font-medium leading-relaxed {{ $isDark ? 'text-white/70' : 'text-muted-foreground' }}" style="text-wrap: balance;">
-            {!! $description !!}
-        </p>
-    @endif
-</div>
+
+        @if($hasActions)
+            <div @class([
+                'flex shrink-0 flex-wrap items-center gap-3',
+                'mt-6 justify-center' => $alignment === 'center',
+                'mt-6 justify-end' => $alignment === 'right',
+            ]) data-reveal style="--reveal-delay: 120ms">
+                {{ $actions }}
+            </div>
+        @endif
+    </div>
 @endif

@@ -1,6 +1,7 @@
 @props(['type', 'data', 'page' => null, 'theme' => 'default', 'hideHeader' => false])
 
 @php
+    $data = (array) $data;
     $isHome = $page ? ($page->slug === '/' || $page->slug === '') : false;
 
     if (!function_exists('resolveFilamentImagePath')) {
@@ -19,6 +20,11 @@
             return null;
         }
     }
+
+    // Ícone escolhido num select com opção "outro"/"other" + campo livre
+    $pickIcon = function (?string $selected, ?string $custom, string $default) {
+        return in_array($selected, ['other', 'outro'], true) ? ($custom ?: $default) : ($selected ?: $custom ?: $default);
+    };
 @endphp
 
 @switch($type)
@@ -29,13 +35,10 @@
         @endphp
         @if($section && $section->is_active)
             @php
-                // Merge style and advanced overrides from the Page Builder
-                $overrides = array_filter([
-                    'background_color' => $data['background_color'] ?? null,
-                    'text_color' => $data['text_color'] ?? null,
-                    'custom_id' => $data['custom_id'] ?? null,
-                    'custom_css_classes' => $data['custom_css_classes'] ?? null,
-                ]);
+                // Estilo e opções avançadas definidos no Page Builder sobrepõem os da seção global
+                $overrides = array_filter(\Illuminate\Support\Arr::only($data, [
+                    'background_color', 'text_color', 'spacing_top', 'spacing_bottom', 'custom_id', 'custom_css_classes',
+                ]));
                 $mergedData = array_merge($section->content ?? [], $overrides);
             @endphp
             <x-render-block :type="$section->type" :data="$mergedData" :page="$page" :theme="$theme" />
@@ -53,213 +56,196 @@
         @break
 
     @case('stats')
-        @if(!empty($data['items']))
-            <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20 -mt-12 sm:-mt-16 mb-12">
-                <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-8">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ min(count($data['items']), 4) }} gap-8 lg:gap-12 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
-                        @foreach($data['items'] as $index => $stat)
-                            <div class="flex items-center gap-6 {{ $index > 0 ? 'pt-8 sm:pt-0 sm:pl-8 lg:pl-12' : '' }}">
-                                <div class="flex-shrink-0 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <i data-lucide="{{ $stat['icon'] ?? 'check-circle' }}" class="w-8 h-8"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">
-                                        {{ $stat['value'] ?? '' }}
-                                    </h3>
-                                    <p class="text-sm md:text-base text-gray-500 font-medium mt-1">
-                                        {{ $stat['label'] ?? '' }}
-                                    </p>
+        @php
+            $statItems = array_values(array_filter((array) ($data['items'] ?? []), fn ($i) => filled($i['value'] ?? null)));
+            $statCols = match (min(count($statItems), 4)) {
+                1 => 'lg:grid-cols-1',
+                2 => 'lg:grid-cols-2',
+                3 => 'lg:grid-cols-3',
+                default => 'lg:grid-cols-4',
+            };
+            $overlap = (bool) ($data['overlap'] ?? true);
+        @endphp
+        @if($statItems)
+            <x-ui.section :data="$data" :spacing="$overlap ? 'none' : 'sm'" :background="$overlap ? 'bg-transparent' : 'bg-background'" :class="$overlap ? '!overflow-visible z-20' : '!overflow-visible'">
+                <div @class(['-mt-10 md:-mt-14' => $overlap])>
+                    <div class="surface-card grid grid-cols-2 gap-px overflow-hidden bg-border/70 shadow-[0_24px_60px_-32px_rgb(0_0_0/0.35)] {{ $statCols }}" data-reveal>
+                        @foreach($statItems as $stat)
+                            <div class="group flex items-center gap-4 bg-card p-5 transition-colors duration-300 hover:bg-primary-500/[0.04] md:p-7">
+                                <x-ui.icon-box :icon="$stat['icon'] ?? 'check-circle'" class="hidden sm:inline-flex" />
+                                <div class="min-w-0">
+                                    <p class="font-mono text-2xl font-bold tracking-tight text-foreground md:text-3xl" data-count>{{ $stat['value'] }}</p>
+                                    <p class="mt-0.5 text-xs font-medium text-muted-foreground md:text-sm">{{ $stat['label'] ?? '' }}</p>
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
-            </div>
+            </x-ui.section>
         @endif
         @break
 
     @case('image_with_text')
         @php
-            $bgColor = !empty($data['background_color']) && $data['background_color'] !== 'bg-white' ? $data['background_color'] : 'bg-white';
-            $isDark = ($data['text_color'] ?? 'light') === 'dark';
-            $titleColor = $isDark ? 'text-white' : 'text-gray-900';
-            $descColor = $isDark ? 'text-gray-300' : 'text-gray-600';
-            $badgeBgClass = $isDark ? 'bg-primary/20' : 'bg-primary/10';
-            $badgeTextColor = $isDark ? 'text-primary-300' : 'text-primary';
-
-            $badgeIcon = ($data['badge_icon_select'] ?? 'zap') === 'other' ? ($data['badge_icon_custom'] ?? 'zap') : ($data['badge_icon_select'] ?? 'zap');
-            $btn1Icon = ($data['button_icon_select'] ?? 'arrow-right') === 'other' ? ($data['button_icon_custom'] ?? 'arrow-right') : ($data['button_icon_select'] ?? 'arrow-right');
-            $btn2Icon = ($data['secondary_button_icon_select'] ?? 'play') === 'other' ? ($data['secondary_button_icon_custom'] ?? 'play') : ($data['secondary_button_icon_select'] ?? 'play');
-
-            $vAlign = $data['image_vertical_alignment'] ?? 'center';
-            $vAlignClass = $vAlign === 'start' ? 'lg:items-start items-center' : ($vAlign === 'end' ? 'lg:items-end items-center' : 'items-center');
+            $badgeIcon = $pickIcon($data['badge_icon_select'] ?? 'zap', $data['badge_icon_custom'] ?? null, 'zap');
+            $btn1Icon = $pickIcon($data['button_icon_select'] ?? 'arrow-right', $data['button_icon_custom'] ?? null, 'arrow-right');
+            $btn2Icon = $pickIcon($data['secondary_button_icon_select'] ?? 'play', $data['secondary_button_icon_custom'] ?? null, 'play');
+            $imageUrl = resolveFilamentImagePath($data['image'] ?? null);
+            $imageRight = ($data['image_position'] ?? 'left') === 'right';
+            $vAlign = match ($data['image_vertical_alignment'] ?? 'center') {
+                'start' => 'lg:items-start',
+                'end' => 'lg:items-end',
+                default => 'lg:items-center',
+            };
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ $isDark ? 'text-scheme-dark' : '' }} {{ $data['custom_css_classes'] ?? '' }}">
-            <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-                <div class="flex flex-col {{ ($data['image_position'] ?? 'left') === 'right' ? 'lg:flex-row-reverse' : 'lg:flex-row' }} {{ $vAlignClass }} gap-12 lg:gap-20">
-                <div class="w-full lg:w-2/5">
-                    @if(!empty($data['image']))
-                        <div class="relative flex justify-center lg:justify-end">
-                            <img src="{{ resolveFilamentImagePath($data['image']) }}" alt="{{ $data['title'] ?? '' }}" class="w-full max-w-lg lg:max-w-none h-auto object-contain">
+        <x-ui.section :data="$data">
+            <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-16 {{ $vAlign }}">
+                @if($imageUrl)
+                    <div @class(['lg:col-span-5', 'lg:order-last' => $imageRight]) data-reveal>
+                        <div class="relative mx-auto max-w-lg lg:max-w-none">
+                            <div class="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-primary-500/15 via-primary-400/5 to-transparent blur-2xl"></div>
+                            <img src="{{ $imageUrl }}" alt="{{ $data['title'] ?? '' }}" class="h-auto w-full object-contain" loading="lazy">
                         </div>
-                    @endif
-                </div>
-                <div class="w-full lg:w-3/5">
-                    @if(!empty($data['badge']))
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full {{ $badgeBgClass }} {{ $badgeTextColor }} font-semibold tracking-wider text-xs uppercase mb-6">
-                            <i data-lucide="{{ $badgeIcon }}" class="w-4 h-4 {{ !empty($badgeIcon) ? '' : 'fill-current' }}"></i> {{ $data['badge'] }}
-                        </div>
-                    @endif
-                    
-                    @if(!empty($data['title']))
-                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold {{ $titleColor }} tracking-tight leading-tight mb-6">
-                            {{ $data['title'] }}
-                        </h2>
-                    @endif
-                    
-                    @if(!empty($data['description']))
-                        <div class="prose prose-lg {{ $descColor }} mb-10 max-w-2xl">
-                            {!! nl2br(e($data['description'])) !!}
-                        </div>
-                    @endif
-                    
-                    <div class="flex flex-wrap items-center gap-4 mb-4">
-                        @if(!empty($data['button_text']) && !empty($data['button_url']))
-                            <a href="{{ $data['button_url'] }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary rounded-xl hover:bg-primary/90 transition-colors duration-200">
-                                {{ $data['button_text'] }}
-                                @if(!empty($btn1Icon))
-                                    <i data-lucide="{{ $btn1Icon }}" class="w-5 h-5 ml-2"></i>
-                                @endif
-                            </a>
-                        @endif
-                        @if(!empty($data['secondary_button_text']) && !empty($data['secondary_button_url']))
-                            <a href="{{ $data['secondary_button_url'] }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold {{ $isDark ? 'text-gray-300 border-gray-700 hover:text-white hover:bg-gray-800' : 'text-gray-700 border-gray-300 hover:text-gray-900 hover:bg-gray-50' }} border rounded-xl transition-colors duration-200">
-                                {{ $data['secondary_button_text'] }}
-                                @if(!empty($btn2Icon))
-                                    <i data-lucide="{{ $btn2Icon }}" class="w-5 h-5 ml-2 text-primary"></i>
-                                @endif
-                            </a>
-                        @endif
                     </div>
+                @endif
 
-                    @if(!empty($data['mini_stats']) && count($data['mini_stats']) > 0)
-                        <div class="flex flex-row flex-nowrap overflow-x-auto items-center mt-8 py-4 divide-x {{ $isDark ? 'divide-white/10' : 'divide-gray-200' }}">
-                            @foreach($data['mini_stats'] as $index => $stat)
-                                @php
-                                    $statIcon = ($stat['icon_select'] ?? 'check-circle') === 'other' ? ($stat['icon_custom'] ?? 'check-circle') : ($stat['icon_select'] ?? 'check-circle');
-                                @endphp
-                                <div class="flex items-center gap-3 px-4 first:pl-0 last:pr-0">
-                                    <div class="flex-shrink-0 w-11 h-11 rounded-xl {{ $isDark ? 'bg-white/5 border border-white/10 text-primary-400 shadow-inner shadow-white/10' : 'bg-gray-50 border border-gray-200 text-primary shadow-sm' }} flex items-center justify-center">
-                                        <i data-lucide="{{ $statIcon }}" class="w-5 h-5"></i>
-                                    </div>
-                                    <div class="flex flex-col min-w-[80px]">
+                <div @class(['lg:col-span-7' => $imageUrl, 'lg:col-span-12 max-w-3xl' => ! $imageUrl]) data-reveal style="--reveal-delay: 100ms">
+                    @if(!empty($data['badge']))
+                        <span class="kicker kicker-pill mb-5">
+                            <i data-lucide="{{ $badgeIcon }}" class="h-3.5 w-3.5"></i>
+                            {{ $data['badge'] }}
+                        </span>
+                    @endif
+
+                    @if(!empty($data['title']))
+                        <h2 class="section-title">{{ $data['title'] }}</h2>
+                    @endif
+
+                    @if(!empty($data['description']))
+                        <div class="section-lead mt-5 max-w-2xl">{!! nl2br(e($data['description'])) !!}</div>
+                    @endif
+
+                    @if((!empty($data['button_text']) && !empty($data['button_url'])) || (!empty($data['secondary_button_text']) && !empty($data['secondary_button_url'])))
+                        <div class="mt-8 flex flex-wrap items-center gap-3">
+                            @if(!empty($data['button_text']) && !empty($data['button_url']))
+                                <x-ui.button :href="$data['button_url']" size="lg" :trailing-icon="$btn1Icon">{{ $data['button_text'] }}</x-ui.button>
+                            @endif
+                            @if(!empty($data['secondary_button_text']) && !empty($data['secondary_button_url']))
+                                <x-ui.button :href="$data['secondary_button_url']" variant="secondary" size="lg" :icon="$btn2Icon">{{ $data['secondary_button_text'] }}</x-ui.button>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if(!empty($data['mini_stats']))
+                        <dl @class([
+                            'mt-10 grid grid-cols-2 gap-3',
+                            'sm:grid-cols-3' => count($data['mini_stats']) === 3,
+                            'sm:grid-cols-4' => count($data['mini_stats']) >= 4,
+                        ])>
+                            @foreach($data['mini_stats'] as $stat)
+                                <div class="group flex items-center gap-3 rounded-xl border border-border/70 bg-card/60 p-3 transition-colors hover:border-primary-500/30">
+                                    <x-ui.icon-box size="sm" :icon="$pickIcon($stat['icon_select'] ?? 'check-circle', $stat['icon_custom'] ?? null, 'check-circle')" />
+                                    <div class="min-w-0 leading-tight">
                                         @if(!empty($stat['title']))
-                                            <span class="font-medium text-xs lg:text-sm {{ $isDark ? 'text-gray-200' : 'text-gray-900' }} leading-tight whitespace-normal">{{ $stat['title'] }}</span>
+                                            <dt class="text-sm font-semibold text-foreground">{{ $stat['title'] }}</dt>
                                         @endif
                                         @if(!empty($stat['subtitle']))
-                                            <span class="font-medium text-xs {{ $isDark ? 'text-gray-400' : 'text-gray-500' }} leading-tight whitespace-normal mt-0.5">{{ $stat['subtitle'] }}</span>
+                                            <dd class="mt-0.5 text-xs text-muted-foreground">{{ $stat['subtitle'] }}</dd>
                                         @endif
                                     </div>
                                 </div>
                             @endforeach
-                        </div>
+                        </dl>
                     @endif
                 </div>
             </div>
-        </section>
+        </x-ui.section>
         @break
 
     @case('data_table')
-        <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="px-6 py-8 border-b border-gray-100 flex items-center justify-between">
-                    @if(!empty($data['title']))
-                        <h3 class="text-xl font-bold text-gray-900">{{ $data['title'] }}</h3>
-                    @endif
-                    @if(!empty($data['badge']))
-                        <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-semibold uppercase tracking-wider">{{ $data['badge'] }}</span>
-                    @endif
-                </div>
+        @php
+            $statusMap = [
+                'success' => ['Concluído', 'bg-emerald-500/10 text-emerald-700'],
+                'warning' => ['Em andamento', 'bg-amber-500/10 text-amber-700'],
+                'danger' => ['Atrasado', 'bg-red-500/10 text-red-700'],
+                'info' => ['Planejamento', 'bg-sky-500/10 text-sky-700'],
+            ];
+        @endphp
+        <x-ui.section :data="$data" spacing="sm">
+            <div class="surface-card overflow-hidden" data-reveal>
+                @if(!empty($data['title']) || !empty($data['badge']))
+                    <div class="flex items-center justify-between gap-4 border-b border-border/70 px-5 py-4 md:px-6">
+                        @if(!empty($data['title']))
+                            <h3 class="font-mono text-lg font-bold text-foreground">{{ $data['title'] }}</h3>
+                        @endif
+                        @if(!empty($data['badge']))
+                            <span class="kicker kicker-pill">{{ $data['badge'] }}</span>
+                        @endif
+                    </div>
+                @endif
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full border-collapse text-left text-sm">
                         <thead>
-                            <tr class="bg-gray-50/50">
-                                <th class="px-6 py-4 text-sm font-semibold text-gray-500 border-b border-gray-100">Projeto</th>
-                                <th class="px-6 py-4 text-sm font-semibold text-gray-500 border-b border-gray-100">Local</th>
-                                <th class="px-6 py-4 text-sm font-semibold text-gray-500 border-b border-gray-100">Status</th>
-                                <th class="px-6 py-4 text-sm font-semibold text-gray-500 border-b border-gray-100">Prazo</th>
+                            <tr class="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
+                                <th class="px-5 py-3 font-semibold md:px-6">Projeto</th>
+                                <th class="px-5 py-3 font-semibold md:px-6">Local</th>
+                                <th class="px-5 py-3 font-semibold md:px-6">Status</th>
+                                <th class="px-5 py-3 font-semibold md:px-6">Prazo</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody class="divide-y divide-border/60">
                             @foreach($data['rows'] ?? [] as $row)
-                                <tr class="hover:bg-gray-50/50 transition-colors">
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $row['col1'] ?? '' }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ $row['col2'] ?? '' }}</td>
-                                    <td class="px-6 py-4 text-sm">
-                                        @php
-                                            $statusColors = [
-                                                'success' => 'bg-green-100 text-green-700',
-                                                'warning' => 'bg-amber-100 text-amber-700',
-                                                'danger' => 'bg-red-100 text-red-700',
-                                                'info' => 'bg-blue-100 text-blue-700',
-                                            ];
-                                            $statusLabels = [
-                                                'success' => 'Concluído',
-                                                'warning' => 'Em andamento',
-                                                'danger' => 'Atrasado',
-                                                'info' => 'Planejamento',
-                                            ];
-                                            $status = $row['col3'] ?? 'success';
-                                            $colorClass = $statusColors[$status] ?? $statusColors['success'];
-                                            $label = $statusLabels[$status] ?? $statusLabels['success'];
-                                        @endphp
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium {{ $colorClass }}">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                                            {{ $label }}
+                                @php [$statusLabel, $statusClass] = $statusMap[$row['col3'] ?? 'success'] ?? $statusMap['success']; @endphp
+                                <tr class="transition-colors hover:bg-primary-500/[0.03]">
+                                    <td class="px-5 py-3.5 font-medium text-foreground md:px-6">{{ $row['col1'] ?? '' }}</td>
+                                    <td class="px-5 py-3.5 text-muted-foreground md:px-6">{{ $row['col2'] ?? '' }}</td>
+                                    <td class="px-5 py-3.5 md:px-6">
+                                        <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                                            {{ $statusLabel }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ $row['col4'] ?? '' }}</td>
+                                    <td class="px-5 py-3.5 text-muted-foreground md:px-6">{{ $row['col4'] ?? '' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
+        </x-ui.section>
         @break
 
     @case('featured_testimonial')
-        <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="relative rounded-3xl overflow-hidden bg-gray-900 text-white shadow-2xl">
-                @if(!empty($data['background_image']))
-                    <div class="absolute inset-0">
-                        <img src="{{ resolveFilamentImagePath($data['background_image']) }}" alt="" class="w-full h-full object-cover opacity-40 mix-blend-overlay">
-                    </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent"></div>
+        @php
+            // background_image aqui é o fundo do cartão, não da seção
+            $quoteBg = resolveFilamentImagePath($data['background_image'] ?? null);
+            $authorImg = resolveFilamentImagePath($data['author_image'] ?? null);
+        @endphp
+        <x-ui.section :data="\Illuminate\Support\Arr::except($data, ['background_image'])" spacing="sm">
+            <figure class="dark relative isolate overflow-hidden rounded-[calc(var(--radius-card)*1.5)] bg-primary-950 px-6 py-12 text-white md:px-14 md:py-16" data-reveal>
+                @if($quoteBg)
+                    <img src="{{ $quoteBg }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover opacity-25 mix-blend-luminosity" loading="lazy">
                 @endif
-                <div class="relative px-8 py-16 md:px-16 md:py-20 lg:p-24">
-                    <div class="flex flex-col md:flex-row gap-12 items-center md:items-start justify-between">
-                        <div class="max-w-2xl">
-                            <i data-lucide="quote" class="w-12 h-12 text-primary opacity-50 mb-8"></i>
-                            <blockquote class="text-2xl md:text-3xl font-medium leading-relaxed mb-8">
-                                "{{ $data['quote'] ?? '' }}"
-                            </blockquote>
-                            <div class="flex items-center gap-4">
-                                @if(!empty($data['author_image']))
-                                    <img src="{{ resolveFilamentImagePath($data['author_image']) }}" alt="{{ $data['author'] ?? '' }}" class="w-14 h-14 rounded-full object-cover border-2 border-primary">
-                                @endif
-                                <div>
-                                    <div class="font-bold text-lg">{{ $data['author'] ?? '' }}</div>
-                                    @if(!empty($data['role']))
-                                        <div class="text-gray-400 text-sm">{{ $data['role'] }}</div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
+                <div class="absolute inset-0 -z-10 bg-gradient-to-br from-primary-900/80 via-primary-950/90 to-black/90"></div>
+                <div class="absolute -right-24 -top-24 -z-10 h-72 w-72 rounded-full bg-primary-500/30 blur-3xl"></div>
+
+                <i data-lucide="quote" class="mb-6 h-10 w-10 text-primary-400"></i>
+                <blockquote class="max-w-3xl font-mono text-xl font-medium leading-snug md:text-3xl" style="text-wrap: balance;">
+                    “{{ trim($data['quote'] ?? '', '"“” ') }}”
+                </blockquote>
+                <figcaption class="mt-8 flex items-center gap-4">
+                    @if($authorImg)
+                        <img src="{{ $authorImg }}" alt="{{ $data['author'] ?? '' }}" class="h-12 w-12 rounded-full object-cover ring-2 ring-primary-400/60 ring-offset-2 ring-offset-primary-950">
+                    @endif
+                    <div>
+                        <div class="font-semibold">{{ $data['author'] ?? '' }}</div>
+                        @if(!empty($data['role']))
+                            <div class="text-sm text-white/60">{{ $data['role'] }}</div>
+                        @endif
                     </div>
-                </div>
-            </div>
-        </div>
+                </figcaption>
+            </figure>
+        </x-ui.section>
         @break
 
     @case('hero')
@@ -267,16 +253,8 @@
             $heroBadge = $data['header']['subtitle'] ?? $data['badge'] ?? '';
             $heroTitle = $data['header']['title'] ?? $data['title'] ?? '';
             $heroSubtitle = $data['header']['description'] ?? $data['subtitle'] ?? '';
-            
-            $primaryIconSelect = $data['primary_button_icon_select'] ?? '';
-            $primaryIcon = $primaryIconSelect === 'outro' 
-                ? ($data['primary_button_icon'] ?? '') 
-                : ($primaryIconSelect ?: ($data['primary_button_icon'] ?? ''));
-
-            $secondaryIconSelect = $data['secondary_button_icon_select'] ?? '';
-            $secondaryIcon = $secondaryIconSelect === 'outro' 
-                ? ($data['secondary_button_icon'] ?? '') 
-                : ($secondaryIconSelect ?: ($data['secondary_button_icon'] ?? ''));
+            $primaryIcon = $pickIcon($data['primary_button_icon_select'] ?? '', $data['primary_button_icon'] ?? '', '');
+            $secondaryIcon = $pickIcon($data['secondary_button_icon_select'] ?? '', $data['secondary_button_icon'] ?? '', '');
         @endphp
         <livewire:section-hero-cep
             :bg-color="$data['background_color'] ?? null"
@@ -311,6 +289,7 @@
             :overlay-theme="$data['overlay_theme'] ?? 'dark'"
             :theme="$theme"
             :stats="$data['stats'] ?? []"
+            :spacing="\App\Support\SectionStyle::spacing($data, 'md')"
         />
         @break
 
@@ -339,8 +318,7 @@
 
     @case('partners')
         <x-section-partners
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
+            :data="$data"
             :layout="$data['layout'] ?? 'slider'"
             :subtitle="$data['header']['subtitle'] ?? $data['subtitle'] ?? null"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
@@ -352,311 +330,146 @@
 
     @case('services')
         @php
-            $headerVisible = $data['header']['visible'] ?? true;
-            $headerAlignment = $data['header']['alignment'] ?? 'center';
-            $alignClass = $headerAlignment === 'left' ? 'text-left mr-auto' : ($headerAlignment === 'right' ? 'text-right ml-auto' : 'text-center mx-auto');
-
-            $servicesTitle = $data['header']['title'] ?? $data['title'] ?? 'Nossos Serviços';
-            $servicesSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? 'O que fazemos';
-            $servicesDesc = $data['header']['description'] ?? $data['description'] ?? 'Soluções completas com qualidade garantida.';
-            
-            $bgColor = $data['background_color'] ?? 'bg-white';
-            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
-            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
-            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
-            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/10';
-            
-            $bgImg = !empty($data['background_image']) ? resolveFilamentImagePath($data['background_image']) : null;
-            $bgFit = $data['background_image_fit'] ?? 'cover';
-            $bgPos = $data['background_image_position'] ?? 'center';
-            $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
-            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
-            $bgDivClasses = 'absolute inset-x-0 z-0 pointer-events-none bg-no-repeat';
-            $bgPosParts = explode(' ', $bgPos);
-            $bgPosHorizontal = $bgPosParts[0];
-            if ($bgPullUpAmount > 0) {
-                $topStyle = "-{$bgPullUpAmount}%";
-                $bottomStyle = "0";
-                $bgPositionStyle = $bgPosHorizontal . ' bottom';
-            } elseif ($bgPullUpAmount < 0) {
-                $topStyle = "0";
-                $bottomStyle = $bgPullUpAmount . "%";
-                $bgPositionStyle = $bgPosHorizontal . ' top';
-            } else {
-                $topStyle = "0";
-                $bottomStyle = "0";
-                $bgPositionStyle = $bgPos;
-            }
-            
             $displayItems = $data['items'] ?? [];
             if (empty($displayItems)) {
-                // Fallback de demonstração
+                // Conteúdo de demonstração
                 $displayItems = [
                     ['title' => 'Concreto Usinado', 'subtitle' => 'Alta Performance', 'description' => 'Concreto de alta resistência com controle rigoroso de qualidade. Entregue pontualmente na sua obra.', 'icon' => 'truck', 'bullets' => ['Até 50 MPa', 'Laudo técnico', 'Frota moderna'], 'cta_label' => 'Fazer Orçamento', 'cta_url' => '#orcamento'],
                     ['title' => 'Bombeamento', 'subtitle' => 'Alcance Máximo', 'description' => 'Serviço de bombeamento eficiente para lajes e locais de difícil acesso, otimizando o tempo da sua equipe.', 'icon' => 'arrow-up-circle', 'bullets' => ['Bomba lança', 'Bomba estacionária', 'Operadores treinados'], 'cta_label' => 'Fazer Orçamento', 'cta_url' => '#orcamento'],
                     ['title' => 'Locação de Máquinas', 'subtitle' => 'Frota Renovada', 'description' => 'Equipamentos pesados para terraplanagem, escavação e compactação. Disponibilidade imediata.', 'icon' => 'tractor', 'bullets' => ['Retroescavadeiras', 'Rolos compactadores', 'Manutenção em dia'], 'cta_label' => 'Fazer Orçamento', 'cta_url' => '#orcamento'],
                 ];
             }
+            $useSlider = count($displayItems) > 3;
+            $sliderId = 'services-swiper-' . Str::random(6);
+            $showServicesHeader = ! $hideHeader && ($data['header']['visible'] ?? true);
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
-            <x-ui.section-background :data="$data" />
-            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                @if(!$hideHeader && $headerVisible && (!empty($servicesTitle) || !empty($servicesSubtitle)))
-                    <div class="mb-16 max-w-3xl {{ $alignClass }}">
-                        @if(!empty($servicesSubtitle))
-                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
-                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
-                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $servicesSubtitle }}</span>
-                            </div>
-                        @endif
-                        @if(!empty($servicesTitle))
-                            <h2 class="font-mono text-4xl font-extrabold tracking-tight text-foreground md:text-5xl drop-shadow-sm mb-4" style="text-wrap: balance;">
-                                {{ $servicesTitle }}
-                            </h2>
-                        @endif
-                        @if(!empty($servicesDesc))
-                            <p class="text-lg font-medium leading-relaxed text-muted-foreground {{ $headerAlignment === 'center' ? 'mx-auto' : '' }}" style="text-wrap: balance;">
-                                {{ $servicesDesc }}
-                            </p>
-                        @endif
+        <x-ui.section :data="$data">
+            @if($showServicesHeader)
+                <x-ui.section-header
+                    :header="$data['header'] ?? []"
+                    default-align="center"
+                    :fallback-title="$data['title'] ?? 'Nossos Serviços'"
+                    :fallback-subtitle="$data['badge'] ?? 'O que fazemos'"
+                    :fallback-description="$data['description'] ?? 'Soluções completas com qualidade garantida.'"
+                >
+                    @if($useSlider)
+                        <x-slot:actions><x-ui.slider-nav :id="$sliderId" class="hidden md:flex" /></x-slot:actions>
+                    @endif
+                </x-ui.section-header>
+            @endif
+
+            @if($useSlider)
+                <div class="swiper {{ $sliderId }} !overflow-visible md:!overflow-hidden">
+                    <div class="swiper-wrapper">
+            @else
+                <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            @endif
+
+            @foreach($displayItems as $index => $service)
+                @if($useSlider)<div class="swiper-slide !h-auto">@endif
+                <article class="surface-card surface-card-interactive group flex h-full flex-col p-6 md:p-7" data-spotlight data-reveal style="--reveal-delay: {{ ($index % 3) * 90 }}ms">
+                    <div class="mb-6 flex items-start justify-between">
+                        <x-ui.icon-box size="lg" :icon="$service['icon'] ?? 'droplets'" />
+                        <span class="font-mono text-sm font-medium text-muted-foreground/40 transition-colors group-hover:text-primary-ink">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
                     </div>
 
-                @endif
+                    @if(!empty($service['subtitle']))
+                        <p class="mb-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{{ $service['subtitle'] }}</p>
+                    @endif
+                    <h3 class="text-xl font-bold text-foreground">{{ $service['title'] ?? '' }}</h3>
 
-                @php
-                    $itemsCount = count($displayItems);
-                    $useSlider = $itemsCount > 3;
-                    $sliderId = 'services-swiper-' . Str::random(6);
-                @endphp
+                    @if(!empty($service['description']))
+                        <p class="mt-3 text-sm leading-relaxed text-muted-foreground">{{ $service['description'] }}</p>
+                    @endif
 
-                @if($useSlider)
-                    <div class="relative w-full">
-                        <div class="swiper {{ $sliderId }} w-full pb-16">
-                            <div class="swiper-wrapper items-stretch">
-                @else
-                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                @endif
+                    @if(!empty($service['bullets']))
+                        <ul class="mt-5 flex flex-wrap gap-2">
+                            @foreach((array) $service['bullets'] as $bullet)
+                                <li class="inline-flex items-center gap-1.5 rounded-full border border-border/70 px-2.5 py-1 text-xs font-medium text-foreground/80">
+                                    <i data-lucide="check" class="h-3 w-3 text-primary-ink"></i>
+                                    {{ is_array($bullet) ? ($bullet['text'] ?? $bullet['value'] ?? '') : $bullet }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
 
-                    @foreach($displayItems as $index => $service)
-                        @if($useSlider) <div class="swiper-slide !h-auto flex"> @endif
-                        
-                        <div class="flex w-full h-full flex-col rounded-[24px] bg-card border border-border/40 p-8 shadow-sm transition-all hover:shadow-md hover:border-primary/20">
-                            <div class="flex items-start justify-between mb-8">
-                                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                                    <i data-lucide="{{ $service['icon'] ?? 'droplets' }}" class="h-6 w-6"></i>
-                                </div>
-                            </div>
-                            
-                            @if(!empty($service['subtitle']))
-                                <div class="mb-2 text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground">
-                                    {{ $service['subtitle'] }}
-                                </div>
-                            @endif
-                            
-                            <h3 class="mb-3 text-xl font-bold text-foreground">
-                                {{ $service['title'] ?? '' }}
-                            </h3>
-                            
-                            @if(!empty($service['description']))
-                                <p class="mb-6 text-sm leading-relaxed text-muted-foreground">
-                                    {{ $service['description'] }}
-                                </p>
-                            @endif
-                            
-                            @if(!empty($service['bullets']))
-                                <ul class="mb-8 flex flex-col gap-3">
-                                    @foreach((array) $service['bullets'] as $bullet)
-                                        <li class="flex items-start gap-3 text-sm text-muted-foreground">
-                                            <div class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                                <i data-lucide="check" class="h-2.5 w-2.5"></i>
-                                            </div>
-                                            <span>{{ $bullet }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                            
-                            <div class="mt-auto pt-6 border-t border-border/30">
-                                <a href="{{ $service['cta_url'] ?? '#orcamento' }}" class="group flex items-center justify-between text-sm font-bold text-primary hover:text-primary/80 transition-colors">
-                                    {{ $service['cta_label'] ?? 'Solicitar orçamento' }}
-                                    <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1"></i>
-                                </a>
-                            </div>
-                        </div>
-                        
-                        @if($useSlider) </div> @endif
-                    @endforeach
-
-                @if($useSlider)
-                            </div>
-                            <div class="swiper-pagination !bottom-0"></div>
-                        </div>
-                        
-                        <!-- Botões de Navegação (Escondidos no mobile, visíveis a partir de md) -->
-                        <div class="{{ $sliderId }}-prev absolute top-[calc(50%-2rem)] -translate-y-1/2 -left-4 xl:-left-6 hidden md:flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] text-primary z-10 transition-transform hover:scale-110 group">
-                            <i data-lucide="chevron-left" class="h-6 w-6 transition-transform group-hover:-translate-x-0.5"></i>
-                        </div>
-                        <div class="{{ $sliderId }}-next absolute top-[calc(50%-2rem)] -translate-y-1/2 -right-4 xl:-right-6 hidden md:flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] text-primary z-10 transition-transform hover:scale-110 group">
-                            <i data-lucide="chevron-right" class="h-6 w-6 transition-transform group-hover:translate-x-0.5"></i>
-                        </div>
+                    <div class="mt-auto pt-6">
+                        <a href="{{ $service['cta_url'] ?? '#orcamento' }}" class="link-arrow w-full justify-between border-t border-border/60 pt-5">
+                            {{ $service['cta_label'] ?? 'Solicitar orçamento' }}
+                            <i data-lucide="arrow-right"></i>
+                        </a>
                     </div>
-                    
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            if (typeof Swiper !== 'undefined' && document.querySelector('.{{ $sliderId }}')) {
-                                new Swiper('.{{ $sliderId }}', {
-                                    slidesPerView: 1,
-                                    spaceBetween: 24,
-                                    pagination: {
-                                        el: '.{{ $sliderId }} .swiper-pagination',
-                                        clickable: true,
-                                    },
-                                    navigation: {
-                                        nextEl: '.{{ $sliderId }}-next',
-                                        prevEl: '.{{ $sliderId }}-prev',
-                                    },
-                                    breakpoints: {
-                                        768: { slidesPerView: 2 },
-                                        1024: { slidesPerView: 3 },
-                                    }
-                                });
-                            }
+                </article>
+                @if($useSlider)</div>@endif
+            @endforeach
+
+            @if($useSlider)
+                    </div>
+                    <div class="mt-8 flex items-center justify-between gap-4">
+                        <div class="swiper-pagination !static !w-auto"></div>
+                        <x-ui.slider-nav :id="$sliderId" :class="$showServicesHeader ? 'md:hidden' : ''" />
+                    </div>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        if (typeof Swiper === 'undefined' || !document.querySelector('.{{ $sliderId }}')) return;
+                        new Swiper('.{{ $sliderId }}', {
+                            slidesPerView: 1.08,
+                            spaceBetween: 16,
+                            grabCursor: true,
+                            pagination: { el: '.{{ $sliderId }} .swiper-pagination', clickable: true },
+                            navigation: { nextEl: '.{{ $sliderId }}-next', prevEl: '.{{ $sliderId }}-prev' },
+                            breakpoints: {
+                                768: { slidesPerView: 2, spaceBetween: 20 },
+                                1024: { slidesPerView: 3, spaceBetween: 20 },
+                            },
                         });
-                    </script>
-                @else
-                    </div>
-                @endif
-            </div>
-        </section>
+                    });
+                </script>
+            @else
+                </div>
+            @endif
+        </x-ui.section>
         @break
 
     @case('timeline')
         <x-section-timeline
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
-            :title="$data['header']['title'] ?? $data['title'] ?? null"
+            :data="$data"
             :header="$data['header'] ?? array_filter(['title' => $data['title'] ?? null])"
             :steps="$data['steps'] ?? []"
         />
         @break
+
     @case('commercial_partners')
-        @php
-            $bgColor = $data['background_color'] ?? 'bg-white';
-            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
-        @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
-            <x-ui.section-background :data="$data" />
-            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                <livewire:commercial-partners :data="$data" />
-            </div>
-        </section>
+        <x-ui.section :data="$data">
+            <livewire:commercial-partners :data="$data" />
+        </x-ui.section>
         @break
 
     @case('showcase')
-        @php
-            $headerVisible = $data['header']['visible'] ?? true;
-            $headerAlignment = $data['header']['alignment'] ?? 'center';
-            $alignClass = $headerAlignment === 'left' ? 'text-left mr-auto' : ($headerAlignment === 'right' ? 'text-right ml-auto' : 'text-center mx-auto');
-
-            $showcaseTitle = $data['header']['title'] ?? $data['title'] ?? null;
-            $showcaseSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
-            $showcaseDesc = $data['header']['description'] ?? $data['description'] ?? null;
-            
-            $bgColor = $data['background_color'] ?? 'bg-white';
-            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
-            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
-            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
-            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/10';
-            
-            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
-        @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
-            <x-ui.section-background :data="$data" />
-            
-            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                @if(!$hideHeader && $headerVisible && (!empty($showcaseTitle) || !empty($showcaseSubtitle)))
-                    <div class="mb-12 max-w-3xl {{ $alignClass }}">
-                        @if(!empty($showcaseSubtitle))
-                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
-                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
-                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $showcaseSubtitle }}</span>
-                            </div>
-                        @endif
-                        @if(!empty($showcaseTitle))
-                            <h2 class="font-mono text-3xl font-extrabold tracking-tight text-foreground md:text-5xl drop-shadow-sm mb-4" style="text-wrap: balance;">
-                                {{ $showcaseTitle }}
-                            </h2>
-                        @endif
-                        @if(!empty($showcaseDesc))
-                            <p class="text-lg font-medium leading-relaxed text-muted-foreground {{ $headerAlignment === 'center' ? 'mx-auto' : '' }}" style="text-wrap: balance;">
-                                {{ $showcaseDesc }}
-                            </p>
-                        @endif
-                    </div>
-                @endif
-                
-                <livewire:showcase-feed :limit="$data['limit'] ?? 6" />
-            </div>
-        </section>
-        @break
-
     @case('equipment_showcase')
-        @php
-            $headerVisible = $data['header']['visible'] ?? true;
-            $headerAlignment = $data['header']['alignment'] ?? 'center';
-            $alignClass = $headerAlignment === 'left' ? 'text-left mr-auto' : ($headerAlignment === 'right' ? 'text-right ml-auto' : 'text-center mx-auto');
+        <x-ui.section :data="$data">
+            @unless($hideHeader)
+                <x-ui.section-header
+                    :header="$data['header'] ?? []"
+                    default-align="center"
+                    :fallback-title="$data['title'] ?? null"
+                    :fallback-subtitle="$data['badge'] ?? null"
+                    :fallback-description="$data['description'] ?? null"
+                />
+            @endunless
 
-            $showcaseTitle = $data['header']['title'] ?? $data['title'] ?? null;
-            $showcaseSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
-            $showcaseDesc = $data['header']['description'] ?? $data['description'] ?? null;
-            
-            $bgColor = $data['background_color'] ?? 'bg-white';
-            $isPrimaryBg = str_contains($bgColor, 'bg-primary');
-            $badgeTextClass = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
-            $badgeBgClass = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)]' : 'bg-primary';
-            $badgeBorderClass = $isPrimaryBg ? 'border-black/30 bg-black/20' : 'border-primary/20 bg-primary/10';
-            
-            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
-        @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 lg:py-24 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
-            <x-ui.section-background :data="$data" />
-            
-            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                @if(!$hideHeader && $headerVisible && (!empty($showcaseTitle) || !empty($showcaseSubtitle)))
-                    <div class="mb-12 max-w-3xl {{ $alignClass }}">
-                        @if(!empty($showcaseSubtitle))
-                            <div class="mb-4 inline-flex items-center gap-2 rounded-full border {{ $badgeBorderClass }} px-4 py-1.5 backdrop-blur-md shadow-lg shadow-primary/5">
-                                <span class="h-1.5 w-1.5 rounded-full {{ $badgeBgClass }} animate-pulse shadow-md"></span>
-                                <span class="font-mono text-[10px] font-bold uppercase tracking-[0.2em] {{ $badgeTextClass }}">{{ $showcaseSubtitle }}</span>
-                            </div>
-                        @endif
-                        @if(!empty($showcaseTitle))
-                            <h2 class="font-mono text-3xl font-extrabold tracking-tight text-foreground md:text-5xl drop-shadow-sm mb-4" style="text-wrap: balance;">
-                                {{ $showcaseTitle }}
-                            </h2>
-                        @endif
-                        @if(!empty($showcaseDesc))
-                            <p class="text-lg font-medium leading-relaxed text-muted-foreground {{ $headerAlignment === 'center' ? 'mx-auto' : '' }}" style="text-wrap: balance;">
-                                {{ $showcaseDesc }}
-                            </p>
-                        @endif
-                    </div>
-                @endif
-                
+            @if($type === 'showcase')
+                <livewire:showcase-feed :limit="$data['limit'] ?? 6" />
+            @else
                 <livewire:equipment-showcase />
-            </div>
-        </section>
+            @endif
+        </x-ui.section>
         @break
 
     @case('faq')
         <x-section-faq
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
-            :title="$data['header']['title'] ?? $data['title'] ?? null"
+            :data="$data"
             :header="$data['header'] ?? array_filter(['title' => $data['title'] ?? null])"
             :items="$data['items'] ?? []"
         />
@@ -665,9 +478,6 @@
     @case('testimonials')
         <x-section-testimonials
             :data="$data"
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
-            :title="$data['header']['title'] ?? $data['title'] ?? null"
             :header="$data['header'] ?? array_filter(['title' => $data['title'] ?? null])"
             :items="$data['items'] ?? []"
         />
@@ -676,8 +486,6 @@
     @case('team')
         <x-section-team
             :data="$data"
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
             :header="$data['header'] ?? []"
             :items="$data['items'] ?? []"
         />
@@ -690,6 +498,7 @@
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :header="$data['header'] ?? []"
             :cities="$data['cities'] ?? []"
+            :spacing="\App\Support\SectionStyle::spacing($data, 'md')"
             :overlay-data="[
                 'enabled' => $data['background_overlay_enabled'] ?? false,
                 'type' => $data['background_overlay_type'] ?? 'dark',
@@ -700,8 +509,7 @@
 
     @case('differentials')
         <x-section-differentials
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
+            :data="$data"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :subtitle="$data['header']['subtitle'] ?? $data['subtitle'] ?? $data['badge'] ?? null"
             :description="$data['header']['description'] ?? $data['description'] ?? null"
@@ -712,8 +520,7 @@
 
     @case('contact_banner')
         <x-section-contact-banner
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
+            :data="$data"
             :badge="$data['badge'] ?? null"
             :title="$data['title'] ?? null"
             :description="$data['description'] ?? null"
@@ -724,312 +531,197 @@
         @break
 
     @case('calculator')
-        @php
-            $calcTitle = $data['header']['title'] ?? $data['title'] ?? null;
-            $calcSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
-            $calcDesc = $data['header']['description'] ?? $data['description'] ?? null;
-            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
-        @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $data['background_color'] ?? 'bg-white' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }} {{ $data['custom_css_classes'] ?? '' }}">
-            <x-ui.section-background :data="$data" />
-            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                <livewire:calculator 
-                    :bg-color="$data['background_color'] ?? ''" 
-                    :title="$calcTitle"
-                    :subtitle="$calcSubtitle"
-                    :description="$calcDesc"
-                    :header-visible="$data['header']['visible'] ?? true"
-                    :header-alignment="$data['header']['alignment'] ?? 'left'"
-                />
-            </div>
-        </section>
+        <x-ui.section :data="$data" spacing="sm">
+            <livewire:calculator
+                :bg-color="$data['background_color'] ?? ''"
+                :title="$data['header']['title'] ?? $data['title'] ?? null"
+                :subtitle="$data['header']['subtitle'] ?? $data['badge'] ?? null"
+                :description="$data['header']['description'] ?? $data['description'] ?? null"
+                :header-visible="$data['header']['visible'] ?? true"
+                :header-alignment="$data['header']['alignment'] ?? 'left'"
+            />
+        </x-ui.section>
         @break
 
     @case('payment_offer')
         @php
-            $headerVisible = $data['header']['visible'] ?? true;
-            $headerAlignment = $data['header']['alignment'] ?? 'center';
-            $alignClass = $headerAlignment === 'left' ? 'text-left items-start' : ($headerAlignment === 'right' ? 'text-right items-end' : 'text-center items-center');
+            $offerHeader = $data['header'] ?? [];
+            $offerAlign = $offerHeader['alignment'] ?? 'center';
+            $offerTitle = $offerHeader['title'] ?? $data['title'] ?? null;
+            $offerSubtitle = $offerHeader['subtitle'] ?? $data['badge'] ?? null;
+            $offerDesc = $offerHeader['description'] ?? $data['subtitle'] ?? null;
+            $showOfferHeader = ! $hideHeader && ($offerHeader['visible'] ?? true) && (filled($offerTitle) || filled($offerSubtitle));
 
-            $offerTitle = $data['header']['title'] ?? $data['title'] ?? null;
-            $offerSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? null;
-            $offerDesc = $data['header']['description'] ?? $data['subtitle'] ?? null;
-            
-            $bgColor = $data['background_color'] ?? '';
-            $bgImg = !empty($data['background_image']) ? resolveFilamentImagePath($data['background_image']) : null;
-            $bgFit = $data['background_image_fit'] ?? 'cover';
-            $bgPos = $data['background_image_position'] ?? 'center';
-            $bgOp = ($data['background_image_opacity'] ?? '100') / 100;
-            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
-            $bgDivClasses = 'absolute inset-x-0 z-0 pointer-events-none bg-no-repeat';
-            $bgPosParts = explode(' ', $bgPos);
-            $bgPosHorizontal = $bgPosParts[0];
-            if ($bgPullUpAmount > 0) {
-                $topStyle = "-{$bgPullUpAmount}%";
-                $bottomStyle = "0";
-                $bgPositionStyle = $bgPosHorizontal . ' bottom';
-            } elseif ($bgPullUpAmount < 0) {
-                $topStyle = "0";
-                $bottomStyle = $bgPullUpAmount . "%";
-                $bgPositionStyle = $bgPosHorizontal . ' top';
-            } else {
-                $topStyle = "0";
-                $bottomStyle = "0";
-                $bgPositionStyle = $bgPos;
-            }
-            
-            $website = \App\Models\Setting::get('website', []);
-            $whatsappNumber = data_get($website, 'features.whatsapp_widget.number', '');
+            $whatsappNumber = \App\Models\Setting::get('website.features.whatsapp_widget.number', '');
             $buttonUrl = $data['button_url'] ?? null;
-            $whatsappUrl = $whatsappNumber && empty($buttonUrl)
-                ? "https://wa.me/55" . preg_replace('/[^0-9]/', '', $whatsappNumber) . "?text=" . urlencode('Olá! Gostaria de fazer um orçamento.')
+            $offerUrl = $whatsappNumber && empty($buttonUrl)
+                ? 'https://wa.me/55' . preg_replace('/[^0-9]/', '', $whatsappNumber) . '?text=' . urlencode('Olá! Gostaria de fazer um orçamento.')
                 : $buttonUrl;
-                
-            $methodsUrl = !empty($data['payment_methods_image']) 
-                ? resolveFilamentImagePath($data['payment_methods_image']) 
-                : null;
-                
-            $isClickableBanner = !empty($whatsappUrl) && empty($data['button_label']);
-            $wrapperTag = $isClickableBanner ? 'a' : 'div';
-            $wrapperHref = $isClickableBanner ? 'href="' . $whatsappUrl . '" target="_blank"' : '';
-        @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="bg-transparent py-4 lg:py-8 w-full {{ $data['custom_css_classes'] ?? '' }}">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                <{{ $wrapperTag }} {!! $wrapperHref !!} class="relative {{ $overflowClass }} flex flex-col {{ $alignClass }} rounded-[24px] {{ $bgColor ?: 'bg-card' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} border border-border/40 p-8 md:p-10 shadow-sm hover:shadow-md transition-all w-full {{ $isClickableBanner ? 'cursor-pointer hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2' : '' }}">
-                    
-                    <x-ui.section-background :data="$data" />
-                    
-                    <div class="relative z-10 flex flex-col {{ $alignClass }} w-full">
-                        @if(!$hideHeader && $headerVisible && (!empty($offerTitle) || !empty($offerSubtitle)))
-                            <div class="mb-8 max-w-3xl">
-                                @if(!empty($offerSubtitle))
-                                    <div class="mb-3 text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-white/70' : '' }}">
-                                        {{ $offerSubtitle }}
-                                    </div>
-                                @endif
-                                @if(!empty($offerTitle))
-                                    <h2 class="mb-4 font-mono text-3xl font-extrabold tracking-tight text-foreground md:text-4xl" style="text-wrap: balance;">
-                                        {{ $offerTitle }}
-                                    </h2>
-                                @endif
-                                @if(!empty($offerDesc))
-                                    <p class="text-base md:text-lg leading-relaxed text-muted-foreground {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-white/80' : '' }}" style="text-wrap: balance;">
-                                        {{ $offerDesc }}
-                                    </p>
-                                @endif
-                            </div>
-                        @endif
-                    
-                    <div class="flex flex-col gap-8 {{ $headerAlignment === 'center' ? 'items-center' : '' }} w-full">
-                        @if(!empty($data['button_label']))
-                            <a href="{{ $whatsappUrl }}" target="_blank" class="group flex h-14 w-fit items-center gap-3 rounded-2xl bg-primary px-8 font-bold text-primary-foreground shadow-sm hover:shadow-md hover:bg-primary/90 transition-all">
-                                <i data-lucide="message-circle" class="h-5 w-5"></i>
-                                {{ $data['button_label'] }}
-                                <i data-lucide="arrow-right" class="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1"></i>
-                            </a>
-                        @endif
+            $methodsUrl = resolveFilamentImagePath($data['payment_methods_image'] ?? null);
+            $isClickableBanner = filled($offerUrl) && empty($data['button_label']);
+            $tag = $isClickableBanner ? 'a' : 'div';
 
-                        @if(($data['show_payment_methods'] ?? true) !== false)
-                        <!-- Meios de pagamento -->
-                        <div class="mt-4 pt-6 w-full {{ $headerAlignment === 'center' ? 'text-center' : 'text-left' }}">
-                            <div class="text-[10px] font-bold tracking-[0.2em] text-muted-foreground/50 uppercase mb-4 {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-white/60' : '' }}">PAGUE COM:</div>
+            $methods = [['scan-line', 'Pix'], ['barcode', 'Boleto'], ['credit-card', 'Visa'], ['credit-card', 'Master'], ['credit-card', 'Amex'], ['credit-card', 'Elo']];
+            $cardData = \Illuminate\Support\Arr::only($data, ['background_color', 'text_color', 'background_image', 'background_image_fit', 'background_image_scale', 'background_image_position', 'background_image_opacity', 'background_overlay_enabled', 'background_overlay_type', 'background_overlay_opacity']);
+        @endphp
+        {{-- A cor e a imagem de fundo do bloco pintam o cartão; a seção em volta fica transparente --}}
+        <x-ui.section :data="\Illuminate\Support\Arr::except($data, array_keys($cardData))" spacing="xs" background="bg-transparent">
+            <{{ $tag }} @if($isClickableBanner) href="{{ $offerUrl }}" target="_blank" rel="noopener noreferrer" @endif
+                @class([
+                    'surface-card group relative isolate flex flex-col gap-8 overflow-hidden p-6 md:p-10 lg:flex-row lg:items-center lg:justify-between',
+                    $data['background_color'] ?? 'bg-card',
+                    \App\Support\SectionStyle::schemeClass(\App\Support\SectionStyle::scheme($data)),
+                    'surface-card-interactive cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500' => $isClickableBanner,
+                    'lg:flex-col lg:items-center text-center' => $offerAlign === 'center',
+                ])
+                data-spotlight data-reveal>
+                <x-ui.section-background :data="$cardData" />
+
+                @if($showOfferHeader)
+                    <div @class(['relative z-10 max-w-2xl', 'mx-auto' => $offerAlign === 'center'])>
+                        @if(filled($offerSubtitle))
+                            <span class="kicker mb-3">{{ $offerSubtitle }}</span>
+                        @endif
+                        @if(filled($offerTitle))
+                            <h2 class="font-mono text-2xl font-bold tracking-tight text-foreground md:text-3xl" style="text-wrap: balance;">{{ $offerTitle }}</h2>
+                        @endif
+                        @if(filled($offerDesc))
+                            <p class="mt-3 text-base leading-relaxed text-muted-foreground">{{ $offerDesc }}</p>
+                        @endif
+                    </div>
+                @endif
+
+                <div @class(['relative z-10 flex flex-col gap-6', 'items-center' => $offerAlign === 'center', 'lg:items-end' => $offerAlign !== 'center'])>
+                    @if(!empty($data['button_label']))
+                        <x-ui.button :href="$offerUrl" target="_blank" size="lg" icon="message-circle" trailing-icon="arrow-right">{{ $data['button_label'] }}</x-ui.button>
+                    @endif
+
+                    @if(($data['show_payment_methods'] ?? true) !== false)
+                        <div @class(['flex flex-col gap-3', 'items-center' => $offerAlign === 'center', 'lg:items-end' => $offerAlign !== 'center'])>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Pague com</span>
                             @if($methodsUrl)
-                                <img src="{{ $methodsUrl }}" alt="Meios de Pagamento" class="h-12 md:h-16 w-auto object-contain {{ $headerAlignment === 'center' ? 'mx-auto' : '' }} opacity-80 hover:opacity-100 transition-opacity">
+                                <img src="{{ $methodsUrl }}" alt="Meios de pagamento" class="h-10 w-auto object-contain opacity-80 transition-opacity group-hover:opacity-100 md:h-12" loading="lazy">
                             @else
-                                <div class="flex flex-wrap gap-4 md:gap-6 {{ $headerAlignment === 'center' ? 'justify-center' : '' }} text-muted-foreground/60 {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-white/60' : '' }} text-xs md:text-sm font-semibold tracking-widest">
-                                    <div class="flex items-center gap-1.5 hover:text-primary transition-colors cursor-default">
-                                        <i data-lucide="scan-line" class="h-5 w-5"></i>
-                                        <span>PIX</span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
-                                        <i data-lucide="barcode" class="h-5 w-5"></i>
-                                        <span>BOLETO</span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
-                                        <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                        <span>VISA</span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
-                                        <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                        <span>MASTER</span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
-                                        <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                        <span>AMEX</span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
-                                        <i data-lucide="credit-card" class="h-5 w-5"></i>
-                                        <span>ELO</span>
-                                    </div>
-                                </div>
+                                <ul class="flex flex-wrap justify-center gap-2">
+                                    @foreach($methods as [$methodIcon, $methodLabel])
+                                        <li class="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-card/60 px-2.5 py-1.5 text-xs font-semibold text-foreground/80 transition-colors hover:border-primary-500/40 hover:text-primary-ink">
+                                            <i data-lucide="{{ $methodIcon }}" class="h-4 w-4"></i>
+                                            {{ $methodLabel }}
+                                        </li>
+                                    @endforeach
+                                </ul>
                             @endif
                         </div>
-                        @endif
-                    </div>
-                    </div>
-                </{{ $wrapperTag }}>
-            </div>
-        </section>
+                    @endif
+                </div>
+            </{{ $tag }}>
+        </x-ui.section>
         @break
 
     @case('budget_form')
-        @php
-            $budgetTitle = $data['header']['title'] ?? $data['title'] ?? null;
-            $budgetSubtitle = $data['header']['subtitle'] ?? $data['badge'] ?? 'Orçamento Online';
-            $budgetDesc = $data['header']['description'] ?? $data['description'] ?? null;
-            
-            $bgPullUpAmount = (int) ($data['background_image_pull_up'] ?? 0);
-            $overflowClass = $bgPullUpAmount !== 0 ? '' : 'overflow-hidden';
-        @endphp
-        <section id="orcamento" class="{{ $data['background_color'] ?? 'bg-muted/50' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-8 lg:py-12 relative {{ $overflowClass }}">
-            <x-ui.section-background :data="$data" />
-            <div class="mx-auto max-w-7xl px-4 lg:px-8 relative z-10">
-                <livewire:budget 
-                    :bg-color="$data['background_color'] ?? ''"
-                    :title="$budgetTitle"
-                    :subtitle="$budgetSubtitle"
-                    :description="$budgetDesc"
-                    :header-visible="$data['header']['visible'] ?? true"
-                    :header-alignment="$data['header']['alignment'] ?? 'left'"
-                />
-            </div>
-        </section>
+        <x-ui.section :data="$data" id="orcamento" spacing="sm" background="bg-muted/50">
+            <livewire:budget
+                :bg-color="$data['background_color'] ?? ''"
+                :title="$data['header']['title'] ?? $data['title'] ?? null"
+                :subtitle="$data['header']['subtitle'] ?? $data['badge'] ?? 'Orçamento Online'"
+                :description="$data['header']['description'] ?? $data['description'] ?? null"
+                :header-visible="$data['header']['visible'] ?? true"
+                :header-alignment="$data['header']['alignment'] ?? 'left'"
+            />
+        </x-ui.section>
         @break
 
     @case('cta_contact')
     @case('contact_form')
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ !empty($data['background_color']) && $data['background_color'] !== 'bg-white' ? $data['background_color'] : 'bg-white' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-20 lg:py-28 {{ $data['custom_css_classes'] ?? '' }}">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                <div class="grid lg:grid-cols-2 gap-16 items-start">
-                    <div>
-                        @php
-                            $contactSubtitle = $data['header']['subtitle'] ?? $data['subtitle'] ?? null;
-                            $contactTitle = $data['header']['title'] ?? $data['title'] ?? null;
-                            $contactDesc = $data['header']['description'] ?? $data['description'] ?? null;
-                        @endphp
-                        @if(!empty($contactSubtitle))
-                            <div class="mb-4 inline-block text-xs font-bold uppercase tracking-widest text-primary">
-                                {{ $contactSubtitle }}
-                            </div>
-                        @endif
-                        @if(!empty($contactTitle))
-                            <h2 class="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl mb-4" style="text-wrap: balance;">
-                                {{ $contactTitle }}
-                            </h2>
-                        @endif
-                        @if(!empty($contactDesc))
-                            <p class="text-lg leading-relaxed text-muted-foreground mb-10">
-                                {{ $contactDesc }}
-                            </p>
-                        @endif
+        @php
+            $company = \App\Models\Setting::get('company', []);
+            $website = \App\Models\Setting::get('website', []);
+            $contactEmail = !empty($data['email_to']) ? $data['email_to'] : data_get($company, 'email');
+            $phone = data_get($company, 'phone');
+            $addr = data_get($company, 'address', []);
+            $addrStr = is_array($addr) ? implode(', ', array_filter($addr)) : (string) $addr;
 
-                        @php
-                            $company = \App\Models\Setting::get('company', []);
-                            $website = \App\Models\Setting::get('website', []);
-                            $contactEmail = !empty($data['email_to']) ? $data['email_to'] : data_get($company, 'email');
-                            $phone = data_get($company, 'phone');
-                            $addr = data_get($company, 'address', []);
-                            $addrStr = is_array($addr) ? implode(', ', array_filter($addr)) : (string)$addr;
+            $whatsappNumber = data_get($website, 'features.whatsapp_widget.number');
+            $phoneClean = preg_replace('/[^0-9]/', '', (string) $phone);
 
-                            $whatsappBtnEnabled = $data['whatsapp_btn_enabled'] ?? true;
-                            $whatsappBtnText = data_get($website, 'features.whatsapp_button.text', 'Chamar no WhatsApp');
-                            $whatsappNumber = data_get($website, 'features.whatsapp_widget.number');
-                            $whatsappUrl = $whatsappNumber 
-                                ? "https://wa.me/55" . preg_replace('/[^0-9]/', '', $whatsappNumber) . "?text=" . urlencode('Olá! Vim pela página de contato do site.')
-                                : '#';
+            // Canais de contato na ordem de exibição; cada um pode ser desligado no bloco
+            $channels = array_filter([
+                ($data['budget_btn_enabled'] ?? true) ? [
+                    'href' => $data['budget_btn_url'] ?? url('/#orcamento'), 'icon' => 'calculator', 'featured' => true,
+                    'title' => $data['budget_btn_title'] ?? 'Orçamento Grátis Online', 'text' => $data['budget_btn_subtitle'] ?? 'Faça uma cotação rápida agora',
+                ] : null,
+                ($data['whatsapp_btn_enabled'] ?? true) && $whatsappNumber ? [
+                    'href' => 'https://wa.me/55' . preg_replace('/[^0-9]/', '', $whatsappNumber) . '?text=' . urlencode('Olá! Vim pela página de contato do site.'),
+                    'icon' => 'message-circle', 'whatsapp' => true, 'target' => '_blank',
+                    'title' => data_get($website, 'features.whatsapp_button.text', 'Chamar no WhatsApp'), 'text' => $whatsappNumber,
+                ] : null,
+                ($data['email_btn_enabled'] ?? true) && $contactEmail ? [
+                    'href' => 'mailto:' . $contactEmail, 'icon' => 'mail', 'title' => 'E-mail', 'text' => $contactEmail,
+                ] : null,
+                ($data['phone_btn_enabled'] ?? true) && $phone ? [
+                    'href' => 'tel:' . (strlen($phoneClean) >= 10 ? '55' . $phoneClean : $phoneClean), 'icon' => 'phone', 'title' => 'Telefone', 'text' => $phone,
+                ] : null,
+            ]);
+        @endphp
+        <x-ui.section :data="$data">
+            <div class="grid items-start gap-10 lg:grid-cols-12 lg:gap-14">
+                <div class="lg:col-span-5">
+                    <x-ui.section-header
+                        :header="$data['header'] ?? []"
+                        :fallback-title="$data['title'] ?? null"
+                        :fallback-subtitle="$data['subtitle'] ?? null"
+                        :fallback-description="$data['description'] ?? null"
+                        align="left"
+                        class="!mb-8"
+                    />
 
-                            $budgetBtnEnabled = $data['budget_btn_enabled'] ?? true;
-                            $budgetBtnTitle = $data['budget_btn_title'] ?? 'Orçamento Grátis Online';
-                            $budgetBtnSubtitle = $data['budget_btn_subtitle'] ?? 'Faça uma cotação rápida agora';
-                            $budgetBtnUrl = $data['budget_btn_url'] ?? url('/#orcamento');
-
-                            $emailBtnEnabled = $data['email_btn_enabled'] ?? true;
-                            $phoneBtnEnabled = $data['phone_btn_enabled'] ?? true;
-                            $addressEnabled = $data['address_enabled'] ?? true;
-                        @endphp
-
-                        <div class="space-y-4">
-                            @if($budgetBtnEnabled)
-                            <a href="{{ $budgetBtnUrl }}" class="flex items-center gap-4 rounded-xl bg-primary p-4 text-white shadow transition-all hover:-translate-y-0.5 hover:shadow-md group">
-                                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white transition-transform group-hover:scale-110">
-                                    <i data-lucide="calculator" class="h-6 w-6 fill-none stroke-current stroke-2"></i>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-white">{{ $budgetBtnTitle }}</p>
-                                    <p class="text-xs font-medium text-white/80">{{ $budgetBtnSubtitle }}</p>
-                                </div>
+                    <div class="grid gap-3">
+                        @foreach($channels as $i => $channel)
+                            <a href="{{ $channel['href'] }}" @if(!empty($channel['target'])) target="_blank" rel="noopener noreferrer" @endif
+                               @class([
+                                   'group flex items-center gap-4 rounded-card p-4 transition-all duration-300 ease-out-expo hover:-translate-y-0.5',
+                                   'bg-primary-500 text-primary-foreground shadow-md shadow-primary-700/20 hover:bg-primary-600' => !empty($channel['featured']),
+                                   'bg-[#25D366] text-white shadow-md shadow-green-700/20 hover:bg-[#1ebe5b]' => !empty($channel['whatsapp']),
+                                   'surface-card hover:border-primary-500/40 hover:shadow-md' => empty($channel['featured']) && empty($channel['whatsapp']),
+                               ])
+                               data-reveal style="--reveal-delay: {{ $i * 70 }}ms">
+                                @if(!empty($channel['featured']) || !empty($channel['whatsapp']))
+                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 transition-transform duration-300 group-hover:scale-110">
+                                        <i data-lucide="{{ $channel['icon'] }}" class="h-5 w-5"></i>
+                                    </span>
+                                @else
+                                    <x-ui.icon-box :icon="$channel['icon']" />
+                                @endif
+                                <span class="min-w-0 flex-1">
+                                    <span class="block font-semibold">{{ $channel['title'] }}</span>
+                                    <span @class(['block truncate text-sm', 'opacity-80' => !empty($channel['featured']) || !empty($channel['whatsapp']), 'text-muted-foreground' => empty($channel['featured']) && empty($channel['whatsapp'])])>{{ $channel['text'] }}</span>
+                                </span>
+                                <i data-lucide="arrow-up-right" class="h-4 w-4 shrink-0 opacity-50 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"></i>
                             </a>
-                            @endif
+                        @endforeach
+                    </div>
 
-                            @if($whatsappBtnEnabled && $whatsappNumber)
-                                <a href="{{ $whatsappUrl }}" target="_blank" class="flex items-center gap-4 rounded-xl bg-[#25D366] p-4 text-white shadow transition-all hover:-translate-y-0.5 hover:bg-[#20ba5a] hover:shadow-md group">
-                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white transition-transform group-hover:scale-110">
-                                        <i data-lucide="message-circle" class="h-6 w-6 fill-current"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-white">{{ $whatsappBtnText }}</p>
-                                        <p class="text-xs font-medium text-white/80">{{ $whatsappNumber }}</p>
-                                    </div>
-                                </a>
-                            @endif
-
-                            @if($emailBtnEnabled && $contactEmail)
-                                <a href="mailto:{{ $contactEmail }}" class="flex items-center gap-4 rounded-xl border border-primary bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md group">
-                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-hover:scale-110">
-                                        <i data-lucide="mail" class="h-6 w-6 fill-current"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-primary">E-mail</p>
-                                        <p class="text-xs font-medium text-foreground">{{ $contactEmail }}</p>
-                                    </div>
-                                </a>
-                            @endif
-
-                            @if($phoneBtnEnabled && $phone)
-                                @php
-                                    $phoneClean = preg_replace('/[^0-9]/', '', $phone);
-                                    $phoneLink = strlen($phoneClean) >= 10 ? '55' . $phoneClean : $phoneClean;
-                                @endphp
-                                <a href="tel:{{ $phoneLink }}" class="flex items-center gap-4 rounded-xl border border-primary bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md group">
-                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-hover:scale-110">
-                                        <i data-lucide="phone" class="h-6 w-6 fill-current"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-primary">Telefone</p>
-                                        <p class="text-xs font-medium text-foreground">{{ $phone }}</p>
-                                    </div>
-                                </a>
-                            @endif
-                        </div>
-
-                        @if($addressEnabled && $addrStr)
-                            <div class="mt-8 pt-8 border-t border-border">
-                                <div class="flex items-start gap-4">
-                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <i data-lucide="map-pin" class="h-5 w-5"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-foreground mb-1">Nosso Endereço</p>
-                                        <p class="text-sm text-muted-foreground leading-relaxed">{{ $addrStr }}</p>
-                                    </div>
-                                </div>
+                    @if(($data['address_enabled'] ?? true) && $addrStr)
+                        <div class="mt-6 flex items-start gap-3 border-t border-border/60 pt-6">
+                            <x-ui.icon-box size="sm" icon="map-pin" :react="false" />
+                            <div>
+                                <p class="text-sm font-semibold text-foreground">Nosso endereço</p>
+                                <p class="mt-0.5 text-sm leading-relaxed text-muted-foreground">{{ $addrStr }}</p>
                             </div>
-                        @endif
-                    </div>
-                    <div class="rounded-2xl border border-border bg-card p-8 shadow-sm">
-                        <livewire:mail.form />
-                    </div>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="surface-card text-scheme-light p-6 md:p-8 lg:col-span-7" data-reveal style="--reveal-delay: 120ms">
+                    <livewire:mail.form />
                 </div>
             </div>
-        </section>
+        </x-ui.section>
         @break
 
     @case('map')
         <x-section-map
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
+            :data="$data"
             :title="$data['header']['title'] ?? $data['title'] ?? null"
             :header="$data['header'] ?? []"
             :iframe="$data['iframe_code'] ?? null"
@@ -1037,24 +729,21 @@
         @break
 
     @case('rich_text')
-        <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $data['background_color'] ?? 'bg-white' }} {{ ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '' }} py-16 {{ $data['custom_css_classes'] ?? '' }}">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                <div class="prose prose-zinc max-w-3xl">
-                    {!! $data['content'] !!}
-                </div>
+        <x-ui.section :data="$data" spacing="sm" container="narrow">
+            <div class="prose prose-zinc max-w-none prose-headings:font-mono prose-headings:tracking-tight prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary-ink prose-a:underline-offset-4 hover:prose-a:text-primary-700 prose-strong:text-foreground prose-li:marker:text-primary-500">
+                {!! $data['content'] ?? '' !!}
             </div>
-        </section>
+        </x-ui.section>
         @break
 
     @case('cta')
         <x-section-cta-contact
+            :data="$data"
             :image="$data['image'] ?? null"
             :image-size="$data['image_size'] ?? 155"
             :image-offset-x="$data['image_offset_x'] ?? 0"
             :image-offset-y="$data['image_offset_y'] ?? 0"
             :show-features="$data['show_features'] ?? true"
-            :bg-color="$data['background_color'] ?? null"
-            :text-color="$data['text_color'] ?? 'light'"
             :title="$data['title'] ?? null"
             :subtitle="$data['subtitle'] ?? null"
             :button-label="$data['button_label'] ?? null"
@@ -1064,72 +753,50 @@
 
     @case('cards')
         @php
-            $columns = $data['columns'] ?? '3';
-            $gridClass = match($columns) {
-                '2' => 'md:grid-cols-2',
-                '4' => 'md:grid-cols-2 lg:grid-cols-4',
-                default => 'md:grid-cols-3',
+            $cardsCols = match ($data['columns'] ?? '3') {
+                '2' => 'sm:grid-cols-2',
+                '4' => 'sm:grid-cols-2 lg:grid-cols-4',
+                default => 'sm:grid-cols-2 lg:grid-cols-3',
             };
         @endphp
-        <section id="{{ $data['custom_id'] ?? '' }}" class="py-16 lg:py-24 bg-background {{ $data['custom_css_classes'] ?? '' }}">
-            <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                @if(!empty($data['badge']) || !empty($data['title']) || !empty($data['description']))
-                <div class="mb-12 text-center max-w-3xl mx-auto">
-                    @if(!empty($data['badge']))
-                    <span class="mb-3 block font-mono text-sm font-bold uppercase tracking-wider text-primary">{{ $data['badge'] }}</span>
-                    @endif
-                    @if(!empty($data['title']))
-                    <h2 class="mb-4 font-mono text-3xl font-extrabold text-foreground md:text-5xl" style="text-wrap: balance;">{{ $data['title'] }}</h2>
-                    @endif
-                    @if(!empty($data['description']))
-                    <p class="text-lg font-medium text-muted-foreground leading-relaxed" style="text-wrap: balance;">{{ $data['description'] }}</p>
-                    @endif
-                </div>
-                @endif
-                
-                <div class="grid gap-6 {{ $gridClass }}">
-                    @foreach($data['items'] ?? [] as $item)
-                        <div class="group relative overflow-hidden rounded-2xl border bg-card p-8 shadow-sm transition-all hover:shadow-md hover:border-primary/50 flex flex-col items-center text-center">
-                            <div class="absolute right-0 top-0 -mr-8 -mt-8 h-32 w-32 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-150"></div>
-                            <div class="relative z-10 flex flex-col items-center">
-                                <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
-                                    <i data-lucide="{{ $item['icon'] ?? 'star' }}" class="h-8 w-8"></i>
-                                </div>
-                                <h3 class="mb-3 font-mono text-xl font-bold text-foreground">{{ $item['title'] ?? '' }}</h3>
-                                <p class="text-muted-foreground leading-relaxed">{{ $item['description'] ?? '' }}</p>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+        <x-ui.section :data="$data" background="bg-background">
+            <x-ui.section-header
+                :header="$data['header'] ?? []"
+                default-align="center"
+                :fallback-title="$data['title'] ?? null"
+                :fallback-subtitle="$data['badge'] ?? null"
+                :fallback-description="$data['description'] ?? null"
+            />
+
+            <div class="grid gap-5 {{ $cardsCols }}">
+                @foreach($data['items'] ?? [] as $index => $item)
+                    <div class="surface-card surface-card-interactive group p-6 md:p-7" data-spotlight data-reveal style="--reveal-delay: {{ ($index % 4) * 80 }}ms">
+                        <x-ui.icon-box size="lg" :icon="$item['icon'] ?? 'star'" class="mb-5" />
+                        <h3 class="text-lg font-bold text-foreground">{{ $item['title'] ?? '' }}</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{{ $item['description'] ?? '' }}</p>
+                    </div>
+                @endforeach
             </div>
-        </section>
+        </x-ui.section>
         @break
 
     @case('simple_banner')
         @php
-            $bannerImg = !empty($data['image']) ? resolveFilamentImagePath($data['image']) : null;
+            $bannerImg = resolveFilamentImagePath($data['image'] ?? null);
             $bannerLink = $data['link_url'] ?? null;
-            $openInNewTab = $data['open_in_new_tab'] ?? true;
-            $target = $openInNewTab ? '_blank' : '_self';
-            
-            $bgColor = $data['background_color'] ?? 'bg-transparent';
-            $textColor = ($data['text_color'] ?? 'light') === 'dark' ? 'text-scheme-dark' : '';
         @endphp
-        
         @if($bannerImg)
-            <section id="{{ $data['custom_id'] ?? '' }}" class="{{ $bgColor }} {{ $textColor }} py-4 {{ $data['custom_css_classes'] ?? '' }}">
-                <div class="mx-auto max-w-7xl px-4 lg:px-8">
-                    @if($bannerLink)
-                        <a href="{{ $bannerLink }}" target="{{ $target }}" class="block overflow-hidden rounded-xl transition-transform hover:-translate-y-1 duration-300">
-                            <img src="{{ $bannerImg }}" alt="Banner" class="w-full h-auto object-contain" />
-                        </a>
-                    @else
-                        <div class="block overflow-hidden rounded-xl">
-                            <img src="{{ $bannerImg }}" alt="Banner" class="w-full h-auto object-contain" />
-                        </div>
-                    @endif
-                </div>
-            </section>
+            <x-ui.section :data="$data" spacing="xs" background="bg-transparent">
+                @if($bannerLink)
+                    <a href="{{ $bannerLink }}" target="{{ ($data['open_in_new_tab'] ?? true) ? '_blank' : '_self' }}" class="group block overflow-hidden rounded-card shadow-sm transition-all duration-500 ease-out-expo hover:-translate-y-1 hover:shadow-xl" data-reveal>
+                        <img src="{{ $bannerImg }}" alt="Banner" class="h-auto w-full object-contain transition-transform duration-700 ease-out-expo group-hover:scale-[1.02]" loading="lazy" />
+                    </a>
+                @else
+                    <div class="overflow-hidden rounded-card" data-reveal>
+                        <img src="{{ $bannerImg }}" alt="Banner" class="h-auto w-full object-contain" loading="lazy" />
+                    </div>
+                @endif
+            </x-ui.section>
         @endif
         @break
 

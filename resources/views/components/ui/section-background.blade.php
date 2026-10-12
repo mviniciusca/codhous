@@ -3,7 +3,13 @@
 ])
 
 @php
-    $bgImg = !empty($data['background_image']) ? \Illuminate\Support\Facades\Storage::url($data['background_image']) : null;
+    // Aceita caminho, array ou upload temporário (prévia do painel)
+    $bgImg = match (true) {
+        empty($data['background_image']) => null,
+        function_exists('resolveFilamentImagePath') => resolveFilamentImagePath($data['background_image']),
+        is_string($data['background_image']) => \Illuminate\Support\Facades\Storage::url($data['background_image']),
+        default => null,
+    };
     $bgFitOption = $data['background_image_fit'] ?? 'cover';
     $bgScale = $data['background_image_scale'] ?? '50';
     $bgFit = $bgFitOption === 'custom' ? "{$bgScale}% auto" : $bgFitOption;

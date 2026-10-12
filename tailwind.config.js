@@ -1,10 +1,12 @@
 /** @type {import('tailwindcss').Config} */
-const colors = require('tailwindcss/colors')
+// Cor vinda de uma variável CSS --color-<nome>, com suporte aos modificadores de opacidade (bg-primary/10)
+const token = (name) => `color-mix(in oklab, var(--color-${name}) calc(<alpha-value> * 100%), transparent)`
 
 export default {
     content: [
         './app/Filament/**/*.php',
         './app/Livewire/**/*.php',
+        './app/Support/**/*.php',
         './resources/views/filament/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
         './resources/**/*.blade.php',
@@ -28,39 +30,57 @@ export default {
                 mono: ['"Space Grotesk"', 'monospace'],
             },
             colors: {
-                background: 'oklch(0.97 0.002 250 / <alpha-value>)',
-                foreground: 'oklch(0.18 0.01 250 / <alpha-value>)',
+                // Tokens de tema: cada cor é uma variável CSS completa (ver resources/css/app.css).
+                // Um tema só precisa redefinir as variáveis; as classes continuam as mesmas.
+                background: token('background'),
+                foreground: token('foreground'),
                 card: {
-                    DEFAULT: 'oklch(1 0 0 / <alpha-value>)',
-                    foreground: 'oklch(0.18 0.01 250 / <alpha-value>)',
+                    DEFAULT: token('card'),
+                    foreground: token('card-foreground'),
                 },
                 primary: {
-                    DEFAULT: 'rgb(var(--primary-color) / <alpha-value>)',
-                    foreground: colors.white,
+                    DEFAULT: token('primary-500'),
+                    foreground: token('primary-foreground'),
+                    // Tom seguro para texto sobre fundo claro (escolhido pelo contraste da cor da marca)
+                    ink: token('primary-ink'),
+                    400: token('primary-400'),
+                    500: token('primary-500'),
+                    600: token('primary-600'),
+                    700: token('primary-700'),
+                    800: token('primary-800'),
+                    900: token('primary-900'),
+                    950: token('primary-950'),
                 },
                 secondary: {
-                    DEFAULT: 'oklch(0.92 0.005 250 / <alpha-value>)',
-                    foreground: 'oklch(0.18 0.01 250 / <alpha-value>)',
+                    DEFAULT: token('muted'),
+                    foreground: token('foreground'),
                 },
                 muted: {
-                    DEFAULT: 'oklch(0.92 0.005 250 / <alpha-value>)',
-                    foreground: 'oklch(0.45 0.01 250 / <alpha-value>)',
+                    DEFAULT: token('muted'),
+                    foreground: token('muted-foreground'),
                 },
                 accent: {
-                    DEFAULT: 'oklch(0.92 0.005 250 / <alpha-value>)',
-                    foreground: 'oklch(0.18 0.01 250 / <alpha-value>)',
+                    DEFAULT: token('muted'),
+                    foreground: token('foreground'),
                 },
                 popover: {
-                    DEFAULT: 'oklch(1 0 0 / <alpha-value>)',
-                    foreground: 'oklch(0.18 0.01 250 / <alpha-value>)',
+                    DEFAULT: token('card'),
+                    foreground: token('card-foreground'),
                 },
                 destructive: {
                     DEFAULT: 'oklch(0.6 0.2 25 / <alpha-value>)',
                     foreground: 'oklch(0.98 0.002 250 / <alpha-value>)',
                 },
-                border: 'oklch(0.88 0.005 250 / <alpha-value>)',
-                input: 'oklch(0.88 0.005 250 / <alpha-value>)',
-                ring: 'rgb(var(--primary-color) / <alpha-value>)',
+                border: token('border'),
+                input: token('border'),
+                ring: token('primary-500'),
+            },
+            borderRadius: {
+                card: 'var(--radius-card)',
+                control: 'var(--radius-control)',
+            },
+            transitionTimingFunction: {
+                'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
             },
             boxShadow: {
                 'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -72,6 +92,10 @@ export default {
                 'inner': 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
             },
             keyframes: {
+                marquee: {
+                    from: { transform: 'translateX(0)' },
+                    to: { transform: 'translateX(-50%)' },
+                },
                 "accordion-down": {
                     from: { height: 0 },
                     to: { height: "var(--radix-accordion-content-height)" },
@@ -82,6 +106,7 @@ export default {
                 },
             },
             animation: {
+                marquee: 'marquee var(--marquee-duration, 40s) linear infinite',
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
             },

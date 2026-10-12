@@ -445,6 +445,7 @@ class PageResource extends Resource
                                 ])
                                 ->default('light')
                                 ->inline(),
+                            ...static::getSpacingFields(),
                         ], $styleSchema)),
                     \Filament\Forms\Components\Tabs\Tab::make('Avançado')
                         ->icon('heroicon-o-cog-8-tooth')
@@ -460,6 +461,28 @@ class PageResource extends Resource
                         ], $advancedSchema)),
                 ])
                 ->contained(false)
+        ];
+    }
+
+    /**
+     * Espaçamento vertical da seção (escala em App\Support\SectionStyle).
+     * Vazio = padrão do bloco.
+     */
+    public static function getSpacingFields(string $prefix = ''): array
+    {
+        $field = fn (string $name, string $label, string $help) => \Filament\Forms\Components\ToggleButtons::make($prefix.$name)
+            ->label($label)
+            ->helperText($help)
+            ->options(\App\Support\SectionStyle::SPACING_LABELS)
+            ->inline()
+            ->grouped();
+
+        return [
+            \Filament\Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
+                ->schema([
+                    $field('spacing_top', __('Espaço acima'), __('Sem seleção, usa o padrão do bloco.')),
+                    $field('spacing_bottom', __('Espaço abaixo'), __('Use 0 para colar em uma seção de mesmo fundo.')),
+                ]),
         ];
     }
 
@@ -712,6 +735,11 @@ class PageResource extends Resource
                     ->collapsible()
                     ->maxItems(4)
                     ->defaultItems(4),
+            ], [
+                Forms\Components\Toggle::make('overlap')
+                    ->label(__('Sobrepor à seção anterior'))
+                    ->helperText(__('O cartão sobe sobre o fim do bloco de cima (ideal logo após o banner principal).'))
+                    ->default(true),
             ]));
     }
 

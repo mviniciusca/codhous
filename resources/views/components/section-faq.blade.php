@@ -1,16 +1,18 @@
 @props([
-    'textColor' => 'light',
+    'data' => [],
+    'textColor' => null,
     'bgColor' => null,
     'title' => null,
     'header' => null,
     'items' => null,
 ])
 @php
+    $data = array_merge(array_filter(['background_color' => $bgColor, 'text_color' => $textColor]), (array) $data);
     $section = \App\Models\ContentSection::getBySlug('faq');
-    $header = $header ?? $section?->content['header'] ?? [];
-    $items = $items ?? $section?->content['items'] ?? null;
-    $useStatic = empty($items);
-    if ($useStatic) {
+    $header = $header ?: ($section?->content['header'] ?? []);
+    $items = $items ?: ($section?->content['items'] ?? null);
+
+    if (empty($items)) {
         $header = [
             'subtitle' => 'Dúvidas Frequentes',
             'title' => 'Perguntas frequentes',
@@ -24,30 +26,58 @@
             ['question' => 'Posso solicitar bombeamento junto com o concreto?', 'answer' => 'Sim. Oferecemos serviço de bombeamento (bomba estacionária e lança) para lajes e estruturas em altura. O orçamento pode incluir concreto + bombeamento em uma única solicitação.'],
         ];
     }
+
+    $whatsappNumber = \App\Models\Setting::get('website.features.whatsapp_widget.number');
+    $helpUrl = $whatsappNumber
+        ? 'https://wa.me/55' . preg_replace('/\D/', '', $whatsappNumber) . '?text=' . urlencode('Olá! Tenho uma dúvida.')
+        : '/contato';
+    $centered = ($header['alignment'] ?? 'left') === 'center';
 @endphp
 @if(!\App\Models\ContentSection::isHidden('faq'))
-<section id="faq" class="border-b border-border bg-muted/30 py-12 lg:py-16">
-    <div class="mx-auto max-w-7xl px-4 lg:px-8">
-        <x-ui.section-header 
-            :header="$header ?? []"
-            :fallback-title="$header['title'] ?? 'Perguntas frequentes'"
-            :fallback-subtitle="$header['subtitle'] ?? null"
-            :fallback-description="$header['description'] ?? null"
-        />
-
-        <div class="mx-auto max-w-3xl space-y-3">
-            @foreach($items as $item)
-                <details class="group rounded-lg border border-border bg-card transition-colors hover:border-primary/30 [&[open]]:border-primary/40">
-                    <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 font-mono text-base font-semibold text-foreground">
-                        {{ $item['question'] ?? '' }}
-                        <i data-lucide="chevron-down" class="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"></i>
-                    </summary>
-                    <div class="border-t border-border px-6 pb-5 pt-2">
-                        <p class="text-sm leading-relaxed text-muted-foreground">{{ $item['answer'] ?? '' }}</p>
+<x-ui.section :data="$data" id="faq" background="bg-muted/30">
+    <div @class(['grid gap-10', 'lg:grid-cols-12 lg:gap-16' => ! $centered])>
+        {{-- Cabeçalho fixo ao lado das perguntas em telas largas --}}
+        <div @class(['lg:col-span-5' => ! $centered])>
+            <div @class(['lg:sticky lg:top-28' => ! $centered])>
+                <x-ui.section-header
+                    :header="$header"
+                    :fallback-title="$header['title'] ?? 'Perguntas frequentes'"
+                    :fallback-subtitle="$header['subtitle'] ?? null"
+                    :fallback-description="$header['description'] ?? null"
+                    :class="$centered ? '' : '!mb-6'"
+                />
+                <div @class(['flex items-center gap-3 rounded-card border border-dashed border-border p-4', 'mx-auto max-w-md' => $centered, 'hidden lg:flex' => ! $centered]) data-reveal>
+                    <x-ui.icon-box icon="message-circle-question" :react="false" />
+                    <div class="flex-1 text-sm">
+                        <p class="font-semibold text-foreground">Não achou sua dúvida?</p>
+                        <a href="{{ $helpUrl }}" target="_blank" rel="noopener" class="link-arrow">Fale com a gente <i data-lucide="arrow-right"></i></a>
                     </div>
-                </details>
-            @endforeach
+                </div>
+            </div>
+        </div>
+
+        <div @class(['lg:col-span-7' => ! $centered, 'mx-auto w-full max-w-3xl' => $centered]) x-data="{ open: 0 }">
+            <div class="divide-y divide-border/70 overflow-hidden rounded-card border border-border/70 bg-card">
+                @foreach($items as $index => $item)
+                    <div class="group" :class="open === {{ $index }} && 'bg-primary-500/[0.03]'" data-reveal style="--reveal-delay: {{ min($index, 5) * 50 }}ms">
+                        <button type="button"
+                                class="flex w-full items-center gap-4 px-5 py-4 text-left md:px-6 md:py-5"
+                                @click="open = open === {{ $index }} ? null : {{ $index }}"
+                                :aria-expanded="open === {{ $index }}">
+                            <span class="font-mono text-xs font-semibold text-muted-foreground/50 transition-colors" :class="open === {{ $index }} && '!text-primary-ink'">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                            <span class="flex-1 font-semibold text-foreground transition-colors group-hover:text-primary-ink">{{ $item['question'] ?? '' }}</span>
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border transition-all duration-300"
+                                  :class="open === {{ $index }} ? 'rotate-45 border-primary-500 bg-primary-500 text-primary-foreground' : 'text-muted-foreground'">
+                                <i data-lucide="plus" class="h-3.5 w-3.5"></i>
+                            </span>
+                        </button>
+                        <div x-show="open === {{ $index }}" x-collapse @if($index !== 0) x-cloak @endif>
+                            <p class="px-5 pb-5 pl-[3.25rem] text-sm leading-relaxed text-muted-foreground md:px-6 md:pl-[3.75rem]">{{ $item['answer'] ?? '' }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
     </div>
-</section>
+</x-ui.section>
 @endif

@@ -993,6 +993,7 @@ class ContentSectionResource extends Resource
                                         'dark' => 'heroicon-o-pencil-square',
                                     ])
                                     ->default('light'),
+                                ...PageResource::getSpacingFields('content.'),
                                 Forms\Components\Fieldset::make('Fundo com imagem')
                                     ->columns(1)
                                     ->schema([

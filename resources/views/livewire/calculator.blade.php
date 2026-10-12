@@ -1,7 +1,7 @@
 @php
     $isPrimaryBg = str_contains($bgColor, 'bg-primary');
-    $accentText = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
-    $accentBg = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)] text-white' : 'bg-primary text-primary-foreground';
+    $accentText = $isPrimaryBg ? 'text-primary-950' : 'text-primary-ink';
+    $accentBg = $isPrimaryBg ? 'bg-primary-950 text-white' : 'bg-primary text-primary-foreground';
     $accentLightBg = $isPrimaryBg ? 'bg-black/40' : 'bg-primary/10';
     $accentLightBorder = $isPrimaryBg ? 'border-black/50' : 'border-primary/30';
     
@@ -180,7 +180,7 @@
             </div>
         </div>
 
-        <div class="mt-5 relative overflow-hidden rounded-[16px] bg-slate-900 p-5 text-white shadow-inner">
+        <div class="mt-5 relative overflow-hidden rounded-[16px] bg-primary-950 p-5 text-white shadow-inner">
             <i data-lucide="package" class="absolute -right-4 -bottom-4 h-24 w-24 text-white/5"></i>
             <div class="relative z-10">
                 <div class="flex items-center gap-1.5 mb-1.5 opacity-80">

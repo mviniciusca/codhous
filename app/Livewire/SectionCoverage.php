@@ -25,8 +25,14 @@ class SectionCoverage extends Component
     public $header = [];
     public $overlayData = [];
 
-    public function mount($title = null, $subtitle = null, $description = null, $cities = null, $sidebar = null, $backgroundMedia = null, $header = [], $overlayData = [])
+    /** Classes de padding vertical (App\Support\SectionStyle::spacing) */
+    public $spacing = null;
+
+    public function mount($title = null, $subtitle = null, $description = null, $cities = null, $sidebar = null, $backgroundMedia = null, $header = [], $overlayData = [], $spacing = null, $bgColor = null, $textColor = 'light')
     {
+        $this->spacing = $spacing;
+        $this->bgColor = $bgColor;
+        $this->textColor = $textColor ?: 'light';
         $this->title = $title;
         $this->subtitle = $subtitle;
         $this->description = $description;

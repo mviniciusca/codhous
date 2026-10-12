@@ -3,20 +3,8 @@
 <head>
     <x-site-head />
     
-    @php
-        $websiteSettings = \App\Models\Setting::get('website', []);
-        $primaryColor = data_get($websiteSettings, 'primary_color', '249 115 22');
-    @endphp
     <style>
-        :root {
-            --primary-color: {{ $primaryColor }};
-            --primary-400: {{ $primaryColor }};
-            --primary-500: {{ $primaryColor }};
-            --primary-600: {{ $primaryColor }};
-            --gray-400: 156, 163, 175;
-            --gray-500: 107, 114, 128;
-            --gray-600: 75, 85, 99;
-        }
+        {!! \App\Support\SiteTheme::css() !!}
         body { 
             margin: 0; 
             padding: 0; 

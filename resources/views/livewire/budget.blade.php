@@ -1,9 +1,9 @@
 <div class="relative max-w-7xl mx-auto">
     @php
         $isPrimaryBg = str_contains($bgColor ?? '', 'bg-primary');
-        $primaryColor = $isPrimaryBg ? '[color-mix(in_srgb,var(--primary),black_85%)]' : 'primary';
-        $accentText = $isPrimaryBg ? 'text-[color-mix(in_srgb,var(--primary),black_85%)]' : 'text-primary';
-        $accentBg = $isPrimaryBg ? 'bg-[color-mix(in_srgb,var(--primary),black_85%)] text-white' : 'bg-primary text-primary-foreground';
+        $primaryColor = $isPrimaryBg ? 'primary-950' : 'primary';
+        $accentText = $isPrimaryBg ? 'text-primary-950' : 'text-primary-ink';
+        $accentBg = $isPrimaryBg ? 'bg-primary-950 text-white' : 'bg-primary text-primary-foreground';
         $accentLightBg = $isPrimaryBg ? 'bg-black/10' : 'bg-primary/5';
         $accentLightBorder = $isPrimaryBg ? 'border-black/20' : 'border-primary/20';
         $boxBg = $isPrimaryBg ? 'bg-black/10' : 'bg-card';
@@ -27,7 +27,7 @@
                 <p class="mt-3 text-xs text-muted-foreground">Enviamos uma confirmação para <strong>{{ $customer_email }}</strong>.</p>
             @endif
             <div class="mt-10">
-                <button wire:click="resetForm" class="rounded-xl px-8 py-4 text-sm font-bold tracking-widest text-white transition-all hover:-translate-y-1 hover:shadow-lg {{ $accentBg }}">
+                <button wire:click="resetForm" class="rounded-xl px-8 py-4 text-sm font-bold tracking-widest transition-all hover:-translate-y-1 hover:shadow-lg {{ $accentBg }}">
                     Fazer outro pedido
                 </button>
             </div>
@@ -389,12 +389,12 @@
                     @endif
 
                     @if ($currentStep < 3)
-                        <button type="button" wire:click="setStep({{ $currentStep + 1 }})" class="flex items-center gap-2 rounded-xl px-8 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg {{ $accentBg }}">
+                        <button type="button" wire:click="setStep({{ $currentStep + 1 }})" class="flex items-center gap-2 rounded-xl px-8 py-3.5 text-sm font-bold shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg {{ $accentBg }}">
                             Continuar 
                             <i data-lucide="arrow-right" class="h-4 w-4"></i>
                         </button>
                     @else
-                        <button type="button" wire:click="submit" wire:loading.attr="disabled" wire:target="submit" class="flex items-center gap-2 rounded-xl px-10 py-4 text-sm font-bold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-wait disabled:opacity-70 {{ $accentBg }}">
+                        <button type="button" wire:click="submit" wire:loading.attr="disabled" wire:target="submit" class="flex items-center gap-2 rounded-xl px-10 py-4 text-sm font-bold shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-wait disabled:opacity-70 {{ $accentBg }}">
                             <span wire:loading.remove wire:target="submit">Enviar Solicitação Grátis</span>
                             <span wire:loading wire:target="submit">Enviando...</span>
                             <i data-lucide="check-circle" class="h-4 w-4"></i>
