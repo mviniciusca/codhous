@@ -6,6 +6,7 @@ use App\Models\VolumeFormula;
 use App\Services\VolumeCalculator\CalculationResult;
 use App\Services\VolumeCalculator\Expression\ExpressionError;
 use App\Services\VolumeCalculator\InvalidInputs;
+use App\Services\VolumeCalculator\TruckMinimum;
 use App\Services\VolumeCalculator\VolumeCalculator;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -112,6 +113,18 @@ trait CalculatesVolume
         }
 
         return $state;
+    }
+
+    /**
+     * Recomendação quando o volume final não completa o caminhão betoneira
+     * (regra de entrega da empresa, separada da fórmula).
+     */
+    #[Computed]
+    public function truckAdvice(): ?array
+    {
+        $result = $this->calculation['result'];
+
+        return $result ? TruckMinimum::advise($result->finalVolume) : null;
     }
 
     protected function marginValue(): float

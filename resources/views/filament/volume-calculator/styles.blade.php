@@ -229,6 +229,31 @@
     .vc-breakdown .is-total { margin-top: 2px; padding-top: 8px; border-top: 1px dashed rgba(255, 255, 255, .2); font-weight: 600; }
     .vc-breakdown .is-total dt { opacity: 1; }
 
+    /* Pedido mínimo do caminhão */
+    .vc-advice {
+        gap: 12px;
+        background: linear-gradient(rgba(var(--tone), .08), rgba(var(--tone), .08)), var(--cx-surface);
+        border-color: rgba(var(--tone), .35);
+    }
+    .vc-advice-head { display: flex; gap: 12px; align-items: flex-start; }
+    .vc-advice-head .vc-title { color: var(--tone-fg); }
+    .vc-advice-head .vc-help { margin-top: 2px; color: var(--cx-text); opacity: .85; }
+    .vc-advice-icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        color: var(--tone-fg);
+        background: rgba(var(--tone), .16);
+    }
+    .vc-advice-list { display: grid; gap: 8px; padding-left: 44px; font-size: 12.5px; line-height: 1.45; }
+    .vc-advice-list li { display: flex; gap: 8px; align-items: flex-start; }
+    .vc-advice-list .cx-icon-sm { margin-top: 1px; color: var(--tone-fg); }
+    .vc-advice-list strong { font-weight: 600; }
+    @media (max-width: 560px) { .vc-advice-list { padding-left: 0; } }
+
     /* Memória de cálculo */
     .vc-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
     .vc-title .cx-icon-sm { color: var(--cx-muted); }

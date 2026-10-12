@@ -7,6 +7,7 @@ use App\Filament\Resources\VolumeCalculationResource\Pages\ListVolumeCalculation
 use App\Filament\Resources\VolumeFormulaResource;
 use App\Filament\Resources\VolumeFormulaResource\Pages\CreateVolumeFormula;
 use App\Filament\Resources\VolumeFormulaResource\Pages\EditVolumeFormula;
+use App\Filament\Resources\VolumeFormulaResource\Pages\ListVolumeFormulas;
 use App\Filament\Resources\VolumeFormulaResource\RelationManagers\VersionsRelationManager;
 use App\Livewire\Calculator;
 use App\Livewire\VolumeCalculatorTool;
@@ -14,6 +15,7 @@ use App\Models\User;
 use App\Models\VolumeCalculation;
 use App\Models\VolumeFormula;
 use App\Services\VolumeCalculator\FormulaDefinition;
+use App\Services\VolumeCalculator\TruckMinimum;
 use App\Services\VolumeCalculator\VolumeCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -302,4 +304,48 @@ test('mudanças nas fórmulas do painel valem no site', function () {
         ->assertSet('margin', '0')
         ->set('values', ['area' => '2', 'altura' => '50'])
         ->assertSee('1,00');
+});
+
+test('abaixo do pedido mínimo do caminhão, painel e site sugerem alternativas', function () {
+    // 4 × 5 × 10 cm = 2 m³ + 10% = 2,2 m³ (< 3 m³)
+    $small = ['largura' => '4', 'comprimento' => '5', 'espessura' => '10'];
+
+    Livewire::test(VolumeCalculatorTool::class)
+        ->set('values', $small)
+        ->assertSee('Abaixo do pedido mínimo do caminhão')
+        ->assertSee('Faltam')
+        ->assertSee('0,80 m³')
+        ->assertSee('Virar o concreto na obra')
+        ->assertSee('Usar concreto ensacado')
+        ->set('values.largura', '6') // 3,3 m³
+        ->assertDontSee('Abaixo do pedido mínimo do caminhão');
+
+    auth()->logout();
+
+    Livewire::test(Calculator::class)
+        ->set('values', $small)
+        ->assertSee('Abaixo do pedido mínimo do caminhão (3,00 m³)')
+        ->assertSee('Virar o concreto na obra');
+});
+
+test('o pedido mínimo é configurável e pode ser desligado', function () {
+    Livewire::test(ListVolumeFormulas::class)
+        ->assertActionVisible('truckMinimum')
+        ->callAction('truckMinimum', ['enabled' => true, 'min_volume' => 5])
+        ->assertHasNoActionErrors()
+        ->assertNotified('Pedido mínimo atualizado');
+
+    expect(TruckMinimum::settings())->toBe(['enabled' => true, 'min_volume' => 5.0]);
+
+    // 4,4 m³ agora fica abaixo dos 5 m³
+    Livewire::test(VolumeCalculatorTool::class)
+        ->set('values', ['largura' => '5', 'comprimento' => '8', 'espessura' => '10'])
+        ->assertSee('O caminhão betoneira sai a partir de 5,00 m³')
+        ->assertSee('0,60 m³');
+
+    TruckMinimum::save(false, 5);
+
+    Livewire::test(VolumeCalculatorTool::class)
+        ->set('values', ['largura' => '1', 'comprimento' => '1', 'espessura' => '10'])
+        ->assertDontSee('Abaixo do pedido mínimo do caminhão');
 });

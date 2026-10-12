@@ -178,6 +178,29 @@
                 @endif
             </div>
 
+            @if ($advice = $this->truckAdvice)
+                <section class="vc-card vc-advice cx-tone-warning" role="status" aria-labelledby="vc-{{ $variant }}-advice">
+                    <div class="vc-advice-head">
+                        <span class="vc-advice-icon" aria-hidden="true"><x-filament::icon icon="heroicon-m-truck" class="cx-icon-sm" /></span>
+                        <div>
+                            <h3 class="vc-title" id="vc-{{ $variant }}-advice">Abaixo do pedido mínimo do caminhão</h3>
+                            <p class="vc-help">
+                                O caminhão betoneira sai a partir de {{ CalculationResult::formatVolume($advice['min_volume']) }}.
+                                Faltam <strong>{{ CalculationResult::formatVolume($advice['missing']) }}</strong> para completar. Sugira ao cliente:
+                            </p>
+                        </div>
+                    </div>
+                    <ul class="vc-advice-list">
+                        @foreach ($advice['suggestions'] as $suggestion)
+                            <li>
+                                <x-filament::icon :icon="$suggestion['icon']" class="cx-icon-sm" />
+                                <span><strong>{{ $suggestion['title'] }}.</strong> {{ $suggestion['text'] }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
+
             <div class="vc-card vc-memory">
                 @if ($result)
                     <h3 class="vc-title">

@@ -186,10 +186,22 @@
                         Volume final com margem de segurança.
                     @endif
                 </p>
-                @if($result && $result->finalVolume > 0 && $result->finalVolume < 3)
-                    <p class="mt-2 text-[9px] text-amber-400 font-medium leading-tight">
-                        ⚠️ Atenção: Para volumes < 3m³, considere usar betoneira.
-                    </p>
+                @if($advice = $this->truckAdvice)
+                    <div class="mt-3 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-amber-300">
+                        <p class="flex items-center gap-1.5 text-[11px] font-bold leading-tight">
+                            <i data-lucide="truck" class="h-3.5 w-3.5"></i>
+                            Abaixo do pedido mínimo do caminhão ({{ number_format($advice['min_volume'], 2, ',', '.') }} m³)
+                        </p>
+                        <p class="mt-1 text-[10px] leading-snug text-amber-100/80">Faltam {{ number_format($advice['missing'], 2, ',', '.') }} m³. Para volumes assim, considere:</p>
+                        <ul class="mt-1.5 space-y-1 text-[10px] leading-snug text-amber-100/90">
+                            @foreach (array_slice($advice['suggestions'], 0, 3) as $suggestion)
+                                <li class="flex items-start gap-1.5">
+                                    <i data-lucide="{{ $suggestion['lucide'] }}" class="mt-px h-3 w-3 shrink-0"></i>
+                                    <span><strong class="font-bold">{{ $suggestion['title'] }}:</strong> {{ $suggestion['text'] }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 @endif
             </div>
         </div>
