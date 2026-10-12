@@ -69,9 +69,15 @@
         @if($statItems)
             <x-ui.section :data="$data" :spacing="$overlap ? 'none' : 'sm'" :background="$overlap ? 'bg-transparent' : 'bg-background'" :class="$overlap ? '!overflow-visible z-20' : '!overflow-visible'">
                 <div @class(['-mt-10 md:-mt-14' => $overlap])>
-                    <div class="surface-card grid grid-cols-2 gap-px overflow-hidden bg-border/70 shadow-[0_24px_60px_-32px_rgb(0_0_0/0.35)] {{ $statCols }}" data-reveal>
+                    {{-- Fundo e divisórias opacos: o card sobrepõe a foto do hero e nada pode vazar por trás --}}
+                    <div class="surface-card grid grid-cols-2 gap-px overflow-hidden bg-border shadow-[0_24px_60px_-32px_rgb(0_0_0/0.35)] {{ $statCols }}" data-reveal>
                         @foreach($statItems as $stat)
-                            <div class="group flex items-center gap-4 bg-card p-5 transition-colors duration-300 hover:bg-primary-500/[0.04] md:p-7">
+                            <div @class([
+                                'group relative isolate flex items-center gap-4 bg-card p-5 md:p-7',
+                                // tom do hover em camada sobre o bg-card (trocar o fundo deixaria a célula transparente)
+                                'before:absolute before:inset-0 before:-z-10 before:bg-primary-500/[0.05] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100',
+                                'col-span-2 lg:col-span-1' => $loop->last && count($statItems) % 2 === 1,
+                            ])>
                                 <x-ui.icon-box :icon="$stat['icon'] ?? 'check-circle'" class="hidden sm:inline-flex" />
                                 <div class="min-w-0">
                                     <p class="font-mono text-2xl font-bold tracking-tight text-foreground md:text-3xl" data-count>{{ $stat['value'] }}</p>
