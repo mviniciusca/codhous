@@ -3,6 +3,7 @@
 use App\Http\Controllers\BudgetDownloadController;
 use App\Http\Controllers\BudgetPdfController;
 use App\Http\Controllers\DesignPreviewController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\PageBuilderPreviewController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ShowcaseController;
@@ -12,22 +13,24 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /**
- * TODO: Remove this fn after development
- * Auth auto login
+ * Auto login de desenvolvimento: entra como o primeiro usuário ativo.
+ * Só existe em APP_ENV=local; em qualquer outro ambiente vale o login do Filament.
  */
-Route::get('/admin/login', function (): RedirectResponse {
-    if (Auth::check()) {
-        return redirect('/admin');
-    }
+if (app()->isLocal()) {
+    Route::get('/admin/login', function (): RedirectResponse {
+        if (Auth::check()) {
+            return redirect('/admin');
+        }
 
-    if ($user = User::first()) {
-        Auth::login($user);
+        if ($user = User::query()->where('is_active', true)->orderBy('id')->first()) {
+            Auth::login($user);
 
-        return redirect('/admin');
-    }
+            return redirect('/admin');
+        }
 
-    abort(403, 'Usuário não encontrado. Execute o seeder do banco de dados.');
-})->name('filament.admin.auth.login');
+        abort(403, 'Usuário não encontrado. Execute o seeder do banco de dados.');
+    })->name('filament.admin.auth.login');
+}
 
 // Budget public download route with signed URL protection (legacy, kept for backward compatibility)
 Route::get('/budget/download/{budget}', [BudgetDownloadController::class, 'download'])
@@ -51,6 +54,14 @@ Route::get('/admin/design-preview/{token}', DesignPreviewController::class)
     ->middleware('auth')
     ->where('token', '[a-f0-9]{64}')
     ->name('design.preview');
+
+// Convite para a equipe (público; o token é validado pelo hash guardado no banco)
+Route::middleware('throttle:20,1')
+    ->where(['token' => '[A-Za-z0-9]{64}'])
+    ->group(function () {
+        Route::get('/convite/{token}', [InvitationController::class, 'show'])->name('invitation.show');
+        Route::post('/convite/{token}', [InvitationController::class, 'store'])->name('invitation.accept');
+    });
 
 // Dynamic Pages Catch-all (must be at the end)
 Route::get('/{slug?}', [PageController::class, 'show'])

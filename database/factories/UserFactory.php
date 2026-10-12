@@ -2,12 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -30,6 +32,31 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Por padrão o usuário é Administrador, como os usuários que já existiam
+     * quando o controle de acesso entrou (ver migração create_access_control).
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->assignRole(Role::ADMIN));
+    }
+
+    /** Troca o perfil padrão (roda depois do configure) */
+    public function withRole(string $role): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->syncRoles([$role]));
+    }
+
+    public function withoutRole(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->syncRoles([]));
+    }
+
+    public function inactive(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->forceFill(['is_active' => false])->save());
     }
 
     /**

@@ -63,6 +63,13 @@ use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class BudgetResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Comercial;
+    }
+
     protected static ?string $recordTitleAttribute = 'Orçamento';
 
     protected static ?string $model = Budget::class;

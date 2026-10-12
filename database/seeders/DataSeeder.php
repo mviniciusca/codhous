@@ -5,8 +5,6 @@ namespace Database\Seeders;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class DataSeeder extends Seeder
 {
@@ -118,6 +116,6 @@ class DataSeeder extends Seeder
                 'name' => 'Codhous Admin',
                 'password' => bcrypt('password'),
             ]
-        );
+        )->assignRole(\App\Models\Role::admin());
     }
 }

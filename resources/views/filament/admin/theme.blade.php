@@ -8,11 +8,26 @@
         border-bottom: 1px solid rgba(var(--gray-950), .06);
         --tw-ring-shadow: 0 0 #0000;
     }
+    /*
+        O desfoque fica num pseudo-elemento: backdrop-filter no próprio <nav> o tornaria
+        o bloco de contenção dos dropdowns (position: fixed) e eles pulariam de lugar
+        ao trocar de tema. isolation cria o empilhamento sem afetar o posicionamento.
+    */
     .dark .fi-topbar > nav {
-        background: rgba(var(--gray-950), .82);
+        position: relative;
+        isolation: isolate;
+        background: transparent;
         border-bottom-color: rgba(255, 255, 255, .06);
+    }
+    .dark .fi-topbar > nav::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: rgba(var(--gray-950), .82);
         -webkit-backdrop-filter: saturate(140%) blur(10px);
         backdrop-filter: saturate(140%) blur(10px);
+        pointer-events: none;
     }
 
     /* Topbar: busca à esquerda e larga; ações e usuário à direita */
@@ -51,27 +66,89 @@
     .dark .cx-topbar-btn { color: rgb(var(--gray-300)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1); }
     .dark .cx-topbar-btn:hover { color: #fff; background: rgba(255, 255, 255, .05); }
 
-    .cx-topbar-user {
-        display: none;
-        flex-direction: column;
-        align-items: flex-end;
-        max-width: 200px;
-        line-height: 1.25;
-        padding-inline-start: 12px;
-        border-inline-start: 1px solid rgba(var(--gray-950), .08);
-    }
-    .dark .cx-topbar-user { border-inline-start-color: rgba(255, 255, 255, .08); }
-    .cx-topbar-user > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .cx-topbar-user-name { font-size: 13px; font-weight: 600; color: rgb(var(--gray-950)); }
-    .dark .cx-topbar-user-name { color: #fff; }
-    .cx-topbar-user-mail { font-size: 11px; color: rgb(var(--gray-500)); }
-    @media (min-width: 1024px) { .cx-topbar-user { display: flex; } }
     @media (max-width: 639px) {
         .cx-topbar-btn span { display: none; }
         .cx-topbar-btn { padding: 8px; }
         /* Sem teclado físico, o atalho só ocupa espaço */
         .fi-topbar .fi-global-search-field .fi-input-wrp-suffix { display: none; }
     }
+
+    .cx-topbar-icon {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        color: rgb(var(--gray-500));
+        transition: background-color .15s ease, color .15s ease;
+    }
+    .cx-topbar-icon:hover { color: rgb(var(--gray-950)); background: rgba(var(--gray-950), .05); }
+    .dark .cx-topbar-icon { color: rgb(var(--gray-400)); }
+    .dark .cx-topbar-icon:hover { color: #fff; background: rgba(255, 255, 255, .06); }
+
+    /* Menu do usuário */
+    .cx-um-trigger {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 8px 4px 4px;
+        border-radius: 12px;
+        text-align: left;
+        transition: background-color .15s ease;
+    }
+    .cx-um-trigger:hover { background: rgba(var(--gray-950), .04); }
+    .dark .cx-um-trigger:hover { background: rgba(255, 255, 255, .05); }
+    .cx-um-trigger-text { display: none; flex-direction: column; max-width: 180px; line-height: 1.25; }
+    .cx-um-trigger-text > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cx-um-trigger-name { font-size: 13px; font-weight: 600; color: rgb(var(--gray-950)); }
+    .dark .cx-um-trigger-name { color: #fff; }
+    .cx-um-trigger-role { font-size: 11px; color: rgb(var(--gray-500)); }
+    .cx-um-chevron { display: none; width: 16px; height: 16px; color: rgb(var(--gray-400)); }
+    @media (min-width: 1024px) {
+        .cx-um-trigger-text { display: flex; }
+        .cx-um-chevron { display: block; }
+    }
+
+    .cx-um-head { display: flex; align-items: center; gap: 12px; padding: 14px; }
+    .cx-um-id { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+    .cx-um-id strong { font-size: 14px; font-weight: 600; color: rgb(var(--gray-950)); }
+    .dark .cx-um-id strong { color: #fff; }
+    .cx-um-id > span { font-size: 12px; color: rgb(var(--gray-500)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cx-um-id .cx-um-role {
+        align-self: flex-start;
+        margin-top: 6px;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        color: rgb(var(--primary-700));
+        background: rgba(var(--primary-500), .12);
+    }
+    .dark .cx-um-id .cx-um-role { color: rgb(var(--primary-200)); }
+    .cx-um-section { padding: 10px 12px 12px; border-top: 1px solid rgba(var(--gray-950), .06); }
+    .dark .cx-um-section { border-top-color: rgba(255, 255, 255, .06); }
+    .cx-um-section-solo { border-top: 0; }
+    .cx-um-label { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: rgb(var(--gray-400)); }
+
+    .cx-theme { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 3px; border-radius: 10px; background: rgba(var(--gray-500), .1); }
+    .cx-theme-opt {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 4px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        color: rgb(var(--gray-500));
+        transition: background-color .15s ease, color .15s ease;
+    }
+    .cx-theme-opt:hover { color: rgb(var(--gray-950)); }
+    .dark .cx-theme-opt { color: rgb(var(--gray-400)); }
+    .dark .cx-theme-opt:hover { color: #fff; }
+    .cx-theme-opt[aria-checked="true"] { color: rgb(var(--primary-600)); background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .1); }
+    .dark .cx-theme-opt[aria-checked="true"] { color: rgb(var(--primary-300)); background: rgb(var(--gray-800)); }
+    .cx-theme-opt:focus-visible { outline: 2px solid rgb(var(--primary-500)); outline-offset: 1px; }
 
     /* Sidebar: coluna própria no desktop */
     @media (min-width: 1024px) {

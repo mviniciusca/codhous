@@ -16,6 +16,13 @@ use Illuminate\Support\Facades\Mail;
 
 class SendNewsletter extends Page implements HasForms
 {
+    use \App\Filament\Concerns\RequiresArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Website;
+    }
+
     use InteractsWithForms;
 
     protected static ?string $cluster = NewsletterCluster::class;

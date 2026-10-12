@@ -19,6 +19,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LocationResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Catalogo;
+    }
+
     protected static ?string $model = Location::class;
 
     protected static ?string $navigationGroup = 'Orçamentos';

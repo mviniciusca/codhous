@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\RequiresArea;
 use App\Filament\Forms\Components\ColorSwatches;
 use App\Http\Controllers\DesignPreviewController;
 use App\Models\Page as SitePage;
@@ -34,6 +36,13 @@ use Livewire\Attributes\Renderless;
  */
 class DesignAndSeo extends Page implements HasForms
 {
+    use RequiresArea;
+
+    public static function getAccessArea(): AccessArea
+    {
+        return AccessArea::Website;
+    }
+
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-paint-brush';

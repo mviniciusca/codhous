@@ -11,6 +11,13 @@ use Filament\Resources\Pages\Page;
 
 class SettingResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Configuracoes;
+    }
+
     protected static ?string $model = Setting::class;
 
     public static function getNavigationGroup(): ?string

@@ -2,10 +2,12 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\AccessArea;
 use App\Filament\Actions\QuickQuoteAction;
 use App\Filament\Resources\BudgetResource;
 use App\Services\DashboardOverview;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Contracts\Support\Htmlable;
 use Livewire\Attributes\Computed;
@@ -33,8 +35,38 @@ class Dashboard extends BaseDashboard
         return $this->getGreeting().', '.$this->getUserName();
     }
 
+    /** Indicadores, agenda e orçamentos são dados da área Comercial */
+    public function canSeeCommercial(): bool
+    {
+        return (bool) auth()->user()?->canAccessArea(AccessArea::Comercial);
+    }
+
+    /**
+     * Atalhos para quem não tem a área Comercial: só o que o perfil libera.
+     *
+     * @return array<int, array{label: string, url: string, icon: string, area: string}>
+     */
+    public function getShortcuts(): array
+    {
+        return collect(Filament::getResources())
+            ->filter(fn (string $resource) => method_exists($resource, 'getAccessArea') && $resource::shouldRegisterNavigation() && $resource::canAccess())
+            ->map(fn (string $resource) => [
+                'label' => $resource::getNavigationLabel(),
+                'url' => $resource::getUrl('index'),
+                'icon' => $resource::getNavigationIcon() ?? 'heroicon-o-squares-2x2',
+                'area' => $resource::getAccessArea()->label(),
+            ])
+            ->sortBy('label')
+            ->values()
+            ->all();
+    }
+
     public function getSubheading(): string|Htmlable|null
     {
+        if (! $this->canSeeCommercial()) {
+            return ucfirst($this->overview->now()->translatedFormat('l, j \\d\\e F'));
+        }
+
         $today = $this->agenda['today'];
 
         $summary = match ($today['count']) {
@@ -53,10 +85,12 @@ class Dashboard extends BaseDashboard
     protected function getHeaderActions(): array
     {
         return [
-            QuickQuoteAction::make(),
+            QuickQuoteAction::make()
+                ->visible(fn () => BudgetResource::canCreate()),
             Action::make('create')
                 ->label('Novo orçamento')
                 ->icon('heroicon-o-plus')
+                ->visible(fn () => BudgetResource::canCreate())
                 ->url(BudgetResource::getUrl('create')),
         ];
     }

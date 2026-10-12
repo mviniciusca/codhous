@@ -13,6 +13,13 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PosterDesignResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Website;
+    }
+
     protected static ?string $model = PosterDesign::class;
 
     protected static ?string $slug = 'poster-builder';

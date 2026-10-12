@@ -15,6 +15,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ShowcaseResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Website;
+    }
+
     protected static ?string $model = Showcase::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-camera';

@@ -3,7 +3,11 @@
     /* O botão Descartar (header da página) só aparece com alterações pendentes */
     html:not(.ds-dirty) [data-ds-discard] { display: none; }
 
-    .ds-root { container: ds / inline-size; }
+    /*
+        Media queries, não container queries: container-type tornaria .ds-root o bloco de
+        contenção dos elementos fixed do formulário (editor de imagem do upload, modais).
+        1279px ≈ largura em que, com a sidebar aberta, duas colunas deixam de caber.
+    */
     .ds {
         --ds-height: max(600px, calc(100dvh - 196px));
         display: grid;
@@ -274,7 +278,7 @@
     /* ---------- Alternância e responsivo ---------- */
     .ds-switch { display: none; }
 
-    @container ds (max-width: 960px) {
+    @media (max-width: 1279px) {
         .ds { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px; }
         .ds-switch {
             display: inline-flex;
@@ -298,7 +302,7 @@
         .ds-root[data-mode="edit"] .ds-preview { display: none; }
         .ds-root[data-mode="preview"] .ds-editor { display: none; }
     }
-    @container ds (max-width: 520px) {
+    @media (max-width: 639px) {
         .ds-form .fi-fo-tabs > div:not(.fi-tabs) { padding: 4px 14px 20px; }
         .ds-hint { display: none; }
         .ds-page select { max-width: 120px; }

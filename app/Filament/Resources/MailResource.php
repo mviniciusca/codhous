@@ -14,6 +14,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
  */
 class MailResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Comercial;
+    }
+
     protected static ?string $model = Mail::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox';

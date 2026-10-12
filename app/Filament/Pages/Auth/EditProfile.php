@@ -2,26 +2,17 @@
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Form;
+use App\Filament\Pages\Dashboard;
 use Filament\Pages\Auth\EditProfile as BaseEditProfile;
 
+/**
+ * O perfil agora é um modal (App\Livewire\ProfileModal). A rota /admin/profile
+ * continua existindo e abre o painel com o modal aberto.
+ */
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form
+    public function mount(): void
     {
-        return $form
-            ->schema([
-                FileUpload::make('avatar_url')
-                    ->label('Foto de Perfil')
-                    ->avatar()
-                    ->directory('avatars')
-                    ->visibility('public')
-                    ->imageEditor(),
-                $this->getNameFormComponent(),
-                $this->getEmailFormComponent(),
-                $this->getPasswordFormComponent(),
-                $this->getPasswordConfirmationFormComponent(),
-            ]);
+        $this->redirect(Dashboard::getUrl(['perfil' => 1]));
     }
 }

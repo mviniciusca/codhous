@@ -13,6 +13,13 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ContactAgendaResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Comercial;
+    }
+
     protected static ?string $model = ContactAgenda::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-book-open';

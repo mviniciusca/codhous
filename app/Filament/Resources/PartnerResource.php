@@ -24,6 +24,13 @@ use Illuminate\Validation\ValidationException;
 
 class PartnerResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Website;
+    }
+
     protected static ?string $model = Partner::class;
 
     protected static ?string $navigationGroup = 'Empresa';

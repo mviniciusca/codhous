@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Filament\Resources\PageResource\Concerns\InteractsWithLivePreview;
+use App\Enums\AccessArea;
 use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -19,7 +19,10 @@ class PageBuilderPreviewController extends Controller
 
     public function __invoke(Request $request, string $token)
     {
-        $payload = Cache::get(self::CACHE_PREFIX . $token);
+        $payload = Cache::get(self::CACHE_PREFIX.$token);
+
+        // Rotas fora do Filament: a área precisa ser conferida aqui também
+        abort_unless($request->user()?->canAccessArea(AccessArea::Website), 403);
 
         // O snapshot só pode ser visto pelo mesmo usuário que o gerou.
         abort_unless(

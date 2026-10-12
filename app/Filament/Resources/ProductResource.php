@@ -35,6 +35,13 @@ use Illuminate\Support\HtmlString;
 
 class ProductResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Catalogo;
+    }
+
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationGroup = 'Orçamentos';

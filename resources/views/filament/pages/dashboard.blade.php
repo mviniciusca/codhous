@@ -1,6 +1,9 @@
 <x-filament-panels::page class="fi-dashboard-page">
     @include('filament.dashboard.styles')
 
+    @if (! $this->canSeeCommercial())
+        @include('filament.dashboard.limited')
+    @else
     @php
         $overview = $this->overview;
         $kpis = $overview->kpis();
@@ -12,6 +15,7 @@
 
     <div class="cx cx-ui" wire:poll.visible.60s>
         {{-- Indicadores: uma faixa única, cada segmento leva à lista já filtrada --}}
+        <div class="cx-kpis-ctn">
         <section class="cx-kpis" aria-label="Indicadores comerciais">
             <x-dashboard.kpi
                 label="Novos pedidos"
@@ -69,6 +73,7 @@
                 </span>
             </x-dashboard.kpi>
         </section>
+        </div>
 
         <div class="cx-row">
             {{-- Agenda de entregas --}}
@@ -305,4 +310,5 @@
             </x-dashboard.panel>
         </div>
     </div>
+    @endif
 </x-filament-panels::page>

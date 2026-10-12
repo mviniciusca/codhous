@@ -12,6 +12,13 @@ use Filament\Tables\Table;
 
 class ContentSectionResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Website;
+    }
+
     protected static ?string $model = ContentSection::class;
 
     protected static ?string $navigationGroup = 'Website';

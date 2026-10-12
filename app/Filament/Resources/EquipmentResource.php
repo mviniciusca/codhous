@@ -12,6 +12,13 @@ use Filament\Tables\Table;
 
 class EquipmentResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Catalogo;
+    }
+
     protected static ?string $model = Equipment::class;
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationGroup = 'Empresa';

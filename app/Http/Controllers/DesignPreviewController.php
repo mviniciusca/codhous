@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AccessArea;
 use App\Models\Page;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -20,6 +21,9 @@ class DesignPreviewController extends Controller
     public function __invoke(Request $request, string $token)
     {
         $payload = Cache::get(self::CACHE_PREFIX.$token);
+
+        // Rotas fora do Filament: a área precisa ser conferida aqui também
+        abort_unless($request->user()?->canAccessArea(AccessArea::Website), 403);
 
         // O snapshot só pode ser visto pelo mesmo usuário que o gerou.
         abort_unless(

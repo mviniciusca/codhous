@@ -18,6 +18,13 @@ use Filament\Tables\Table;
 
 class NewsletterResource extends Resource
 {
+    use \App\Filament\Concerns\BelongsToArea;
+
+    public static function getAccessArea(): \App\Enums\AccessArea
+    {
+        return \App\Enums\AccessArea::Website;
+    }
+
     protected static ?string $model = Newsletter::class;
 
     protected static ?string $slug = 'subscribers';

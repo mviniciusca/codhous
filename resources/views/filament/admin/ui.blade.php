@@ -76,6 +76,134 @@
     .cx-link:hover { background: rgba(var(--primary-500), .1); }
     .dark .cx-link { color: rgb(var(--primary-400)); }
 
+    /* ---------- Faixa de indicadores ---------- */
+    /*
+        Envolva em .cx-kpis-ctn: as colunas se ajustam à largura disponível.
+        Atenção: container-type cria bloco de contenção para position: fixed. Não use
+        container queries em elementos que envolvem dropdowns, tabelas ou modais do Filament.
+    */
+    .cx-kpis-ctn { container: kpis / inline-size; }
+    .cx-kpis {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        background: var(--cx-surface);
+        border: 1px solid var(--cx-border);
+        border-radius: var(--cx-radius);
+        box-shadow: var(--cx-shadow);
+        overflow: hidden;
+    }
+    .cx-kpi {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+        padding: 18px 20px 20px;
+        color: inherit;
+        text-decoration: none;
+        transition: background-color .15s ease;
+    }
+    .cx-kpi + .cx-kpi { border-left: 1px solid var(--cx-border); }
+    .cx-kpi:hover { background: var(--cx-hover); }
+    .cx-kpi::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 2px;
+        background: rgb(var(--tone));
+        opacity: 0;
+        transition: opacity .15s ease;
+    }
+    .cx-kpi:hover::before { opacity: .9; }
+    .cx-kpi-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--cx-muted);
+    }
+    .cx-kpi-go {
+        width: 14px; height: 14px;
+        margin-left: auto;
+        opacity: 0;
+        transform: translate(-2px, 2px);
+        transition: opacity .15s ease, transform .15s ease;
+    }
+    .cx-kpi:hover .cx-kpi-go,
+    .cx-kpi:focus-visible .cx-kpi-go { opacity: .8; transform: none; }
+    .cx-kpi-value {
+        font-size: 28px;
+        line-height: 1.15;
+        font-weight: 600;
+        letter-spacing: -.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .cx-kpi-note { font-size: 13px; color: var(--cx-muted); }
+    .cx-tone-danger .cx-kpi-note,
+    .cx-tone-warning .cx-kpi-note { color: var(--tone-fg); }
+
+    .cx-spark {
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 28px;
+        margin-top: 6px;
+    }
+    .cx-spark-bar {
+        flex: 1;
+        border-radius: 2px;
+        background: rgba(var(--gray-400), .45);
+    }
+    .cx-spark-bar.is-empty { background: var(--cx-track); }
+    .cx-spark-bar.is-last { background: rgb(var(--tone)); }
+
+    .cx-delta {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--cx-muted);
+    }
+    .cx-delta.is-up { color: rgb(var(--success-600)); }
+    .cx-delta.is-down { color: rgb(var(--danger-600)); }
+    .dark .cx-delta.is-up { color: rgb(var(--success-400)); }
+    .dark .cx-delta.is-down { color: rgb(var(--danger-400)); }
+    .cx-delta-label { font-weight: 400; color: var(--cx-muted); }
+
+    .cx-meter {
+        display: block;
+        height: 6px;
+        margin-top: 10px;
+        border-radius: 999px;
+        background: var(--cx-track);
+        overflow: hidden;
+    }
+    .cx-meter > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: rgb(var(--tone));
+    }
+
+    @container kpis (max-width: 760px) {
+        .cx-kpis { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .cx-kpi:nth-child(odd) { border-left: 0; }
+        .cx-kpi:nth-child(n + 3) { border-top: 1px solid var(--cx-border); }
+    }
+    @container kpis (max-width: 480px) {
+        .cx-kpis { grid-template-columns: minmax(0, 1fr); }
+        .cx-kpi + .cx-kpi { border-left: 0; border-top: 1px solid var(--cx-border); }
+        .cx-kpi { padding: 16px; }
+        .cx-kpi-value { font-size: 24px; }
+    }
+
     /* ---------- Badge ---------- */
     .cx-badge {
         display: inline-flex;

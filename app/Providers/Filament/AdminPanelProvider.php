@@ -95,8 +95,8 @@ class AdminPanelProvider extends PanelProvider
                 fn () => view('filament.admin.topbar-actions'),
             )
             ->renderHook(
-                PanelsRenderHook::USER_MENU_BEFORE,
-                fn () => view('filament.admin.topbar-user'),
+                PanelsRenderHook::BODY_END,
+                fn () => auth()->check() ? view('filament.admin.profile-modal-host') : '',
             )
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
