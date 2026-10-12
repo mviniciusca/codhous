@@ -8,6 +8,7 @@ use App\Filament\Resources\VolumeFormulaResource;
 use App\Filament\Resources\VolumeFormulaResource\Pages\CreateVolumeFormula;
 use App\Filament\Resources\VolumeFormulaResource\Pages\EditVolumeFormula;
 use App\Filament\Resources\VolumeFormulaResource\RelationManagers\VersionsRelationManager;
+use App\Livewire\Calculator;
 use App\Livewire\VolumeCalculatorTool;
 use App\Models\User;
 use App\Models\VolumeCalculation;
@@ -258,4 +259,47 @@ test('perfil Comercial usa a calculadora e edita fórmulas', function () {
 
     $this->get(VolumeCalculatorPage::getUrl())->assertOk();
     $this->get(VolumeFormulaResource::getUrl())->assertOk();
+});
+
+test('a calculadora do site usa as mesmas fórmulas e o mesmo motor do painel', function () {
+    auth()->logout();
+
+    Livewire::test(Calculator::class)
+        ->assertSee(['Lajes / Pisos', 'Pilares / Estacas', 'Pilares / Vigas retangulares'])
+        ->assertSee('Volume = largura × comprimento × espessura')
+        ->assertSet('margin', '10')
+        ->assertSee('10% (recomendado)')
+        ->set('values', ['largura' => '5', 'comprimento' => '8', 'espessura' => '10'])
+        ->assertSee('4,40')
+        ->assertSee('Volume sem margem: 4,00 m³')
+        ->set('values.largura', '-1')
+        ->assertSee('Largura deve ser maior que zero.');
+});
+
+test('mudanças nas fórmulas do painel valem no site', function () {
+    $this->slab->saveVersion(FormulaDefinition::fromArray(array_merge($this->slab->definition()->toArray(), [
+        'margin_percent' => 5, 'rounding' => 'up', 'rounding_step' => 0.5,
+    ])), $this->user);
+    VolumeFormula::where('slug', 'pilar-viga-retangular')->update(['is_active' => false]);
+
+    $custom = VolumeFormula::create(['name' => 'Sapata', 'sort' => 9]);
+    $custom->saveVersion(FormulaDefinition::fromArray([
+        'expression' => 'area * altura',
+        'variables' => [['key' => 'area', 'label' => 'Área', 'unit' => 'm2'], ['key' => 'altura', 'label' => 'Altura', 'unit' => 'cm']],
+        'margin_percent' => 0,
+    ]));
+
+    auth()->logout();
+
+    Livewire::test(Calculator::class)
+        ->assertDontSee('Pilares / Vigas retangulares')
+        ->assertSee('Sapata')
+        ->assertSet('margin', '5')
+        ->set('values', ['largura' => '5', 'comprimento' => '8', 'espessura' => '10'])
+        ->assertSee('4,50') // 4,2 arredondado para cima em 0,5, como no painel
+        ->call('selectFormula', $custom->id)
+        ->assertSet('values', ['area' => '', 'altura' => ''])
+        ->assertSet('margin', '0')
+        ->set('values', ['area' => '2', 'altura' => '50'])
+        ->assertSee('1,00');
 });

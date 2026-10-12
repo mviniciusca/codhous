@@ -259,7 +259,9 @@ class Expression
                 $left = $this->renderNode($node[2], $variable, $node[1] === '^' ? $own + 1 : $own);
                 $right = $this->renderNode($node[3], $variable, in_array($node[1], ['-', '/'], true) ? $own + 1 : $own);
                 $symbol = ['+' => ' + ', '-' => ' − ', '*' => ' × ', '/' => ' ÷ ', '^' => '^'][$node[1]];
-                $text = $left.$symbol.$right;
+                // Quadrado e cubo com expoente fixo aparecem sobrescritos: (d ÷ 2)²
+                $superscript = $node[1] === '^' && $node[3][0] === 'num' ? ([2 => '²', 3 => '³'][(string) $node[3][1]] ?? null) : null;
+                $text = $superscript ? $left.$superscript : $left.$symbol.$right;
 
                 return $own < $parent ? "({$text})" : $text;
 

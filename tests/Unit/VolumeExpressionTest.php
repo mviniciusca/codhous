@@ -85,8 +85,8 @@ test('a verificação de unidades exige resultado em m³', function () {
 test('a memória de cálculo reescreve a fórmula com os valores', function () {
     $expression = Expression::parse('pi*(d/2)^2*h - (a - b)', ['d', 'h', 'a', 'b']);
 
-    expect($expression->renderWithValues(['d' => 0.3, 'h' => 6, 'a' => 1, 'b' => 0.5]))->toBe('π × (0,3 ÷ 2)^2 × 6 − (1 − 0,5)')
-        ->and($expression->render(fn ($name) => strtoupper($name)))->toBe('π × (D ÷ 2)^2 × H − (A − B)');
+    expect($expression->renderWithValues(['d' => 0.3, 'h' => 6, 'a' => 1, 'b' => 0.5]))->toBe('π × (0,3 ÷ 2)² × 6 − (1 − 0,5)')
+        ->and($expression->render(fn ($name) => strtoupper($name)))->toBe('π × (D ÷ 2)² × H − (A − B)');
 });
 
 test('calcula laje com conversão de cm, margem e memória de cálculo', function () {
