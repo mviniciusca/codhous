@@ -10,7 +10,7 @@
         $topProducts = $overview->topProducts();
     @endphp
 
-    <div class="cx" wire:poll.visible.60s>
+    <div class="cx cx-ui" wire:poll.visible.60s>
         {{-- Indicadores: uma faixa única, cada segmento leva à lista já filtrada --}}
         <section class="cx-kpis" aria-label="Indicadores comerciais">
             <x-dashboard.kpi

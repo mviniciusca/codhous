@@ -29,3 +29,5 @@
     .dark .fi-sidebar-item-active .fi-sidebar-item-label { color: rgb(var(--primary-300)); }
     .fi-sidebar-group-label { letter-spacing: .04em; text-transform: uppercase; font-size: 11px; }
 </style>
+
+@include('filament.admin.ui')

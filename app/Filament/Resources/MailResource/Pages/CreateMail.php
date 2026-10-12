@@ -3,10 +3,17 @@
 namespace App\Filament\Resources\MailResource\Pages;
 
 use App\Filament\Resources\MailResource;
-use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\Page;
 
-class CreateMail extends CreateRecord
+/**
+ * Rota antiga de criação: abre a caixa com o modal "Nova mensagem".
+ */
+class CreateMail extends Page
 {
     protected static string $resource = MailResource::class;
+
+    public function mount(): void
+    {
+        $this->redirect(MailResource::getUrl('index', ['action' => 'compose']));
+    }
 }
