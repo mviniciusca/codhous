@@ -5,6 +5,7 @@ use App\Http\Controllers\BudgetPdfController;
 use App\Http\Controllers\ContentSectionPreviewController;
 use App\Http\Controllers\DesignPreviewController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\NewsletterUnsubscribeController;
 use App\Http\Controllers\PageBuilderPreviewController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ShowcaseController;
@@ -68,6 +69,14 @@ Route::middleware('throttle:20,1')
     ->group(function () {
         Route::get('/convite/{token}', [InvitationController::class, 'show'])->name('invitation.show');
         Route::post('/convite/{token}', [InvitationController::class, 'store'])->name('invitation.accept');
+    });
+
+// Cancelar inscrição da newsletter pelo link do e-mail (URL assinada; POST sem CSRF, ver bootstrap/app.php)
+Route::middleware(['signed', 'throttle:30,1'])
+    ->whereNumber('newsletter')
+    ->group(function () {
+        Route::get('/newsletter/cancelar/{newsletter}', [NewsletterUnsubscribeController::class, 'show'])->name('newsletter.unsubscribe');
+        Route::post('/newsletter/cancelar/{newsletter}', [NewsletterUnsubscribeController::class, 'store'])->name('newsletter.unsubscribe.store');
     });
 
 // Dynamic Pages Catch-all (must be at the end)

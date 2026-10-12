@@ -62,6 +62,7 @@ CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 
 ### Other pieces
 - Livewire front-end components live in `app/Livewire` (budget wizard, calculator, cart, newsletter, showcase feed, contact `Mail/Form`).
 - Estúdio de Posts (`PosterDesignResource`, `/admin/poster-builder`): a Fabric.js editor for social media posts with JSON templates in `resources/poster-templates/`, config in `config/poster-studio.php`, services in `app/Services/PosterStudio`. See `docs/POSTER_STUDIO.md`.
+- Newsletter (`NewsletterCluster`): `SendNewsletter` is a three-step composer (content + email preview → confirmation → result). `Services/Newsletter/NewsletterSender` sends through the default mailer in small batches driven by the page's `wire:poll` (no queue worker needed) and records every send in `NewsletterCampaign`/`NewsletterCampaignRecipient`, which `NewsletterCampaignResource` (history) displays. Content is sanitized and inlined by `NewsletterContent`, and the same `mail.newsletter` view renders both the email and the preview. The signed unsubscribe route `/newsletter/cancelar/{id}` is exempt from CSRF in `bootstrap/app.php` (for one-click `List-Unsubscribe-Post`).
 - Integrations: Mailgun/SMTP mail, Cloudflare Turnstile (`TurnstileService`), WhatsApp links (`WhatsappService`), CEP/address lookup (`PostcodeFinderService`, `AddressFinderService`).
 
 ## Gotchas
