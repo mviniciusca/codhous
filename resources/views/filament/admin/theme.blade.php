@@ -160,6 +160,8 @@
     .cx-um-section { padding: 10px 12px 12px; border-top: 1px solid rgba(var(--gray-950), .06); }
     .dark .cx-um-section { border-top-color: rgba(255, 255, 255, .06); }
     .cx-um-section-solo { border-top: 0; }
+    .cx-um-version { padding: 8px 14px 10px; border-top: 1px solid rgba(var(--gray-950), .06); font-size: 11px; color: rgb(var(--gray-400)); font-variant-numeric: tabular-nums; }
+    .dark .cx-um-version { border-top-color: rgba(255, 255, 255, .06); color: rgb(var(--gray-500)); }
     .cx-um-label { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: rgb(var(--gray-400)); }
 
     .cx-theme { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 3px; border-radius: 10px; background: rgba(var(--gray-500), .1); }

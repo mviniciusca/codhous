@@ -17,11 +17,13 @@ php artisan budget:history  # see app/Console/Commands/ShowBudgetHistory.php
 
 CI (`.github/workflows/laravel.yml`) runs on push/PR to `main`. It uses PHP 8.3 and SQLite, builds assets, then runs `php artisan test`.
 
+Releases are automated by release-please (`.github/workflows/release.yml`, `release-please-config.json`, `.release-please-manifest.json`). Every push to `main` updates an open release PR with the next SemVer version (computed from Conventional Commits) and a `CHANGELOG.md` entry. Merging that PR bumps `version.txt`, tags `vX.Y.Z` and creates a GitHub Release. `config('app.version')` reads `version.txt` and is shown at the bottom of the admin user menu. Never edit `version.txt`, the manifest or `CHANGELOG.md` by hand. The app stays on `0.x` until the first production deploy, which becomes `v1.0.0`.
+
 ## Conventions
 
 - **The UI language is Brazilian Portuguese** (`APP_LOCALE=pt_BR`). Labels, helper texts, comments and test names are mostly in Portuguese and often wrapped in `__()`. Keep new UI strings in Portuguese.
 - Commits use Conventional Commits (`feat:`, `refactor:`, `style:`, `chore:`, `fix:`), written in English.
-- Work happens on feature branches. PRs target `main`.
+- Branches are short-lived, start from an up-to-date `main`, and are named `type/short-description` after the commit type (`feat/budget-discount`, `fix/pdf-total`, `refactor/…`, `chore/…`). PRs target `main`. Do not create long-lived or version-named branches.
 - Admin "builder" screens (component library + live preview + step inspector) follow `docs/PADRAO_UI_BUILDER.md`. Every admin page gets the compact one-line header (breadcrumb › title, subheading as a `?` tooltip, actions on the right) from the overridden `resources/views/vendor/filament-panels/components/header/index.blade.php`; set heading/subheading/actions through Filament methods, never build a header inside the view. Public-site blocks follow `docs/estilo-minimalista-design.md`.
 
 ## Architecture

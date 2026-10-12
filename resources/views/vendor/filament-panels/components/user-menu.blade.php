@@ -73,4 +73,6 @@
             Sair
         </x-filament::dropdown.list.item>
     </x-filament::dropdown.list>
+
+    <div class="cx-um-version">Codhous v{{ config('app.version') }}</div>
 </x-filament::dropdown>

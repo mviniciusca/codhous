@@ -21,6 +21,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Version
+    |--------------------------------------------------------------------------
+    |
+    | Versão atual (SemVer), mantida pelo release-please em version.txt.
+    | Não edite à mão: ela sobe sozinha ao fazer merge do PR de release.
+    |
+    */
+
+    'version' => is_file(base_path('version.txt'))
+        ? trim((string) file_get_contents(base_path('version.txt')))
+        : 'dev',
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |
