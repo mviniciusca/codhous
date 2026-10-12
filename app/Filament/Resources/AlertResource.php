@@ -33,7 +33,7 @@ class AlertResource extends Resource
 
     protected static ?string $navigationGroup = 'Website';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationLabel = 'Alertas e notificações';
 

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\PosterDesignResource\Pages;
 use App\Models\PosterDesign;
 use App\Services\PosterStudio\Formats;
@@ -13,11 +15,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PosterDesignResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Website;
+        return AccessArea::Website;
     }
 
     protected static ?string $model = PosterDesign::class;
@@ -26,7 +28,9 @@ class PosterDesignResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'Marketing';
+
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $modelLabel = 'arte';
 

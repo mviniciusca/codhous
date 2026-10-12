@@ -7,7 +7,9 @@ use Filament\Clusters\Cluster;
 class NewsletterCluster extends Cluster
 {
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
-    protected static ?string $navigationGroup = 'Website';
+
+    protected static ?string $navigationGroup = 'Marketing';
+
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationLabel(): string

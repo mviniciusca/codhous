@@ -2,24 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccessArea;
+use App\Filament\Concerns\BelongsToArea;
 use App\Filament\Resources\ShowcaseResource\Pages;
-use App\Filament\Resources\ShowcaseResource\RelationManagers;
 use App\Models\Showcase;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ShowcaseResource extends Resource
 {
-    use \App\Filament\Concerns\BelongsToArea;
+    use BelongsToArea;
 
-    public static function getAccessArea(): \App\Enums\AccessArea
+    public static function getAccessArea(): AccessArea
     {
-        return \App\Enums\AccessArea::Website;
+        return AccessArea::Website;
     }
 
     protected static ?string $model = Showcase::class;
@@ -27,6 +26,8 @@ class ShowcaseResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-camera';
 
     protected static ?string $navigationGroup = 'Website';
+
+    protected static ?int $navigationSort = 5;
 
     public static function getNavigationLabel(): string
     {

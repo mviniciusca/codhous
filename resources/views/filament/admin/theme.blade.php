@@ -184,19 +184,81 @@
     .dark .cx-theme-opt[aria-checked="true"] { color: rgb(var(--primary-300)); background: rgb(var(--gray-800)); }
     .cx-theme-opt:focus-visible { outline: 2px solid rgb(var(--primary-500)); outline-offset: 1px; }
 
-    /* Sidebar: coluna própria no desktop */
+    /*
+        Sidebar chapada: mesma superfície da topbar (branco / grafite 950), separada do conteúdo
+        só por linhas finas. O cabeçalho da marca tem a altura da topbar e continua a linha dela.
+    */
+    .fi-sidebar { --cx-sb-line: rgba(var(--gray-950), .06); background: #fff; }
+    .dark .fi-sidebar { --cx-sb-line: rgba(255, 255, 255, .06); background: rgb(var(--gray-950)); }
     @media (min-width: 1024px) {
-        .fi-sidebar { border-inline-end: 1px solid rgba(var(--gray-950), .06); }
-        .dark .fi-sidebar {
-            background: rgba(var(--gray-900), .45);
-            border-inline-end-color: rgba(255, 255, 255, .06);
-        }
+        .fi-sidebar { border-inline-end: 1px solid var(--cx-sb-line); }
     }
 
+    .fi-sidebar .fi-sidebar-header {
+        height: 64px;
+        padding-inline: 16px;
+        background: transparent;
+        box-shadow: none;
+        border-bottom: 1px solid var(--cx-sb-line);
+    }
+    .fi-sidebar-header .fi-logo { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+    .fi-sidebar-header .fi-icon-btn { width: 32px; height: 32px; border-radius: 8px; }
+    .fi-sidebar-header .fi-icon-btn svg { width: 18px; height: 18px; }
+
+    /* Navegação: mais densa, rolagem discreta (a barra só aparece ao passar o mouse) */
+    .fi-sidebar .fi-sidebar-nav {
+        row-gap: 20px;
+        padding: 16px 16px 24px;
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+    .fi-sidebar .fi-sidebar-nav:hover { scrollbar-color: rgba(var(--gray-500), .35) transparent; }
+    .fi-sidebar .fi-sidebar-nav-groups { row-gap: 20px; }
+    .fi-sidebar .fi-sidebar-group { row-gap: 2px; }
+    .fi-sidebar .fi-sidebar-group-items { row-gap: 2px; }
+
+    /* Rótulo do grupo: caixa-alta pequena; a seta só aparece ao passar o mouse ou com o grupo fechado */
+    .fi-sidebar .fi-sidebar-group-button { padding: 2px 8px; min-height: 28px; }
+    .fi-sidebar .fi-sidebar-group-label {
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 20px;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: rgb(var(--gray-400));
+    }
+    .dark .fi-sidebar .fi-sidebar-group-label { color: rgb(var(--gray-500)); }
+    .fi-sidebar .fi-sidebar-group-collapse-button { width: 20px; height: 20px; opacity: 0; transition: opacity .15s ease, transform .15s ease; }
+    .fi-sidebar .fi-sidebar-group-collapse-button svg { width: 14px; height: 14px; }
+    .fi-sidebar .fi-sidebar-group-button:hover .fi-sidebar-group-collapse-button,
+    .fi-sidebar .fi-sidebar-group-collapse-button:focus-visible,
+    .fi-sidebar .fi-sidebar-group-collapse-button.-rotate-180 { opacity: 1; }
+
+    /* Itens */
+    .fi-sidebar .fi-sidebar-item-button { gap: 10px; padding: 6px 8px; border-radius: 8px; }
+    .fi-sidebar .fi-sidebar-item-icon { width: 18px; height: 18px; }
+    .fi-sidebar .fi-sidebar-item-label { font-size: 13.5px; line-height: 20px; color: rgb(var(--gray-600)); transition: color .15s ease; }
+    .dark .fi-sidebar .fi-sidebar-item-label { color: rgb(var(--gray-300)); }
+    .fi-sidebar .fi-sidebar-item-button:hover { background: rgba(var(--gray-950), .04); }
+    .fi-sidebar .fi-sidebar-item-button:hover .fi-sidebar-item-label { color: rgb(var(--gray-950)); }
+    .dark .fi-sidebar .fi-sidebar-item-button:hover { background: rgba(255, 255, 255, .04); }
+    .dark .fi-sidebar .fi-sidebar-item-button:hover .fi-sidebar-item-label { color: #fff; }
+
     /* Item ativo: fundo azul translúcido */
-    .dark .fi-sidebar-item-active > .fi-sidebar-item-button { background: rgba(var(--primary-500), .1); }
-    .dark .fi-sidebar-item-active .fi-sidebar-item-label { color: rgb(var(--primary-300)); }
-    .fi-sidebar-group-label { letter-spacing: .04em; text-transform: uppercase; font-size: 11px; }
+    .fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-button { background: rgba(var(--primary-500), .08); }
+    .dark .fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-button { background: rgba(var(--primary-500), .1); }
+    .fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-button .fi-sidebar-item-label { color: rgb(var(--primary-700)); }
+    .dark .fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-button .fi-sidebar-item-label { color: rgb(var(--primary-300)); }
+
+    /* Contadores: pílula compacta, sem contorno */
+    .fi-sidebar .fi-sidebar-item .fi-badge {
+        min-width: 20px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+        box-shadow: none;
+    }
 
     /*
         Cabeçalho de página compacto (todas as páginas): uma linha com trilha › título,
