@@ -60,6 +60,19 @@ class PdfGeneratorService
     }
 
     /**
+     * Generate a PDF from a view and return its binary content.
+     */
+    public function outputFromView(string $view, array $data = [], string $paper = 'a4', string $orientation = 'portrait'): string
+    {
+        $pdf = Pdf::loadView($view, $data);
+        $pdf->setPaper($paper, $orientation);
+        $pdf->setOptions($this->getOptions());
+        $pdf->setWarnings(false);
+
+        return $pdf->output();
+    }
+
+    /**
      * Generate a PDF from a view and save it to a file.
      */
     public function saveFromView(string $view, array $data, string $path, string $paper = 'a4', string $orientation = 'portrait')

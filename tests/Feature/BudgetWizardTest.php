@@ -266,3 +266,60 @@ test('admin consegue salvar orçamento vindo do site sem preencher taxa e descon
         ->and($budget->content['customer_phone'])->toBe('(21) 96645-2451')
         ->and($budget->content['needs_pump'])->toBe('sim');
 });
+
+test('barra de etapas muda o status do orçamento', function () {
+    fillWizard()->call('submit');
+    $budget = Budget::sole();
+
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(EditBudget::class, ['record' => $budget->getRouteKey()])
+        ->assertSee('Novo pedido')
+        ->assertSee('Revise itens e valores')
+        ->call('setStatus', 'done')
+        ->assertSee('Pedido fechado. Combine a data de entrega');
+
+    expect($budget->fresh()->status)->toBe('done');
+});
+
+test('status inválido enviado pelo navegador é ignorado', function () {
+    fillWizard()->call('submit');
+    $budget = Budget::sole();
+
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(EditBudget::class, ['record' => $budget->getRouteKey()])
+        ->call('setStatus', 'hacked');
+
+    expect($budget->fresh()->status)->toBe('pending');
+});
+
+test('admin negocia o preço unitário e o subtotal do item acompanha', function () {
+    fillWizard()->call('submit');
+    $budget = Budget::with('budgetItems')->sole();
+    $itemKey = 'record-'.$budget->budgetItems->first()->id;
+
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(EditBudget::class, ['record' => $budget->getRouteKey()])
+        ->set("data.budgetItems.{$itemKey}.price", '380,00')
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $item = $budget->budgetItems()->first();
+
+    expect((float) $item->price)->toBe(380.0)
+        ->and((float) $item->subtotal)->toBe(950.0) // 2,5 x 380
+        ->and((float) $budget->fresh()->content['total'])->toBe(1100.0); // 950 + 150 de frete
+});
+
+test('baixar PDF salva o orçamento e devolve o arquivo', function () {
+    fillWizard()->call('submit');
+    $budget = Budget::sole();
+
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(EditBudget::class, ['record' => $budget->getRouteKey()])
+        ->callAction('download_pdf')
+        ->assertFileDownloaded('Orcamento_'.$budget->code.'.pdf');
+});

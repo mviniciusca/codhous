@@ -3,7 +3,10 @@
 namespace App\Filament\Resources\BudgetResource\Pages;
 
 use App\Filament\Resources\BudgetResource;
+use App\Models\Setting;
+use App\Services\PdfGeneratorService;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditBudget extends EditRecord
@@ -12,12 +15,37 @@ class EditBudget extends EditRecord
 
     public function getTitle(): string
     {
-        return 'Detalhes do Orçamento';
+        return 'Orçamento '.$this->record->code;
     }
 
     public function getSubheading(): ?string
     {
-        return 'Revise as informações do cliente, defina os preços e gere o PDF para envio.';
+        $customer = $this->record->content['customer_name'] ?? 'Cliente não informado';
+        $origin = $this->record->user_id ? 'criado no painel' : 'recebido pelo site';
+        $date = $this->record->created_at?->timezone(config('app.display_timezone'))->format('d/m/Y \à\s H:i');
+
+        return "{$customer} · {$origin} em {$date}";
+    }
+
+    /**
+     * Chamado pela barra de etapas (resources/views/filament/budget/status-pipeline.blade.php).
+     */
+    public function setStatus(string $status): void
+    {
+        if (! array_key_exists($status, BudgetResource::STATUSES) || $this->record->status === $status) {
+            return;
+        }
+
+        $this->record->update(['status' => $status]);
+
+        activity()
+            ->performedOn($this->record)
+            ->log('Alterou a etapa para '.BudgetResource::STATUSES[$status]);
+
+        Notification::make()
+            ->title('Etapa: '.BudgetResource::STATUSES[$status])
+            ->success()
+            ->send();
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -48,19 +76,46 @@ class EditBudget extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('download_pdf')
+                ->label('Baixar PDF')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('gray')
+                ->tooltip('Salva e baixa o PDF com os valores atuais')
+                ->action(function () {
+                    $this->save(shouldRedirect: false, shouldSendSavedNotification: false);
+
+                    $budget = $this->record->refresh();
+                    $settings = Setting::first();
+                    $output = (new PdfGeneratorService)->outputFromView('pdf.invoice', [
+                        'state' => $budget->toArray(),
+                        'budget' => $budget,
+                        'company' => $settings?->companySetting,
+                        'layout' => $settings?->layoutSetting,
+                    ]);
+
+                    return response()->streamDownload(fn () => print ($output), 'Orcamento_'.$budget->code.'.pdf', [
+                        'Content-Type' => 'application/pdf',
+                    ]);
+                }),
             Actions\Action::make('save')
-                ->label('Salvar Orçamento')
+                ->label('Salvar')
+                ->icon('heroicon-o-check')
                 ->action('save')
                 ->color('primary')
                 ->keyBindings(['mod+s']),
-            Actions\Action::make('cancel')
-                ->label('Voltar')
-                ->url($this->getResource()::getUrl('index'))
-                ->color('gray'),
-            Actions\ForceDeleteAction::make()
-                ->label('Excluir Permanente'),
-            Actions\RestoreAction::make()
-                ->label('Restaurar'),
+            Actions\ActionGroup::make([
+                Actions\DeleteAction::make()
+                    ->label('Mover para lixeira')
+                    ->modalHeading('Mover orçamento para a lixeira?')
+                    ->successNotificationTitle('Orçamento enviado para a lixeira'),
+                Actions\RestoreAction::make()
+                    ->label('Restaurar'),
+                Actions\ForceDeleteAction::make()
+                    ->label('Excluir permanentemente'),
+            ])
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->color('gray')
+                ->tooltip('Mais ações'),
         ];
     }
 
