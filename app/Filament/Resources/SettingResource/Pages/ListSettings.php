@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SettingResource\Pages;
 
 use App\Filament\Resources\SettingResource;
+use App\Models\Setting;
 use Filament\Resources\Pages\ListRecords;
 
 class ListSettings extends ListRecords
@@ -11,6 +12,6 @@ class ListSettings extends ListRecords
 
     public function mount(): void
     {
-        $this->redirect(EditWebsite::getUrl(['record' => 1]));
+        $this->redirect(EditCompany::getUrl(['record' => Setting::firstOrCreate(['id' => 1])]));
     }
 }
