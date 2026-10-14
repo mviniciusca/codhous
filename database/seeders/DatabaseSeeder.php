@@ -2,24 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Budget;
-use App\Models\BudgetHistory;
-use App\Models\CompanySetting;
-use App\Models\Contact;
-use App\Models\Customer;
-use App\Models\Layout;
-use App\Models\Location;
-use App\Models\Mail;
-use App\Models\Module;
-use App\Models\Navigation;
-use App\Models\Newsletter;
-use App\Models\Partner;
-use App\Models\Product;
-use App\Models\Setting;
-use App\Models\User;
 use App\Models\Page;
+use App\Models\Showcase;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -38,12 +23,15 @@ class DatabaseSeeder extends Seeder
 
         // 3. Alertas do site (inclui o aviso de cookies)
         $this->call(AlertSeeder::class);
+
+        // 4. Agenda de contatos
+        $this->call(ContactAgendaSeeder::class);
     }
 
     protected function seedShowcases()
     {
         // Criar 3 obras de exemplo para o portfólio
-        \App\Models\Showcase::create([
+        Showcase::create([
             'title' => 'Residencial Bela Vista',
             'description' => 'Fornecimento de 150m³ de concreto usinado para lajes e vigas com suporte técnico integral.',
             'location' => 'São Paulo, SP',
@@ -52,7 +40,7 @@ class DatabaseSeeder extends Seeder
             'sort_order' => 1,
         ]);
 
-        \App\Models\Showcase::create([
+        Showcase::create([
             'title' => 'Pátio Industrial Logix',
             'description' => 'Execução de 2.000m² de piso de concreto polido de alta resistência para tráfego pesado.',
             'location' => 'Barueri, SP',
@@ -61,7 +49,7 @@ class DatabaseSeeder extends Seeder
             'sort_order' => 2,
         ]);
 
-        \App\Models\Showcase::create([
+        Showcase::create([
             'title' => 'Edifício Horizonte',
             'description' => 'Locação de bomba estacionária e fornecimento de concreto para bombeamento em grandes alturas.',
             'location' => 'Rio de Janeiro, RJ',
@@ -84,12 +72,12 @@ class DatabaseSeeder extends Seeder
                     'layout' => 'default',
                     'badge' => 'Qualidade Certificada',
                     'slides' => [
-                        ['title' => 'Concreto usinado com agilidade e precisão no traço', 'subtitle' => 'Entrega rápida e suporte técnico especializado.']
+                        ['title' => 'Concreto usinado com agilidade e precisão no traço', 'subtitle' => 'Entrega rápida e suporte técnico especializado.'],
                     ],
                     'stats' => [
                         ['value' => '500+', 'label' => 'Obras atendidas'],
                         ['value' => '98%', 'label' => 'Pontualidade'],
-                    ]
+                    ],
                 ]],
                 ['type' => 'partners', 'data' => ['title' => 'Nossos Parceiros']],
                 ['type' => 'services', 'data' => ['title' => 'Nossos Serviços']],
@@ -98,14 +86,14 @@ class DatabaseSeeder extends Seeder
                     'badge' => 'PORTFÓLIO',
                     'title' => 'Nossas Obras',
                     'description' => 'Conheça alguns dos projetos realizados pela Codhous em toda a região.',
-                    'limit' => 4
+                    'limit' => 4,
                 ]],
                 ['type' => 'calculator', 'data' => []],
                 ['type' => 'budget_form', 'data' => [
                     'title' => 'Solicitar Orçamento Grátis',
-                    'description' => 'Preencha os dados abaixo e receba uma proposta personalizada em até 24h.'
+                    'description' => 'Preencha os dados abaixo e receba uma proposta personalizada em até 24h.',
                 ]],
-            ]
+            ],
         ]);
 
         // Serviços
@@ -116,7 +104,7 @@ class DatabaseSeeder extends Seeder
             'sort_order' => 2,
             'content' => [
                 ['type' => 'services', 'data' => ['title' => 'Nossos Serviços']],
-            ]
+            ],
         ]);
 
         // Nossas Obras
@@ -130,10 +118,10 @@ class DatabaseSeeder extends Seeder
                     'badge' => 'PORTFÓLIO',
                     'title' => 'Nossas Obras',
                     'description' => 'Conheça alguns dos projetos realizados pela ConcretoPro em toda a região.',
-                    'show_breadcrumbs' => true
+                    'show_breadcrumbs' => true,
                 ]],
                 ['type' => 'showcase', 'data' => ['title' => 'Portfólio de Obras', 'limit' => 10]],
-            ]
+            ],
         ]);
 
         // Sobre Nós
@@ -148,7 +136,7 @@ class DatabaseSeeder extends Seeder
                     'title' => 'Compromisso com a Solidez da sua Obra',
                     'description' => 'Desde a fundação até o acabamento, a Codhous é sua parceira em concreto usinado de alta performance.',
                     'show_breadcrumbs' => true,
-                    'background_image' => 'about/betoneira-premium.png'
+                    'background_image' => 'about/betoneira-premium.png',
                 ]],
                 ['type' => 'rich_text', 'data' => ['content' => '<h2>Nossa História</h2><p>Com mais de 15 anos de atuação no mercado de construção civil, a Codhous nasceu com o propósito de desmistificar o fornecimento de concreto usinado. Entendemos que cada obra é única e que o cronograma é sagrado. Por isso, investimos em tecnologia de traço e logística de precisão para garantir que o seu projeto nunca pare.</p><p>Hoje, somos referência no Rio de Janeiro, atendendo desde pequenas reformas residenciais até grandes complexos industriais, sempre com o mesmo padrão de rigor técnico e atendimento personalizado.</p>']],
                 ['type' => 'differentials', 'data' => [
@@ -157,22 +145,22 @@ class DatabaseSeeder extends Seeder
                         [
                             'title' => 'Nossa Missão',
                             'description' => 'Fornecer soluções em concreto com agilidade, precisão e sustentabilidade, contribuindo para a segurança e durabilidade das construções de nossos clientes.',
-                            'icon' => 'target'
+                            'icon' => 'target',
                         ],
                         [
                             'title' => 'Nossa Visão',
                             'description' => 'Ser a concreteira mais confiável e inovadora do estado, reconhecida pela excelência técnica e pelo compromisso com o sucesso de cada obra.',
-                            'icon' => 'eye'
+                            'icon' => 'eye',
                         ],
                         [
                             'title' => 'Nossos Valores',
                             'description' => 'Ética nas negociações, rigor técnico no traço, pontualidade britânica e respeito absoluto ao meio ambiente e às normas de segurança.',
-                            'icon' => 'shield-check'
+                            'icon' => 'shield-check',
                         ],
-                    ]
+                    ],
                 ]],
                 ['type' => 'timeline', 'data' => ['title' => 'Nossa Trajetória']],
-            ]
+            ],
         ]);
 
         // Contato
@@ -186,18 +174,18 @@ class DatabaseSeeder extends Seeder
                     'badge' => 'CONTATO',
                     'title' => 'Fale Conosco',
                     'description' => 'Tire suas dúvidas ou solicite uma visita técnica.',
-                    'show_breadcrumbs' => true
+                    'show_breadcrumbs' => true,
                 ]],
                 ['type' => 'contact_form', 'data' => [
                     'title' => 'Envie sua Mensagem',
                     'description' => 'Preencha o formulário abaixo e retornaremos o mais breve possível.',
-                    'email_to' => ''
+                    'email_to' => '',
                 ]],
                 ['type' => 'map', 'data' => [
                     'title' => 'Nossa Localização',
-                    'iframe_code' => ''
+                    'iframe_code' => '',
                 ]],
-            ]
+            ],
         ]);
     }
 }
